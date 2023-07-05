@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/game.css">
+    <title>Document</title>
+</head>
+<body>
+    <div id="wrapper">
+        <div id="action_menu" class="absolute">
+            <ul>
+                <li class="action" data-action="move">Move</li>
+                <li class="action" data-action="attack">Attack</li>
+                <li class="action" data-action="skill">Skill</li>
+                <li class="action" data-action="item">Item</li>
+                <li class="action" data-action="status">Status</li>
+                <li class="action" data-action="stay">Stay</li>
+            </ul>
+        </div>
+
+        <div id="characterCaption" class="absolute">
+            <h5 style="margin: 0;">Player</h5>
+            <ul>
+                <li class="hp">
+                    <span class="gauge"></span>
+                </li>
+                <li class="mp">
+                    <span class="gauge"></span>
+                </li>
+            </ul>
+        </div>
+        <canvas id="game"></canvas>
+    </div>
+
+    <script type="module" src="/js/game.js"></script>
+</body>
+</html>
