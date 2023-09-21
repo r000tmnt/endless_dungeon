@@ -10,6 +10,8 @@ export default class Character {
         this.int = int
         this.spd = spd
         this.ap = 3
+        this.maxAp = 3
+        this.stay = false
         this.status = 'healthy'
     }
 

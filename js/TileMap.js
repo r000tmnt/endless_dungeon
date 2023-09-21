@@ -5,7 +5,7 @@ export default class TileMap {
         this.tileSize = tileSize;
         this.wall = this.#image("wall.png")
         this.player = this.#image("fighter.png")
-        this.enimy = this.#image("zombie.png")
+        this.enemy = this.#image("zombie.png")
     }
 
     #image(fileName){
@@ -65,7 +65,7 @@ export default class TileMap {
 
     #clearCanvas(canvas, ctx){
         ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillRect(0, 0, canvas.width, canvas.height); // x, y, width, height
     }
 
     #drawMap(ctx, row){
@@ -83,7 +83,7 @@ export default class TileMap {
                     img = this.player;
                 break;
                 case 3:
-                    img = this.enimy;
+                    img = this.enemy;
                 break;
                 default:
                 break;
@@ -106,13 +106,13 @@ export default class TileMap {
 
             for(let block = 0; block < walkableSpace[layer].length; block++){
                 if(walkableSpace[layer][block].length){
-                    const row = walkableSpace[layer][block][1]
-                    const col = walkableSpace[layer][block][0]
+                    const row = walkableSpace[layer][block][0]
+                    const col = walkableSpace[layer][block][1]
                     if(this.map[row][col] === 0){
                         ctx.fillStyle = 'green';
-                        ctx.fillRect(
-                            walkableSpace[layer][block][0] * this.tileSize,
-                            walkableSpace[layer][block][1] * this.tileSize,
+                        ctx.fillRect( // x, y, width, height
+                            col * this.tileSize,
+                            row * this.tileSize,
                             this.tileSize,
                             this.tileSize
                         );                        
