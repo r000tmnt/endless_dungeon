@@ -1,0 +1,7 @@
+[
+    {
+        "id": "mob_zombie_1",
+        "name": "Zombie",
+        "prefer_attributes": [ "str" ]
+    }
+]

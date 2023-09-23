@@ -1,0 +1,16 @@
+[
+    {
+        "id": "class_fighter_1",
+        "name": "Fighter",
+        "prefer_attributes": [ "str", "def" ],
+        "base_attribute": {
+            "hp": 15, 
+            "mp": 10, 
+            "str": 10, 
+            "def": 7, 
+            "int": 5,
+            "spd": 5, 
+            "ap": 3
+        }
+    }
+]

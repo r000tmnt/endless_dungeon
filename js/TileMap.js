@@ -1,16 +1,18 @@
+import Character from "./Character.js";
+
 // class - 物件創建的模板
 export default class TileMap {
     //付值給實體的物件
     constructor(tileSize){
         this.tileSize = tileSize;
         this.wall = this.#image("wall.png")
-        this.player = this.#image("fighter.png")
-        this.enemy = this.#image("zombie.png")
+        // this.player = this.#image("fighter.png")
+        // this.enemy = this.#image("zombie.png")
     }
 
     #image(fileName){
         const img = new Image();
-        img.src = `images/${fileName}`;
+        img.src = `assets/images/env/${fileName}`;
         return img
     }
 
@@ -47,14 +49,14 @@ export default class TileMap {
     }
 
     //負責渲染於畫面的函式
-    draw(canvas, ctx, walkableSpace, characterPosition){
+    draw(canvas, ctx, walkableSpace){
         // console.log(walkableSpace)
         this.#setCanvasSize(canvas);
         this.#clearCanvas(canvas, ctx)
         this.#drawMap(ctx, 0);
 
         if(walkableSpace !== undefined && walkableSpace.length){
-            this.#showMovableSpace(ctx, walkableSpace, characterPosition)
+            this.#showMovableSpace(ctx, walkableSpace)
         }
     }
 
@@ -80,10 +82,12 @@ export default class TileMap {
                     img = this.wall;
                 break;
                 case 2:
-                    img = this.player;
+                    // img = this.player;
+                    
                 break;
                 case 3:
-                    img = this.enemy;
+                    // img = this.enemy;
+                    this.map[currentRow][column] = 0
                 break;
                 default:
                 break;
@@ -98,9 +102,39 @@ export default class TileMap {
         }
     }
 
+    // Get the player position on the canvas
+    getPlayer(velocity){
+
+        for(let row=0; row < this.map.length; row++){
+            for(let column = 0; column < this.map[row].length; column++){
+                const tile = this.map[row][column];
+
+                if(tile === 2){
+                    this.map[row][column] = 0
+
+                    const attributes = {
+                        name: 'Player', 
+                        class: 'class_fighter_1',
+                    }
+                    
+                    // Create a player character
+                    // x, y, tile size, velocity, attributes, tile map
+                    return new Character(
+                        column * this.tileSize, 
+                        row * this.tileSize, 
+                        this.tileSize, 
+                        velocity,
+                        attributes, 
+                        this.map
+                    )
+                }
+            }            
+        }
+
+    }
+
     // show a the walkable space
-    #showMovableSpace(ctx, walkableSpace, characterPosition){
-        // console.log(characterPosition)
+    #showMovableSpace(ctx, walkableSpace){
 
         for(let layer = 0; layer < walkableSpace.length; layer++){
 

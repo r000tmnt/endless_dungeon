@@ -21,6 +21,7 @@ var turn = 1
 // 1 - enemy
 var turnType = 0
 
+
 // row === y
 // col === x
 var playerPosition = {
@@ -46,13 +47,18 @@ var playerWalkableSpace = []
 // #endregion
 
 // #region Game characters
-// player
-const player = new Character('Player', 15, 10, 10, 7, 5, 5, 3)
-player.setSkills('slash')
+// Character movement speed
+const velocity = 1;
 
+// player
+const player = tileMap.getPlayer(velocity)
+console.log('player :>>>', player)
+// player.setSkills('slash')
+
+// Draw the character
 // enemy
-const enemy = new Character('zombie', 10, 3, 7, 5, 2, 2, 1, 1, 1)
-enemy.setSkills('poison')
+// const enemy = new Character('zombie', 10, 3, 7, 5, 2, 2, 1, 1, 1)
+// enemy.setSkills('poison')
 // #endregion
 
 // #region Game logic functions
@@ -75,10 +81,10 @@ canvas.addEventListener('mousedown', function(event){
     console.log('column :>>>', col)
 
     // if this tile is player
-    if(tileMap.map[row][col] === 2){
+    if((row * tileSize) === player.y && (col * tileSize) === player.x){
         console.log('I am player')
 
-        // Keep tracking where the player is on the tile map
+        // Keep tracking player position
         playerPosition.row = row
         playerPosition.col = col
 
@@ -112,9 +118,15 @@ canvas.addEventListener('mousedown', function(event){
         // If true, swap the tileMap type number
         if(isWalkable == true){
             tileMap.map[playerPosition.row][playerPosition.col] = 0
-            tileMap.map[row][col] = 2
-            playerPosition.row = row
-            playerPosition.col = col
+            // tileMap.map[row][col] = 2
+            // playerPosition.row = row
+            // playerPosition.col = col
+
+            // player.x = col * tileSize
+            // player.y = row * tileSize
+
+            player.setDestination({row, col})
+            player.setWalkableSpace(playerWalkableSpace)
         }
         
         // Clear the array
@@ -417,20 +429,20 @@ const enemyAI = async() => {
 
     } 
 
-    
+    // Init the function
     await findXandY()
    
 }
 
 //  Initialize the game
 const gameLoop = () => {
-    // console.log(playerPosition)
+    tileMap.draw(canvas, ctx, playerWalkableSpace)
 
-    tileMap.draw(canvas, ctx, playerWalkableSpace, (turnType)? enemyPosition : playerPosition)
-
-    //set actionMenu wrapper width and height
-    actionMenu.style.width = canvas.width + 'px';
-    actionMenu.style.height = canvas.height + 'px';
+    if(player !== undefined) {
+        player.draw(ctx)
+    }else{
+        console.log('player undefined')
+    }
 }
 
 // Move to the next phase
@@ -461,6 +473,10 @@ const actionMenuOptions = actionMenu.getElementsByTagName('li')
 
 const characterCaption = document.getElementById('characterCaption')
 const characterCaptionAttributes = ['hp', 'mp']
+
+//set actionMenu wrapper width and height
+actionMenu.style.width = canvas.width + 'px';
+actionMenu.style.height = canvas.height + 'px';
 
 // action menu child click event
 for(let i=0; i < actionMenuOptions.length; i++){
