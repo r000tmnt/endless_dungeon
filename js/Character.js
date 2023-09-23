@@ -27,6 +27,7 @@ export default class Character {
         this.destination = destination
     }
 
+    // Moving the character
     #move(destination, walkableSpace){
         // col ====x, row === y
         const { row, col } = destination
@@ -55,15 +56,18 @@ export default class Character {
         const currentRow = this.y / this.tileSize
         const currentCol = this.x / this.tileSize
 
-        let movementInterval
-
         // If the player is at the deeper row
         if(currentRow > row){
             if(walkable((currentRow - 1), currentCol)){
                 const destination_y = (currentRow - 1) * this.tileSize
 
-                while ( this.y !== destination_y )
-                    this.y -= this.velocity
+                let movementInterval = setInterval(() => {
+                    if(this.y !== destination_y){
+                        this.y -= this.velocity
+                    }else{
+                        clearInterval(movementInterval)
+                    }
+                }, 50)
             }
         }
 
@@ -72,8 +76,14 @@ export default class Character {
             if(walkable((currentRow + 1), currentCol)){
                 const destination_y = (currentRow + 1) * this.tileSize
 
-                while ( this.y !== destination_y )
-                    this.y += this.velocity
+                let movementInterval = setInterval(() => {
+                    if(this.y !== destination_y){
+                        this.y += this.velocity
+                        console.log()
+                    }else{
+                        clearInterval(movementInterval)
+                    }
+                }, 50)
             }
         }
 
@@ -82,8 +92,13 @@ export default class Character {
             if(walkable(currentRow , (currentCol - 1))){
                 const destination_x = (currentCol - 1) * this.tileSize
 
-                while ( this.x !== destination_x )
-                    this.x -= this.velocity
+                let movementInterval = setInterval(() => {
+                    if(this.x !== destination_x){
+                        this.x -= this.velocity
+                    }else{
+                        clearInterval(movementInterval)
+                    }
+                }, 50)
             }
         }
         
@@ -92,9 +107,20 @@ export default class Character {
             if(walkable(currentRow , (currentCol + 1))){
                 const destination_x = (currentCol + 1) * this.tileSize
 
-                while ( this.x !== destination_x )
-                    this.x += this.velocity
+                let movementInterval = setInterval(() => {
+                    if(this.x !== destination_x){
+                        this.x += this.velocity
+                    }else{
+                        clearInterval(movementInterval)
+                    }
+                }, 50)
             }
+        }
+
+        if(this.y === (row * this.tileSize) && this.x === (col * this.tileSize))
+        {
+            this.walkableSpace.splice(0)
+            this.destination = null
         }
         
     }

@@ -154,18 +154,21 @@ canvas.addEventListener('mousemove', function(event){
     // if this tile is player
     if(tileMap.map[row][col] === 2){
 
-        // Fill the element with a portion of the character info
-        characterCaption.firstElementChild.innerHTML = player.name
-        const gauges = characterCaption.getElementsByTagName('li')
+        // If the player is not moving
+        if(!player.destination){
+            // Fill the element with a portion of the character info
+            characterCaption.firstElementChild.innerHTML = player.name
+            const gauges = characterCaption.getElementsByTagName('li')
 
-        // calculation the percentage of the attribute
-        for(let i=0; i < gauges.length; i++){
-            // console.log(gauges[i].firstElementChild)
-            gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], player) + '%';
+            // calculation the percentage of the attribute
+            for(let i=0; i < gauges.length; i++){
+                // console.log(gauges[i].firstElementChild)
+                gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], player) + '%';
+            }
+
+            // Display the element
+            characterCaption['style']['visibility'] = 'visible'            
         }
-
-        // Display the element
-        characterCaption['style']['visibility'] = 'visible'
 
     }else 
     
