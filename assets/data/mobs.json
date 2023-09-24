@@ -14,7 +14,8 @@
             "spd": 2, 
             "ap": 2,
             "maxAp": 2,
-            "moveSpeed": 1
+            "moveSpeed": 1,
+            "sight": 3
         },
         "base_skills": []
     }
