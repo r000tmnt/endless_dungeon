@@ -124,6 +124,39 @@ export default class TileMap {
                         row * this.tileSize, 
                         this.tileSize, 
                         velocity,
+                        tile,
+                        attributes, 
+                        this.map
+                    )
+                }
+            }            
+        }
+
+    }
+    
+    // Get the enemy position on the canvas
+    getEnemy(velocity){
+
+        for(let row=0; row < this.map.length; row++){
+            for(let column = 0; column < this.map[row].length; column++){
+                const tile = this.map[row][column];
+
+                if(tile === 3){
+                    this.map[row][column] = 0
+
+                    const attributes = {
+                        name: 'Zombie', 
+                        class: 'mob_zombie_1',
+                    }
+                    
+                    // Create a player character
+                    // x, y, tile size, velocity, attributes, tile map
+                    return new Character(
+                        column * this.tileSize, 
+                        row * this.tileSize, 
+                        this.tileSize, 
+                        velocity,
+                        tile,
                         attributes, 
                         this.map
                     )

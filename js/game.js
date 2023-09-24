@@ -21,7 +21,6 @@ var turn = 1
 // 1 - enemy
 var turnType = 0
 
-
 // row === y
 // col === x
 var playerPosition = {
@@ -50,14 +49,13 @@ var playerWalkableSpace = []
 // Character movement speed
 const velocity = 1;
 
-// player
+// Create player object
 const player = tileMap.getPlayer(velocity)
 console.log('player :>>>', player)
 // player.setSkills('slash')
 
-// Draw the character
-// enemy
-// const enemy = new Character('zombie', 10, 3, 7, 5, 2, 2, 1, 1, 1)
+// Create enemy object
+const enemy = tileMap.getEnemy(velocity)
 // enemy.setSkills('poison')
 // #endregion
 
@@ -84,16 +82,17 @@ canvas.addEventListener('mousedown', function(event){
     if((row * tileSize) === player.y && (col * tileSize) === player.x){
         console.log('I am player')
 
-        // Keep tracking player position
-        playerPosition.row = row
-        playerPosition.col = col
 
-        // If the player is out of action point
-        if(player.ap === 0){
-            // Do something else...
-        }else{
-            // Open UI element
-            actionMenu['style']['margin-left'] = 0
+        // If the player is not moving
+        if(!player.destination){
+
+            // If the player is out of action point
+            if(player.ap === 0){
+                // Do something else...
+            }else{
+                // Open UI element
+                actionMenu['style']['margin-left'] = 0
+            }            
         }
     }
 
@@ -118,12 +117,10 @@ canvas.addEventListener('mousedown', function(event){
         // If true, swap the tileMap type number
         if(isWalkable == true){
             tileMap.map[playerPosition.row][playerPosition.col] = 0
-            // tileMap.map[row][col] = 2
-            // playerPosition.row = row
-            // playerPosition.col = col
-
-            // player.x = col * tileSize
-            // player.y = row * tileSize
+            
+            // Keep tracking player position
+            playerPosition.row = row
+            playerPosition.col = col
 
             player.setDestination({row, col})
             player.setWalkableSpace(playerWalkableSpace)
@@ -211,7 +208,7 @@ const getPercentage = (type, character) => {
 const getWalkableSpace = async (characterPosition) => {
 
     // The max length of blocks in a straight line include the character
-    const diameter = (defaultWalkableRange * 2) + 1
+    const diameter = (turnType === 0)? (player.moveSpeed * 2) + 1: (defaultWalkableRange * 2) + 1
     // 1
     // 3
     // 5
@@ -445,6 +442,12 @@ const gameLoop = () => {
         player.draw(ctx)
     }else{
         console.log('player undefined')
+    }
+
+    if(enemy !== undefined){
+        enemy.draw(ctx)
+    }else{
+        console.log('enemy not found')
     }
 }
 

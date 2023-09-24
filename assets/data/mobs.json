@@ -2,6 +2,17 @@
     {
         "id": "mob_zombie_1",
         "name": "Zombie",
-        "prefer_attributes": [ "str" ]
+        "prefer_attributes": [ "str" ],
+        "base_attribute": {
+            "hp": 10, 
+            "mp": 3, 
+            "str": 7, 
+            "def": 5, 
+            "int": 2,
+            "spd": 2, 
+            "ap": 2,
+            "moveSpeed": 1
+        },
+        "base_skills": []
     }
 ]

@@ -10,7 +10,9 @@
             "def": 7, 
             "int": 5,
             "spd": 5, 
-            "ap": 3
-        }
+            "ap": 3,
+            "moveSpeed": 3
+        },
+        "base_skills": []
     }
 ]
