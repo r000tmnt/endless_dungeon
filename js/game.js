@@ -446,7 +446,7 @@ const enemyAI = async() => {
                 }else{
                     console.log('enemyAI can not find the player')
                     // Go to the random selected position
-                    enemy.setDestination({newRow, newCol})
+                    enemy.setDestination({ row: newRow, col: newCol })
                     enemy.setWalkableSpace(playerWalkableSpace)
 
                     let animationSignalReceiver = setInterval(() => {
