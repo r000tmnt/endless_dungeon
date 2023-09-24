@@ -6,11 +6,14 @@
         "base_attribute": {
             "hp": 15, 
             "mp": 10, 
+            "maxHp": 15, 
+            "maxMp": 10, 
             "str": 10, 
             "def": 7, 
             "int": 5,
             "spd": 5, 
             "ap": 3,
+            "maxAp": 3,
             "moveSpeed": 3
         },
         "base_skills": []

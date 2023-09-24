@@ -5,12 +5,15 @@
         "prefer_attributes": [ "str" ],
         "base_attribute": {
             "hp": 10, 
-            "mp": 3, 
+            "mp": 3,
+            "maxHp": 10, 
+            "maxMp": 3,  
             "str": 7, 
             "def": 5, 
             "int": 2,
             "spd": 2, 
             "ap": 2,
+            "maxAp": 2,
             "moveSpeed": 1
         },
         "base_skills": []

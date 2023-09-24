@@ -4,11 +4,46 @@ import TileMap from './TileMap.js';
 // #region Canvas element
 const canvas = document.getElementById('game');
 const ctx = canvas.getContext("2d");
-const canvasPosition = canvas.getBoundingClientRect();
+
+let canvasPosition
+let deviceWidth = window.innerWidth
+let deviceHeight = window.innerHeight
+
+const resize = () => {
+    console.log('resize')
+    // aspect ratio
+    const aspectRatio = 9 / 16
+
+    const deviceWidthToDeviceHeight = deviceWidth / deviceHeight
+
+    deviceWidth = window.innerWidth
+    deviceHeight = window.innerHeight
+
+    canvas.style.width = window.innerWidth
+    canvas.style.height = window.innerHeight
+
+    // Adjust canvas size
+    if(deviceWidthToDeviceHeight > aspectRatio){
+        // If window width is wider than the aspect ratio
+        deviceWidth = Math.floor(deviceHeight * aspectRatio)
+        canvas.style.width = deviceWidth + 'px'
+        canvas.style.height = deviceHeight + 'px'
+    }else{
+        // If window height is taller than aspect ratio
+        deviceHeight = Math.floor(deviceWidth / aspectRatio)
+        canvas.style.width = deviceWidth + 'px'
+        canvas.style.height = deviceHeight + 'px'
+    }
+
+    // Get canvas position after resize
+    canvasPosition = canvas.getBoundingClientRect();
+}
+
 // #endregion
 
 // #region Tile map setup
-const tileSize = 32;
+resize()
+const tileSize = Math.floor(deviceWidth / 9);
 
 const tileMap = new TileMap(tileSize)
 console.log(tileMap)
@@ -35,13 +70,18 @@ var enemyPosition = {
     col: 0
 }
 
-
-var defaultWalkableRange = 3
-
 /** An array to store a range of walkable position
  * [ { row, col }, { row, col }, { row, col }...]
  */
 var playerWalkableSpace = []
+
+// If the character is moving
+var animationInit = false
+
+// A exported function for other object to talk to the game engine
+export const animationSignal = (signal) => {
+    animationInit = signal
+}
 
 // #endregion
 
@@ -56,18 +96,19 @@ console.log('player :>>>', player)
 
 // Create enemy object
 const enemy = tileMap.getEnemy(velocity)
+console.log('enemy :>>>', enemy)
 // enemy.setSkills('poison')
 // #endregion
 
 // #region Game logic functions
 // Get the position on the tileMap
 const getPosition = (event) => {
-    // console.log(event)
-    const positionY = event.clientY - canvasPosition.top
-    const positionX = event.clientX - canvasPosition.left
+    // console.log("tileSize :>>>", tileSize)
+    let positionY = event.clientY - canvasPosition.top
+    let positionX = event.clientX - canvasPosition.left
 
-    const row = parseInt( positionY / tileSize)
-    const col = parseInt( positionX / tileSize)
+    let row = parseInt( positionY / tileSize)
+    let col = parseInt( positionX / tileSize)
 
     return { row, col }
 }
@@ -75,25 +116,55 @@ const getPosition = (event) => {
 // get mouse position and divide by tile size to see where the row and the column it clicked
 canvas.addEventListener('mousedown', function(event){
     const { row, col } = getPosition(event)
-    console.log('row :>>>', row)
-    console.log('column :>>>', col)
+    // console.log('row :>>>', row)
+    // console.log('column :>>>', col)
 
     // if this tile is player
     if((row * tileSize) === player.y && (col * tileSize) === player.x){
         console.log('I am player')
 
+        // Keep tracking player position
+        playerPosition.row = row
+        playerPosition.col = col
 
         // If the player is not moving
         if(!player.destination){
 
-            // If the player is out of action point
-            if(player.ap === 0){
-                // Do something else...
-            }else{
-                // Open UI element
-                actionMenu['style']['margin-left'] = 0
-            }            
+            // Fill the element with a portion of the character info
+            characterCaption.firstElementChild.innerHTML = player.name
+            const gauges = characterCaption.getElementsByTagName('li')
+
+            // calculation the percentage of the attribute
+            for(let i=0; i < gauges.length; i++){
+                // console.log(gauges[i].firstElementChild)
+                gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], player) + '%';
+            }
+
+            // Display the element
+            characterCaption['style']['visibility'] = 'visible' 
+
+            // Open UI element
+            actionMenu['style']['margin-left'] = 0          
         }
+    }else
+
+    // if this tile is enemy
+    if((row * tileSize) === enemy.y && (col * tileSize) === enemy.x){
+        // Fill the element with a portion of the character info
+        characterCaption.firstElementChild.innerHTML = enemy.name
+        const gauges = characterCaption.getElementsByTagName('li')
+
+        // calculation the percentage of the attribute
+        for(let i=0; i < gauges.length; i++){
+            // console.log(gauges[i].firstElementChild)
+            gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], enemy) + '%';
+        }
+
+        // Display the element
+        characterCaption['style']['visibility'] = 'visible' 
+    }else{
+        // Hide the element
+        characterCaption['style']['visibility'] = 'hidden' 
     }
 
     // If there are walkable blocks in the array
@@ -116,75 +187,24 @@ canvas.addEventListener('mousedown', function(event){
 
         // If true, swap the tileMap type number
         if(isWalkable == true){
-            tileMap.map[playerPosition.row][playerPosition.col] = 0
-            
             // Keep tracking player position
             playerPosition.row = row
             playerPosition.col = col
 
             player.setDestination({row, col})
             player.setWalkableSpace(playerWalkableSpace)
+
+            // Hide the element
+            characterCaption['style']['visibility'] = 'hidden'
+            
+            let animationSignalReceiver = setInterval(async() => {
+                if(animationInit) {
+                    clearInterval(animationSignalReceiver)
+                    watchAnimation(2)
+                }
+            }, 100)
+            
         }
-        
-        // Clear the array
-        playerWalkableSpace.splice(0)
-        // Spend an action point
-        player.ap = player.ap - 1
-
-        // If the player is ran out of action point, move to the enemy phase
-        if(player.ap === 0) nextTurn()
-    }
-
-    if(tileMap.map[row][col] === 3){
-        console.log('I am an enemy')
-    }
-})
-
-
-// get mouse position and divide by tile size to see where the row and the column it moved
-canvas.addEventListener('mousemove', function(event){
-    const { row, col } = getPosition(event)
-
-    // console.log('row :>>>', row)
-    // console.log('column :>>>', col)
-
-    // if this tile is player
-    if(tileMap.map[row][col] === 2){
-
-        // If the player is not moving
-        if(!player.destination){
-            // Fill the element with a portion of the character info
-            characterCaption.firstElementChild.innerHTML = player.name
-            const gauges = characterCaption.getElementsByTagName('li')
-
-            // calculation the percentage of the attribute
-            for(let i=0; i < gauges.length; i++){
-                // console.log(gauges[i].firstElementChild)
-                gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], player) + '%';
-            }
-
-            // Display the element
-            characterCaption['style']['visibility'] = 'visible'            
-        }
-
-    }else 
-    
-    // Same things go for the enemy
-    if(tileMap.map[row][col] === 3){
-        // console.log('I am enemy')
-
-        characterCaption.firstElementChild.innerHTML = enemy.name
-        const gauges = characterCaption.getElementsByTagName('li')
-
-        for(let i=0; i < gauges.length; i++){
-            // console.log(gauges[i].children)
-            gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], enemy) + '%';
-        }
-
-        characterCaption['style']['visibility'] = 'visible'        
-    }
-    else{
-        characterCaption['style']['visibility'] = 'hidden'
     }
 })
 
@@ -194,11 +214,11 @@ const getPercentage = (type, character) => {
     let percentage = 0
 
     if(type === 'hp'){
-        each =  character.maxHp / 100
-        percentage = Math.round( Math.floor(character.hp / each) )
+        each =  character.attributes.maxHp / 100
+        percentage = Math.round( Math.floor(character.attributes.hp / each) )
     }else{
-        each = character.maxMp / 100
-        percentage = Math.round( Math.floor(character.mp / each) )
+        each = character.attributes.maxMp / 100
+        percentage = Math.round( Math.floor(character.attributes.mp / each) )
     }
 
     return percentage
@@ -206,9 +226,10 @@ const getPercentage = (type, character) => {
 
 // Define what tile is walkable
 const getWalkableSpace = async (characterPosition) => {
+    const character = (turnType === 0)? player: enemy
 
     // The max length of blocks in a straight line include the character
-    const diameter = (turnType === 0)? (player.moveSpeed * 2) + 1: (defaultWalkableRange * 2) + 1
+    const diameter = (character.attributes.moveSpeed * 2)+ 1
     // 1
     // 3
     // 5
@@ -240,7 +261,7 @@ const getWalkableSpace = async (characterPosition) => {
 
         for(let block = 1; block <= playerWalkableSpace[i].length; block++){
 
-            const rowPosition = (( defaultWalkableRange - i ) >= 0? defaultWalkableRange - i : i - defaultWalkableRange) 
+            const rowPosition = (( character.attributes.moveSpeed - i ) >= 0? character.attributes.moveSpeed - i : i - character.attributes.moveSpeed) 
             let colPosition =  (playerWalkableSpace[i].length - 1) / 2
 
             // console.log(colPosition)
@@ -296,39 +317,16 @@ const getWalkableSpace = async (characterPosition) => {
                     
                 }
             }
-
-            // console.log(playerWalkableSpace)
         } 
     }
-
-
-    // remove empty tile
-    // for(let i = 0; i < playerWalkableSpace.length; i++){
-
-    //     if(!playerWalkableSpace[i].length){
-    //         playerWalkableSpace.splice(i, 1)
-    //     }
-
-    //     for(let block = 1; block <= playerWalkableSpace[i].length; block++){
-    //         if(!playerWalkableSpace[i][block - 1].length){
-    //             playerWalkableSpace[i].splice((block - 1), 1)
-    //         }
-    //     }
-    // }
+    console.log("playerWalkableSpace :>>>", playerWalkableSpace)
 }
 
 // An AI for enemy movement decision
 const enemyAI = async() => {
-    // find enemy position
-    for(let i = 0; i < tileMap.map.length; i++){
-
-        for(let block = 1; block <= tileMap.map[i].length; block++){
-            if(tileMap.map[i][block - 1] === 3){
-                enemyPosition.row = i
-                enemyPosition.col = block - 1
-            }
-        }
-    }
+    // Get enemy position
+    enemyPosition.row = parseInt( enemy.y / tileSize)
+    enemyPosition.col = parseInt( enemy.x / tileSize)
 
     // get walkable space
     await getWalkableSpace(enemyPosition)
@@ -356,15 +354,23 @@ const enemyAI = async() => {
         const col = await toCol()
         
         if(row !== undefined && col !== undefined){
+
+            // console.log('player position :>>>', playerPosition)
+            console.log('get walkable row :>>>', row)
+            console.log('get walkable col :>>>', col)
+
             const newRow = playerWalkableSpace[row][col][0]
             const newCol = playerWalkableSpace[row][col][1]
+
+            console.log('get newRow :>>>', newRow)
+            console.log('get newCol :>>>', newCol)
 
             // If it is a walkable block
             let isWalkable = tileMap.map[newRow][newCol] === 0
             let playerDetect = false
 
             if(isWalkable){
-
+                console.log('enemyAI finding player')
                 // Check if the player is in the range
                 for(let i = 0; i < playerWalkableSpace.length; i++){
 
@@ -380,46 +386,87 @@ const enemyAI = async() => {
 
                 // if player is in the range
                 if(playerDetect){
-                    // If the player is at a deeper row
-                    if(playerPosition.row < enemyPosition.row){
+                    console.log('enemyAI found player')
+                    
+                    const reachableDirections = []
 
-                        // move toward player if the block is a walkable one
-                        if(tileMap.map[playerPosition.row - 1][playerPosition.col] !== 1){
-                            // Rewrite the tile(block) as a ground
-                            tileMap.map[enemyPosition.row][enemyPosition.col] = 0
-                            // Get closer to the player
-                            tileMap.map[playerPosition.row - 1][playerPosition.col] = 3
-                            
-                            // Rewrite the position
-                            enemyPosition.row = newRow
-                            enemyPosition.col = newCol
-                
-                            console.log(tileMap.map)
-                            console.log(enemyPosition)                             
+                    // Get reachable direction
+                    for(let i = 0; i < playerWalkableSpace.length; i++){
+    
+                        for(let block = 0; block <= playerWalkableSpace[i].length; block++){
+
+                            const currentRow = playerWalkableSpace[i][block][0]
+                            const currentCol = playerWalkableSpace[i][block][1]
+
+                            // Top
+                            if(currentRow === (playerPosition.row - 1) && currentCol === playerPosition.col){
+                                reachableDirections.push([currentRow, currentCol])
+                            }
+
+                            // Right
+                            if(i === playerPosition.row && currentCol === (playerPosition.col + 1)){
+                                reachableDirections.push([currentRow, currentCol])
+                            }
+
+                            // Down
+                            if(i === (playerPosition.row + 1) && currentCol === playerPosition.col){
+                                reachableDirections.push([currentRow, currentCol])
+                            }
+
+                            // Left
+                            if(i === playerPosition.row  && currentCol === (playerPosition.col - 1)){
+                                reachableDirections.push([currentRow, currentCol])
+                            }
                         }
-                        
-                        // TODO - More direction checking
                     }
-                                      
+
+                    // Chose a block randomly
+                    const decideWhereToGo = async() => {
+                        const targetBlock = Math.floor(Math.random() * reachableDirections.length)
+
+                        if(reachableDirections[targetBlock] === undefined){
+                            await decideWhereToGo()
+                        }else{
+                            return targetBlock
+                        }
+                    }
+
+                    const finalDecision = await decideWhereToGo()
+
+                    enemy.setDestination({row: reachableDirections[finalDecision][0], col: reachableDirections[finalDecision][1]})
+                    enemy.setWalkableSpace(playerWalkableSpace)
+
+                    let animationSignalReceiver = setInterval(() => {
+                        if(animationInit) {
+                            console.log('enemyAI go towards to player')
+                            clearInterval(animationSignalReceiver)
+                            watchAnimation(3)
+                        }
+                    }, 100)               
                 }else{
+                    console.log('enemyAI can not find the player')
                     // Go to the random selected position
-                    // Rewrite the tile(block) as a ground
-                    tileMap.map[enemyPosition.row][enemyPosition.col] = 0
-                    tileMap.map[newRow][newCol] = 3
+                    enemy.setDestination({newRow, newCol})
+                    enemy.setWalkableSpace(playerWalkableSpace)
+
+                    let animationSignalReceiver = setInterval(() => {
+                        if(animationInit) {
+                            console.log('enemyAI start walking')
+                            console.log('enemyAI wondering')
+                            clearInterval(animationSignalReceiver)
+                            watchAnimation(3)
+                        }else{
+                            console.log('enemyAI waiting')
+                        }
+                    }, 100)
+
                     // Rewrite the position
                     enemyPosition.row = newRow
                     enemyPosition.col = newCol
         
-                    console.log(tileMap.map)
-                    console.log(enemyPosition)                    
+                    // console.log(tileMap.map)
+                    // console.log(enemyPosition)                    
                 }
-
-                // Clear the array
-                playerWalkableSpace.splice(0)
-                enemy.wait = true
-    
-                // Move to player phase
-                if(enemy.wait === true) nextTurn()   
             }else{
                 // keep looking
                 await findXandY()
@@ -432,6 +479,42 @@ const enemyAI = async() => {
     // Init the function
     await findXandY()
    
+}
+
+// Waiting for the animation to end 
+const watchAnimation = (type) => {
+    let animationWatcher = setInterval(async() => {
+        if(!animationInit) {
+            clearInterval(animationWatcher)
+            await characterAnimationPhaseEnded(type)
+        }
+    })
+}
+
+// Thing to do after animation ended
+const characterAnimationPhaseEnded = async(type) => {
+    // Clear the array
+    playerWalkableSpace.splice(0)
+
+    if(type === 2){
+        // Spend an action point
+        player.attributes.ap -= 1
+
+        // If the player is ran out of action point, move to the enemy phase
+        if(player.attributes.ap === 0) nextTurn()
+    }else{
+        enemy.attributes.ap -= 1 
+            
+        // Move to the next phase
+        if(enemy.attributes.ap === 0){
+            enemy.wait = true
+            nextTurn()
+        }else{
+            // keep looking
+            await enemyAI()
+            console.log('enemyAI keep looking')
+        }         
+    }
 }
 
 //  Initialize the game
@@ -454,38 +537,43 @@ const gameLoop = () => {
 // Move to the next phase
 const nextTurn = () => {
     if(turnType === 0){
+        console.log('enemy phase')
         enemy.wait = false
         turnType = 1
+        enemy.attributes.ap = enemy.attributes.maxAp
         enemyAI() 
     }else{
+        console.log('player phase')
         player.wait = false
         turnType = 0
-        player.ap = player.maxAp
+        player.attributes.ap = player.attributes.maxAp
         turn += 1
     }
 }
 // #endregion
 
 // #region UI element variables and functions
-// Hide UI elements
-const cancelActionMenu = () => {
-    actionMenu['style']['margin-left'] = -100 + '%'
-}
-
 // Get UI element and bind a click event
 const actionMenu = document.getElementById('action_menu');
-actionMenu.addEventListener('click', cancelActionMenu)
+// Hide UI elements
+actionMenu.addEventListener('click', () => {
+    actionMenu['style']['margin-left'] = -100 + '%'
+})
+
+// const actionMenuHolder = actionMenu.getElementByIdy('action_list')
 const actionMenuOptions = actionMenu.getElementsByTagName('li')
 
 const characterCaption = document.getElementById('characterCaption')
 const characterCaptionAttributes = ['hp', 'mp']
 
 //set actionMenu wrapper width and height
-actionMenu.style.width = canvas.width + 'px';
-actionMenu.style.height = canvas.height + 'px';
+actionMenu.style.width = Math.floor( 40 * Math.floor(deviceWidth / 100)) + 'px';
+// actionMenu.style.height = canvas.style.height + 'px';
 
 // action menu child click event
 for(let i=0; i < actionMenuOptions.length; i++){
+
+    actionMenuOptions[i].style['font-size'] = Math.floor( 10 * Math.floor(deviceWidth / 100)) + 'px';
 
     switch(actionMenuOptions[i].dataset.action){
         case 'move':
@@ -497,6 +585,10 @@ for(let i=0; i < actionMenuOptions.length; i++){
 }
 // #endregion
 
+
+// resize()
+window.addEventListener('resize', resize, false);
+window.addEventListener('orientationchange', resize, false);
 
 // 30 fps
 setInterval(gameLoop, 1000 / 30)

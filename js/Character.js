@@ -1,3 +1,5 @@
+import { animationSignal } from './game.js'
+
 export default class Character {
     /**
      * Character object constructor
@@ -54,100 +56,116 @@ export default class Character {
      * @param {array} walkableSpace - A multi dimension array which represent all the blocks the character can reached 
      */
     #move(destination, walkableSpace){
+        console.log('destination :>>>', destination)
         // col ====x, row === y
         const { row, col } = destination
-
-        const walkable = (row, col) => {
-            let walkableIndex = -1
-
-            for(let layer=0; layer < walkableSpace.length; layer++){
-
-                if(walkableIndex >= 0) break
-
-                for(let block=0; block < walkableSpace[layer].length; block++){
-                    const block_y = walkableSpace[layer][block][0]
-                    const block_x = walkableSpace[layer][block][1]
-
-                    if(block_y === row && block_x === col){
-                        walkableIndex = block
-                        break
-                    }
-                }
-            }
-
-            return walkableIndex >= 0
-        }
 
         const currentRow = this.y / this.tileSize
         const currentCol = this.x / this.tileSize
 
-        // If the player is at the deeper row
-        if(currentRow > row){
-            if(walkable((currentRow - 1), currentCol)){
-                const destination_y = (currentRow - 1) * this.tileSize
-
-                let movementInterval = setInterval(() => {
-                    if(this.y !== destination_y){
-                        this.y -= this.velocity
-                    }else{
-                        clearInterval(movementInterval)
-                    }
-                }, 50)
-            }
-        }
-
-        // If the player is at the upper row
-        if(currentRow < row){
-            if(walkable((currentRow + 1), currentCol)){
-                const destination_y = (currentRow + 1) * this.tileSize
-
-                let movementInterval = setInterval(() => {
-                    if(this.y !== destination_y){
-                        this.y += this.velocity
-                        console.log()
-                    }else{
-                        clearInterval(movementInterval)
-                    }
-                }, 50)
-            }
-        }
-
-        // If the player is at right side
-        if(currentCol > col){
-            if(walkable(currentRow , (currentCol - 1))){
-                const destination_x = (currentCol - 1) * this.tileSize
-
-                let movementInterval = setInterval(() => {
-                    if(this.x !== destination_x){
-                        this.x -= this.velocity
-                    }else{
-                        clearInterval(movementInterval)
-                    }
-                }, 50)
-            }
-        }
-        
-        // If the player is at the left side
-        if(currentCol < col){
-            if(walkable(currentRow , (currentCol + 1))){
-                const destination_x = (currentCol + 1) * this.tileSize
-
-                let movementInterval = setInterval(() => {
-                    if(this.x !== destination_x){
-                        this.x += this.velocity
-                    }else{
-                        clearInterval(movementInterval)
-                    }
-                }, 50)
-            }
-        }
-
-        if(this.y === (row * this.tileSize) && this.x === (col * this.tileSize))
+        if(currentRow === row && currentCol === col )
         {
+            console.log('Stop walking animation')
             this.walkableSpace.splice(0)
             this.destination = null
+            // Tell the game engine to unfreeze other objects
+            animationSignal(false)
+        }else{
+            console.log('Init walking animation')
+            const walkable = (row, col) => {
+                let walkableIndex = -1
+
+                for(let layer=0; layer < walkableSpace.length; layer++){
+
+                    if(walkableIndex >= 0) break
+
+                    for(let block=0; block < walkableSpace[layer].length; block++){
+                        const block_y = walkableSpace[layer][block][0]
+                        const block_x = walkableSpace[layer][block][1]
+
+                        if(block_y === row && block_x === col){
+                            walkableIndex = block
+                            break
+                        }
+                    }
+                }
+
+                return walkableIndex >= 0
+            }
+
+            // If the player is at the deeper row
+            if(currentRow > row){
+                if(walkable((currentRow - 1), currentCol)){
+                    const destination_y = (currentRow - 1) * this.tileSize
+                    
+                    // Tell the game engine the character is moving
+                    animationSignal(true)
+                    let movementInterval = setInterval(() => {
+                        if(this.y !== destination_y){
+                            this.y -= this.velocity
+                        }else{
+                            // Stop timer
+                            clearInterval(movementInterval)
+                        }
+                    }, 50)
+                }
+            }
+
+            // If the player is at the upper row
+            if(currentRow < row){
+                if(walkable((currentRow + 1), currentCol)){
+                    const destination_y = (currentRow + 1) * this.tileSize
+
+                    // Tell the game engine the character is moving
+                    animationSignal(true)
+                    let movementInterval = setInterval(() => {
+                        if(this.y !== destination_y){
+                            this.y += this.velocity
+                            console.log()
+                        }else{
+                            // Stop timer
+                            clearInterval(movementInterval)
+                        }
+                    }, 50)
+                }
+            }
+
+            // If the player is at right side
+            if(currentCol > col){
+                if(walkable(currentRow , (currentCol - 1))){
+                    const destination_x = (currentCol - 1) * this.tileSize
+                    
+                    // Tell the game engine the character is moving
+                    animationSignal(true)
+                    let movementInterval = setInterval(() => {
+                        if(this.x !== destination_x){
+                            this.x -= this.velocity
+                        }else{
+                            // Stop timer                        
+                            clearInterval(movementInterval)
+                        }
+                    }, 50)
+                }
+            }
+            
+            // If the player is at the left side
+            if(currentCol < col){
+                if(walkable(currentRow , (currentCol + 1))){
+                    const destination_x = (currentCol + 1) * this.tileSize
+
+                    // Tell the game engine the character is moving
+                    animationSignal(true)
+                    let movementInterval = setInterval(() => {
+                        if(this.x !== destination_x){
+                            this.x += this.velocity
+                        }else{
+                            // Stop timer                        
+                            clearInterval(movementInterval)
+                        }
+                    }, 50)
+                }
+            }         
         }
-        
     }
 
     /**
@@ -203,17 +221,23 @@ export default class Character {
             this.class = job.name
             this.attributes = {
                 ...job.base_attribute,
-                stay: false,
                 status: 'healthy'
             }
+            this.wait = false,
             this.skills = []       
             this.#loadImage(type, job.id)     
         }
 
-        // If the character in an enemy, set the given exp for player to gain
-        if(type === 3){
-            console.log('exp')
-            this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
+        switch(type){
+            case 2:
+                // If the character in an a player, set the initial exp and the required points to level up
+                this.exp = 0
+                this.requiredExp = 100
+            break    
+            case 3:
+                // If the character in an enemy, set the given exp for player to gain
+                this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
+            break
         }
     }
 

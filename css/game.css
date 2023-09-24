@@ -2,8 +2,8 @@ body{
     display: flex;
     justify-content: center;
     background-color: gray;
-    /* margin: 0; */
-    /* padding: 0; */
+    margin: 0;
+    padding: 0;
 }
 
 .absolute{
@@ -17,7 +17,7 @@ body{
 
 #game{
     /* border: 1px solid red; */
-    aspect-ratio: 9 / 16;
+    /* aspect-ratio: 9 / 16; */
     /* height: 90vh; */
 }
 
@@ -27,24 +27,25 @@ body{
 }
 
 ul{
-    background: white;
     padding: 0;
     margin-left: 3px;
     list-Style: none;
-    width: 100px;
 }
 
 li{
+    background: white;
     border: 1px solid;
     padding: 1px 2px;
-    margin:  0;
+    margin:  3px 0;
+    padding: 5px
 }
 
 #characterCaption{
     background: white;
-    padding: 3px;
+    padding: 5px 5px 0 5px;
     bottom: 0;
     visibility: hidden;
+    width: 80%;
 }
 
 #characterCaption > ul > li{
