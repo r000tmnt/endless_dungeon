@@ -18,6 +18,7 @@ export default class Character {
         this.velocity = velocity
         this.tileMap = map
         this.#createCharacter(attributes, type)
+        this.characterIsMoving = false
     }
 
     /**
@@ -25,7 +26,7 @@ export default class Character {
      * @param {function} ctx - canvas.getContext("2d")
      */
     draw(ctx){
-        if(this.destination){
+        if(!this.characterIsMoving && this.destination){
             this.#move(this.destination, this.walkableSpace)
         }
 
@@ -63,109 +64,194 @@ export default class Character {
         const currentRow = this.y / this.tileSize
         const currentCol = this.x / this.tileSize
 
-        if(currentRow === row && currentCol === col )
-        {
-            console.log('Stop walking animation')
-            this.walkableSpace.splice(0)
-            this.destination = null
-            // Tell the game engine to unfreeze other objects
-            animationSignal(false)
-        }else{
-            console.log('Init walking animation')
-            const walkable = (row, col) => {
-                let walkableIndex = -1
+        console.log('Init walking animation')
+        this.characterIsMoving = true
 
-                for(let layer=0; layer < walkableSpace.length; layer++){
+        const walkable = (row, col) => {
+            let walkableIndex = -1
 
-                    if(walkableIndex >= 0) break
+            for(let layer=0; layer < walkableSpace.length; layer++){
 
-                    for(let block=0; block < walkableSpace[layer].length; block++){
-                        const block_y = walkableSpace[layer][block][0]
-                        const block_x = walkableSpace[layer][block][1]
+                if(walkableIndex >= 0) break
 
-                        if(block_y === row && block_x === col){
-                            walkableIndex = block
-                            break
-                        }
+                for(let block=0; block < walkableSpace[layer].length; block++){
+                    const block_y = walkableSpace[layer][block][0]
+                    const block_x = walkableSpace[layer][block][1]
+
+                    if(block_y === row && block_x === col){
+                        console.log('This block is good enough')
+                        walkableIndex = block
+                        break
                     }
                 }
-
-                return walkableIndex >= 0
             }
 
-            // If the player is at the deeper row
-            if(currentRow > row){
-                if(walkable((currentRow - 1), currentCol)){
-                    const destination_y = (currentRow - 1) * this.tileSize
-                    
-                    // Tell the game engine the character is moving
-                    animationSignal(true)
-                    let movementInterval = setInterval(() => {
-                        if(this.y !== destination_y){
-                            this.y -= this.velocity
-                        }else{
-                            // Stop timer
-                            clearInterval(movementInterval)
-                        }
-                    }, 50)
-                }
-            }
-
-            // If the player is at the upper row
-            if(currentRow < row){
-                if(walkable((currentRow + 1), currentCol)){
-                    const destination_y = (currentRow + 1) * this.tileSize
-
-                    // Tell the game engine the character is moving
-                    animationSignal(true)
-                    let movementInterval = setInterval(() => {
-                        if(this.y !== destination_y){
-                            this.y += this.velocity
-                            console.log()
-                        }else{
-                            // Stop timer
-                            clearInterval(movementInterval)
-                        }
-                    }, 50)
-                }
-            }
-
-            // If the player is at right side
-            if(currentCol > col){
-                if(walkable(currentRow , (currentCol - 1))){
-                    const destination_x = (currentCol - 1) * this.tileSize
-                    
-                    // Tell the game engine the character is moving
-                    animationSignal(true)
-                    let movementInterval = setInterval(() => {
-                        if(this.x !== destination_x){
-                            this.x -= this.velocity
-                        }else{
-                            // Stop timer                        
-                            clearInterval(movementInterval)
-                        }
-                    }, 50)
-                }
-            }
-            
-            // If the player is at the left side
-            if(currentCol < col){
-                if(walkable(currentRow , (currentCol + 1))){
-                    const destination_x = (currentCol + 1) * this.tileSize
-
-                    // Tell the game engine the character is moving
-                    animationSignal(true)
-                    let movementInterval = setInterval(() => {
-                        if(this.x !== destination_x){
-                            this.x += this.velocity
-                        }else{
-                            // Stop timer                        
-                            clearInterval(movementInterval)
-                        }
-                    }, 50)
-                }
-            }         
+            return walkableIndex >= 0
         }
+
+        // If the player is at the deeper row
+        if(currentRow > row){
+            console.log('If the player is at the deeper row')
+            
+            if(walkable((currentRow - 1), currentCol)){
+                const destination_y = (currentRow - 1) * this.tileSize
+                this.#moveUp(destination_y)
+
+            }else if(walkable(currentRow , (currentCol - 1))){
+                const destination_x = (currentCol - 1) * this.tileSize
+                this.#moveLeft(destination_x)
+
+            }else if(walkable(currentRow , (currentCol + 1))){
+                const destination_x = (currentCol + 1) * this.tileSize
+                this.#moveRight(destination_x)
+            }
+            return
+        }
+
+        // If the player is at the upper row
+        if(currentRow < row){
+            console.log('If the player is at the upper row')
+            
+            if(walkable((currentRow + 1), currentCol)){
+                const destination_y = (currentRow + 1) * this.tileSize
+                this.#moveDown(destination_y)
+
+            }else if(walkable(currentRow , (currentCol - 1))){
+                const destination_x = (currentCol - 1) * this.tileSize
+                this.#moveLeft(destination_x)
+
+            }else if(walkable(currentRow , (currentCol + 1))){
+                const destination_x = (currentCol + 1) * this.tileSize
+                this.#moveRight(destination_x)
+            }
+            return
+        }
+
+        // If the player is at right side
+        if(currentCol > col){
+            console.log('If the player is at right side')
+            
+            if(walkable(currentRow , (currentCol - 1))){
+                const destination_x = (currentCol - 1) * this.tileSize
+                this.#moveLeft(destination_x)
+
+            }else if(walkable(currentRow - 1 , currentCol)){
+                const destination_y = (currentRow - 1) * this.tileSize
+                this.#moveUp(destination_y)
+
+            }else if(walkable(currentRow + 1 , currentCol)){
+                const destination_y = (currentRow + 1) * this.tileSize
+                this.#moveDown(destination_y)
+            }
+            return
+        }
+        
+        // If the player is at the left side
+        if(currentCol < col){
+            console.log('If the player is at left side')
+            
+            if(walkable(currentRow , (currentCol + 1))){
+                const destination_x = (currentCol + 1) * this.tileSize
+                this.#moveRight(destination_x)
+
+            }else if(walkable(currentRow - 1 , currentCol)){
+                const destination_y = (currentRow - 1) * this.tileSize
+                this.#moveUp(destination_y)
+
+            }else if(walkable(currentRow + 1 , currentCol)){
+                const destination_y = (currentRow + 1) * this.tileSize
+                this.#moveDown(destination_y)
+            }
+            return
+        }  
+    }
+
+    #moveUp(destination_y){
+        console.log('go up')        
+        // Tell the game engine the character is moving
+        animationSignal(true)
+        let movementInterval = setInterval(() => {
+            if(this.y !== destination_y){
+                this.y -= this.velocity
+            }else{
+                // Stop timer
+                this.characterIsMoving = false
+                clearInterval(movementInterval)  
+                if(this.y === (this.destination.row * this.tileSize)){
+                    if(this.x === (this.destination.col * this.tileSize)){
+                        this.#stopMoving()                                     
+                    }                                     
+                }
+            }
+        }, 10)
+    }
+
+    #moveDown(destination_y){
+        console.log('go down')
+        // Tell the game engine the character is moving
+        animationSignal(true)
+        let movementInterval = setInterval(() => {
+            if(this.y !== destination_y){
+                this.y += this.velocity
+            }else{
+                // Stop timer
+                this.characterIsMoving = false
+                clearInterval(movementInterval)  
+                if(this.y === (this.destination.row * this.tileSize)){
+                    if(this.x === (this.destination.col * this.tileSize)){
+                        this.#stopMoving()                                     
+                    }                                      
+                }
+            }
+        }, 10)
+    }
+
+    #moveRight(destination_x){
+        console.log('go right')
+        // Tell the game engine the character is moving
+        animationSignal(true)
+        let movementInterval = setInterval(() => {
+            if(this.x !== destination_x){
+                this.x += this.velocity
+            }else{
+                // Stop timer            
+                this.characterIsMoving = false  
+                clearInterval(movementInterval)  
+                if(this.x === (this.destination.col * this.tileSize)){
+                    if(this.y === (this.destination.row * this.tileSize)){
+                        this.#stopMoving()                                     
+                    }                                    
+                }
+            }
+        }, 10)
+    }
+
+    #moveLeft(destination_x){    
+        console.log('go left')        
+        // Tell the game engine the character is moving
+        animationSignal(true)
+        let movementInterval = setInterval(() => {
+            if(this.x !== destination_x){
+                this.x -= this.velocity
+            }else{
+                // Stop timer       
+                this.characterIsMoving = false 
+                clearInterval(movementInterval)  
+                if(this.x === (this.destination.col * this.tileSize)){
+                    if(this.y === (this.destination.row * this.tileSize)){
+                        this.#stopMoving()                                     
+                    }                              
+                }
+            }
+        }, 10)
+    }
+
+    #stopMoving(){
+        console.log('Stop walking animation')
+        this.walkableSpace.splice(0)
+        this.destination = null 
+        // Tell the game engine to unfreeze other objects
+        animationSignal(false)
     }
 
     /**
