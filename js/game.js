@@ -77,6 +77,13 @@ var actionMode = ''
  */
 var playerWalkableSpace = []
 
+/**
+ * An array to store steps in order
+ */
+var playerReachableDirections = []
+
+var stepCount = 0
+
 // If the character is moving
 var animationInit = false
 
@@ -103,6 +110,108 @@ console.log('enemy :>>>', enemy)
 // #endregion
 
 // #region Game logic functions
+/**
+ * Form an array of directions
+ * @param {object} currentPlayer 
+ * @param {object} target 
+ * @returns 
+ */
+const prepareDirections = async(currentPlayer, target) => {
+    let directionX = '', directionY = ''
+    let distanceX = 0, distanceY = 0
+    const reachableDirections = []
+
+    // Find the shortest distance
+    if(currentPlayer.col > target.col){
+        directionX = 'left'
+        distanceX = currentPlayer.col - target.col
+    }
+    
+    if(currentPlayer.col < target.col){
+        directionX = 'right'
+        distanceX = target.col - currentPlayer.col
+    }
+
+    if(currentPlayer.row > target.row){
+        directionY = 'top'
+        distanceY = currentPlayer.row - target.row
+    }
+    
+    if(currentPlayer.row < target.row){
+        directionY = 'down'
+        distanceY = target.row - currentPlayer.row
+    }
+
+    console.log('totoal distance :>>>', distanceX + distanceY)
+
+    // The overall direction
+    const targetDirection = [directionX, directionY]
+    // A signal which tells the game to move on to the animation phase
+    // Current inspecting number for both x and y axis
+    let x = currentPlayer.col, y = currentPlayer.row 
+
+    const getEachStep = async() => {
+        for(let i=0; i < targetDirection.length; i++){
+            if(reachableDirections.length === (distanceX + distanceY)){
+                break
+            }else{
+                if(!targetDirection[i].length){
+                    continue
+                }
+
+                if(targetDirection[i] === 'left'){
+                    x = x - 1
+                }
+                
+                if(targetDirection[i] === 'right'){
+                    x = x + 1
+                }
+        
+                if(targetDirection[i] === 'top'){
+                    y = y - 1 
+                }
+        
+                if(targetDirection[i] === 'down'){
+                    y = y + 1 
+                }
+
+                // If the block is a walkable space
+                if(tileMap.map[y][x] === 0){
+                    // If it is player's turn
+                    if(turnType === 0){
+                        if(enemy.x !== (x * tileSize) && enemy.y !== (y * tileSize)){
+                            reachableDirections.push([y, x])
+                            console.log('reachableDirections :>>>', reachableDirections)
+    
+                            // If the required steps not meet
+                            if(i == (targetDirection.length - 1) && reachableDirections.length !== (distanceX + distanceY)){
+                                await getEachStep()
+                            }
+                        }
+                    }else{
+                        if(player.x !== (x * tileSize) && player.y !== (y * tileSize)){
+                            reachableDirections.push([y, x])
+                            console.log('reachableDirections :>>>', reachableDirections)
+    
+                            // If the required steps not meet
+                            if(i == (targetDirection.length - 1) && reachableDirections.length !== (distanceX + distanceY)){
+                                await getEachStep()
+                            }
+                        }
+                    }
+                }                
+            }
+        }
+    }
+
+    // Get all steps
+    await getEachStep()
+
+    console.log('return reachableDirections :>>>', reachableDirections)
+    return reachableDirections
+}
+
+
 // Get the position on the tileMap
 const getPosition = (event) => {
     // console.log("tileSize :>>>", tileSize)
@@ -116,7 +225,7 @@ const getPosition = (event) => {
 }
 
 // get mouse position and divide by tile size to see where the row and the column it clicked
-canvas.addEventListener('mousedown', function(event){
+canvas.addEventListener('mousedown', async(event) =>{
 
     // If is the turn for player
     if(turnType === 0){
@@ -175,41 +284,31 @@ canvas.addEventListener('mousedown', function(event){
         // If there are walkable blocks in the array
         if(playerWalkableSpace.length){
     
-            let isWalkable = false
-    
+            let inRange = false
+
             // Loop through the array find if the position matches
             for(let i=0; i < playerWalkableSpace.length; i++){
-    
-                // If true, break the loop 
-                if(isWalkable == true) break;
-    
-                for(let j = 0; j < playerWalkableSpace[i].length; j++){
-                    if(playerWalkableSpace[i][j][0] === row && playerWalkableSpace[i][j][1] === col){
-                        isWalkable = true
+                if(inRange){
+                    break
+                }else{
+                    for(let j=0; j < playerWalkableSpace[i].length; j++){
+                        if(playerWalkableSpace[i][j][0] === row && playerWalkableSpace[i][j][1] === col){
+                            inRange = true
+
+                            playerReachableDirections = await prepareDirections(playerPosition, { row: row, col: col })
+
+                            // Hide the element
+                            characterCaption['style']['visibility'] = 'hidden'
+            
+                            player.setWalkableSpace(playerWalkableSpace)  
+            
+                            // Start moving
+                            // Maybe I need a global variable to track the steps...
+                            beginAnimationPhase(stepCount, 2)   
+                        }
                     }
                 }
-            }
-    
-            // If true, swap the tileMap type number
-            if(isWalkable == true){
-                // Keep tracking player position
-                playerPosition.row = row
-                playerPosition.col = col
-    
-                player.setDestination({row, col})
-                player.setWalkableSpace(playerWalkableSpace)
-    
-                // Hide the element
-                characterCaption['style']['visibility'] = 'hidden'
-                
-                let animationSignalReceiver = setInterval(async() => {
-                    if(animationInit) {
-                        clearInterval(animationSignalReceiver)
-                        watchAnimation(2)
-                    }
-                }, 100)
-                
-            }
+            }   
         }
     }
 })
@@ -296,7 +395,10 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
                         availableSpace[i][block - 1] = [characterPosition.row - rowPosition, characterPosition.col]                         
                     }
  
-                }    
+                }else{
+                    // Remove empty space 
+                    availableSpace[i].splice((block - 1), 1)
+                }   
             }else if( i === (availableSpace.length - 1)){
                 // bottom
                 // If the row is at the bottom or higher an the type of the block is a walkable one
@@ -311,6 +413,9 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
                         // keep the row(y) and col(y) position of the block
                         availableSpace[i][block - 1] = [characterPosition.row + rowPosition, characterPosition.col]                          
                     }
+                }else{
+                    // Remove empty space 
+                    availableSpace[i].splice((block - 1), 1)
                 }    
             }else{
                 // all direction in between
@@ -337,6 +442,9 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
                                 // keep the row(y) and col(y) position of the block                         
                                 availableSpace[i][block - 1] = [characterPosition.row - rowPosition, colPosition]                                 
                             } 
+                    }else{
+                        // Remove empty space 
+                        availableSpace[i].splice((block - 1), 1)                        
                     }
                 }else if( i === blocksPerDirection){
                     // Middle
@@ -352,6 +460,9 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
                                 // keep the row(y) and col(y) position of the block                            
                                 availableSpace[i][block - 1] = [characterPosition.row - rowPosition, colPosition]  
                             }
+                        }else{
+                            // Remove empty space 
+                            availableSpace[i].splice((block - 1), 1)                               
                         }
                 }
                 else{
@@ -370,12 +481,18 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
                                 availableSpace[i][block - 1] = [characterPosition.row + rowPosition, colPosition] 
                             }  
                         }                        
+                    }else{
+                        // Remove empty space 
+                        availableSpace[i].splice((block - 1), 1)                           
                     }
                     
                 }
             }
         } 
     }
+
+    // clear empty array
+
     console.log("availableSpace :>>>", availableSpace)
     return availableSpace
 }
@@ -423,159 +540,51 @@ const enemyAI = async() => {
             // if player is in the range
             if(playerDetect){
                 console.log('enemyAI found player')
-                
-                const reachableDirections = []
 
-                const walkable = (row, col) => {
-                    let walkableIndex = -1
-    
-                    for(let layer=0; layer < playerWalkableSpace.length; layer++){
-    
-                        if(walkableIndex >= 0) break
-    
-                        for(let block=0; block < playerWalkableSpace[layer].length; block++){
-                            const block_y = playerWalkableSpace[layer][block][0]
-                            const block_x = playerWalkableSpace[layer][block][1]
-    
-                            if(block_y === row && block_x === col){
-                                console.log('This block is good enough')
-                                walkableIndex = block
-                                break
-                            }
-                        }
-                    }
-    
-                    return walkableIndex >= 0
-                }
+                playerReachableDirections = await prepareDirections(enemyPosition, playerPosition)
 
-                // Top
-                if(playerPosition.row < enemyPosition.row){
-                    for(let i = 0; i < playerWalkableSpace.length; i++){
+                console.log("reachableDirections :>>>", playerReachableDirections)
 
-                        const targetY = playerPosition.row - i
-                        const targetX = (playerPosition.col > enemyPosition.col)? playerPosition.col - i : playerPosition.col + i
-                    
-                        if(walkable(targetY, targetX)){
-                            reachableDirections.push([targetY, targetX])
-                            break
-                        }  
-                    }
-                }
-
-                // Right
-                if(playerPosition.col > enemyPosition.col){
-                    for(let i = 0; i < playerWalkableSpace.length; i++){
-
-                        const targetY = (playerPosition.row > enemyPosition.row)?  playerPosition.row - i: playerPosition.row + 1
-                        const targetX = playerPosition.col + i 
-                    
-                        if(walkable(targetY, targetX)){
-                            reachableDirections.push([targetY, targetX])
-                            break
-                        }  
-                    }
-                }
-
-                // Down
-                if(playerPosition.row > enemyPosition.row){
-                    for(let i = 0; i < playerWalkableSpace.length; i++){
-
-                        const targetY = playerPosition.row + i
-                        const targetX = (playerPosition.col > enemyPosition.col)? playerPosition.col - i : playerPosition.col + i
-                    
-                        if(walkable(targetY, targetX)){
-                            reachableDirections.push([targetY, targetX])
-                            break
-                        }  
-                    }
-                }
-
-                // Left
-                if(playerPosition.col < enemyPosition.col){
-                    for(let i = 0; i < playerWalkableSpace.length; i++){
-
-                        const targetY = (playerPosition.row > enemyPosition.row)?  playerPosition.row - i: playerPosition.row + 1
-                        const targetX = playerPosition.col - i 
-                    
-                        if(walkable(targetY, targetX)){
-                            reachableDirections.push([targetY, targetX])
-                            break
-                        }  
-                    }
-                }
-                console.log("reachableDirections :>>>", reachableDirections)
-
-                // Chose a block randomly
-                const decideWhereToGo = async() => {
-                    const targetBlock = Math.floor(Math.random() * reachableDirections.length)
-
-                    if(reachableDirections[targetBlock] === undefined){
-                        await decideWhereToGo()
-                    }else{
-                        return targetBlock
-                    }
-                }
-
-                const finalDecision = await decideWhereToGo()
-
-                enemy.setDestination({row: reachableDirections[finalDecision][0], col: reachableDirections[finalDecision][1]})
-                enemy.setWalkableSpace(playerWalkableSpace)
-
-                let animationSignalReceiver = setInterval(() => {
-                    if(animationInit) {
-                        console.log('enemyAI go towards to player')
-                        clearInterval(animationSignalReceiver)
-                        watchAnimation(3)
-                    }
-                }, 100)               
+                // Start moving
+                beginAnimationPhase(stepCount, 3)
+             
             }else{
                 console.log('enemyAI can not find the player')
 
                 const getRow = async() => {
-                    const row = Math.floor( Math.random() * (playerWalkableSpace.length - 1))
+                    const row =  Math.floor( Math.random() * (playerWalkableSpace.length - 1))
                     console.log("row :>>>", row)
-                    if(row >= 0 && playerWalkableSpace[row].length){
-                        return row
-                    }else{
-                        await getRow()
-                    }
+                    // if(row >= 0 && playerWalkableSpace[row].length){
+                    //     return row
+                    // }else{
+                    //     await getRow()
+                    // }
+                    return row
                 }
 
-                const getCol = async() => {
-                    const col = Math.floor( Math.random() * (playerWalkableSpace[newRow].length - 1))
+                const getCol = async(row) => {
+                    const col = Math.floor( Math.random() * (playerWalkableSpace[row].length - 1))
                     console.log("col :>>>", col)
-                    if(col >= 0 && playerWalkableSpace[newRow][col].length){
-                        return col
-                    }else{
-                        await getCol()
-                    }
+                    // if(col >= 0 && playerWalkableSpace[newRow][col].length){
+                    //     return col
+                    // }else{
+                    //     await getCol()
+                    // }
+                    return col
                 }
 
                 const newRow = await getRow()
-                const newCol = await getCol()
+                const newCol = await getCol(newRow)
 
                 if(playerWalkableSpace[newRow][newCol][0] === enemyPosition.row && playerWalkableSpace[newRow][newCol][1] === enemyPosition.col){
                     // Spend a action point
                     characterAnimationPhaseEnded(3)                       
                 }else{
                     // Go to the random selected position
-                    enemy.setDestination({ row: playerWalkableSpace[newRow][newCol][0], col: playerWalkableSpace[newRow][newCol][1] })
+                    playerReachableDirections = prepareDirections(enemyPosition, { row: playerWalkableSpace[newRow][newCol][0], col: playerWalkableSpace[newRow][newCol][1] })
                     enemy.setWalkableSpace(playerWalkableSpace)
 
-                    let animationSignalReceiver = setInterval(() => {
-                        if(animationInit) {
-                            console.log('enemyAI start walking')
-                            console.log('enemyAI wondering')
-                            clearInterval(animationSignalReceiver)
-                            watchAnimation(3)
-                        }else{
-                            console.log('enemyAI waiting')
-                        }
-                    }, 100)
-
-                    // Rewrite the position
-                    enemyPosition.row = newRow
-                    enemyPosition.col = newCol    
+                    beginAnimationPhase(stepCount, 3)  
                 }                  
             }
         }
@@ -587,40 +596,67 @@ const enemyAI = async() => {
    
 }
 
-// Waiting for the animation to end 
-const watchAnimation = (type) => {
+// Start moving
+const beginAnimationPhase = (step, type) => {
+    console.log('step :>>>', step)
+    player.setDestination({row: playerReachableDirections[step][0], col: playerReachableDirections[step][1]})
+                    
+    // Waiting for the animation to end 
     let animationWatcher = setInterval(async() => {
         if(!animationInit) {
+            if(turnType === 0){
+                playerPosition.row = player.y / tileSize
+                playerPosition.col = player.x / tileSize                
+            }else{
+                enemyPosition.row = enemy.y / tileSize
+                enemyPosition.col = enemy.x / tileSize  
+            }
             clearInterval(animationWatcher)
             await characterAnimationPhaseEnded(type)
+        }else{
+            console.log('watching animation')
         }
-    })
+    }, 100) 
 }
 
 // Thing to do after animation ended
 const characterAnimationPhaseEnded = async(type) => {
-    // Clear the array
-    playerWalkableSpace.splice(0)
 
-    if(type === 2){
-        // Spend an action point
-        player.attributes.ap -= 1
-
-        // If the player is ran out of action point, move to the enemy phase
-        if(player.attributes.ap === 0) nextTurn()
+    // If the steps are not finished yet
+    if(stepCount !== (playerReachableDirections.length - 1)){
+        stepCount += 1
+        beginAnimationPhase(stepCount, type)
     }else{
-        enemy.attributes.ap -= 1 
-            
-        // Move to the next phase
-        if(enemy.attributes.ap === 0){
-            enemy.wait = true
-            nextTurn()
+        // Reset steps
+        stepCount = 0
+
+        // Clear the array
+        playerWalkableSpace.splice(0)
+
+        // If it is the player's turn
+        if(type === 2){
+            // Spend an action point
+            player.attributes.ap -= 1
+
+            // If the player is ran out of action point, move to the enemy phase
+            if(player.attributes.ap === 0) {
+                nextTurn()
+            }
         }else{
-            // keep looking
-            await enemyAI()
-            console.log('enemyAI keep looking')
-        }         
+            enemy.attributes.ap -= 1 
+                
+            // Move to the next phase
+            if(enemy.attributes.ap === 0){
+                enemy.wait = true
+                nextTurn()
+            }else{
+                // keep looking
+                await enemyAI()
+                console.log('enemyAI keep looking')
+            }         
+        }        
     }
+
 }
 
 //  Initialize the game
