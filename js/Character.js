@@ -19,6 +19,7 @@ export default class Character {
         this.tileMap = map
         this.#createCharacter(attributes, type)
         this.characterIsMoving = false
+        this.destination = null
     }
 
     /**
@@ -27,7 +28,7 @@ export default class Character {
      */
     draw(ctx){
         if(!this.characterIsMoving && this.destination){
-            this.#move(this.destination, this.walkableSpace)
+            this.#move(this.destination)
         }
 
         if(this.characterImage?.src?.length){
@@ -56,7 +57,7 @@ export default class Character {
      * @param {object} destination - An object that represent a block which the character is going for
      * @param {array} walkableSpace - A multi dimension array which represent all the blocks the character can reached 
      */
-    #move(destination, walkableSpace){
+    #move(destination){
         console.log('destination :>>>', destination)
         // col ====x, row === y
         const { row, col } = destination
@@ -67,103 +68,30 @@ export default class Character {
         console.log('Init walking animation')
         this.characterIsMoving = true
 
-        const walkable = (row, col) => {
-            let walkableIndex = -1
-
-            for(let layer=0; layer < walkableSpace.length; layer++){
-
-                if(walkableIndex >= 0) break
-
-                for(let block=0; block < walkableSpace[layer].length; block++){
-                    const block_y = walkableSpace[layer][block][0]
-                    const block_x = walkableSpace[layer][block][1]
-
-                    if(block_y === row && block_x === col){
-                        console.log('This block is good enough')
-                        walkableIndex = block
-                        break
-                    }
-                }
-            }
-
-            return walkableIndex >= 0
+        // If the target is at the upper row
+        if(row < currentRow){
+            const destination_y = row * this.tileSize
+            this.#moveUp(destination_y)
         }
 
-        // If the player is at the deeper row
-        if(currentRow > row){
-            console.log('If the player is at the deeper row')
-            
-            if(walkable((currentRow - 1), currentCol)){
-                const destination_y = (currentRow - 1) * this.tileSize
-                this.#moveUp(destination_y)
-
-            }else if(walkable(currentRow , (currentCol - 1))){
-                const destination_x = (currentCol - 1) * this.tileSize
-                this.#moveLeft(destination_x)
-
-            }else if(walkable(currentRow , (currentCol + 1))){
-                const destination_x = (currentCol + 1) * this.tileSize
-                this.#moveRight(destination_x)
-            }
-            return
+        // If the target is at the deeper row
+        if(row > currentRow){
+            const destination_y = row * this.tileSize
+            this.#moveDown(destination_y)
         }
 
-        // If the player is at the upper row
-        if(currentRow < row){
-            console.log('If the player is at the upper row')
-            
-            if(walkable((currentRow + 1), currentCol)){
-                const destination_y = (currentRow + 1) * this.tileSize
-                this.#moveDown(destination_y)
-
-            }else if(walkable(currentRow , (currentCol - 1))){
-                const destination_x = (currentCol - 1) * this.tileSize
-                this.#moveLeft(destination_x)
-
-            }else if(walkable(currentRow , (currentCol + 1))){
-                const destination_x = (currentCol + 1) * this.tileSize
-                this.#moveRight(destination_x)
-            }
-            return
+        // If the target is at the left side
+        if(col < currentCol){
+            const destination_x = col * this.tileSize
+            this.#moveLeft(destination_x)            
         }
 
-        // If the player is at right side
-        if(currentCol > col){
-            console.log('If the player is at right side')
-            
-            if(walkable(currentRow , (currentCol - 1))){
-                const destination_x = (currentCol - 1) * this.tileSize
-                this.#moveLeft(destination_x)
-
-            }else if(walkable(currentRow - 1 , currentCol)){
-                const destination_y = (currentRow - 1) * this.tileSize
-                this.#moveUp(destination_y)
-
-            }else if(walkable(currentRow + 1 , currentCol)){
-                const destination_y = (currentRow + 1) * this.tileSize
-                this.#moveDown(destination_y)
-            }
-            return
+        // If the target is at the right side
+        if(col > currentCol){
+            const destination_x = col * this.tileSize
+            this.#moveRight(destination_x)  
         }
-        
-        // If the player is at the left side
-        if(currentCol < col){
-            console.log('If the player is at left side')
-            
-            if(walkable(currentRow , (currentCol + 1))){
-                const destination_x = (currentCol + 1) * this.tileSize
-                this.#moveRight(destination_x)
 
-            }else if(walkable(currentRow - 1 , currentCol)){
-                const destination_y = (currentRow - 1) * this.tileSize
-                this.#moveUp(destination_y)
-
-            }else if(walkable(currentRow + 1 , currentCol)){
-                const destination_y = (currentRow + 1) * this.tileSize
-                this.#moveDown(destination_y)
-            }
-            return
-        }  
     }
 
     #moveUp(destination_y){
@@ -187,12 +115,13 @@ export default class Character {
     }
 
     #moveDown(destination_y){
-        console.log('go down')
+        console.log('go down to y:>>>', destination_y)
         // Tell the game engine the character is moving
         animationSignal(true)
         let movementInterval = setInterval(() => {
             if(this.y !== destination_y){
                 this.y += this.velocity
+                console.log('y :>>>', this.y)
             }else{
                 // Stop timer
                 this.characterIsMoving = false
