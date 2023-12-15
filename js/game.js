@@ -123,34 +123,48 @@ const prepareDirections = async(currentPlayer, target) => {
 
     // Find the shortest distance
     if(currentPlayer.col > target.col){
-        directionX = 'left'
         distanceX = currentPlayer.col - target.col
     }
     
     if(currentPlayer.col < target.col){
-        directionX = 'right'
         distanceX = target.col - currentPlayer.col
     }
 
     if(currentPlayer.row > target.row){
-        directionY = 'top'
         distanceY = currentPlayer.row - target.row
     }
     
     if(currentPlayer.row < target.row){
-        directionY = 'down'
         distanceY = target.row - currentPlayer.row
     }
 
     console.log('totoal distance :>>>', distanceX + distanceY)
 
-    // The overall direction
-    const targetDirection = [directionX, directionY]
     // A signal which tells the game to move on to the animation phase
     // Current inspecting number for both x and y axis
     let x = currentPlayer.col, y = currentPlayer.row 
 
     const getEachStep = async() => {
+        // Find direction
+        if(x > target.col){
+            directionX = 'left'
+        }
+        
+        if(x < target.col){
+            directionX = 'right'
+        }
+
+        if(y > target.row){
+            directionY = 'top'
+        }
+        
+        if(y < target.row){
+            directionY = 'down'
+        }
+
+        // The overall direction
+        const targetDirection = [directionX, directionY]
+
         for(let i=0; i < targetDirection.length; i++){
             if(reachableDirections.length === (distanceX + distanceY)){
                 break
@@ -581,7 +595,7 @@ const enemyAI = async() => {
                     characterAnimationPhaseEnded(3)                       
                 }else{
                     // Go to the random selected position
-                    playerReachableDirections = prepareDirections(enemyPosition, { row: playerWalkableSpace[newRow][newCol][0], col: playerWalkableSpace[newRow][newCol][1] })
+                    playerReachableDirections = await prepareDirections(enemyPosition, { row: playerWalkableSpace[newRow][newCol][0], col: playerWalkableSpace[newRow][newCol][1] })
                     enemy.setWalkableSpace(playerWalkableSpace)
 
                     beginAnimationPhase(stepCount, 3)  
