@@ -104,12 +104,14 @@ export default class Character {
             }else{
                 // Stop timer
                 this.characterIsMoving = false
-                clearInterval(movementInterval)  
-                if(this.y === (this.destination.row * this.tileSize)){
-                    if(this.x === (this.destination.col * this.tileSize)){
-                        this.#stopMoving()                                     
-                    }                                     
-                }
+                clearInterval(movementInterval) 
+                if(this.destination !== null){
+                    if(this.y === (this.destination.row * this.tileSize)){
+                        if(this.x === (this.destination.col * this.tileSize)){
+                            this.#stopMoving()                                     
+                        }                                     
+                    }                    
+                } 
             }
         }, 10)
     }
@@ -126,10 +128,12 @@ export default class Character {
                 // Stop timer
                 this.characterIsMoving = false
                 clearInterval(movementInterval)  
-                if(this.y === (this.destination.row * this.tileSize)){
-                    if(this.x === (this.destination.col * this.tileSize)){
-                        this.#stopMoving()                                     
-                    }                                      
+                if(this.destination !== null){
+                    if(this.y === (this.destination.row * this.tileSize)){
+                        if(this.x === (this.destination.col * this.tileSize)){
+                            this.#stopMoving()                                     
+                        }                                      
+                    }                    
                 }
             }
         }, 10)
@@ -146,10 +150,12 @@ export default class Character {
                 // Stop timer            
                 this.characterIsMoving = false  
                 clearInterval(movementInterval)  
-                if(this.x === (this.destination.col * this.tileSize)){
-                    if(this.y === (this.destination.row * this.tileSize)){
-                        this.#stopMoving()                                     
-                    }                                    
+                if(this.destination !== null){
+                    if(this.x === (this.destination.col * this.tileSize)){
+                        if(this.y === (this.destination.row * this.tileSize)){
+                            this.#stopMoving()                                     
+                        }                                    
+                    }                    
                 }
             }
         }, 10)
@@ -165,11 +171,13 @@ export default class Character {
             }else{
                 // Stop timer       
                 this.characterIsMoving = false 
-                clearInterval(movementInterval)  
-                if(this.x === (this.destination.col * this.tileSize)){
-                    if(this.y === (this.destination.row * this.tileSize)){
-                        this.#stopMoving()                                     
-                    }                              
+                clearInterval(movementInterval)
+                if(this.destination !== null){
+                    if(this.x === (this.destination.col * this.tileSize)){
+                        if(this.y === (this.destination.row * this.tileSize)){
+                            this.#stopMoving()                                     
+                        }                              
+                    }                    
                 }
             }
         }, 10)

@@ -154,12 +154,20 @@ const prepareDirections = async(currentPlayer, target) => {
             directionX = 'right'
         }
 
+        if(x === target.col){
+            directionX = '';
+        }
+
         if(y > target.row){
             directionY = 'top'
         }
         
         if(y < target.row){
             directionY = 'down'
+        }
+
+        if(y === target.row){
+            directionY = ''
         }
 
         // The overall direction
@@ -541,68 +549,62 @@ const enemyAI = async() => {
         for(let i = 0; i < enemySight.length; i++){
 
             // if player is in the range, break the loop
-            if(playerDetect) break
-
-            for(let block = 0; block < enemySight[i].length; block++){
-                if(enemySight[i][block].length){
-                    if(enemySight[i][block][0] === playerPosition.row && enemySight[i][block][1] === playerPosition.col){
-                        playerDetect = true
-                    }                            
-                }
-            }
-
-            // if player is in the range
             if(playerDetect){
-                console.log('enemyAI found player')
-
-                playerReachableDirections = await prepareDirections(enemyPosition, playerPosition)
-
-                console.log("reachableDirections :>>>", playerReachableDirections)
-
-                // Start moving
-                beginAnimationPhase(stepCount, 3)
-             
+                break
             }else{
-                console.log('enemyAI can not find the player')
-
-                const getRow = async() => {
-                    const row =  Math.floor( Math.random() * (playerWalkableSpace.length - 1))
-                    console.log("row :>>>", row)
-                    // if(row >= 0 && playerWalkableSpace[row].length){
-                    //     return row
-                    // }else{
-                    //     await getRow()
-                    // }
-                    return row
-                }
-
-                const getCol = async(row) => {
-                    const col = Math.floor( Math.random() * (playerWalkableSpace[row].length - 1))
-                    console.log("col :>>>", col)
-                    // if(col >= 0 && playerWalkableSpace[newRow][col].length){
-                    //     return col
-                    // }else{
-                    //     await getCol()
-                    // }
-                    return col
-                }
-
-                const newRow = await getRow()
-                const newCol = await getCol(newRow)
-
-                if(playerWalkableSpace[newRow][newCol][0] === enemyPosition.row && playerWalkableSpace[newRow][newCol][1] === enemyPosition.col){
-                    // Spend a action point
-                    characterAnimationPhaseEnded(3)                       
-                }else{
-                    // Go to the random selected position
-                    playerReachableDirections = await prepareDirections(enemyPosition, { row: playerWalkableSpace[newRow][newCol][0], col: playerWalkableSpace[newRow][newCol][1] })
-                    enemy.setWalkableSpace(playerWalkableSpace)
-
-                    beginAnimationPhase(stepCount, 3)  
-                }                  
+                for(let block = 0; block < enemySight[i].length; block++){
+                    if(enemySight[i][block].length){
+                        if(enemySight[i][block][0] === playerPosition.row && enemySight[i][block][1] === playerPosition.col){
+                            playerDetect = true
+                        }                            
+                    }
+                }                
             }
+
         }
 
+        // if player is in the range
+        if(playerDetect){
+            console.log('enemyAI found player')
+
+            playerReachableDirections = await prepareDirections(enemyPosition, playerPosition)
+
+            console.log("reachableDirections :>>>", playerReachableDirections)
+
+            // Start moving
+            beginAnimationPhase(stepCount, 3)
+            
+        }else{
+            console.log('enemyAI can not find the player')
+
+            // Randomly decide x and y
+            const getXY = async() => {
+                const row =  Math.floor( Math.random() * (playerWalkableSpace.length - 1))
+                console.log("row :>>>", row)
+                const col = Math.floor( Math.random() * (playerWalkableSpace[row].length - 1))
+                console.log("col :>>>", col)
+                // if(row >= 0 && playerWalkableSpace[row].length){
+                //     return row
+                // }else{
+                //     await getRow()
+                // }
+                return { row, col }
+            }
+
+
+            const { row, col } = await getXY()
+
+            if(playerWalkableSpace[row][col][0] === enemyPosition.row && playerWalkableSpace[row][col][1] === enemyPosition.col){
+                // Spend a action point
+                characterAnimationPhaseEnded(3)                       
+            }else{
+                // Go to the random selected position
+                playerReachableDirections = await prepareDirections(enemyPosition, { row: playerWalkableSpace[row][col][0], col: playerWalkableSpace[row][col][1] })
+                enemy.setWalkableSpace(playerWalkableSpace)
+
+                beginAnimationPhase(stepCount, 3)  
+            }                  
+        }
     } 
 
     // Init the function
@@ -637,7 +639,7 @@ const beginAnimationPhase = (step, type) => {
 const characterAnimationPhaseEnded = async(type) => {
 
     // If the steps are not finished yet
-    if(stepCount !== (playerReachableDirections.length - 1)){
+    if(stepCount < (playerReachableDirections.length - 1)){
         stepCount += 1
         beginAnimationPhase(stepCount, type)
     }else{
