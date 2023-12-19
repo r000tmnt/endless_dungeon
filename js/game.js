@@ -571,8 +571,14 @@ const enemyAI = async() => {
 
             console.log("reachableDirections :>>>", playerReachableDirections)
 
-            // Start moving
-            beginAnimationPhase(stepCount, 3)
+            if(playerReachableDirections.length){
+                // Start moving
+                enemy.setWalkableSpace(playerWalkableSpace)
+                beginAnimationPhase(stepCount, 3)  
+            }else{
+                // Spend an action point
+                characterAnimationPhaseEnded(3)  
+            }
             
         }else{
             console.log('enemyAI can not find the player')
@@ -595,14 +601,21 @@ const enemyAI = async() => {
             const { row, col } = await getXY()
 
             if(playerWalkableSpace[row][col][0] === enemyPosition.row && playerWalkableSpace[row][col][1] === enemyPosition.col){
-                // Spend a action point
+                // Spend an action point
                 characterAnimationPhaseEnded(3)                       
             }else{
                 // Go to the random selected position
                 playerReachableDirections = await prepareDirections(enemyPosition, { row: playerWalkableSpace[row][col][0], col: playerWalkableSpace[row][col][1] })
-                enemy.setWalkableSpace(playerWalkableSpace)
-
-                beginAnimationPhase(stepCount, 3)  
+                console.log("reachableDirections :>>>", playerReachableDirections)
+                
+                if(playerReachableDirections.length){
+                    // Start moving
+                    enemy.setWalkableSpace(playerWalkableSpace)
+                    beginAnimationPhase(stepCount, 3)  
+                }else{
+                    // Spend an action point
+                    characterAnimationPhaseEnded(3)  
+                }
             }                  
         }
     } 
@@ -615,7 +628,12 @@ const enemyAI = async() => {
 // Start moving
 const beginAnimationPhase = (step, type) => {
     console.log('step :>>>', step)
-    player.setDestination({row: playerReachableDirections[step][0], col: playerReachableDirections[step][1]})
+    
+    if(turnType === 0){
+        player.setDestination({row: playerReachableDirections[step][0], col: playerReachableDirections[step][1]})
+    }else{
+        enemy.setDestination({row: playerReachableDirections[step][0], col: playerReachableDirections[step][1]})
+    }
                     
     // Waiting for the animation to end 
     let animationWatcher = setInterval(async() => {
