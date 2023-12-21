@@ -377,143 +377,105 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
     
     // get upper half circle
     for(let i = 1; i <= (diameter - 2); i += 2){
-        availableSpace.push([])  
         // add space for blocks
+        let rowCount = (i - 2) < 0? 0 : (i -1) / 2
         for(let block = 1; block <= i; block++){
-            availableSpace[ availableSpace.length - 1 ].push([])            
+            console.log('checking block :>>>', block) 
+            const inspectRow = characterPosition.row - (blocksPerDirection - rowCount)
+            let inspectCol = characterPosition.col
+
+            if(inspectRow < 0){
+                // Skip current iteration
+                continue
+            }
+
+            // Get the number of cols to count in both directions
+            const left_and_right_blocks = (i - 1) / 2
+
+            if(left_and_right_blocks > 0){
+                // Decide to add or minus the col number
+                if(block > left_and_right_blocks){
+                    inspectCol = inspectCol + (block - (left_and_right_blocks + 1))
+                }else{
+                    inspectCol = inspectCol - (left_and_right_blocks - (block - 1))
+                }
+
+                const onTheSameBlock = characterPosition.row === inspectRow && characterPosition.col === inspectCol
+
+                console.log(`checking tile map row:${inspectRow} col:${inspectCol} :>>>`, tileMap.map[inspectRow][inspectCol])
+
+                // Check if the block is walkable
+                if(tileMap.map[inspectRow][inspectCol] === 0 && !onTheSameBlock){
+                    if(!availableSpace.length){
+                        availableSpace.push([])
+                    }
+
+                    availableSpace[availableSpace.length - 1].push([inspectRow, inspectCol])
+                }
+            }else{
+                if(!availableSpace.length){
+                    availableSpace.push([])
+                }
+
+                availableSpace[availableSpace.length - 1].push([inspectRow, inspectCol])
+            }
         }
     }   
 
     //get other half circle
     for(let i = diameter; i >= 1; i += -2){
-        availableSpace.push([])  
+        let rowCount = (i < diameter)? (diameter - i) / 2 : 0
         for(let block = 1; block <= i; block++){
-            availableSpace[ availableSpace.length - 1 ].push([])            
+            console.log('checking block :>>>', block) 
+            const inspectRow = characterPosition.row + rowCount
+            let inspectCol = characterPosition.col 
+
+            if(inspectRow > 15){
+                // Skip current iteration
+                continue
+            }
+            
+            // Get the number of cols to count in both directions
+            const left_and_right_blocks = (i - 1) / 2
+
+            if(left_and_right_blocks > 0){
+                // Decide to add or minus the col number
+                if(block > left_and_right_blocks){
+                    inspectCol = inspectCol + (block - (left_and_right_blocks + 1))
+                }else{
+                    inspectCol = inspectCol - (left_and_right_blocks - (block - 1))
+                }
+
+                const onTheSameBlock = characterPosition.row === inspectRow && characterPosition.col === inspectCol
+
+                // Check if the block is walkable
+                if(tileMap.map[inspectRow][inspectCol] === 0 && !onTheSameBlock){
+                    if(!availableSpace.length){
+                        availableSpace.push([])
+                    }
+
+                    availableSpace[availableSpace.length -1].push([inspectRow, inspectCol])
+                }
+            }else{
+                if(!availableSpace.length){
+                    availableSpace.push([])
+                }
+
+                availableSpace[availableSpace.length -1].push([inspectRow, inspectCol])
+            }
         }
     }
 
-    // get x and y position for each tile
-    for(let i = 0; i < availableSpace.length; i++){
-
-        for(let block = 1; block <= availableSpace[i].length; block++){
-
-            const rowPosition = (( blocksPerDirection - i ) >= 0? blocksPerDirection - i : i - blocksPerDirection) 
-            let colPosition =  (availableSpace[i].length - 1) / 2
-
-            // console.log(colPosition)
-
-            if(i == 0){
-                // top
-                // If the row is at the top or deeper and the type of the block is a walkable one
-                if(characterPosition.row - rowPosition >= 0 && tileMap.map[characterPosition.row - rowPosition][characterPosition.col] !== 1){
-
-                    if(actionMode !== 'move'){
-                        // keep the row(y) and col(y) position of the block
-                        availableSpace[i][block - 1] = [characterPosition.row - rowPosition, characterPosition.col]                         
-                    }else
-                    // If both axis is not collided
-                    if(!positionCollided([characterPosition.row - rowPosition, characterPosition.col], [enemyY, enemyX])){
-                        // keep the row(y) and col(y) position of the block
-                        availableSpace[i][block - 1] = [characterPosition.row - rowPosition, characterPosition.col]                         
-                    }
- 
-                }else{
-                    // Remove empty space 
-                    availableSpace[i].splice((block - 1), 1)
-                }   
-            }else if( i === (availableSpace.length - 1)){
-                // bottom
-                // If the row is at the bottom or higher an the type of the block is a walkable one
-                if(characterPosition.row + rowPosition <= 15 && tileMap.map[characterPosition.row + rowPosition][characterPosition.col] !== 1){
-
-                    if(actionMode !== 'move'){
-                        // keep the row(y) and col(y) position of the block
-                        availableSpace[i][block - 1] = [characterPosition.row + rowPosition, characterPosition.col]                         
-                    }else
-                    // If both axis is not collided
-                    if(!positionCollided([characterPosition.row + rowPosition, characterPosition.col], [enemyY, enemyX])){
-                        // keep the row(y) and col(y) position of the block
-                        availableSpace[i][block - 1] = [characterPosition.row + rowPosition, characterPosition.col]                          
-                    }
-                }else{
-                    // Remove empty space 
-                    availableSpace[i].splice((block - 1), 1)
-                }    
-            }else{
-                // all direction in between
-                colPosition = ( (colPosition >= block)? 
-                    (characterPosition.col - (colPosition - (block - 1)) ) : 
-                    (characterPosition.col + (block - (colPosition + 1))))
-
-                    // console.log((characterPosition.col + (block - colPosition)))
-                // console.log('layer:>>>', i)
-                // console.log('block:>>>', block)
-                // console.log('col:>>>',colPosition)
-                if(i < blocksPerDirection){
-                    // Upper half
-                    if(characterPosition.row - rowPosition >= 0 && 
-                        colPosition <= 8 &&
-                        tileMap.map[characterPosition.row - rowPosition][colPosition] !== 1){
-
-                            if(actionMode !== 'move'){
-                                // keep the row(y) and col(y) position of the block
-                                availableSpace[i][block - 1] = [characterPosition.row - rowPosition, colPosition]                         
-                            }else
-                            // If both axis is not collided
-                            if(!positionCollided([characterPosition.row - rowPosition, colPosition], [enemyY, enemyX])) {
-                                // keep the row(y) and col(y) position of the block                         
-                                availableSpace[i][block - 1] = [characterPosition.row - rowPosition, colPosition]                                 
-                            } 
-                    }else{
-                        // Remove empty space 
-                        availableSpace[i].splice((block - 1), 1)                        
-                    }
-                }else if( i === blocksPerDirection){
-                    // Middle
-                    if(characterPosition.row >=0 &&
-                        colPosition <= 8 &&
-                        tileMap.map[characterPosition.row][colPosition] !== 1){
-                            if(actionMode !== 'move'){
-                                // keep the row(y) and col(y) position of the block
-                                availableSpace[i][block - 1] = [characterPosition.row - rowPosition, colPosition]                         
-                            }else
-                            // If both axis is not collided
-                            if(!positionCollided([characterPosition.row - rowPosition, colPosition], [enemyY, enemyX])) {
-                                // keep the row(y) and col(y) position of the block                            
-                                availableSpace[i][block - 1] = [characterPosition.row - rowPosition, colPosition]  
-                            }
-                        }else{
-                            // Remove empty space 
-                            availableSpace[i].splice((block - 1), 1)                               
-                        }
-                }
-                else{
-                    // The rest
-                    if(tileMap.map[characterPosition.row + rowPosition][colPosition] !== undefined){
-                        if(characterPosition.row + rowPosition >= 0 &&
-                            colPosition <= 8 &&
-                            tileMap.map[characterPosition.row + rowPosition][colPosition] !== 1){
-                                if(actionMode !== 'move'){
-                                    // keep the row(y) and col(y) position of the block
-                                    availableSpace[i][block - 1] = [characterPosition.row + rowPosition, colPosition]                         
-                                }else
-                            // If both axis is not collided
-                            if(!positionCollided([characterPosition.row + rowPosition, colPosition], [enemyY, enemyX])) {
-                                // keep the row(y) and col(y) position of the block                              
-                                availableSpace[i][block - 1] = [characterPosition.row + rowPosition, colPosition] 
-                            }  
-                        }                        
-                    }else{
-                        // Remove empty space 
-                        availableSpace[i].splice((block - 1), 1)                           
-                    }
-                    
-                }
-            }
-        } 
-    }
-
     // clear empty array
+    for(let i=0; i < availableSpace.length; i++){
+        if(availableSpace[i] !== undefined || availableSpace[i] !== null){
+            if(!availableSpace[i].length){
+            availableSpace.splice(i, 1) 
+            }            
+        }else{
+            break
+        }
+    }
 
     console.log("availableSpace :>>>", availableSpace)
     return availableSpace
