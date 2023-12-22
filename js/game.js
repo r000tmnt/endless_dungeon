@@ -35,6 +35,9 @@ const resize = () => {
         canvas.style.height = deviceHeight + 'px'
     }
 
+    // phaseWrapper.style.width = canvas.style.width;
+    // phaseWrapper.style.width = canvas.style.width;
+
     // Get canvas position after resize
     canvasPosition = canvas.getBoundingClientRect();
 }
@@ -277,10 +280,10 @@ canvas.addEventListener('mousedown', async(event) =>{
                 }
     
                 // Display the element
-                characterCaption['style']['visibility'] = 'visible' 
+                characterCaption.classList.add('visible') 
     
                 // Open UI element
-                actionMenu['style']['margin-left'] = 0          
+                actionMenu.classList.add('action_menu_open')    
             }
         }else
     
@@ -297,10 +300,10 @@ canvas.addEventListener('mousedown', async(event) =>{
             }
     
             // Display the element
-            characterCaption['style']['visibility'] = 'visible' 
+            characterCaption.classList.add('visible') 
         }else{
             // Hide the element
-            characterCaption['style']['visibility'] = 'hidden' 
+            characterCaption.classList.remove('visible')
         }
     
         // If there are walkable blocks in the array
@@ -320,7 +323,7 @@ canvas.addEventListener('mousedown', async(event) =>{
                             playerReachableDirections = await prepareDirections(playerPosition, { row: row, col: col })
 
                             // Hide the element
-                            characterCaption['style']['visibility'] = 'hidden'
+                            characterCaption.classList.remove('visible')
             
                             player.setWalkableSpace(playerWalkableSpace)  
             
@@ -466,27 +469,19 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
         }
     }
 
-    // clear empty array
-    for(let i=0; i < availableSpace.length; i++){
-        if(availableSpace[i] !== undefined || availableSpace[i] !== null){
-            if(!availableSpace[i].length){
-            availableSpace.splice(i, 1) 
-            }            
-        }else{
-            break
-        }
-    }
+    // // clear empty array
+    // for(let i=0; i < availableSpace.length; i++){
+    //     if(availableSpace[i] !== undefined || availableSpace[i] !== null){
+    //         if(!availableSpace[i].length){
+    //         availableSpace.splice(i, 1) 
+    //         }            
+    //     }else{
+    //         break
+    //     }
+    // }
 
     console.log("availableSpace :>>>", availableSpace)
     return availableSpace
-}
-
-// Check if both position are the same
-const positionCollided = (targetPosition, characterPosition) => {
-    return Array.isArray(targetPosition) &&
-    Array.isArray(characterPosition) &&
-    targetPosition.length === characterPosition.length &&
-    targetPosition.every((val, index) => val === characterPosition[index]);
 }
 
 // An AI for enemy movement decision
@@ -637,6 +632,9 @@ const characterAnimationPhaseEnded = async(type) => {
             // If the player is ran out of action point, move to the enemy phase
             if(player.attributes.ap === 0) {
                 nextTurn()
+            }else{
+                // Display Action options
+                actionMenu.classList.add('action_menu_open')
             }
         }else{
             enemy.attributes.ap -= 1 
@@ -675,17 +673,42 @@ const gameLoop = () => {
 // Move to the next phase
 const nextTurn = () => {
     if(turnType === 0){
-        console.log('enemy phase')
-        enemy.wait = false
-        turnType = 1
-        enemy.attributes.ap = enemy.attributes.maxAp
-        enemyAI() 
+        // Phase transition fade in
+        phaseElement.innerText = 'Enemy Phase'
+        phaseWrapper.classList.remove('invisible')
+
+        // Phase transition fade out
+        setTimeout(() => {
+            phaseWrapper.classList.add('invisible')
+        }, 1000)
+
+        //
+        setTimeout(() => {
+            console.log('enemy phase')
+            enemy.wait = false
+            turnType = 1
+            enemy.attributes.ap = enemy.attributes.maxAp
+            enemyAI()             
+        }, 1500)
+
     }else{
-        console.log('player phase')
-        player.wait = false
-        turnType = 0
-        player.attributes.ap = player.attributes.maxAp
-        turn += 1
+        // Phase transition fade in
+        phaseElement.innerText = 'player Phase'
+        phaseWrapper.classList.remove('invisible')
+
+        // Phase transition fade out
+        setTimeout(() => {
+            phaseWrapper.classList.add('invisible')
+        }, 1000)
+
+        //
+        setTimeout(() => {
+            console.log('player phase')
+            player.wait = false
+            turnType = 0
+            player.attributes.ap = player.attributes.maxAp
+            turn += 1           
+        }, 1500)
     }
 }
 // #endregion
@@ -695,11 +718,14 @@ const nextTurn = () => {
 const actionMenu = document.getElementById('action_menu');
 // Hide UI elements
 actionMenu.addEventListener('click', () => {
-    actionMenu['style']['margin-left'] = -100 + '%'
+    actionMenu.classList.remove('action_menu_open')
 })
 
 // const actionMenuHolder = actionMenu.getElementByIdy('action_list')
 const actionMenuOptions = actionMenu.getElementsByTagName('li')
+
+const phaseWrapper = document.getElementById('Phase_Transition');
+const phaseElement = document.getElementById('phase');
 
 const characterCaption = document.getElementById('characterCaption')
 const characterCaptionAttributes = ['hp', 'mp']
@@ -720,7 +746,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 playerWalkableSpace = await getAvailableSpace(playerPosition, player.attributes.moveSpeed)
                 console.log("playerWalkableSpace : >>>", playerWalkableSpace)
                 // Hide the element
-                characterCaption['style']['visibility'] = 'hidden'                
+                characterCaption.classList.remove('visible')               
             })
         break;
     }

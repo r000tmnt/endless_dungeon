@@ -9,7 +9,7 @@
 </head>
 <body>
     <div id="wrapper">
-        <div id="action_menu" class="absolute">
+        <div id="action_menu" class="absolute action_menu_close">
             <ul id="action_list">
                 <li class="action" data-action="move">Move</li>
                 <li class="action" data-action="attack">Attack</li>
@@ -32,6 +32,12 @@
             </ul>
         </div>
         <canvas id="game"></canvas>
+
+        <div id="Phase_Transition" class="invisible">
+            <h5 id="phase">
+                <!-- Phase -->
+            </h5>
+        </div>
     </div>
 
     <script type="module" src="/js/game.js"></script>

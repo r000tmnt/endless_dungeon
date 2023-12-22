@@ -16,14 +16,21 @@ body{
 }
 
 #game{
-    /* border: 1px solid red; */
+    border: 1px solid red;
     /* aspect-ratio: 9 / 16; */
-    /* height: 90vh; */
+    /* height: 100vh; */
 }
 
 #action_menu{
-    margin-left: -100%;
     transition: margin-left .1s ease-in-out;
+}
+
+.action_menu_close{
+    margin-left: -100%;
+}
+
+.action_menu_open{
+    margin-left: 0;
 }
 
 ul{
@@ -52,10 +59,31 @@ li{
     margin: 3px 0;
 }
 
+.visible{
+    visibility: visible;
+}
+
+.invisible{
+    visibility: hidden;
+}
+
 .hp{
     background: red;
 }
 
 .mp{
     background: blue;
+}
+
+#Phase_Transition{
+    position: absolute;
+    text-align: center;
+    transition: visility .5s ease-in-out;
+}
+
+#Phase_Transition > h5{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
 }
