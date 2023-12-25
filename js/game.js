@@ -9,34 +9,40 @@ let canvasPosition
 let deviceWidth = window.innerWidth
 let deviceHeight = window.innerHeight
 
+const phaseWrapper = document.getElementById('Phase_Transition');
+const phaseElement = document.getElementById('phase');
+
 const resize = () => {
     console.log('resize')
     // aspect ratio
     const aspectRatio = 9 / 16
 
-    const deviceWidthToDeviceHeight = deviceWidth / deviceHeight
+    // const deviceWidthToDeviceHeight = deviceWidth / deviceHeight
 
     deviceWidth = window.innerWidth
     deviceHeight = window.innerHeight
 
-    canvas.style.width = window.innerWidth
-    canvas.style.height = window.innerHeight
+    canvas.style.width = (deviceHeight * aspectRatio) + 'px'
+    canvas.style.height = deviceHeight + 'px'
+
+    canvas.width = deviceHeight * aspectRatio
+    canvas.height = deviceHeight
 
     // Adjust canvas size
-    if(deviceWidthToDeviceHeight > aspectRatio){
-        // If window width is wider than the aspect ratio
-        deviceWidth = Math.floor(deviceHeight * aspectRatio)
-        canvas.style.width = deviceWidth + 'px'
-        canvas.style.height = deviceHeight + 'px'
-    }else{
-        // If window height is taller than aspect ratio
-        deviceHeight = Math.floor(deviceWidth / aspectRatio)
-        canvas.style.width = deviceWidth + 'px'
-        canvas.style.height = deviceHeight + 'px'
-    }
+    // if(deviceWidthToDeviceHeight > aspectRatio){
+    //     // If window width is wider than the aspect ratio
+    //     deviceWidth = Math.floor(deviceHeight * aspectRatio)
+    //     canvas.style.width = deviceWidth + 'px'
+    //     canvas.style.height = deviceHeight + 'px'
+    // }else{
+    //     // If window height is taller than aspect ratio
+    //     deviceHeight = Math.floor(deviceWidth / aspectRatio)
+    //     canvas.style.width = deviceWidth + 'px'
+    //     canvas.style.height = deviceHeight + 'px'
+    // }
 
-    // phaseWrapper.style.width = canvas.style.width;
-    // phaseWrapper.style.width = canvas.style.width;
+    phaseWrapper.style.width = canvas.style.width;
+    phaseWrapper.style.height = canvas.style.height;
 
     // Get canvas position after resize
     canvasPosition = canvas.getBoundingClientRect();
@@ -46,7 +52,7 @@ const resize = () => {
 
 // #region Tile map setup
 resize()
-const tileSize = Math.floor(deviceWidth / 9);
+const tileSize = Math.floor(canvas.width / 9);
 
 const tileMap = new TileMap(tileSize)
 console.log(tileMap)
@@ -58,20 +64,6 @@ var turn = 1
 // 0 - player
 // 1 - enemy
 var turnType = 0
-
-// row === y
-// col === x
-var playerPosition = {
-    row: 0,
-    col: 0
-}
-
-// row === y
-// col === x
-var enemyPosition = {
-    row: 0,
-    col: 0
-}
 
 var actionMode = ''
 
@@ -105,14 +97,74 @@ const velocity = 1;
 const player = tileMap.getPlayer(velocity)
 console.log('player :>>>', player)
 // player.setSkills('slash')
+var playerPosition = {
+    row: player.y / tileSize,
+    col: player.x / tileSize
+}
 
 // Create enemy object
 const enemy = tileMap.getEnemy(velocity)
 console.log('enemy :>>>', enemy)
 // enemy.setSkills('poison')
+
+var enemyPosition = {
+    row: enemy.y / tileSize,
+    col: enemy.x / tileSize
+}
 // #endregion
 
 // #region Game logic functions
+const getDistance = (x ,y, target) => {
+    // Find the shortest distance
+    let distanceX = 0, distanceY = 0
+
+    if(x > target.col){
+        distanceX = x - target.col
+    }
+    
+    if(x < target.col){
+        distanceX = target.col - x
+    }
+
+    if(y > target.row){
+        distanceY = y - target.row
+    }
+    
+    if(y < target.row){
+        distanceY = target.row - y
+    }
+
+    console.log('total distance :>>>', distanceX + distanceY)
+
+    return distanceX + distanceY
+}
+
+const getDirections = (x, y, target) => {
+    const reachableDirections = []
+
+    // TOP
+    if(tileMap.map[y - 1][x] === 0){
+        reachableDirections.push({ cost: getDistance(x, y-1, target), x, y: y-1 })
+    }
+
+    // DOWN
+    if(tileMap.map[y + 1][x] === 0){
+        reachableDirections.push({ cost: getDistance(x, y+1, target), x, y: y+1 })
+    }  
+
+    // LEFT
+    if(tileMap.map[y][x - 1] === 0){
+        reachableDirections.push({ cost: getDistance(x-1, y, target), x: x-1, y })
+    }
+
+    //RIGHT
+    if(tileMap.map[y][x + 1] === 0){
+        reachableDirections.push({ cost: getDistance(x+1, y, target), x: x+1, y })
+    }
+
+    return reachableDirections
+}
+
 /**
  * Form an array of directions
  * @param {object} currentPlayer 
@@ -120,120 +172,32 @@ console.log('enemy :>>>', enemy)
  * @returns 
  */
 const prepareDirections = async(currentPlayer, target) => {
-    let directionX = '', directionY = ''
-    let distanceX = 0, distanceY = 0
-    const reachableDirections = []
-
-    // Find the shortest distance
-    if(currentPlayer.col > target.col){
-        distanceX = currentPlayer.col - target.col
-    }
-    
-    if(currentPlayer.col < target.col){
-        distanceX = target.col - currentPlayer.col
-    }
-
-    if(currentPlayer.row > target.row){
-        distanceY = currentPlayer.row - target.row
-    }
-    
-    if(currentPlayer.row < target.row){
-        distanceY = target.row - currentPlayer.row
-    }
-
-    console.log('totoal distance :>>>', distanceX + distanceY)
-
-    // A signal which tells the game to move on to the animation phase
-    // Current inspecting number for both x and y axis
     let x = currentPlayer.col, y = currentPlayer.row 
 
+    let reachableDirections = [] 
+
     const getEachStep = async() => {
-        // Find direction
-        if(x > target.col){
-            directionX = 'left'
-        }
-        
-        if(x < target.col){
-            directionX = 'right'
-        }
+        reachableDirections = getDirections(x, y, target)
 
-        if(x === target.col){
-            directionX = '';
-        }
+        // Choose the shortest one
+        const shortest = reachableDirections.findIndex(d => d.cost === Math.min(...reachableDirections.map(r => r.cost)));
 
-        if(y > target.row){
-            directionY = 'top'
-        }
-        
-        if(y < target.row){
-            directionY = 'down'
-        }
+        playerReachableDirections.push([reachableDirections[shortest].y, reachableDirections[shortest].x])
 
-        if(y === target.row){
-            directionY = ''
-        }
-
-        // The overall direction
-        const targetDirection = [directionX, directionY]
-
-        for(let i=0; i < targetDirection.length; i++){
-            if(reachableDirections.length === (distanceX + distanceY)){
-                break
-            }else{
-                if(!targetDirection[i].length){
-                    continue
-                }
-
-                if(targetDirection[i] === 'left'){
-                    x = x - 1
-                }
-                
-                if(targetDirection[i] === 'right'){
-                    x = x + 1
-                }
-        
-                if(targetDirection[i] === 'top'){
-                    y = y - 1 
-                }
-        
-                if(targetDirection[i] === 'down'){
-                    y = y + 1 
-                }
-
-                // If the block is a walkable space
-                if(tileMap.map[y][x] === 0){
-                    // If it is player's turn
-                    if(turnType === 0){
-                        if(enemy.x !== (x * tileSize) && enemy.y !== (y * tileSize)){
-                            reachableDirections.push([y, x])
-                            console.log('reachableDirections :>>>', reachableDirections)
-    
-                            // If the required steps not meet
-                            if(i == (targetDirection.length - 1) && reachableDirections.length !== (distanceX + distanceY)){
-                                await getEachStep()
-                            }
-                        }
-                    }else{
-                        if(player.x !== (x * tileSize) && player.y !== (y * tileSize)){
-                            reachableDirections.push([y, x])
-                            console.log('reachableDirections :>>>', reachableDirections)
-    
-                            // If the required steps not meet
-                            if(i == (targetDirection.length - 1) && reachableDirections.length !== (distanceX + distanceY)){
-                                await getEachStep()
-                            }
-                        }
-                    }
-                }                
-            }
-        }
+        // If destination not reached
+        if(reachableDirections[shortest].y !== target.row || reachableDirections[shortest].x !== target.col ){
+            // Update x and y axis
+            x = reachableDirections[shortest].x
+            y = reachableDirections[shortest].y
+            // Get all steps
+            await getEachStep()        
+        }      
     }
 
     // Get all steps
     await getEachStep()
 
     console.log('return reachableDirections :>>>', reachableDirections)
-    return reachableDirections
 }
 
 
@@ -320,7 +284,7 @@ canvas.addEventListener('mousedown', async(event) =>{
                         if(playerWalkableSpace[i][j][0] === row && playerWalkableSpace[i][j][1] === col){
                             inRange = true
 
-                            playerReachableDirections = await prepareDirections(playerPosition, { row: row, col: col })
+                            await prepareDirections(playerPosition, { row: row, col: col })
 
                             // Hide the element
                             characterCaption.classList.remove('visible')
@@ -357,14 +321,10 @@ const getPercentage = (type, character) => {
 /**
  * Define what tile is walkable
  * @param {object} characterPosition - The x and y axis of the character 
- * @param {number} blocksPerDirection - Blocks a character and see or reach in a direction
+ * @param {number} blocksPerDirection - Number of block for each direction
  * @returns 
  */
 const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
-    const enemyCharacter = (turnType === 0)? enemy: player
-    const enemyY = enemyCharacter.y / tileSize
-    const enemyX = enemyCharacter.x / tileSize
-
     const availableSpace = []
 
     // The max length of blocks in a straight line include the character
@@ -380,7 +340,18 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
     
     // get upper half circle
     for(let i = 1; i <= (diameter - 2); i += 2){
-        // add space for blocks
+
+        // If the previous layer is empty, remove the array
+        if(availableSpace.length){
+            if(!availableSpace[availableSpace.length - 1].length){
+                availableSpace.splice(availableSpace.length - 1, 1)
+            }
+        }
+
+        // Add an array for the layer
+        availableSpace.push([])
+        
+        // Layer counting
         let rowCount = (i - 2) < 0? 0 : (i -1) / 2
         for(let block = 1; block <= i; block++){
             console.log('checking block :>>>', block) 
@@ -409,17 +380,9 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
 
                 // Check if the block is walkable
                 if(tileMap.map[inspectRow][inspectCol] === 0 && !onTheSameBlock){
-                    if(!availableSpace.length){
-                        availableSpace.push([])
-                    }
-
                     availableSpace[availableSpace.length - 1].push([inspectRow, inspectCol])
                 }
             }else{
-                if(!availableSpace.length){
-                    availableSpace.push([])
-                }
-
                 availableSpace[availableSpace.length - 1].push([inspectRow, inspectCol])
             }
         }
@@ -427,6 +390,17 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
 
     //get other half circle
     for(let i = diameter; i >= 1; i += -2){
+
+        // If the previous layer is empty, remove the array
+        if(availableSpace.length){
+            if(!availableSpace[availableSpace.length - 1].length){
+                availableSpace.splice(availableSpace.length - 1, 1)
+            }
+        }
+
+        // Add an array for the layer
+        availableSpace.push([])
+
         let rowCount = (i < diameter)? (diameter - i) / 2 : 0
         for(let block = 1; block <= i; block++){
             console.log('checking block :>>>', block) 
@@ -453,32 +427,13 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
 
                 // Check if the block is walkable
                 if(tileMap.map[inspectRow][inspectCol] === 0 && !onTheSameBlock){
-                    if(!availableSpace.length){
-                        availableSpace.push([])
-                    }
-
                     availableSpace[availableSpace.length -1].push([inspectRow, inspectCol])
                 }
             }else{
-                if(!availableSpace.length){
-                    availableSpace.push([])
-                }
-
                 availableSpace[availableSpace.length -1].push([inspectRow, inspectCol])
             }
         }
     }
-
-    // // clear empty array
-    // for(let i=0; i < availableSpace.length; i++){
-    //     if(availableSpace[i] !== undefined || availableSpace[i] !== null){
-    //         if(!availableSpace[i].length){
-    //         availableSpace.splice(i, 1) 
-    //         }            
-    //     }else{
-    //         break
-    //     }
-    // }
 
     console.log("availableSpace :>>>", availableSpace)
     return availableSpace
@@ -502,7 +457,7 @@ const enemyAI = async() => {
     const findXandY = async() => {
         let playerDetect = false
         console.log('enemyAI finding player')
-        // Check if the player is in the range
+        // Check if the player is in the visible range
         for(let i = 0; i < enemySight.length; i++){
 
             // if player is in the range, break the loop
@@ -520,11 +475,67 @@ const enemyAI = async() => {
 
         }
 
-        // if player is in the range
+        
         if(playerDetect){
             console.log('enemyAI found player')
+            
+            // if player is in the movable range
+            const checkInRange = (row, col) => {
+                let inRange = false
+                for(let i = 0; block < playerWalkableSpace.length; i++){
+                    if(inRange){
+                        break
+                    }else{
+                        for(let block = 0; block < playerWalkableSpace[i].length; block++){
+                            if(playerWalkableSpace[i][block].length){
+                                if(playerWalkableSpace[i][block][0] === row && playerWalkableSpace[i][block][1] === col){
+                                    inRange = true
+                                }                            
+                            }
+                        }                         
+                    }
+                }
+                
+                return inRange
+            }
 
-            playerReachableDirections = await prepareDirections(enemyPosition, playerPosition)
+            // Decide which block to take as destination
+
+            let top = (checkInRange(playerPosition.row - 1, playerPosition.col))? 
+            { 
+                cost:getDistance(enemyPosition.col, enemyPosition.row, { 
+                    row: playerPosition.row - 1, 
+                    col: playerPosition.col}), x: enemyPosition.col ,y: enemyPosition.row 
+            }: {}
+            
+            let down = (checkInRange(playerPosition.row + 1, playerPosition.col))? 
+            { 
+                cost:getDistance(enemyPosition.col, enemyPosition.row, { 
+                    row: playerPosition.row + 1, 
+                    col: playerPosition.col}), x: enemyPosition.col ,y: enemyPosition.row 
+            }: {}
+
+            let left = (checkInRange(playerPosition.row, playerPosition.col -1))? 
+            { 
+                cost:getDistance(enemyPosition.col, enemyPosition.row, { 
+                    row: playerPosition.row, 
+                    col: playerPosition.col - 1}), x: enemyPosition.col ,y: enemyPosition.row 
+            }: {}
+
+            let right = (checkInRange(playerPosition.row, playerPosition.col + 1))? 
+            { 
+                cost:getDistance(enemyPosition.col, enemyPosition.row, { 
+                    row: playerPosition.row, 
+                    col: playerPosition.col - 1}), x: enemyPosition.col ,y: enemyPosition.row 
+            }: {}
+
+            let directions = [top, down, left, right].filter(d => Object(d).length > 0)
+            // let inspectDirection = 0
+
+            const shortest = directions.findIndex(d => d.cost === Math.min(...directions.map(r => r.cost)));
+
+
+            await prepareDirections(enemyPosition, { row: directions[shortest].y, col: directions[shortest].x })
 
             console.log("reachableDirections :>>>", playerReachableDirections)
 
@@ -535,7 +546,7 @@ const enemyAI = async() => {
             }else{
                 // Spend an action point
                 characterAnimationPhaseEnded(3)  
-            }
+            }    
             
         }else{
             console.log('enemyAI can not find the player')
@@ -562,7 +573,7 @@ const enemyAI = async() => {
                 characterAnimationPhaseEnded(3)                       
             }else{
                 // Go to the random selected position
-                playerReachableDirections = await prepareDirections(enemyPosition, { row: playerWalkableSpace[row][col][0], col: playerWalkableSpace[row][col][1] })
+                await prepareDirections(enemyPosition, { row: playerWalkableSpace[row][col][0], col: playerWalkableSpace[row][col][1] })
                 console.log("reachableDirections :>>>", playerReachableDirections)
                 
                 if(playerReachableDirections.length){
@@ -623,6 +634,8 @@ const characterAnimationPhaseEnded = async(type) => {
 
         // Clear the array
         playerWalkableSpace.splice(0)
+
+        playerReachableDirections.splice(0)
 
         // If it is the player's turn
         if(type === 2){
@@ -724,20 +737,17 @@ actionMenu.addEventListener('click', () => {
 // const actionMenuHolder = actionMenu.getElementByIdy('action_list')
 const actionMenuOptions = actionMenu.getElementsByTagName('li')
 
-const phaseWrapper = document.getElementById('Phase_Transition');
-const phaseElement = document.getElementById('phase');
-
 const characterCaption = document.getElementById('characterCaption')
 const characterCaptionAttributes = ['hp', 'mp']
 
 //set actionMenu wrapper width and height
-actionMenu.style.width = Math.floor( 40 * Math.floor(deviceWidth / 100)) + 'px';
+actionMenu.style.width = Math.floor( 40 * Math.floor(canvas.width / 100)) + 'px';
 // actionMenu.style.height = canvas.style.height + 'px';
 
 // action menu child click event
 for(let i=0; i < actionMenuOptions.length; i++){
 
-    actionMenuOptions[i].style['font-size'] = Math.floor( 10 * Math.floor(deviceWidth / 100)) + 'px';
+    actionMenuOptions[i].style['font-size'] = Math.floor( 10 * Math.floor(canvas.width / 100)) + 'px';
 
     switch(actionMenuOptions[i].dataset.action){
         case 'move':
