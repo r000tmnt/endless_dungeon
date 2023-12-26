@@ -276,9 +276,7 @@ canvas.addEventListener('mousedown', async(event) =>{
         
             // If there are walkable blocks in the array
             if(playerWalkableSpace.length){
-        
                 let inRange = false
-
                 // Loop through the array find if the position matches
                 for(let i=0; i < playerWalkableSpace.length; i++){
                     if(inRange){
@@ -286,22 +284,29 @@ canvas.addEventListener('mousedown', async(event) =>{
                     }else{
                         for(let j=0; j < playerWalkableSpace[i].length; j++){
                             if(playerWalkableSpace[i][j][0] === row && playerWalkableSpace[i][j][1] === col){
-                                inRange = true
-
-                                playerReachableDirections = await prepareDirections(tileMap, playerPosition, { row: row, col: col }, playerReachableDirections)
-
-                                // Hide the element
-                                characterCaption.classList.remove('visible')
-                
-                                player.setWalkableSpace(playerWalkableSpace)  
-                
-                                // Start moving
-                                // Maybe I need a global variable to track the steps...
-                                beginAnimationPhase(stepCount, 2)   
+                                inRange = true   
                             }
                         }
                     }
-                }   
+                }
+
+                if(inRange){
+                    playerReachableDirections = await prepareDirections(tileMap, playerPosition, { row: row, col: col }, playerReachableDirections)
+
+                    // Hide the element
+                    characterCaption.classList.remove('visible')
+    
+                    player.setWalkableSpace(playerWalkableSpace)  
+    
+                    // Start moving
+                    // Maybe I need a global variable to track the steps...
+                    beginAnimationPhase(stepCount, 2)
+                }else{
+                    // Cancel action
+                    playerWalkableSpace.splice(0)
+                    characterCaption.classList.remove('invisible')
+                    actionMenu.classList.add('action_menu_open')
+                }
             }
         }
     }
