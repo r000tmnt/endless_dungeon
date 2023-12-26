@@ -50,10 +50,6 @@ const turnCounter = document.getElementById('turn')
 turnCounter.innerText = 'Turn 1'
 
 const actionMenu = document.getElementById('action_menu');
-// Hide UI elements
-actionMenu.addEventListener('click', () => {
-    actionMenu.classList.remove('action_menu_open')
-})
 
 // const actionMenuHolder = actionMenu.getElementByIdy('action_list')
 const actionMenuOptions = actionMenu.getElementsByTagName('li')
@@ -63,21 +59,27 @@ const characterCaptionAttributes = ['hp', 'mp']
 
 // action menu child clcik event
 for(let i=0; i < actionMenuOptions.length; i++){
-    for(let i=0; i < actionMenuOptions.length; i++){
+    switch(actionMenuOptions[i].dataset.action){
+        case 'move':
+            actionMenuOptions[i].addEventListener('click', async() => {
+                actionMode = 'move'
+                playerWalkableSpace = await getAvailableSpace(playerPosition, player.attributes.moveSpeed, enemyPosition)
+                console.log("playerWalkableSpace : >>>", playerWalkableSpace)
+                // Hide the element
+                characterCaption.classList.add('invisible')               
+            })
+        break;
+        case 'stay':
+            actionMenuOptions[i].addEventListener('click', async() => {
+                actionMode = 'stay'
+                actionMenu.classList.remove('action_menu_open')
+                // Hide the element
+                characterCaption.classList.add('invisible')
 
-        actionMenuOptions[i].style['font-size'] = Math.floor( 10 * Math.floor(canvas.width / 100)) + 'px';
-
-        switch(actionMenuOptions[i].dataset.action){
-            case 'move':
-                actionMenuOptions[i].addEventListener('click', async function(){
-                    actionMode = 'move'
-                    playerWalkableSpace = await getAvailableSpace(playerPosition, player.attributes.moveSpeed, enemyPosition)
-                    console.log("playerWalkableSpace : >>>", playerWalkableSpace)
-                    // Hide the element
-                    characterCaption.classList.remove('visible')               
-                })
-            break;
-        }
+                setTimeout(() => {
+                    characterAnimationPhaseEnded(2) 
+                }, 500)
+            })
     }
 }
 
@@ -137,7 +139,6 @@ const resize = () => {
 
     // action menu child font size
     for(let i=0; i < actionMenuOptions.length; i++){
-
         actionMenuOptions[i].style['font-size'] = Math.floor( 10 * Math.floor(canvas.width / 100)) + 'px';
 
     }
