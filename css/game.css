@@ -95,7 +95,7 @@ li{
 
 .caption_top > span{
     margin:  0 5px;
-    font-size: .8rem;
+    /* font-size: .8rem; */
 }
 
 #characterCaption > ul > li{
@@ -126,12 +126,13 @@ li{
     text-align: center;
 }
 
-#Phase_Transition > h5{
+#Phase_Transition > #phase{
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;
+    margin: 0;
 }
 
 .fade_in{
