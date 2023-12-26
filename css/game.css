@@ -19,6 +19,7 @@
 }
 
 body{
+    font-family: "ＭＳ Ｐゴシック";
     display: flex;
     justify-content: center;
     background-color: gray;
@@ -43,6 +44,8 @@ body{
 
 #turn{
     position: absolute;
+    background-color: white;
+    padding: 5px;
     right: 0;
     z-index: 10;
 }
