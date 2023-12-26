@@ -211,104 +211,111 @@ const getPosition = (event) => {
 
 // get mouse position and divide by tile size to see where the row and the column it clicked
 canvas.addEventListener('mousedown', async(event) =>{
+    const { row, col } = getPosition(event)
+    // If there are walkable blocks in the array
+    if(playerWalkableSpace.length){
+        
+        // Not allow to click on the same block
+        if(row === playerPosition.row && col === playerPosition.col) return
 
-    // If is the turn for player
-    if(turnType === 0){
-        const { row, col } = getPosition(event)
-        // console.log('row :>>>', row)
-        // console.log('column :>>>', col)
-    
-        // if this tile is player
-        if((row * tileSize) === player.y && (col * tileSize) === player.x){
-            console.log('I am player')
-    
-            // Keep tracking player position
-            playerPosition.row = row
-            playerPosition.col = col
-    
-            // If the player is not moving
-            if(!player.destination){
-    
-                // Fill the element with a portion of the character info
-                characterName.innerText = player.name
-                characterLv.innerText = `LV ${player.lv}`
-                characterAp.innerText = `AP: ${player.attributes.ap}`
-                const gauges = characterCaption.getElementsByTagName('li')
-    
-                // calculation the percentage of the attribute
-                for(let i=0; i < gauges.length; i++){
-                    // console.log(gauges[i].firstElementChild)
-                    gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], player) + '%';
-                }
-    
-                // Display the element
-                characterCaption.classList.remove('invisible') 
-            
-                // Open UI element
-                actionMenu.classList.add('action_menu_open')    
-            }
-        }else {
-        
-            // if this tile is enemy
-            if((row * tileSize) === enemy.y && (col * tileSize) === enemy.x){
-                // Fill the element with a portion of the character info
-                characterName.innerText = enemy.name
-                characterLv.innerText = `LV ${enemy.lv}`
-                characterAp.innerText = `AP: ${enemy.attributes.ap}`
-                const gauges = characterCaption.getElementsByTagName('li')
-        
-                // calculation the percentage of the attribute
-                for(let i=0; i < gauges.length; i++){
-                    // console.log(gauges[i].firstElementChild)
-                    gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], enemy) + '%';
-                }
-        
-                // Display the element
-                characterCaption.classList.remove('invisible') 
+        let inRange = false
+        // Loop through the array find if the position matches
+        for(let i=0; i < playerWalkableSpace.length; i++){
+            if(inRange){
+                break
             }else{
-                if(!characterCaption.classList.contains('invisible')){
-                    characterCaption.classList.add('invisible') 
-                }
-    
-                if(actionMenu.classList.contains('action_menu_open')){
-                    actionMenu.classList.remove('action_menu_open') 
-                }
-            }
-        
-            // If there are walkable blocks in the array
-            if(playerWalkableSpace.length){
-                let inRange = false
-                // Loop through the array find if the position matches
-                for(let i=0; i < playerWalkableSpace.length; i++){
-                    if(inRange){
-                        break
-                    }else{
-                        for(let j=0; j < playerWalkableSpace[i].length; j++){
-                            if(playerWalkableSpace[i][j][0] === row && playerWalkableSpace[i][j][1] === col){
-                                inRange = true   
-                            }
-                        }
+                for(let j=0; j < playerWalkableSpace[i].length; j++){
+                    if(playerWalkableSpace[i][j][0] === row && playerWalkableSpace[i][j][1] === col){
+                        inRange = true   
                     }
                 }
-
-                if(inRange){
-                    playerReachableDirections = await prepareDirections(tileMap, playerPosition, { row: row, col: col }, playerReachableDirections)
-
-                    // Hide the element
-                    characterCaption.classList.remove('visible')
-    
-                    player.setWalkableSpace(playerWalkableSpace)  
-    
-                    // Start moving
-                    // Maybe I need a global variable to track the steps...
-                    beginAnimationPhase(stepCount, 2)
-                }else{
-                    // Cancel action
-                    playerWalkableSpace.splice(0)
-                    characterCaption.classList.remove('invisible')
-                    actionMenu.classList.add('action_menu_open')
-                }
             }
+        }
+
+        if(inRange){
+            playerReachableDirections = await prepareDirections(tileMap, playerPosition, { row: row, col: col }, playerReachableDirections)
+
+            // Hide the element
+            characterCaption.classList.remove('visible')
+
+            player.setWalkableSpace(playerWalkableSpace)  
+
+            // Start moving
+            // Maybe I need a global variable to track the steps...
+            beginAnimationPhase(stepCount, 2)
+        }else{
+            // Cancel action
+            playerWalkableSpace.splice(0)
+            if(!characterCaption.classList.contains('invisible')){
+                characterCaption.classList.add('invisible') 
+            }else{
+                characterCaption.classList.remove('invisible') 
+            }
+    
+            if(actionMenu.classList.contains('action_menu_open')){
+                actionMenu.classList.remove('action_menu_open') 
+            }else{
+                actionMenu.classList.add('action_menu_open') 
+            }
+        }
+    }else
+    // if this tile is player
+    if((row * tileSize) === player.y && (col * tileSize) === player.x){
+        console.log('I am player')
+
+        // Keep tracking player position
+        playerPosition.row = row
+        playerPosition.col = col
+
+        // If the player is not moving
+        if(!player.destination){
+
+            // Fill the element with a portion of the character info
+            characterName.innerText = player.name
+            characterLv.innerText = `LV ${player.lv}`
+            characterAp.innerText = `AP: ${player.attributes.ap}`
+            const gauges = characterCaption.getElementsByTagName('li')
+
+            // calculation the percentage of the attribute
+            for(let i=0; i < gauges.length; i++){
+                // console.log(gauges[i].firstElementChild)
+                gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], player) + '%';
+            }
+
+            // Display the element
+            characterCaption.classList.remove('invisible') 
+        
+            // Open UI element
+            actionMenu.classList.add('action_menu_open')    
+        }
+    }else
+    // if this tile is enemy
+    if((row * tileSize) === enemy.y && (col * tileSize) === enemy.x){
+        // Fill the element with a portion of the character info
+        characterName.innerText = enemy.name
+        characterLv.innerText = `LV ${enemy.lv}`
+        characterAp.innerText = `AP: ${enemy.attributes.ap}`
+        const gauges = characterCaption.getElementsByTagName('li')
+
+        // calculation the percentage of the attribute
+        for(let i=0; i < gauges.length; i++){
+            // console.log(gauges[i].firstElementChild)
+            gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], enemy) + '%';
+        }
+
+        // Display the element
+        characterCaption.classList.remove('invisible') 
+    }else{
+        if(!characterCaption.classList.contains('invisible')){
+            characterCaption.classList.add('invisible') 
+        }else{
+            characterCaption.classList.remove('invisible') 
+        }
+
+        if(actionMenu.classList.contains('action_menu_open')){
+            actionMenu.classList.remove('action_menu_open') 
+        }else{
+            actionMenu.classList.add('action_menu_open') 
         }
     }
 })
@@ -500,6 +507,8 @@ const characterAnimationPhaseEnded = async(type) => {
             // Spend an action point
             player.attributes.ap -= 1
 
+            characterAp.innerText = `AP: ${player.attributes.ap}`
+
             // If the player is ran out of action point, move to the enemy phase
             if(player.attributes.ap === 0) {
                 nextTurn()
@@ -510,6 +519,8 @@ const characterAnimationPhaseEnded = async(type) => {
             }
         }else{
             enemy.attributes.ap -= 1 
+
+            // characterAp.innerText = `AP: ${player.attributes.ap}`
                 
             // Move to the next phase
             if(enemy.attributes.ap === 0){
