@@ -1,3 +1,23 @@
+@keyframes fade_in {
+    0%{
+      opacity: 0;  
+    }
+    100%{
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+@keyframes fade_out{
+    0%{
+        visibility: visible;
+        opacity: 1;  
+      }
+      100%{
+          opacity: 0;
+      }
+}
+
 body{
     display: flex;
     justify-content: center;
@@ -59,7 +79,6 @@ li{
     background: white;
     padding: 5px 5px 0 5px;
     bottom: 0;
-    visibility: hidden;
     width: 80%;
 }
 
@@ -89,7 +108,6 @@ li{
     top: 0;
     z-index: 15;
     text-align: center;
-    transition: visibility .5s ease-in-out;
 }
 
 #Phase_Transition > h5{
@@ -98,4 +116,12 @@ li{
     left: 50%;
     transform: translate(-50%, -50%);
     color: white;
+}
+
+.fade_in{
+    animation: fade_in .5s ease-in-out forwards;
+}
+
+.fade_out{
+    animation: fade_out .5s ease-in-out forwards;
 }
