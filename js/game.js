@@ -71,7 +71,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
             case 'move':
                 actionMenuOptions[i].addEventListener('click', async function(){
                     actionMode = 'move'
-                    playerWalkableSpace = await getAvailableSpace(playerPosition, player.attributes.moveSpeed)
+                    playerWalkableSpace = await getAvailableSpace(playerPosition, player.attributes.moveSpeed, enemyPosition)
                     console.log("playerWalkableSpace : >>>", playerWalkableSpace)
                     // Hide the element
                     characterCaption.classList.remove('visible')               
@@ -327,60 +327,66 @@ canvas.addEventListener('mousedown', async(event) =>{
                 }
     
                 // Display the element
-                characterCaption.classList.add('visible') 
-    
+                characterCaption.classList.remove('invisible') 
+            
                 // Open UI element
                 actionMenu.classList.add('action_menu_open')    
             }
-        }else
+        }else {
+        
+            // if this tile is enemy
+            if((row * tileSize) === enemy.y && (col * tileSize) === enemy.x){
+                // Fill the element with a portion of the character info
+                characterCaption.firstElementChild.innerHTML = enemy.name
+                const gauges = characterCaption.getElementsByTagName('li')
+        
+                // calculation the percentage of the attribute
+                for(let i=0; i < gauges.length; i++){
+                    // console.log(gauges[i].firstElementChild)
+                    gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], enemy) + '%';
+                }
+        
+                // Display the element
+                characterCaption.classList.remove('invisible') 
+            }else{
+                if(!characterCaption.classList.contains('invisible')){
+                    characterCaption.classList.add('invisible') 
+                }
     
-        // if this tile is enemy
-        if((row * tileSize) === enemy.y && (col * tileSize) === enemy.x){
-            // Fill the element with a portion of the character info
-            characterCaption.firstElementChild.innerHTML = enemy.name
-            const gauges = characterCaption.getElementsByTagName('li')
-    
-            // calculation the percentage of the attribute
-            for(let i=0; i < gauges.length; i++){
-                // console.log(gauges[i].firstElementChild)
-                gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], enemy) + '%';
+                if(actionMenu.classList.contains('action_menu_open')){
+                    actionMenu.classList.remove('action_menu_open') 
+                }
             }
-    
-            // Display the element
-            characterCaption.classList.add('visible') 
-        }else{
-            // Hide the element
-            characterCaption.classList.remove('visible')
-        }
-    
-        // If there are walkable blocks in the array
-        if(playerWalkableSpace.length){
-    
-            let inRange = false
+        
+            // If there are walkable blocks in the array
+            if(playerWalkableSpace.length){
+        
+                let inRange = false
 
-            // Loop through the array find if the position matches
-            for(let i=0; i < playerWalkableSpace.length; i++){
-                if(inRange){
-                    break
-                }else{
-                    for(let j=0; j < playerWalkableSpace[i].length; j++){
-                        if(playerWalkableSpace[i][j][0] === row && playerWalkableSpace[i][j][1] === col){
-                            inRange = true
+                // Loop through the array find if the position matches
+                for(let i=0; i < playerWalkableSpace.length; i++){
+                    if(inRange){
+                        break
+                    }else{
+                        for(let j=0; j < playerWalkableSpace[i].length; j++){
+                            if(playerWalkableSpace[i][j][0] === row && playerWalkableSpace[i][j][1] === col){
+                                inRange = true
 
-                            await prepareDirections(playerPosition, { row: row, col: col })
+                                await prepareDirections(playerPosition, { row: row, col: col })
 
-                            // Hide the element
-                            characterCaption.classList.remove('visible')
-            
-                            player.setWalkableSpace(playerWalkableSpace)  
-            
-                            // Start moving
-                            // Maybe I need a global variable to track the steps...
-                            beginAnimationPhase(stepCount, 2)   
+                                // Hide the element
+                                characterCaption.classList.remove('visible')
+                
+                                player.setWalkableSpace(playerWalkableSpace)  
+                
+                                // Start moving
+                                // Maybe I need a global variable to track the steps...
+                                beginAnimationPhase(stepCount, 2)   
+                            }
                         }
                     }
-                }
-            }   
+                }   
+            }
         }
     }
 })
@@ -403,11 +409,12 @@ const getPercentage = (type, character) => {
 
 /**
  * Define what tile is walkable
- * @param {object} characterPosition - The x and y axis of the character 
+ * @param {object} characterPosition - The x and y axis of the current acting character 
  * @param {number} blocksPerDirection - Number of block for each direction
+ * @param {object} enemyPosition - The x and y axis of the enemy ( player or bot ) 
  * @returns 
  */
-const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
+const getAvailableSpace = async (characterPosition, blocksPerDirection, enemyPosition = null) => {
     const availableSpace = []
 
     // The max length of blocks in a straight line include the character
@@ -457,7 +464,11 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
                     inspectCol = inspectCol - (left_and_right_blocks - (block - 1))
                 }
 
-                const onTheSameBlock = characterPosition.row === inspectRow && characterPosition.col === inspectCol
+                let onTheSameBlock = characterPosition.row === inspectRow && characterPosition.col === inspectCol
+
+                if(enemyPosition !== null){
+                    onTheSameBlock = enemyPosition.row === inspectRow && enemyPosition.col === inspectCol
+                }
 
                 console.log(`checking tile map row:${inspectRow} col:${inspectCol} :>>>`, tileMap.map[inspectRow][inspectCol])
 
@@ -506,7 +517,11 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
                     inspectCol = inspectCol - (left_and_right_blocks - (block - 1))
                 }
 
-                const onTheSameBlock = characterPosition.row === inspectRow && characterPosition.col === inspectCol
+                let onTheSameBlock = characterPosition.row === inspectRow && characterPosition.col === inspectCol
+
+                if(enemyPosition !== null){
+                    onTheSameBlock = enemyPosition.row === inspectRow && enemyPosition.col === inspectCol
+                }
 
                 // Check if the block is walkable
                 if(tileMap.map[inspectRow][inspectCol] === 0 && !onTheSameBlock){
@@ -522,6 +537,45 @@ const getAvailableSpace = async (characterPosition, blocksPerDirection) => {
     return availableSpace
 }
 
+/**
+ * Randomly decide x and y
+ */
+const randomSteps = async() => {
+    const getXY = async() => {
+        const row =  Math.floor( Math.random() * (playerWalkableSpace.length - 1))
+        console.log("row :>>>", row)
+        const col = Math.floor( Math.random() * (playerWalkableSpace[row].length - 1))
+        console.log("col :>>>", col)
+        // if(row >= 0 && playerWalkableSpace[row].length){
+        //     return row
+        // }else{
+        //     await getRow()
+        // }
+        return { row, col }
+    }
+
+
+    const { row, col } = await getXY()
+
+    if(playerWalkableSpace[row][col][0] === enemyPosition.row && playerWalkableSpace[row][col][1] === enemyPosition.col){
+        // Spend an action point
+        characterAnimationPhaseEnded(3)                       
+    }else{
+        // Go to the random selected position
+        await prepareDirections(enemyPosition, { row: playerWalkableSpace[row][col][0], col: playerWalkableSpace[row][col][1] })
+        console.log("reachableDirections :>>>", playerReachableDirections)
+        
+        if(playerReachableDirections.length){
+            // Start moving
+            enemy.setWalkableSpace(playerWalkableSpace)
+            beginAnimationPhase(stepCount, 3)  
+        }else{
+            // Spend an action point
+            characterAnimationPhaseEnded(3)  
+        }
+    } 
+}
+
 // An AI for enemy movement decision
 const enemyAI = async() => {
     // Get enemy position
@@ -530,7 +584,7 @@ const enemyAI = async() => {
 
     // get walkable space
     actionMode = 'move'
-    playerWalkableSpace = await getAvailableSpace(enemyPosition, enemy.attributes.moveSpeed)
+    playerWalkableSpace = await getAvailableSpace(enemyPosition, enemy.attributes.moveSpeed, playerPosition)
 
     if(playerWalkableSpace.length) actionMode = 'search'
 
@@ -557,108 +611,29 @@ const enemyAI = async() => {
             }
 
         }
-
         
         if(playerDetect){
-            console.log('enemyAI found player')
-            
-            // if player is in the movable range
-            const checkInRange = (row, col) => {
-                let inRange = false
-                for(let i = 0; block < playerWalkableSpace.length; i++){
-                    if(inRange){
-                        break
-                    }else{
-                        for(let block = 0; block < playerWalkableSpace[i].length; block++){
-                            if(playerWalkableSpace[i][block].length){
-                                if(playerWalkableSpace[i][block][0] === row && playerWalkableSpace[i][block][1] === col){
-                                    inRange = true
-                                }                            
-                            }
-                        }                         
-                    }
-                }
-                
-                return inRange
-            }
+            console.log('enemyAI found player')            
 
             // Decide which block to take as destination
+            const allDistance = []
 
-            let top = (checkInRange(playerPosition.row - 1, playerPosition.col))? 
-            { 
-                cost:getDistance(enemyPosition.col, enemyPosition.row, { 
-                    row: playerPosition.row - 1, 
-                    col: playerPosition.col}), x: enemyPosition.col ,y: enemyPosition.row 
-            }: {}
-            
-            let down = (checkInRange(playerPosition.row + 1, playerPosition.col))? 
-            { 
-                cost:getDistance(enemyPosition.col, enemyPosition.row, { 
-                    row: playerPosition.row + 1, 
-                    col: playerPosition.col}), x: enemyPosition.col ,y: enemyPosition.row 
-            }: {}
+            playerWalkableSpace.forEach(layer => {
+                layer.forEach(block => {
+                     allDistance.push({ cost: getDistance(block[1], block[0], playerPosition), x: block[1], y: block[0] }) 
+                })
+            }) 
 
-            let left = (checkInRange(playerPosition.row, playerPosition.col -1))? 
-            { 
-                cost:getDistance(enemyPosition.col, enemyPosition.row, { 
-                    row: playerPosition.row, 
-                    col: playerPosition.col - 1}), x: enemyPosition.col ,y: enemyPosition.row 
-            }: {}
+            console.log('all distance :>>>', allDistance)
 
-            let right = (checkInRange(playerPosition.row, playerPosition.col + 1))? 
-            { 
-                cost:getDistance(enemyPosition.col, enemyPosition.row, { 
-                    row: playerPosition.row, 
-                    col: playerPosition.col - 1}), x: enemyPosition.col ,y: enemyPosition.row 
-            }: {}
-
-            let directions = [top, down, left, right].filter(d => Object(d).length > 0)
-            // let inspectDirection = 0
-
-            const shortest = directions.findIndex(d => d.cost === Math.min(...directions.map(r => r.cost)));
+            const shortest = allDistance.findIndex(d => d.cost === Math.min(...allDistance.map(r => r.cost)))
 
 
-            await prepareDirections(enemyPosition, { row: directions[shortest].y, col: directions[shortest].x })
+            if(shortest >= 0){
+                await prepareDirections(enemyPosition, { row: allDistance[shortest].y, col: allDistance[shortest].x })
 
-            console.log("reachableDirections :>>>", playerReachableDirections)
-
-            if(playerReachableDirections.length){
-                // Start moving
-                enemy.setWalkableSpace(playerWalkableSpace)
-                beginAnimationPhase(stepCount, 3)  
-            }else{
-                // Spend an action point
-                characterAnimationPhaseEnded(3)  
-            }    
-            
-        }else{
-            console.log('enemyAI can not find the player')
-
-            // Randomly decide x and y
-            const getXY = async() => {
-                const row =  Math.floor( Math.random() * (playerWalkableSpace.length - 1))
-                console.log("row :>>>", row)
-                const col = Math.floor( Math.random() * (playerWalkableSpace[row].length - 1))
-                console.log("col :>>>", col)
-                // if(row >= 0 && playerWalkableSpace[row].length){
-                //     return row
-                // }else{
-                //     await getRow()
-                // }
-                return { row, col }
-            }
-
-
-            const { row, col } = await getXY()
-
-            if(playerWalkableSpace[row][col][0] === enemyPosition.row && playerWalkableSpace[row][col][1] === enemyPosition.col){
-                // Spend an action point
-                characterAnimationPhaseEnded(3)                       
-            }else{
-                // Go to the random selected position
-                await prepareDirections(enemyPosition, { row: playerWalkableSpace[row][col][0], col: playerWalkableSpace[row][col][1] })
                 console.log("reachableDirections :>>>", playerReachableDirections)
-                
+
                 if(playerReachableDirections.length){
                     // Start moving
                     enemy.setWalkableSpace(playerWalkableSpace)
@@ -666,8 +641,16 @@ const enemyAI = async() => {
                 }else{
                     // Spend an action point
                     characterAnimationPhaseEnded(3)  
-                }
-            }                  
+                }                   
+            }else{
+                console.log('Player out of reach')
+
+                await randomSteps()
+            }
+        }else{
+            console.log('enemyAI can not find the player')
+
+            await randomSteps()
         }
     } 
 
@@ -731,6 +714,7 @@ const characterAnimationPhaseEnded = async(type) => {
             }else{
                 // Display Action options
                 actionMenu.classList.add('action_menu_open')
+                characterCaption.classList.remove('invisible')
             }
         }else{
             enemy.attributes.ap -= 1 
@@ -768,46 +752,33 @@ const gameLoop = () => {
 
 // Move to the next phase
 const nextTurn = () => {
-    if(turnType === 0){
-        // Phase transition fade in
-        phaseElement.innerText = 'Enemy Phase'
-        phaseWrapper.classList.remove('invisible')
+    phaseElement.innerText = (turnType === 0)? 'Enemy Phase' : 'Player Phase'
+    // Phase transition fade in
+    phaseWrapper.classList.add('fade_in')
+    // Phase transition fade out
+    setTimeout(() => {
+        phaseWrapper.classList.add('fade_out')
+    }, 1000)
 
-        // Phase transition fade out
-        setTimeout(() => {
-            phaseWrapper.classList.add('invisible')
-        }, 1000)
-
-        //
-        setTimeout(() => {
+    //
+    setTimeout(() => {
+        phaseWrapper.classList.remove('fade_in')
+        phaseWrapper.classList.remove('fade_out')
+        if(turnType === 0){
             console.log('enemy phase')
             enemy.wait = false
             turnType = 1
             enemy.attributes.ap = enemy.attributes.maxAp
-            enemyAI()             
-        }, 1500)
-
-    }else{
-        // Phase transition fade in
-        phaseElement.innerText = 'Player Phase'
-        phaseWrapper.classList.remove('invisible')
-
-        // Phase transition fade out
-        setTimeout(() => {
-            phaseWrapper.classList.add('invisible')
-        }, 1000)
-
-        //
-        setTimeout(() => {
+            enemyAI() 
+        }else{
             console.log('player phase')
             player.wait = false
             turnType = 0
             player.attributes.ap = player.attributes.maxAp
-            turn += 1           
-        }, 1500)
-
-        turnCounter.innerText = `Turn ${turn}`
-    }
+            turn += 1 
+            turnCounter.innerText = `Turn ${turn}`
+        }            
+    }, 1500)
 }
 // #endregion
 
