@@ -107,22 +107,18 @@ const resize = () => {
     // canvas.style.width = (deviceHeight * aspectRatio) + 'px'
     // canvas.style.height = deviceHeight + 'px'
 
-    canvas.width = Math.floor(deviceHeight * aspectRatio)
-    canvas.height = deviceHeight
+    if(deviceHeight <= 768){
+        canvas.width = Math.floor(deviceHeight * aspectRatio)
+        canvas.height = deviceHeight        
+    }else
 
-    // Adjust canvas size
-    // if(deviceWidthToDeviceHeight > aspectRatio){
-    //     // If window width is wider than the aspect ratio
-    //     deviceWidth = Math.floor(deviceHeight * aspectRatio)
-    //     canvas.style.width = deviceWidth + 'px'
-    //     canvas.style.height = deviceHeight + 'px'
-    // }else{
-    //     // If window height is taller than aspect ratio
-    //     deviceHeight = Math.floor(deviceWidth / aspectRatio)
-    //     canvas.style.width = deviceWidth + 'px'
-    //     canvas.style.height = deviceHeight + 'px'
-    // }
-
+    if(deviceWidth <= 500){
+        canvas.width = deviceWidth
+        canvas.height = Math.floor(deviceWidth * (16/9))
+    }else{
+        canvas.width = Math.floor(deviceHeight * aspectRatio)
+        canvas.height = deviceHeight  
+    }
     phaseWrapper.style.width = canvas.width + 'px';
     phaseWrapper.style.height = canvas.height + 'px';
 
@@ -146,11 +142,16 @@ const resize = () => {
     //set actionMenu wrapper width and height
     actionMenu.style.width = Math.floor( 40 * Math.floor(canvas.width / 100)) + 'px';
 
+    const fontSize = Math.floor( 10 * Math.floor(canvas.width / 100))
+
     // action menu child font size
     for(let i=0; i < actionMenuOptions.length; i++){
-        actionMenuOptions[i].style['font-size'] = Math.floor( 10 * Math.floor(canvas.width / 100)) + 'px';
-
+        actionMenuOptions[i].style['font-size'] = fontSize + 'px';
     }
+
+    characterName.style['font-size'] = fontSize + 'px';
+
+    phaseElement.style['font-size'] = fontSize + 'px';
 
     // Get canvas position after resize
     ctx = canvas.getContext("2d");
