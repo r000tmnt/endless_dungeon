@@ -238,7 +238,7 @@ export default class Character {
 
         // Assign the attributes to the object
         if(job){
-            this.id = crypto.randomUUID()
+            this.id = Math.floor(Math.random * 100)
             this.name = attributes.name
             this.lv = 1
             this.class = job.name
