@@ -170,11 +170,7 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
                     inspectCol = inspectCol - (left_and_right_blocks - (block - 1))
                 }
 
-                let onTheSameBlock = characterPosition.row === inspectRow && characterPosition.col === inspectCol
-
-                if(enemyPosition !== null){
-                    onTheSameBlock = enemyPosition.row === inspectRow && enemyPosition.col === inspectCol
-                }
+                let onTheSameBlock = (enemyPosition !== null)? enemyPosition.row === inspectRow && enemyPosition.col === inspectCol : false
 
                 console.log(`checking tile map row:${inspectRow} col:${inspectCol} :>>>`, tileMap.map[inspectRow][inspectCol])
 
@@ -223,11 +219,7 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
                     inspectCol = inspectCol - (left_and_right_blocks - (block - 1))
                 }
 
-                let onTheSameBlock = characterPosition.row === inspectRow && characterPosition.col === inspectCol
-
-                if(enemyPosition !== null){
-                    onTheSameBlock = enemyPosition.row === inspectRow && enemyPosition.col === inspectCol
-                }
+                let onTheSameBlock = (enemyPosition !== null)? enemyPosition.row === inspectRow && enemyPosition.col === inspectCol : false
 
                 // Check if the block is walkable
                 if(tileMap.map[inspectRow][inspectCol] === 0 && !onTheSameBlock){
