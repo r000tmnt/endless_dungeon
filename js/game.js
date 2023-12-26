@@ -2,8 +2,8 @@ import Character from './Character.js';
 import TileMap from './TileMap.js';
 
 // #region Canvas element
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext("2d");
+let canvas = document.getElementById('game');
+let ctx = canvas.getContext("2d");
 
 let canvasPosition
 let deviceWidth = window.innerWidth
@@ -11,6 +11,77 @@ let deviceHeight = window.innerHeight
 
 const phaseWrapper = document.getElementById('Phase_Transition');
 const phaseElement = document.getElementById('phase');
+// #endregion
+
+// #region Tile map setup
+let tileSize = Math.floor(canvas.width / 9);
+
+let tileMap = new TileMap(tileSize)
+// console.log(tileMap)
+// #endregion
+
+// #region Game characters
+// Character movement speed
+let velocity = 1;
+
+// Create player object
+let player = tileMap.getPlayer(velocity)
+console.log('player :>>>', player)
+// player.setSkills('slash')
+var playerPosition = {
+    row: player.y / tileSize,
+    col: player.x / tileSize
+}
+
+// Create enemy object
+let enemy = tileMap.getEnemy(velocity)
+console.log('enemy :>>>', enemy)
+// enemy.setSkills('poison')
+
+var enemyPosition = {
+    row: enemy.y / tileSize,
+    col: enemy.x / tileSize
+}
+// #endregion
+
+// #region UI element variables and functions
+// Get UI element and bind a click event
+const turnCounter = document.getElementById('turn')
+turnCounter.innerText = 'Turn 1'
+
+const actionMenu = document.getElementById('action_menu');
+// Hide UI elements
+actionMenu.addEventListener('click', () => {
+    actionMenu.classList.remove('action_menu_open')
+})
+
+// const actionMenuHolder = actionMenu.getElementByIdy('action_list')
+const actionMenuOptions = actionMenu.getElementsByTagName('li')
+
+const characterCaption = document.getElementById('characterCaption')
+const characterCaptionAttributes = ['hp', 'mp']
+
+// action menu child clcik event
+for(let i=0; i < actionMenuOptions.length; i++){
+    for(let i=0; i < actionMenuOptions.length; i++){
+
+        actionMenuOptions[i].style['font-size'] = Math.floor( 10 * Math.floor(canvas.width / 100)) + 'px';
+
+        switch(actionMenuOptions[i].dataset.action){
+            case 'move':
+                actionMenuOptions[i].addEventListener('click', async function(){
+                    actionMode = 'move'
+                    playerWalkableSpace = await getAvailableSpace(playerPosition, player.attributes.moveSpeed)
+                    console.log("playerWalkableSpace : >>>", playerWalkableSpace)
+                    // Hide the element
+                    characterCaption.classList.remove('visible')               
+                })
+            break;
+        }
+    }
+}
+
+// #endregion
 
 const resize = () => {
     console.log('resize')
@@ -22,10 +93,10 @@ const resize = () => {
     deviceWidth = window.innerWidth
     deviceHeight = window.innerHeight
 
-    canvas.style.width = (deviceHeight * aspectRatio) + 'px'
-    canvas.style.height = deviceHeight + 'px'
+    // canvas.style.width = (deviceHeight * aspectRatio) + 'px'
+    // canvas.style.height = deviceHeight + 'px'
 
-    canvas.width = deviceHeight * aspectRatio
+    canvas.width = Math.floor(deviceHeight * aspectRatio)
     canvas.height = deviceHeight
 
     // Adjust canvas size
@@ -41,22 +112,47 @@ const resize = () => {
     //     canvas.style.height = deviceHeight + 'px'
     // }
 
-    phaseWrapper.style.width = canvas.style.width;
-    phaseWrapper.style.height = canvas.style.height;
+    phaseWrapper.style.width = canvas.width + 'px';
+    phaseWrapper.style.height = canvas.height + 'px';
+
+    // Set up tile size according to the canvas width
+    tileSize = Math.floor(canvas.width / 9);
+    tileMap = new TileMap(tileSize)
+
+    // Get the player position relative to the canvas size
+    player = tileMap.getPlayer(velocity)
+     playerPosition = {
+        row: player.y / tileSize,
+        col: player.x / tileSize
+    }
+
+    enemy = tileMap.getEnemy(velocity)
+    enemyPosition = {
+        row: enemy.y / tileSize,
+        col: enemy.x / tileSize
+    }
+
+    //set actionMenu wrapper width and height
+    actionMenu.style.width = Math.floor( 40 * Math.floor(canvas.width / 100)) + 'px';
+
+    // action menu child font size
+    for(let i=0; i < actionMenuOptions.length; i++){
+
+        actionMenuOptions[i].style['font-size'] = Math.floor( 10 * Math.floor(canvas.width / 100)) + 'px';
+
+    }
 
     // Get canvas position after resize
+    ctx = canvas.getContext("2d");
     canvasPosition = canvas.getBoundingClientRect();
+
+    console.log('canvas element :>>>', canvas)
+    console.log('canvas position :>>>', canvasPosition)
 }
 
-// #endregion
-
-// #region Tile map setup
+// First time drawing the canvas
 resize()
-const tileSize = Math.floor(canvas.width / 9);
 
-const tileMap = new TileMap(tileSize)
-console.log(tileMap)
-// #endregion
 
 // #region Game logic variables
 var turn = 1
@@ -89,29 +185,6 @@ export const animationSignal = (signal) => {
 
 // #endregion
 
-// #region Game characters
-// Character movement speed
-const velocity = 1;
-
-// Create player object
-const player = tileMap.getPlayer(velocity)
-console.log('player :>>>', player)
-// player.setSkills('slash')
-var playerPosition = {
-    row: player.y / tileSize,
-    col: player.x / tileSize
-}
-
-// Create enemy object
-const enemy = tileMap.getEnemy(velocity)
-console.log('enemy :>>>', enemy)
-// enemy.setSkills('poison')
-
-var enemyPosition = {
-    row: enemy.y / tileSize,
-    col: enemy.x / tileSize
-}
-// #endregion
 
 // #region Game logic functions
 const getDistance = (x ,y, target) => {
@@ -179,8 +252,18 @@ const prepareDirections = async(currentPlayer, target) => {
     const getEachStep = async() => {
         reachableDirections = getDirections(x, y, target)
 
-        // Choose the shortest one
-        const shortest = reachableDirections.findIndex(d => d.cost === Math.min(...reachableDirections.map(r => r.cost)));
+        let shortest 
+
+        // Check if the cost of each block are the same
+        const sameCost = reachableDirections.every(d => d === reachableDirections[0])
+
+        if(sameCost){
+            // Choose the latest one
+            shortest = reachableDirections.length - 1
+        }else{
+            // Choose the shortest one
+            shortest = reachableDirections.findIndex(d => d.cost === Math.min(...reachableDirections.map(r => r.cost)));
+        }
 
         playerReachableDirections.push([reachableDirections[shortest].y, reachableDirections[shortest].x])
 
@@ -706,7 +789,7 @@ const nextTurn = () => {
 
     }else{
         // Phase transition fade in
-        phaseElement.innerText = 'player Phase'
+        phaseElement.innerText = 'Player Phase'
         phaseWrapper.classList.remove('invisible')
 
         // Phase transition fade out
@@ -722,43 +805,8 @@ const nextTurn = () => {
             player.attributes.ap = player.attributes.maxAp
             turn += 1           
         }, 1500)
-    }
-}
-// #endregion
 
-// #region UI element variables and functions
-// Get UI element and bind a click event
-const actionMenu = document.getElementById('action_menu');
-// Hide UI elements
-actionMenu.addEventListener('click', () => {
-    actionMenu.classList.remove('action_menu_open')
-})
-
-// const actionMenuHolder = actionMenu.getElementByIdy('action_list')
-const actionMenuOptions = actionMenu.getElementsByTagName('li')
-
-const characterCaption = document.getElementById('characterCaption')
-const characterCaptionAttributes = ['hp', 'mp']
-
-//set actionMenu wrapper width and height
-actionMenu.style.width = Math.floor( 40 * Math.floor(canvas.width / 100)) + 'px';
-// actionMenu.style.height = canvas.style.height + 'px';
-
-// action menu child click event
-for(let i=0; i < actionMenuOptions.length; i++){
-
-    actionMenuOptions[i].style['font-size'] = Math.floor( 10 * Math.floor(canvas.width / 100)) + 'px';
-
-    switch(actionMenuOptions[i].dataset.action){
-        case 'move':
-            actionMenuOptions[i].addEventListener('click', async function(){
-                actionMode = 'move'
-                playerWalkableSpace = await getAvailableSpace(playerPosition, player.attributes.moveSpeed)
-                console.log("playerWalkableSpace : >>>", playerWalkableSpace)
-                // Hide the element
-                characterCaption.classList.remove('visible')               
-            })
-        break;
+        turnCounter.innerText = `Turn ${turn}`
     }
 }
 // #endregion
@@ -766,7 +814,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
 
 // resize()
 window.addEventListener('resize', resize, false);
-window.addEventListener('orientationchange', resize, false);
+// window.addEventListener('orientationchange', resize, false);
 
 // 30 fps
 setInterval(gameLoop, 1000 / 30)
