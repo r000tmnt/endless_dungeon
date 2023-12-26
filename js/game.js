@@ -11,6 +11,9 @@ let canvasPosition
 let deviceWidth = window.innerWidth
 let deviceHeight = window.innerHeight
 
+// Text information about damange, heal, poisoned... etc
+let statusText = ''
+
 const phaseWrapper = document.getElementById('Phase_Transition');
 const phaseElement = document.getElementById('phase');
 // #endregion
@@ -57,6 +60,9 @@ const actionMenu = document.getElementById('action_menu');
 const actionMenuOptions = actionMenu.getElementsByTagName('li')
 
 const characterCaption = document.getElementById('characterCaption')
+const characterName = document.getElementById('name')
+const characterLv = document.getElementById('lv')
+const characterAp = document.getElementById('ap')
 const characterCaptionAttributes = ['hp', 'mp']
 
 // action menu child clcik event
@@ -223,7 +229,9 @@ canvas.addEventListener('mousedown', async(event) =>{
             if(!player.destination){
     
                 // Fill the element with a portion of the character info
-                characterCaption.firstElementChild.innerHTML = player.name
+                characterName.innerText = player.name
+                characterLv.innerText = `LV ${player.lv}`
+                characterAp.innerText = `AP: ${player.attributes.ap}`
                 const gauges = characterCaption.getElementsByTagName('li')
     
                 // calculation the percentage of the attribute
@@ -243,7 +251,9 @@ canvas.addEventListener('mousedown', async(event) =>{
             // if this tile is enemy
             if((row * tileSize) === enemy.y && (col * tileSize) === enemy.x){
                 // Fill the element with a portion of the character info
-                characterCaption.firstElementChild.innerHTML = enemy.name
+                characterName.innerText = enemy.name
+                characterLv.innerText = `LV ${enemy.lv}`
+                characterAp.innerText = `AP: ${enemy.attributes.ap}`
                 const gauges = characterCaption.getElementsByTagName('li')
         
                 // calculation the percentage of the attribute
