@@ -1,5 +1,6 @@
 // import Character from './Character.js';
 import TileMap from './TileMap.js';
+import Grid from './grid.js';
 
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
 
@@ -22,7 +23,42 @@ const phaseElement = document.getElementById('phase');
 let tileSize = Math.floor(canvas.width / 9);
 
 let tileMap = new TileMap(tileSize)
+
+let grid = new Grid(tileMap.map, tileSize, {})
 // console.log(tileMap)
+// #endregion
+
+// #region Game logic variables
+var turn = 1
+
+// 0 - player
+// 1 - enemy
+var turnType = 0
+
+var actionMode = ''
+
+var pointedBlock = {}
+
+/** An array to store a range of walkable position
+ * [ { row, col }, { row, col }, { row, col }...]
+ */
+var playerWalkableSpace = []
+
+/**
+ * An array to store steps in order
+ */
+var playerReachableDirections = []
+
+var stepCount = 0
+
+// If the character is moving
+var animationInit = false
+
+// A exported function for other object to talk to the game engine
+export const animationSignal = (signal) => {
+    animationInit = signal
+}
+
 // #endregion
 
 // #region Game characters
@@ -125,6 +161,7 @@ const resize = () => {
     // Set up tile size according to the canvas width
     tileSize = Math.floor(canvas.width / 9);
     tileMap = new TileMap(tileSize)
+    grid = new Grid(tileMap.map, tileSize, {})
 
     // Get the player position relative to the canvas size
     player = tileMap.getPlayer(velocity)
@@ -164,39 +201,6 @@ const resize = () => {
 // First time drawing the canvas
 resize()
 
-
-// #region Game logic variables
-var turn = 1
-
-// 0 - player
-// 1 - enemy
-var turnType = 0
-
-var actionMode = ''
-
-/** An array to store a range of walkable position
- * [ { row, col }, { row, col }, { row, col }...]
- */
-var playerWalkableSpace = []
-
-/**
- * An array to store steps in order
- */
-var playerReachableDirections = []
-
-var stepCount = 0
-
-// If the character is moving
-var animationInit = false
-
-// A exported function for other object to talk to the game engine
-export const animationSignal = (signal) => {
-    animationInit = signal
-}
-
-// #endregion
-
-
 // Get the position on the tileMap
 const getPosition = (event) => {
     // console.log("tileSize :>>>", tileSize)
@@ -212,6 +216,11 @@ const getPosition = (event) => {
 // get mouse position and divide by tile size to see where the row and the column it clicked
 canvas.addEventListener('mousedown', async(event) =>{
     const { row, col } = getPosition(event)
+
+    // Set pointed block
+    pointedBlock = { row, col }
+    grid.setPointedBlock(pointedBlock)
+    
     // If there are walkable blocks in the array
     if(playerWalkableSpace.length){
         
@@ -308,14 +317,10 @@ canvas.addEventListener('mousedown', async(event) =>{
     }else{
         if(!characterCaption.classList.contains('invisible')){
             characterCaption.classList.add('invisible') 
-        }else{
-            characterCaption.classList.remove('invisible') 
         }
 
         if(actionMenu.classList.contains('action_menu_open')){
             actionMenu.classList.remove('action_menu_open') 
-        }else{
-            actionMenu.classList.add('action_menu_open') 
         }
     }
 })
@@ -511,6 +516,8 @@ const characterAnimationPhaseEnded = async(type) => {
 
             // If the player is ran out of action point, move to the enemy phase
             if(player.attributes.ap === 0) {
+                pointedBlock = {}
+                grid.setPointedBlock(pointedBlock)
                 nextTurn()
             }else{
                 // Display Action options
@@ -538,7 +545,7 @@ const characterAnimationPhaseEnded = async(type) => {
 
 //  Initialize the game
 const gameLoop = () => {
-    tileMap.draw(canvas, ctx, playerWalkableSpace)
+    tileMap.draw(canvas, ctx, playerWalkableSpace, pointedBlock)
 
     if(player !== undefined) {
         player.draw(ctx)
@@ -550,6 +557,12 @@ const gameLoop = () => {
         enemy.draw(ctx)
     }else{
         console.log('enemy not found')
+    }
+
+    if(grid !== undefined){
+        grid.draw(ctx)
+    }else{
+        console.log('grid close')
     }
 }
 
