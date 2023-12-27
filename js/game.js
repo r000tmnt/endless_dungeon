@@ -66,23 +66,25 @@ export const animationSignal = (signal) => {
 let velocity = 1;
 
 // Create player object
-let player = tileMap.getPlayer(velocity)
-console.log('player :>>>', player)
+let player = null
+// console.log('player :>>>', player)
 // player.setSkills('slash')
 var playerPosition = {
-    row: player.y / tileSize,
-    col: player.x / tileSize
+    row: 0,
+    col: 0
 }
 
 // Create enemy object
-let enemy = tileMap.getEnemy(velocity)
-console.log('enemy :>>>', enemy)
+let enemy = null
+// console.log('enemy :>>>', enemy)
 // enemy.setSkills('poison')
 
 var enemyPosition = {
-    row: enemy.y / tileSize,
-    col: enemy.x / tileSize
+    row: 0,
+    col: 0
 }
+
+var inspectingCharacter = null
 // #endregion
 
 // #region UI element variables and functions
@@ -101,6 +103,26 @@ const characterLv = document.getElementById('lv')
 const characterAp = document.getElementById('ap')
 const characterCaptionAttributes = ['hp', 'mp']
 
+const statusWindow = document.getElementById('status')
+const avatar = document.getElementById('avatar')
+const backBtn = document.getElementsByClassName('back')
+const statusInfo = document.getElementById('info')
+const statusLv = statusWindow.children[2]
+const statusTable = statusWindow.children[3]
+
+// Back button click event
+for(let i=0; i < backBtn.length; i++){
+    switch(backBtn[i].dataset.action){
+        case 'status':
+            backBtn[i].addEventListener('click', () => {
+                actionMode = ''
+                statusWindow.classList.add('invisible')
+                statusWindow.classList.remove('open_window')
+            })
+        break;
+    }
+}
+
 // action menu child clcik event
 for(let i=0; i < actionMenuOptions.length; i++){
     switch(actionMenuOptions[i].dataset.action){
@@ -112,6 +134,43 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 characterCaption.classList.add('invisible')  
                 playerWalkableSpace = await getAvailableSpace(tileMap, playerPosition, player.attributes.moveSpeed, enemyPosition)
                 console.log("playerWalkableSpace : >>>", playerWalkableSpace)             
+            })
+        break;
+        case 'status':
+            actionMenuOptions[i].addEventListener('click', () => {
+                actionMode = 'status'
+
+                const tableNode = statusTable.querySelectorAll('td')
+
+                // Insert status information
+                statusInfo.children[0].innerText = inspectingCharacter.name
+                statusInfo.children[1].innerText = inspectingCharacter.class
+                statusLv.innerText = `LV ${inspectingCharacter.lv}`
+
+                for(let i=0; i < tableNode.length; i++){
+                    if(tableNode[i].dataset.attribute !== undefined){
+                        switch(tableNode[i].dataset.attribute){
+                            case 'hp':
+                                tableNode[i].innerText = `${inspectingCharacter.attributes.hp} / ${inspectingCharacter.attributes.maxHp}`
+                            break;
+                            case 'mp':
+                                tableNode[i].innerText = `${inspectingCharacter.attributes.mp} / ${inspectingCharacter.attributes.maxMp}`
+                            break;
+                            case 'ap':
+                                tableNode[i].innerText = `${inspectingCharacter.attributes.ap} / ${inspectingCharacter.attributes.maxAp}`
+                            break;
+                            case 'exp':
+                                tableNode[i].innerText = `${inspectingCharacter.exp} / ${inspectingCharacter.requiredExp}`
+                            break;
+                            default:
+                                tableNode[i].innerText = `${inspectingCharacter.attributes[`${tableNode[i].dataset.attribute}`]}`
+                            break;
+                        }
+                    }
+                }
+
+                statusWindow.classList.remove('invisible')
+                statusWindow.classList.add('open_window')
             })
         break;
         case 'stay':
@@ -155,8 +214,6 @@ const resize = () => {
         canvas.width = Math.floor(deviceHeight * aspectRatio)
         canvas.height = deviceHeight  
     }
-    phaseWrapper.style.width = canvas.width + 'px';
-    phaseWrapper.style.height = canvas.height + 'px';
 
     // Set up tile size according to the canvas width
     tileSize = Math.floor(canvas.width / 9);
@@ -188,7 +245,21 @@ const resize = () => {
 
     characterName.style['font-size'] = fontSize + 'px';
 
+    phaseWrapper.style.width = (canvas.width -5) + 'px';
+    phaseWrapper.style.height = (canvas.height -10) + 'px';
     phaseElement.style['font-size'] = fontSize + 'px';
+
+    statusWindow.style.width = (canvas.width -5)+ 'px';
+    statusWindow.style.height = (canvas.height -10) + 'px';
+    statusWindow.style.padding = (fontSize / 2) + 'px';
+
+    avatar.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
+    avatar.style.height = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
+
+    for(let i=0; i < backBtn.length; i++){
+        backBtn[i].style.transform = `translateX(-${(fontSize / 2) * 3}px)`
+        backBtn[i].style.top = (fontSize / 2) + 'px'        
+    }
 
     // Get canvas position after resize
     ctx = canvas.getContext("2d");
@@ -272,6 +343,8 @@ canvas.addEventListener('mousedown', async(event) =>{
     if((row * tileSize) === player.y && (col * tileSize) === player.x){
         console.log('I am player')
 
+        inspectingCharacter = player
+
         // Keep tracking player position
         playerPosition.row = row
         playerPosition.col = col
@@ -300,6 +373,7 @@ canvas.addEventListener('mousedown', async(event) =>{
     }else
     // if this tile is enemy
     if((row * tileSize) === enemy.y && (col * tileSize) === enemy.x){
+        inspectingCharacter = enemy
         // Fill the element with a portion of the character info
         characterName.innerText = enemy.name
         characterLv.innerText = `LV ${enemy.lv}`
