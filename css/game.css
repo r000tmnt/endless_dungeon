@@ -25,6 +25,7 @@ body{
     background-color: gray;
     margin: 0;
     padding: 0;
+    height: 100vh;
 }
 
 .absolute{
@@ -141,4 +142,28 @@ li{
 
 .fade_out{
     animation: fade_out .5s ease-in-out forwards;
+}
+
+#status{
+    background-color: black;
+    color: white;
+    transition: all .3s ease-in-out;
+    z-index: 15;
+}
+
+#status > .status_header > img{
+    border: 1px solid red;
+    margin-right: 5%;
+}
+
+#status > table{
+    width: 100%;
+}
+
+.open_window{
+    top: 0
+}
+
+.back{
+    right: 0;
 }
