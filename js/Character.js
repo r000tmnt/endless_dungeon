@@ -20,6 +20,7 @@ export default class Character {
         this.#createCharacter(attributes, type)
         this.characterIsMoving = false
         this.destination = null
+        this.walkableSpace = []
     }
 
     /**
