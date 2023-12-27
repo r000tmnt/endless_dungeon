@@ -7,7 +7,7 @@
             "type": "dmg",
             "base_on_attribute": "str",
             "multiply_as": "solid",
-            "base_dmg": 100 
+            "base_dmg": 10
         }
     }
 ]
