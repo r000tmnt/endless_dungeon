@@ -25,7 +25,6 @@ export default class TileMap {
     map = [
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 2, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -34,7 +33,8 @@ export default class TileMap {
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 3, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 3, 2, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -49,7 +49,7 @@ export default class TileMap {
     }
 
     //負責渲染於畫面的函式
-    draw(canvas, ctx, walkableSpace){
+    draw(canvas, ctx, walkableSpace, attackRange){
         // console.log(walkableSpace)
         this.#setCanvasSize(canvas);
         this.#clearCanvas(canvas, ctx)
@@ -57,6 +57,10 @@ export default class TileMap {
 
         if(walkableSpace !== undefined && walkableSpace.length){
             this.#showMovableSpace(ctx, walkableSpace)
+        }
+
+        if(attackRange !== undefined && attackRange.length){
+            this.#showAttackRange(ctx, attackRange)
         }
     }
 
@@ -166,11 +170,9 @@ export default class TileMap {
 
     }
 
-    // show a the walkable space
+    // show a range of walkable space
     #showMovableSpace(ctx, walkableSpace){
-
         for(let layer = 0; layer < walkableSpace.length; layer++){
-
             for(let block = 0; block < walkableSpace[layer].length; block++){
                 if(walkableSpace[layer][block].length){
                     const row = walkableSpace[layer][block][0]
@@ -186,8 +188,27 @@ export default class TileMap {
                     }
                 }                
             }
+        } 
+    }
 
-
+    // show the range of the attack
+    #showAttackRange(ctx, attackRange){
+        for(let layer = 0; layer < attackRange.length; layer++){
+            for(let block = 0; block < attackRange[layer].length; block++){
+                if(attackRange[layer][block].length){
+                    const row = attackRange[layer][block][0]
+                    const col = attackRange[layer][block][1]
+                    if(this.map[row][col] === 0){
+                        ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
+                        ctx.fillRect( // x, y, width, height
+                            col * this.tileSize,
+                            row * this.tileSize,
+                            this.tileSize,
+                            this.tileSize
+                        );                        
+                    }
+                }                
+            }
         } 
     }
 }

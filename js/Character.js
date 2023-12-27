@@ -14,6 +14,7 @@ export default class Character {
     constructor(x, y, tileSize, velocity, type, attributes, map){
         this.x = x
         this.y = y
+        this.pt = 0
         this.tileSize = tileSize
         this.velocity = velocity
         this.tileMap = map

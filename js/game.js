@@ -13,7 +13,7 @@ let deviceWidth = window.innerWidth
 let deviceHeight = window.innerHeight
 
 // Text information about damange, heal, poisoned... etc
-let statusText = ''
+let statusMessage = ''
 
 const phaseWrapper = document.getElementById('Phase_Transition');
 const phaseElement = document.getElementById('phase');
@@ -43,6 +43,8 @@ var pointedBlock = {}
  * [ { row, col }, { row, col }, { row, col }...]
  */
 var playerWalkableSpace = []
+
+var playerAttackRange = []
 
 /**
  * An array to store steps in order
@@ -136,6 +138,13 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 console.log("playerWalkableSpace : >>>", playerWalkableSpace)             
             })
         break;
+        case 'attack':
+            actionMenuOptions[i].addEventListener('click', async() => {
+                actionMode = 'attack'
+                actionMenu.classList.remove('action_menu_open')
+                playerAttackRange = await getAvailableSpace(tileMap, playerPosition, 1)
+            })
+        break;    
         case 'status':
             actionMenuOptions[i].addEventListener('click', () => {
                 actionMode = 'status'
@@ -292,27 +301,29 @@ canvas.addEventListener('mousedown', async(event) =>{
     pointedBlock = { row, col }
     grid.setPointedBlock(pointedBlock)
     
-    // If there are walkable blocks in the array
-    if(playerWalkableSpace.length){
+    // If there are selectable blocks in the array
+    if(playerWalkableSpace.length || playerAttackRange.length){
+
+        let selectableSpace = playerWalkableSpace.length? playerWalkableSpace : playerAttackRange
         
         // Not allow to click on the same block
         if(row === playerPosition.row && col === playerPosition.col) return
 
         let inRange = false
         // Loop through the array find if the position matches
-        for(let i=0; i < playerWalkableSpace.length; i++){
+        for(let i=0; i < selectableSpace.length; i++){
             if(inRange){
                 break
             }else{
-                for(let j=0; j < playerWalkableSpace[i].length; j++){
-                    if(playerWalkableSpace[i][j][0] === row && playerWalkableSpace[i][j][1] === col){
+                for(let j=0; j < selectableSpace[i].length; j++){
+                    if(selectableSpace[i][j][0] === row && selectableSpace[i][j][1] === col){
                         inRange = true   
                     }
                 }
             }
         }
 
-        if(inRange){
+        if(inRange && playerWalkableSpace.length){
             playerReachableDirections = await prepareDirections(tileMap, playerPosition, { row: row, col: col }, playerReachableDirections)
 
             // Hide the element
@@ -323,15 +334,106 @@ canvas.addEventListener('mousedown', async(event) =>{
             // Start moving
             // Maybe I need a global variable to track the steps...
             beginAnimationPhase(stepCount, 2)
+        }else
+        if(inRange && playerAttackRange.length){
+            // Check if there's a target to attack
+            if(enemyPosition.row === row && enemyPosition.col === col){
+                // Calculate damage and probability
+                let LvDistance = 0
+
+                const Rates = {
+                    hitRate: 0,
+                    evadeRate: enemy.attributes.spd + enemy.attributes.def,
+                    criticalRate: player.attributes.lck 
+                }
+                // Need something to know if the attck is base on skill or not
+                const damage = (player.attributes.str + Math.floor(player.attributes.str * ( 1/100 ))) / 2
+
+                console.log('possible damage :>>>', damage)
+
+                if(player.lv >= enemy.lv){
+                    LvDistance = player.lv - enemy.lv
+                    Rates.hitRate = player.attributes.spd + damage + Math.floor(LvDistance * (1/100))
+                }else{
+                    LvDistance = enemy.lv - player.lv
+                    Rates.hitRate = Math.abs(LvDistance -(player.attributes.spd + damage) + Math.floor(LvDistance * (1/100)))
+                }
+                
+                const totalRate = Rates.hitRate + Rates.evadeRate + Rates.criticalRate
+
+                console.log('Initial rate :>>>', Rates)
+                console.log('totalRate :>>>', totalRate)
+
+                for(let [key, value] of Object.entries(Rates)){
+                    Rates[key] = value / totalRate
+                }
+
+                console.log('Final rate :>>>', Rates)
+
+                const random = Math.random()
+
+                for(let [key, value] of Object.entries(Rates)){
+                    console.log('random :>>>', random)
+                    if(random <= value){
+                        switch(key){
+                            case 'hitRate':
+                                console.log('hit!')
+                                enemy.attributes.hp -= damage
+                            break;
+                            case 'evadeRate':
+                                console.log('miss!')
+                                statusMessage = 'MISS'
+                            break;
+                            case 'criticalRate':
+                                console.log('crit!')
+                                const citicalHit = damage * 1.5
+                                enemy.attributes.hp -= citicalHit
+
+                                if(enemy.attributes.hp <= 0){
+                                    // Remove the enemy on the screen
+                                    player.exp += enemy.givenExp
+
+                                    if(player.exp >= player.requiredExp){
+                                        // Player level up
+                                        // Extend the required exp for the next level
+                                        player.requiredExp += player.requiredExp * 1.5
+
+                                        // Give player a few points to spend
+                                        player.pt = 5
+
+                                        const grows = [0, 1, 3, 5,]
+
+                                        // Randomly apply attributes growth
+                                        for(let key in Object.entries(player.attributes)){
+                                            const randomGrowth = Math.floor(Math.random() * (grows.length -1))
+
+                                            if(!key.includes('max') || !key.includes('ap') || !key.includes('move') || !key.includes('sight')){
+                                                player.attribute[key] += grows[randomGrowth]
+                                            }
+                                        }
+
+                                    }
+                                }
+                            break;
+                        }
+                        // Stop for loop
+                        break;
+                    }else if(key === 'criticalRate'){
+                        console.log('nothing!')
+                        statusMessage = 'MISS'
+                    }
+                }
+            }
         }else{
             // Cancel action
             playerWalkableSpace.splice(0)
+            playerAttackRange.splice(0)
             if(!characterCaption.classList.contains('invisible')){
                 characterCaption.classList.add('invisible') 
             }else{
                 characterCaption.classList.remove('invisible') 
             }
-    
+
             if(actionMenu.classList.contains('action_menu_open')){
                 actionMenu.classList.remove('action_menu_open') 
             }else{
@@ -619,7 +721,7 @@ const characterAnimationPhaseEnded = async(type) => {
 
 //  Initialize the game
 const gameLoop = () => {
-    tileMap.draw(canvas, ctx, playerWalkableSpace, pointedBlock)
+    tileMap.draw(canvas, ctx, playerWalkableSpace, playerAttackRange)
 
     if(player !== undefined) {
         player.draw(ctx)
