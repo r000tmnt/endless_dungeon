@@ -13,6 +13,7 @@
             "int": 5,
             "spd": 5, 
             "ap": 3,
+            "lck": 5,
             "maxAp": 3,
             "moveSpeed": 3,
             "sight": 5
