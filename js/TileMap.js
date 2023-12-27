@@ -99,15 +99,6 @@ export default class TileMap {
                 currentRow += 1
                 this.#drawMap(ctx, currentRow)
             }
-
-            ctx.strokeStyle = "yellow";
-            ctx.strokeRect(
-              column * this.tileSize,
-              currentRow * this.tileSize,
-              this.tileSize,
-              this.tileSize
-            );
-
         }
     }
 
