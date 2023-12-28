@@ -1,6 +1,7 @@
 // import Character from './Character.js';
 import TileMap from './TileMap.js';
 import Grid from './grid.js';
+// import StatusMessage from './statusMessage.js';
 
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
 
@@ -13,7 +14,12 @@ let deviceWidth = window.innerWidth
 let deviceHeight = window.innerHeight
 
 // Text information about damange, heal, poisoned... etc
-let statusMessage = ''
+// let statusMessage = null
+let messageConfig = {
+    message: '',
+    style: 'yellow',
+    size: 0,
+}
 
 const phaseWrapper = document.getElementById('Phase_Transition');
 const phaseElement = document.getElementById('phase');
@@ -91,6 +97,7 @@ var inspectingCharacter = null
 
 // #region UI element variables and functions
 // Get UI element and bind a click event
+const appWrapper = document.getElementById('wrapper')
 const turnCounter = document.getElementById('turn')
 turnCounter.innerText = 'Turn 1'
 
@@ -196,6 +203,28 @@ for(let i=0; i < actionMenuOptions.length; i++){
     }
 }
 
+const displayMessage = (message, size, style, x, y) => {
+    const messageHolder = document.createElement('span')
+    messageHolder.innerText = message
+    messageHolder.style.fontSize = size
+    messageHolder.style.color = style
+    messageHolder.style.textAlign = 'center'
+    messageHolder.style.position = 'absolute',
+    messageHolder.style.top = y + 'px'
+    messageHolder.style.left = x + 'px'
+    appWrapper.append(messageHolder)
+
+    // Clear message
+    setTimeout(() => {
+        messageHolder.remove()
+    }, 1000)
+
+    // Spend an action point
+    setTimeout(() => {
+        characterAnimationPhaseEnded(2)
+    }, 1500)
+}
+
 // #endregion
 
 const resize = () => {
@@ -246,6 +275,8 @@ const resize = () => {
     actionMenu.style.width = Math.floor( 40 * Math.floor(canvas.width / 100)) + 'px';
 
     const fontSize = Math.floor( 10 * Math.floor(canvas.width / 100))
+
+    messageConfig.size = fontSize
 
     // action menu child font size
     for(let i=0; i < actionMenuOptions.length; i++){
@@ -425,6 +456,7 @@ canvas.addEventListener('mousedown', async(event) =>{
                         switch(Rates[i].name){
                             case 'hitRate':
                                 console.log('hit!')
+                                messageConfig.message = String(damage)
                                 enemy.attributes.hp -= damage
                                 console.log('enmey hp:>>>', enemy.attributes.hp)
 
@@ -434,12 +466,13 @@ canvas.addEventListener('mousedown', async(event) =>{
                             break;
                             case 'evadeRate':
                                 console.log('miss!')
-                                statusMessage = 'MISS'
+                                messageConfig.message = 'MISS!'
                             break;
                             case 'criticalRate':
                                 console.log('crit!')
-                                const citicalHit = damage * 1.5
-                                enemy.attributes.hp -= citicalHit
+                                const criticalHit = damage * 1.5
+                                messageConfig.message = String(criticalHit)
+                                enemy.attributes.hp -= criticalHit
                                 console.log('enmey hp:>>>', enemy.attributes.hp)
 
                                 if(enemy.attributes.hp <= 0){
@@ -452,9 +485,17 @@ canvas.addEventListener('mousedown', async(event) =>{
                     // If loop to the late one and still miss anything
                     }else if(i === (Rates.length - 1)){
                         console.log('nothing!')
-                        statusMessage = 'MISS'
+                        messageConfig.message = 'MISS!'
                     }
                 }
+
+                characterCaption.classList.add('invisible') 
+                actionMenu.classList.remove('action_menu_open') 
+                playerAttackRange.splice(0)
+
+                const { message, style, size} = messageConfig
+
+                displayMessage(message, size, style,  enemy.x, (enemy.y - tileSize))
             }
         }else{
             // Cancel action
