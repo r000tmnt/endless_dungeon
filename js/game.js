@@ -1,9 +1,9 @@
 // import Character from './Character.js';
 import TileMap from './TileMap.js';
 import Grid from './grid.js';
-// import StatusMessage from './statusMessage.js';
 
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
+import { weaponAttack } from './utils/battle.js';
 
 // #region Canvas element
 let canvas = document.getElementById('game');
@@ -133,7 +133,7 @@ for(let i=0; i < backBtn.length; i++){
     }
 }
 
-// action menu child clcik event
+// action menu child click event
 for(let i=0; i < actionMenuOptions.length; i++){
     switch(actionMenuOptions[i].dataset.action){
         case 'move':
@@ -331,40 +331,6 @@ const getPosition = (event) => {
     return { row, col }
 }
 
-// Player gain expirence upon enemy defeated
-const gainExp = () => {
-    // Remove the enemy on the screen
-    player.exp += enemy.givenExp
-
-    if(player.exp >= player.requiredExp){
-        levelUp()
-    }
-}
-
-// Player level up if the exp reached the required amount
-const levelUp = () => {
-    // Player level up
-    // Extend the required exp for the next level
-    player.requiredExp += player.requiredExp * 1.5
-
-    // Give player a few points to spend
-    player.pt = 5
-
-    const grows = [0, 1, 3, 5,]
-
-    // A list of attributes that are allow to growth on level up
-    const attributeList = ['maxHp', 'maxMp', 'str', 'def', 'spd', 'int', 'lck']
-    // Randomly apply attributes growth
-    for(let key in Object.entries(player.attributes)){
-        const allowIndex = attributeList.findIndex(a => a === key)
-
-        if(allowIndex >= 0){
-            const randomGrowth = Math.floor(Math.random() * (grows.length -1))
-            player.attribute[key] += grows[randomGrowth]
-        }
-    }
-}
-
 // get mouse position and divide by tile size to see where the row and the column it clicked
 canvas.addEventListener('mousedown', async(event) =>{
     const { row, col } = getPosition(event)
@@ -410,91 +376,12 @@ canvas.addEventListener('mousedown', async(event) =>{
         if(inRange && playerAttackRange.length){
             // Check if there's a target to attack
             if(enemyPosition.row === row && enemyPosition.col === col){
-                // Calculate damage and probability
-                let LvDistance = 0
-
-                const Rates = [
-                    {
-                        name: 'hitRate',
-                        value: 0
-                    },
-                    {
-                        name: 'evadeRate',
-                        value: enemy.attributes.spd + enemy.attributes.def
-                    },
-                    {
-                        name: 'criticalRate',
-                        value: player.attributes.lck
-                    }
-                ]
-
-                // Need something to know if the attck is base on skill or not
-                const damage = (player.attributes.str + Math.floor(player.attributes.str * ( 1/100 ))) - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))
-
-                console.log('possible damage :>>>', damage)
-
-                if(player.lv >= enemy.lv){
-                    LvDistance = player.lv - enemy.lv
-                    Rates[0].value = player.attributes.spd + player.attributes.lck + damage + Math.floor(LvDistance/100)
-                }else{
-                    LvDistance = enemy.lv - player.lv
-                    Rates[0].value = Math.abs(LvDistance -(player.attributes.spd + damage) + Math.floor(LvDistance/100))
-                }
-                
-                const totalRate = Rates.reduce((accu, current) => accu + current.value, 0)
-
-                console.log('Initial rate :>>>', Rates)
-                console.log('totalRate :>>>', totalRate)
-
-                for(let i=0; i < Rates.length; i++){
-                    Rates[i].value = Rates[i].value / totalRate
+                // Check attck type
+                if(actionMode === 'attack'){
+                    messageConfig.message = await weaponAttack(player, enemy)
                 }
 
-                // Sort in ascending order for accuracy
-                Rates.sort((a, b) => a.value - b.value)
-
-                console.log('Final rate :>>>', Rates)
-
-                const random = Math.random()
-
-                for(let i=0; i < Rates.length; i++){
-                    console.log('random :>>>', random)
-                    if(random <= Rates[i].value){
-                        switch(Rates[i].name){
-                            case 'hitRate':
-                                console.log('hit!')
-                                messageConfig.message = String(damage)
-                                enemy.attributes.hp -= damage
-                                console.log('enmey hp:>>>', enemy.attributes.hp)
-
-                                if(enemy.attributes.hp <= 0){
-                                    gainExp()
-                                }
-                            break;
-                            case 'evadeRate':
-                                console.log('miss!')
-                                messageConfig.message = 'MISS!'
-                            break;
-                            case 'criticalRate':
-                                console.log('crit!')
-                                const criticalHit = damage * 1.5
-                                messageConfig.message = String(criticalHit)
-                                enemy.attributes.hp -= criticalHit
-                                console.log('enmey hp:>>>', enemy.attributes.hp)
-
-                                if(enemy.attributes.hp <= 0){
-                                    gainExp()
-                                }
-                            break;
-                        }
-                        // Stop for loop
-                        break;
-                    // If loop to the late one and still miss anything
-                    }else if(i === (Rates.length - 1)){
-                        console.log('nothing!')
-                        messageConfig.message = 'MISS!'
-                    }
-                }
+                // TODO - skill attack
 
                 characterCaption.classList.add('invisible') 
                 actionMenu.classList.remove('action_menu_open') 
