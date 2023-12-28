@@ -111,6 +111,10 @@ li{
     visibility: hidden;
 }
 
+.gauge{
+    padding: 0;
+}
+
 .hp{
     background: red;
 }

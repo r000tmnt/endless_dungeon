@@ -111,6 +111,7 @@ const characterName = document.getElementById('name')
 const characterLv = document.getElementById('lv')
 const characterAp = document.getElementById('ap')
 const characterCaptionAttributes = ['hp', 'mp']
+const gauges = document.querySelectorAll('.gauge')
 
 const statusWindow = document.getElementById('status')
 const avatar = document.getElementById('avatar')
@@ -277,6 +278,12 @@ const resize = () => {
     const fontSize = Math.floor( 10 * Math.floor(canvas.width / 100))
 
     messageConfig.size = fontSize
+
+    // calculation the percentage of the attribute
+    for(let i=0; i < gauges.length; i++){
+        // console.log(gauges[i].firstElementChild)
+        gauges[i].firstElementChild.style.height = (fontSize / 2) + 'px';
+    }
 
     // action menu child font size
     for(let i=0; i < actionMenuOptions.length; i++){
@@ -525,13 +532,12 @@ canvas.addEventListener('mousedown', async(event) =>{
         playerPosition.col = col
 
         // If the player is not moving
-        if(!player.destination){
+        if(!player.destination || !messageConfig.message.length){
 
             // Fill the element with a portion of the character info
             characterName.innerText = player.name
             characterLv.innerText = `LV ${player.lv}`
             characterAp.innerText = `AP: ${player.attributes.ap}`
-            const gauges = characterCaption.getElementsByTagName('li')
 
             // calculation the percentage of the attribute
             for(let i=0; i < gauges.length; i++){
@@ -553,7 +559,6 @@ canvas.addEventListener('mousedown', async(event) =>{
         characterName.innerText = enemy.name
         characterLv.innerText = `LV ${enemy.lv}`
         characterAp.innerText = `AP: ${enemy.attributes.ap}`
-        const gauges = characterCaption.getElementsByTagName('li')
 
         // calculation the percentage of the attribute
         for(let i=0; i < gauges.length; i++){
