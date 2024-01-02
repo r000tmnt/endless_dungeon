@@ -42,25 +42,32 @@ export default class TileMap {
     ]
 
     type = {
-        0: { walkable: false },
+        0: { walkable: true },
         1: { walkable: false },
         2: { walkable: false },
         3: { walkable: false },
     }
 
     //負責渲染於畫面的函式
-    draw(canvas, ctx, walkableSpace, attackRange){
+    draw(canvas, ctx, selectableSpace, actionMode){
         // console.log(walkableSpace)
         this.#setCanvasSize(canvas);
         this.#clearCanvas(canvas, ctx)
         this.#drawMap(ctx, 0);
 
-        if(walkableSpace !== undefined && walkableSpace.length){
-            this.#showMovableSpace(ctx, walkableSpace)
-        }
+        // console.log('current action mode :>>>', actionMode)
 
-        if(attackRange !== undefined && attackRange.length){
-            this.#showAttackRange(ctx, attackRange)
+        switch(actionMode){
+            case 'move':
+                if(selectableSpace.length){
+                    this.#showMovableSpace(ctx, selectableSpace)
+                }
+            break;
+            case 'attack': case 'skill':
+                if(selectableSpace.length){
+                    this.#showAttackRange(ctx, selectableSpace)
+                }
+            break;
         }
     }
 
@@ -168,6 +175,11 @@ export default class TileMap {
             }            
         }
 
+    }
+
+    // Remove an enemy on the tile map
+    removeEnemy(row, col){
+        this.map[row][col] = 0
     }
 
     // show a range of walkable space
