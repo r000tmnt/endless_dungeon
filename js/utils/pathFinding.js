@@ -117,7 +117,7 @@ export const prepareDirections = async(tileMap, currentPlayer, target, playerRea
  * @param {object} tileMap - An object contains information about each tile
  * @param {object} characterPosition - The x and y axis of the current acting character 
  * @param {number} blocksPerDirection - Number of block for each direction
- * @param {object} enemyPosition - The x and y axis of the enemy ( player or bot ) 
+ * @param {object} enemyPosition - Optional. The x and y axis of the enemy ( player or bot ) 
  * @returns An array of walkable blocks
  */
 export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDirection, enemyPosition = null) => {
