@@ -18,6 +18,18 @@
             "moveSpeed": 1,
             "sight": 3
         },
-        "base_skills": []
+        "base_skills": [],
+        "drop": [
+            {
+                "name": "Gold",
+                "amount": 1,
+                "rate": 70
+            },
+            {
+                "name": "Rotten meat",
+                "amount": 1,
+                "rate": 50
+            }
+        ]
     }
 ]
