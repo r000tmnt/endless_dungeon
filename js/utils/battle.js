@@ -1,10 +1,12 @@
 // Player gain expirence upon enemy defeated
-const gainExp = (player) => {
+const gainExp = (player, enemy) => {
     // Remove the enemy on the screen
-    player.exp += enemy.givenExp
+    if(player.exp !== undefined){
+        player.exp += enemy.givenExp
 
-    if(player.exp >= player.requiredExp){
-        levelUp(player)
+        if(player.exp >= player.requiredExp){
+            levelUp(player)
+        }        
     }
 }
 
@@ -21,6 +23,9 @@ const levelUp = (player) => {
 
     // A list of attributes that are allow to growth on level up
     const attributeList = ['maxHp', 'maxMp', 'str', 'def', 'spd', 'int', 'lck']
+
+    console.log('player status before level up :>>>', player)
+
     // Randomly apply attributes growth
     for(let key in Object.entries(player.attributes)){
         const allowIndex = attributeList.findIndex(a => a === key)
@@ -30,6 +35,8 @@ const levelUp = (player) => {
             player.attribute[key] += grows[randomGrowth]
         }
     }
+
+    console.log('player status after level up :>>>', player)
 }
 
 /**
@@ -38,7 +45,7 @@ const levelUp = (player) => {
  * @param {object} enemy - An object contains enemy attributes 
  * @returns 
  */
-export const weaponAttack = async(player, enemy) => {
+export const weaponAttack = async(player, enemy, tileMap, row, col) => {
     // Calculate damage and probability
     let LvDistance = 0
 
@@ -104,7 +111,7 @@ export const weaponAttack = async(player, enemy) => {
                 break;
                 case 'criticalRate':
                     console.log('crit!')
-                    const criticalHit = damage * 1.5
+                    const criticalHit = Math.round(damage * 1.5)
                     resultMessage = String(criticalHit)
                     enemy.attributes.hp -= criticalHit
                     console.log('enmey hp:>>>', enemy.attributes.hp)
@@ -112,7 +119,9 @@ export const weaponAttack = async(player, enemy) => {
             }
             // Check if the enemy is defeated
             if(enemy.attributes.hp <= 0){
-                gainExp(player)
+                tileMap.removeEnemy(row, col)
+
+                gainExp(player, enemy)
             }
             // Stop for loop
             break;
