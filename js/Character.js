@@ -19,9 +19,11 @@ export default class Character {
         this.velocity = velocity
         this.tileMap = map
         this.#createCharacter(attributes, type)
+        this.characterType = type
         this.characterIsMoving = false
         this.destination = null
         this.walkableSpace = []
+        this.wait = false
     }
 
     /**
@@ -33,6 +35,36 @@ export default class Character {
             this.#move(this.destination)
         }
 
+        // If the character is dead
+        if(this.attributes.hp <= 0){
+            switch(this.characterType){
+                case 2:
+                    // Leave the body
+                break    
+                case 3:
+                    const fadeOut = [0.7, 1, 0.7, 0.5, 0.3, 0]
+                    // Remove body
+                    // for(let i=0; i < fadeOut.length; i++){
+                    //     ctx.globalAlpha = fadeOut[i];
+                    //     ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
+                    // }
+                    let stepCount = 0
+
+                    const enemyFadeOutTimer = setInterval(() => {
+                        if(stepCount !== (fadeOut.length - 1)){
+                            ctx.globalAlpha = fadeOut[stepCount];
+                            ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
+                            stepCount += 1                            
+                        }else{
+                            clearInterval(enemyFadeOutTimer)
+                            this.characterImage = null
+                            ctx.globalAlpha = 1
+                        }
+                    }, 100)
+                break
+            }
+        }else
+        // If the image of the character is loaded
         if(this.characterImage?.src?.length){
             ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
         }
