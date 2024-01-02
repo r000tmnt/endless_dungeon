@@ -18,6 +18,7 @@
             "moveSpeed": 3,
             "sight": 5
         },
-        "base_skills": []
+        "base_skills": [],
+        "bag": []
     }
 ]
