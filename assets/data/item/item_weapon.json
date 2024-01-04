@@ -5,12 +5,15 @@
         "stackable": false,
         "stackLimit": 1,
         "name": "Wooden sword",
-        "base_damage": {
-            "min": 1,
-            "max": 3
-        },
-        "base_attribute":{
-            "str": 1
+        "effect":{
+            "base_damage": {
+                "min": 1,
+                "max": 3
+            },
+            "base_attribute":{
+                "str": 1
+            },
+            "desc": "A sword made out of wood, often use for practice."           
         },
         "prefix": [],
         "suffix": []

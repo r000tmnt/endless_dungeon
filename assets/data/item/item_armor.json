@@ -5,8 +5,11 @@
         "type": 4,
         "stackable": false,
         "stackLimit": 1,
-        "base_attribute":{
-            "def": 2
+        "effect":{
+            "base_attribute":{
+                "def": 2
+            },
+            "desc": "A cloth in a poor condition"
         },
         "prefix": [],
         "suffix": []

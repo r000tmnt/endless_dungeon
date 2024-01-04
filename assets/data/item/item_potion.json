@@ -12,7 +12,9 @@
             "target": "hp",
             "amount": 10,
             "desc": "Restore 10 points of health."
-        }
+        },
+        "prefix": [],
+        "suffix": []
     },
     {
         "id": "potion_mana_1",
@@ -27,7 +29,9 @@
             "target": "mp",
             "amount": 10,
             "desc": "Restore 10 points of mana."
-        }
+        },
+        "prefix": [],
+        "suffix": []
     },
     {
         "id": "potion_antidote",
@@ -42,7 +46,9 @@
             "target": "status",
             "amount": 0,
             "desc": "Remove the poison."
-        }
+        },
+        "prefix": [],
+        "suffix": []
     },
     {
         "id": "potion_revive",
@@ -57,6 +63,8 @@
             "target": "all",
             "amount": 10,
             "desc": "Revive the character with 10% of health."
-        }
+        },
+        "prefix": [],
+        "suffix": []
     }
 ]

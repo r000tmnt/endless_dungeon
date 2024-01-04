@@ -1,7 +1,7 @@
 [
     {
         "id": "key_dark_1",
-        "name": "Key of uncertainty",
+        "name": "Key of silence",
         "stackable": true,
         "stackLimit": 99,
         "effect":{
@@ -9,7 +9,8 @@
             "rare": "N",
             "enemy_number": 3,
             "elite_rate": 50,
-            "item_drop_modify": ""
+            "item_drop_modify": "",
+            "desc": "There's not much enemy in the field"
         }
     }
 ]
