@@ -36,6 +36,10 @@ body{
     display: flex;
 }
 
+.flex-wrap{
+    flex-wrap: wrap;
+}
+
 #wrapper{
     position: relative;
     overflow: hidden;
@@ -148,7 +152,7 @@ li{
     animation: fade_out .5s ease-in-out forwards;
 }
 
-#status{
+.menu{
     background-color: black;
     color: white;
     transition: all .3s ease-in-out;
@@ -170,4 +174,21 @@ li{
 
 .back{
     right: 0;
+}
+
+.item{
+    flex-grow: 1;
+    /* width: 33%; */
+    /* height: 33%; */
+}
+
+.item-count{
+    margin: auto 0 0 auto;
+    background-color: black;
+}
+
+.sub-action{
+    flex-grow: 1;
+    width: 50%;
+    height: 50%;
 }
