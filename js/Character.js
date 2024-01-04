@@ -264,37 +264,39 @@ export default class Character {
                 }
             }
     
-            console.log(job)                        
+            console.log(job)  
+            
+            // Assign the attributes to the object
+            if(job){
+                this.id = Math.floor(Math.random * 100)
+                this.name = attributes.name
+                this.lv = 1
+                this.class = job.name
+                this.attributes = {
+                    ...job.base_attribute,
+                    status: 'Healthy'
+                }
+                this.wait = false,
+                this.skills = []       
+                this.#loadImage(type, job.id)     
+            }
+
+            switch(type){
+                case 2:
+                    // If the character in an a player, set the initial exp and the required points to level up
+                    this.exp = 0
+                    this.requiredExp = 100
+                    this.bag = job.bag
+                break    
+                case 3:
+                    // If the character in an enemy, set the given exp for player to gain
+                    this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
+                    this.drop = job.drop
+                break
+            }
         } catch (error) {
             console.log(error)
             return error
-        }
-
-        // Assign the attributes to the object
-        if(job){
-            this.id = Math.floor(Math.random * 100)
-            this.name = attributes.name
-            this.lv = 1
-            this.class = job.name
-            this.attributes = {
-                ...job.base_attribute,
-                status: 'Healthy'
-            }
-            this.wait = false,
-            this.skills = []       
-            this.#loadImage(type, job.id)     
-        }
-
-        switch(type){
-            case 2:
-                // If the character in an a player, set the initial exp and the required points to level up
-                this.exp = 0
-                this.requiredExp = 100
-            break    
-            case 3:
-                // If the character in an enemy, set the given exp for player to gain
-                this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
-            break
         }
     }
 
