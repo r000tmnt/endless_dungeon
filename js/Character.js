@@ -278,7 +278,7 @@ export default class Character {
             this.class = job.name
             this.attributes = {
                 ...job.base_attribute,
-                status: 'healthy'
+                status: 'Healthy'
             }
             this.wait = false,
             this.skills = []       
