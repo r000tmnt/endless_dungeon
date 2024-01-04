@@ -49,12 +49,14 @@ export default class Action{
      * @returns 
      */
     async setInventoryWindow(currentActingPlayer, canvasPosition){
-        const Inventory = document.getElementById('inventory')
+        const Inventory = document.getElementById('item')
+        const space = document.getElementById('inventory')
         for(let i=0; i < currentActingPlayer.bag.length; i++){
             const item = document.createElement('div')
             const itemCount = document.createElement('div')
             let requestUrl = ''
             
+            // Set item data url from type
             switch(currentActingPlayer.bag[i].type){
                 case 0:
                     requestUrl = '../assets/data/item/item_potion.json'
@@ -87,29 +89,49 @@ export default class Action{
         
                 console.log(items)
         
-                for(let i=0; i < items.length; i++){
-                    if(items[i].id === currentActingPlayer.bag[i].id){
-                        item.innerText = items[i].name
+                // Set inner text with item data
+                for(let j=0; j < items.length; j++){
+                    if(items[j].id === currentActingPlayer.bag[i].id){
+                        item.innerText = items[j].name
                         itemCount.innerText = currentActingPlayer.bag[i].amount
                         break
                     }
                 }
         
-                console.log(item)                        
+                console.log(item)       
+                
+                // Set the size of each block
+                const itemBlockSize = Math.floor(canvasPosition.width / 100) * 33
+                const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
+
+                // Apply size number
+                // itemCount.style.position = 'absolute'
+                itemCount.style.width = 'fit-content'
+                itemCount.classList.add('item-count')
+
+                item.style.width = itemBlockSize + 'px'
+                item.style.height = itemBlockSize + 'px'
+
+                // If the index is the middle column
+                if(((i + (i+1)) % 3) === 0){
+                    item.style.margin = `0 ${itemBlockMargin}px`
+                }
+                
+                item.classList.add('item')
+
+                space.style.padding = itemBlockMargin + 'px'
+
+                // Appen child to element
+                item.append(itemCount)
+                space.append(item)
+
+                // Display inventory
+                Inventory.classList.remove('invisible')
+                Inventory.classList.add('open_window')
             } catch (error) {
                 console.log(error)
                 return error
             }
-
-            const itemBlockSize = Math.floor(canvasPosition.width / 100) * 33
-
-            item.style.width = itemBlockSize + 'px'
-            item.style.height = itemBlockSize + 'px'
-
-            item.append(itemCount)
-            Inventory.append(item)
-
-            Inventory.classList.remove('invisble')
         }
     }
 
