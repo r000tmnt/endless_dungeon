@@ -108,7 +108,7 @@
             </div>
             <button class="back absolute" data-action="status" type="button">BACK</button>
 
-            <!-- Short cuts -->
+            <!-- filter -->
             <nav class="flex short-cut">
                 <button type="button">Equipment</button>
                 <button type="button">Potion</button>
@@ -120,13 +120,19 @@
                 <!-- items -->
             </div>
 
-            <div class="sub-menu absolute invisible">
+            <div id="itemAction" class="sub-menu absolute invisible">
+                <div id="item-desc" class="flex">
+                    <img src="" alt="icon">
+                    <div>
+                        <!-- item desc -->
+                    </div>
+                </div>
                 <ul id="action_list" class="flex">
                     <li class="action sub-action" data-action="use">Use</li>
                     <li class="action sub-action" data-action="equip">Equip</li>
                     <li class="action sub-action" data-action="drop">Drop</li>
                     <li class="action sub-action" data-action="compare">Compare</li>
-                    <li class="action sub-action" data-action="cancel">Cancel</li>
+                    <li class="action sub-action" data-action="close">Close</li>
                 </ul>
             </div>
         </div>
