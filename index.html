@@ -46,7 +46,7 @@
         <canvas id="game"></canvas>
 
         <!-- Character status -->
-        <div id="status" class="absolute invisible">
+        <div id="status" class="menu absolute invisible">
             <div class="status_header flex">
                 <img id="avatar" src="" alt="avatar">
                 <div id="info">
@@ -100,6 +100,26 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <div id="item" class="menu absolute invisible">
+            <div class="flex">
+                INVENTORY
+            </div>
+            <button class="back absolute" data-action="status" type="button">BACK</button>
+            <div id="inventory" class="flex">
+                <!-- items -->
+            </div>
+
+            <div class="sub-menu absolute invisible">
+                <ul id="action_list" class="flex">
+                    <li class="action sub-action" data-action="use">Use</li>
+                    <li class="action sub-action" data-action="equip">Equip</li>
+                    <li class="action sub-action" data-action="drop">Drop</li>
+                    <li class="action sub-action" data-action="compare">Compare</li>
+                    <li class="action sub-action" data-action="cancel">Cancel</li>
+                </ul>
+            </div>
         </div>
 
         <!-- Phase Counter -->
