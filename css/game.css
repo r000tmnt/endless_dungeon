@@ -176,14 +176,24 @@ li{
     right: 0;
 }
 
+#inventory{
+    display: flex;
+    flex-wrap: wrap;
+    /* justify-content:space-between; */
+    height: fit-content;
+    overflow-y: scroll;
+}
+
 .item{
-    flex-grow: 1;
-    /* width: 33%; */
-    /* height: 33%; */
+    flex: 0 0 30%;
+    position: relative;
+    /* border: 1px solid rgba(211, 211, 211, .7); */
 }
 
 .item-count{
-    margin: auto 0 0 auto;
+    position: absolute;
+    bottom: 0;
+    right: 0;
     background-color: black;
 }
 
