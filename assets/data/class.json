@@ -19,6 +19,17 @@
             "sight": 5
         },
         "base_skills": [],
-        "bag": []
+        "bag": [
+            {
+                "id": "sword_1",
+                "type": 3,
+                "amount": 1
+            },
+            {
+                "id": "armor_light_1",
+                "type": 4,
+                "amount": 1
+            }
+        ]
     }
 ]

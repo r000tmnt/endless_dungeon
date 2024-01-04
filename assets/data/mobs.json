@@ -29,6 +29,11 @@
                 "name": "Rotten meat",
                 "amount": 1,
                 "rate": 50
+            },
+            {
+                "name": "key",
+                "amount": 1,
+                "rate": 100
             }
         ]
     }
