@@ -1,0 +1,14 @@
+[
+    {
+        "id": "armor_light_1",
+        "name": "Rag",
+        "type": 4,
+        "stackable": false,
+        "stackLimit": 1,
+        "base_attribute":{
+            "def": 2
+        },
+        "prefix": [],
+        "suffix": []
+    }
+]

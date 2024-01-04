@@ -1,0 +1,62 @@
+[
+    {
+        "id": "potion_health_1",
+        "name": "Health potion",
+        "type": 0,
+        "stackable": true,
+        "stackLimit": 99,
+        "effect":{
+            "lv": 1,
+            "rare": "N",
+            "type": 0,
+            "target": "hp",
+            "amount": 10,
+            "desc": "Restore 10 points of health."
+        }
+    },
+    {
+        "id": "potion_mana_1",
+        "name": "Mana potion",
+        "type": 0,
+        "stackable": true,
+        "stackLimit": 99,
+        "effect":{
+            "lv": 1,
+            "rare": "N",
+            "type": 0,
+            "target": "mp",
+            "amount": 10,
+            "desc": "Restore 10 points of mana."
+        }
+    },
+    {
+        "id": "potion_antidote",
+        "name": "Antidote",
+        "type": 0,
+        "stackable": true,
+        "stackLimit": 99,
+        "effect":{
+            "lv": 1,
+            "rare": "N",
+            "type": 0,
+            "target": "status",
+            "amount": 0,
+            "desc": "Remove the poison."
+        }
+    },
+    {
+        "id": "potion_revive",
+        "name": "Candle of soul",
+        "type": 0,
+        "stackable": true,
+        "stackLimit": 99,
+        "effect":{
+            "lv": 1,
+            "rare": "N",
+            "type": 1,
+            "target": "all",
+            "amount": 10,
+            "desc": "Revive the character with 10% of health."
+        }
+    }
+]

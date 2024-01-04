@@ -1,0 +1,15 @@
+[
+    {
+        "id": "key_dark_1",
+        "name": "Key of uncertainty",
+        "stackable": true,
+        "stackLimit": 99,
+        "effect":{
+            "lv": 1,
+            "rare": "N",
+            "enemy_number": 3,
+            "elite_rate": 50,
+            "item_drop_modify": ""
+        }
+    }
+]
