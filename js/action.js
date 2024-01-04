@@ -1,5 +1,6 @@
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
 import { weaponAttack } from './utils/battle.js';
+import { constructInventoryWindow } from './utils/inventory.js';
 
 export default class Action{
     constructor(mode, selectableSpace, reachableDirections, steps, animationInit){
@@ -49,90 +50,8 @@ export default class Action{
      * @returns 
      */
     async setInventoryWindow(currentActingPlayer, canvasPosition){
-        const Inventory = document.getElementById('item')
-        const space = document.getElementById('inventory')
-        for(let i=0; i < currentActingPlayer.bag.length; i++){
-            const item = document.createElement('div')
-            const itemCount = document.createElement('div')
-            let requestUrl = ''
-            
-            // Set item data url from type
-            switch(currentActingPlayer.bag[i].type){
-                case 0:
-                    requestUrl = '../assets/data/item/item_potion.json'
-                break;
-                case 1:
-                break;
-                case 2:
-                break;
-                case 3:
-                    requestUrl = '../assets/data/item/item_weapon.json'
-                break;
-                case 4:
-                    requestUrl = '../assets/data/item/item_armor.json'
-                break;
-                case 5:
-                break;
-                case 6:
-                break;
-            }
-
-            // Get item data
-            const response = await fetch(requestUrl)
-
-            try {
-                const result = await response.json()
-                console.log(result)
-                console.log(typeof result)
-        
-                const items = Object.values(result)
-        
-                console.log(items)
-        
-                // Set inner text with item data
-                for(let j=0; j < items.length; j++){
-                    if(items[j].id === currentActingPlayer.bag[i].id){
-                        item.innerText = items[j].name
-                        itemCount.innerText = currentActingPlayer.bag[i].amount
-                        break
-                    }
-                }
-        
-                console.log(item)       
-                
-                // Set the size of each block
-                const itemBlockSize = Math.floor(canvasPosition.width / 100) * 33
-                const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
-
-                // Apply size number
-                // itemCount.style.position = 'absolute'
-                itemCount.style.width = 'fit-content'
-                itemCount.classList.add('item-count')
-
-                item.style.width = itemBlockSize + 'px'
-                item.style.height = itemBlockSize + 'px'
-
-                // If the index is the middle column
-                if(((i + (i+1)) % 3) === 0){
-                    item.style.margin = `0 ${itemBlockMargin}px`
-                }
-                
-                item.classList.add('item')
-
-                space.style.padding = itemBlockMargin + 'px'
-
-                // Appen child to element
-                item.append(itemCount)
-                space.append(item)
-
-                // Display inventory
-                Inventory.classList.remove('invisible')
-                Inventory.classList.add('open_window')
-            } catch (error) {
-                console.log(error)
-                return error
-            }
-        }
+        this.mode = 'item'
+        constructInventoryWindow(currentActingPlayer, canvasPosition)
     }
 
     /**
