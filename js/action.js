@@ -42,8 +42,76 @@ export default class Action{
     // TODO: Skill menu
     setSKillWindow(){}
 
-    // TODO: Inventory menu
-    setInventoryWindow(){}
+    /**
+     * Set inventory style and display it
+     * @param {object} currentActingPlayer - An object represent the current acting player 
+     * @param {object} canvasPosition - An object contains information about the canvas 
+     * @returns 
+     */
+    async setInventoryWindow(currentActingPlayer, canvasPosition){
+        const Inventory = document.getElementById('inventory')
+        for(let i=0; i < currentActingPlayer.bag.length; i++){
+            const item = document.createElement('div')
+            const itemCount = document.createElement('div')
+            let requestUrl = ''
+            
+            switch(currentActingPlayer.bag[i].type){
+                case 0:
+                    requestUrl = '../assets/data/item/item_potion.json'
+                break;
+                case 1:
+                break;
+                case 2:
+                break;
+                case 3:
+                    requestUrl = '../assets/data/item/item_weapon.json'
+                break;
+                case 4:
+                    requestUrl = '../assets/data/item/item_armor.json'
+                break;
+                case 5:
+                break;
+                case 6:
+                break;
+            }
+
+            // Get item data
+            const response = await fetch(requestUrl)
+
+            try {
+                const result = await response.json()
+                console.log(result)
+                console.log(typeof result)
+        
+                const items = Object.values(result)
+        
+                console.log(items)
+        
+                for(let i=0; i < items.length; i++){
+                    if(items[i].id === currentActingPlayer.bag[i].id){
+                        item.innerText = items[i].name
+                        itemCount.innerText = currentActingPlayer.bag[i].amount
+                        break
+                    }
+                }
+        
+                console.log(item)                        
+            } catch (error) {
+                console.log(error)
+                return error
+            }
+
+            const itemBlockSize = Math.floor(canvasPosition.width / 100) * 33
+
+            item.style.width = itemBlockSize + 'px'
+            item.style.height = itemBlockSize + 'px'
+
+            item.append(itemCount)
+            Inventory.append(item)
+
+            Inventory.classList.remove('invisble')
+        }
+    }
 
     /**
      * Set text information for status dialog
@@ -104,7 +172,7 @@ export default class Action{
      * @param {function} characterAnimationPhaseEnded - A callBack function to init after animation finished 
      * @returns {boolean} A value represend the state of pointed block is ib the range or not
      */
-    move = async(tileMap, row, col, playerPosition, currentActingPlayer, characterAnimationPhaseEnded) => {
+    async move(tileMap, row, col, playerPosition, currentActingPlayer, characterAnimationPhaseEnded){
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
@@ -122,9 +190,8 @@ export default class Action{
 
         return inRange
     }
-
     
-    attack = async(row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded) => {
+    async attack(row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded){
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
@@ -145,7 +212,7 @@ export default class Action{
         this.#beginAnimationPhase(currentActingPlayer, characterAnimationPhaseEnded)
     }
 
-    #checkIfInRange = async(row, col) => {
+    async #checkIfInRange(row, col) {
         let inRange = false
         // Loop through the array and find if the position matches
         for(let i=0; i < this.selectableSpace.length; i++){
@@ -168,7 +235,7 @@ export default class Action{
      * @param {object} currentActingPlayer - An object represent current acting player 
      * @param {function} characterAnimationPhaseEnded - A callBack function to init after animation finished 
      */
-    #beginAnimationPhase = (currentActingPlayer, characterAnimationPhaseEnded) => {
+    #beginAnimationPhase(currentActingPlayer, characterAnimationPhaseEnded) {
         console.log('step :>>>', this.steps)
 
         if(this.mode !== 'stay'){
@@ -211,7 +278,7 @@ export default class Action{
     }
 
     // Text information about damange, heal, poisoned... etc
-    #displayMessage = (message, size, style, x, y, characterAnimationPhaseEnded) => {
+    #displayMessage(message, size, style, x, y, characterAnimationPhaseEnded) {
         const appWrapper = document.getElementById('wrapper')
         const messageHolder = document.createElement('span')
         messageHolder.innerText = message
@@ -242,7 +309,7 @@ export default class Action{
         }, 1500)
     }
 
-    enemyMove = async(tileMap, enemyPosition, moveSpeed, sight, playerPosition,currentActingPlayer, characterAnimationPhaseEnded) => {
+    async enemyMove(tileMap, enemyPosition, moveSpeed, sight, playerPosition,currentActingPlayer, characterAnimationPhaseEnded) {
         // get walkable space
         await this.setMove(tileMap, enemyPosition, moveSpeed, playerPosition)
 
@@ -262,11 +329,9 @@ export default class Action{
                     break
                 }else{
                     for(let block = 0; block < enemySight[i].length; block++){
-                        if(enemySight[i][block].length){
-                            if(enemySight[i][block][0] === playerPosition.row && enemySight[i][block][1] === playerPosition.col){
-                                playerDetect = true
-                            }                            
-                        }
+                        if(enemySight[i][block][0] === playerPosition.row && enemySight[i][block][1] === playerPosition.col){
+                            playerDetect = true
+                        }  
                     }                
                 }
 
@@ -321,22 +386,12 @@ export default class Action{
     /**
      * Randomly decide x and y
      */
-    #randomSteps = async(tileMap, currentActingPlayer, enemyPosition, characterAnimationPhaseEnded) => {
-        const getXY = async() => {
-            const row =  Math.floor( Math.random() * this.selectableSpace.length)
-            console.log("row :>>>", row)
-            const col = Math.floor( Math.random() * this.selectableSpace[row].length)
-            console.log("col :>>>", col)
-            // if(row >= 0 && playerWalkableSpace[row].length){
-            //     return row
-            // }else{
-            //     await getRow()
-            // }
-            return { row, col }
-        }
+    async #randomSteps(tileMap, currentActingPlayer, enemyPosition, characterAnimationPhaseEnded){
 
-
-        const { row, col } = await getXY()
+        const row =  Math.floor( Math.random() * this.selectableSpace.length)
+        console.log("row :>>>", row)
+        const col = Math.floor( Math.random() * this.selectableSpace[row].length)
+        console.log("col :>>>", col)
 
         if(this.selectableSpace[row][col][0] === enemyPosition.row && this.selectableSpace[row][col][1] === enemyPosition.col){
             // Spend an action point
