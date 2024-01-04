@@ -85,7 +85,7 @@ const gauges = document.querySelectorAll('.gauge')
 const statusWindow = document.getElementById('status')
 const backBtn = document.getElementsByClassName('back')
 const avatar = document.getElementById('avatar')
-const Inventory = document.getElementById('inventory')
+const Inventory = document.getElementById('item')
 
 // Back button click event
 for(let i=0; i < backBtn.length; i++){
@@ -109,6 +109,7 @@ for(let i=0; i < backBtn.length; i++){
             backBtn[i].addEventListener('click', () => {
                 action.mode = ''
                 Inventory.classList.add('invisible')
+                Inventory.classList.remove('open_window')
             })
         break;
     }
@@ -219,16 +220,23 @@ const resize = () => {
 
     characterName.style['font-size'] = fontSize + 'px';
 
+    // Set phase transition style
     phaseWrapper.style.width = (canvas.width -5) + 'px';
     phaseWrapper.style.height = (canvas.height -10) + 'px';
     phaseElement.style['font-size'] = fontSize + 'px';
 
+    // Set status window style
     statusWindow.style.width = (canvas.width -5)+ 'px';
     statusWindow.style.height = (canvas.height -10) + 'px';
     statusWindow.style.padding = (fontSize / 2) + 'px';
 
     avatar.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
     avatar.style.height = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
+
+    // Set inventory style
+    Inventory.style.width = (canvas.width -5)+ 'px';
+    Inventory.style.height = (canvas.height -10) + 'px';
+    Inventory.style.padding = (fontSize / 2) + 'px';
 
     for(let i=0; i < backBtn.length; i++){
         backBtn[i].style.transform = `translateX(-${(fontSize / 2) * 3}px)`
