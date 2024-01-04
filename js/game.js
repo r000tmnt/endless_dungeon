@@ -85,6 +85,7 @@ const gauges = document.querySelectorAll('.gauge')
 const statusWindow = document.getElementById('status')
 const backBtn = document.getElementsByClassName('back')
 const avatar = document.getElementById('avatar')
+const Inventory = document.getElementById('inventory')
 
 // Back button click event
 for(let i=0; i < backBtn.length; i++){
@@ -102,6 +103,12 @@ for(let i=0; i < backBtn.length; i++){
 
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
+            })
+        break;
+        case 'item':
+            backBtn[i].addEventListener('click', () => {
+                action.mode = ''
+                Inventory.classList.add('invisible')
             })
         break;
     }
@@ -123,7 +130,13 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 actionMenu.classList.remove('action_menu_open')
                 await action.setAttack(tileMap, playerPosition, 1)
             })
-        break;    
+        break;   
+        case 'item':
+            actionMenuOptions[i].addEventListener('click', async() => {
+                actionMenu.classList.remove('action_menu_open')
+                await action.setInventoryWindow(player, canvasPosition)
+            })
+        break; 
         case 'status':
             actionMenuOptions[i].addEventListener('click', () => {
                 action.setStatusWindow(inspectingCharacter)
