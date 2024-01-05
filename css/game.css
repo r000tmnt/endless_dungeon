@@ -219,3 +219,13 @@ li{
     height: 25%;
     color: black;
 }
+
+.item-toolTip{
+    visibility: hidden;
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    left: 10px;
+    top: 10px;
+    padding: 0 5px;
+}
