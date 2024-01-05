@@ -3,6 +3,8 @@ import TileMap from './TileMap.js';
 import Grid from './grid.js';
 import Action from './action.js';
 
+import { clearInventory } from './utils/inventory.js'
+
 // #region Canvas element
 let canvas = document.getElementById('game');
 let ctx = canvas.getContext("2d");
@@ -110,6 +112,8 @@ for(let i=0; i < backBtn.length; i++){
                 action.mode = ''
                 Inventory.classList.add('invisible')
                 Inventory.classList.remove('open_window')
+                actionMenu.classList.add('action_menu_open')
+                clearInventory()
             })
         break;
     }
