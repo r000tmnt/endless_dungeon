@@ -23,6 +23,16 @@ export default class Character {
         this.characterIsMoving = false
         this.destination = null
         this.walkableSpace = []
+        this.skills = []  
+        this.bag = []
+        this.equip = {
+            head: {},
+            body: {},
+            hand: {},
+            leg: {},
+            foot: {},
+            accerory: {}
+        }
         this.wait = false
     }
 
@@ -275,9 +285,7 @@ export default class Character {
                 this.attributes = {
                     ...job.base_attribute,
                     status: 'Healthy'
-                }
-                this.wait = false,
-                this.skills = []       
+                }     
                 this.#loadImage(type, job.id)     
             }
 
@@ -287,6 +295,16 @@ export default class Character {
                     this.exp = 0
                     this.requiredExp = 100
                     this.bag = job.bag
+
+                    // Equip with default setting
+                    for(let i=0; i < job.bag.length; i++){
+                        if(job.bag[i].type === 3 || job.bag[i].type === 4){
+                            this.equip[`${job.bag[i].position}`] = { 
+                                id: job.bag[i].id,
+                                name: job.bag[i].name
+                             }
+                        }
+                    }
                 break    
                 case 3:
                     // If the character in an enemy, set the given exp for player to gain

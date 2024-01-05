@@ -5,6 +5,7 @@
         "stackable": false,
         "stackLimit": 1,
         "name": "Wooden sword",
+        "position": "hand",
         "effect":{
             "base_damage": {
                 "min": 1,

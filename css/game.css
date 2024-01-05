@@ -25,7 +25,7 @@ body{
     background-color: gray;
     margin: 0;
     padding: 0;
-    /* height: 100vh; */
+    image-rendering: pixelated;
 }
 
 .absolute{
@@ -172,6 +172,10 @@ li{
     top: 0
 }
 
+.open_subWindow{
+    bottom: 0;
+}
+
 .back{
     right: 0;
 }
@@ -184,10 +188,22 @@ li{
     overflow-y: scroll;
 }
 
+#itemAction{
+    width: 85%;
+    border-top: 1px solid white;
+}
+
 .item{
     flex: 0 0 30%;
     position: relative;
     /* border: 1px solid rgba(211, 211, 211, .7); */
+}
+
+.item-equip{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background-color: black;
 }
 
 .item-count{
@@ -199,6 +215,7 @@ li{
 
 .sub-action{
     flex-grow: 1;
-    width: 50%;
-    height: 50%;
+    width: 25%;
+    height: 25%;
+    color: black;
 }

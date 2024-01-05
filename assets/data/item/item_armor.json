@@ -5,6 +5,7 @@
         "type": 4,
         "stackable": false,
         "stackLimit": 1,
+        "position": "body",
         "effect":{
             "base_attribute":{
                 "def": 2
