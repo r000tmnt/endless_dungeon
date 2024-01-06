@@ -203,7 +203,7 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
             const inspectRow = characterPosition.row + rowCount
             let inspectCol = characterPosition.col 
 
-            if(inspectRow > (tileMap.map[0].length - 1)){
+            if(inspectRow > (tileMap.map.length - 1)){
                 // Skip current iteration
                 continue
             }
