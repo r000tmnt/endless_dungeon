@@ -51,11 +51,9 @@ body{
     overflow: hidden;
 }
 
-/* #game{
-    border: 1px solid red;
-    aspect-ratio: 9 / 16; 
-    height: 100vh; 
-}*/
+#game{
+    transition: all .3s ease-in-out;
+}
 
 #turn{
     position: absolute;
