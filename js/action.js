@@ -132,15 +132,32 @@ export default class Action{
         return inRange
     }
     
-    async attack(row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded){
+    async attack(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded){
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
             if(enemyPosition.row === row && enemyPosition.col === col)
                 this.animationInit = true
-                this.messageConfig.message = await weaponAttack(player, enemy, tileMap, row, col)
-                const { message, style, size} = this.messageConfig
-                this.#displayMessage(message, size, style,  enemy.x, (enemy.y - tileSize), characterAnimationPhaseEnded)            
+
+                const horizontalLine = Math.floor(tileMap.map.length / 2)
+                const verticalLine = Math.floor(tileMap.map[0].length / 2)
+
+                const offsetX = (col > verticalLine)? col - verticalLine : verticalLine - col
+                const offsetY = (row > horizontalLine)? horizontalLine - row : row - horizontalLine 
+
+                canvas.style.transform = `scale(1.5) translate(${(offsetX * Math.floor(tileSize / 1.5))}px, ${offsetY * Math.floor(tileSize / 1.5)}px)`
+
+                if(this.mode === 'attack' || this.mode === 'skill' || this.mode === 'item'){
+                    this.selectableSpace.splice(0)
+                    console.log('clear selectable :>>>', this.selectableSpace)
+                }
+
+                setTimeout(async() => {
+                    this.messageConfig.message = await weaponAttack(player, enemy, tileMap, row, col)
+                    const { message, style, size} = this.messageConfig
+                    
+                    this.#displayMessage(canvas, message, Math.floor(size * 1.5), style,  Math.floor(enemy.x * 1.5), Math.floor(enemy.y - Math.floor(tileSize * 1.5) * 1.5), characterAnimationPhaseEnded)    
+                }, 300)
         }else{
             this.selectableSpace.splice(0)
         }
@@ -218,12 +235,12 @@ export default class Action{
         }, 100) 
     }
 
-    // Text information about damange, heal, poisoned... etc
-    #displayMessage(message, size, style, x, y, characterAnimationPhaseEnded) {
+    // Text information about damage, heal, poisoned... etc
+    #displayMessage(canvas, message, size, style, x, y, characterAnimationPhaseEnded) {
         const appWrapper = document.getElementById('wrapper')
         const messageHolder = document.createElement('span')
         messageHolder.innerText = message
-        messageHolder.style.fontSize = size
+        messageHolder.style.fontSize = (size / 2) + 'px'
         messageHolder.style.fontWeight = 'bold'
         messageHolder.style.color = style
         messageHolder.style.textAlign = 'center'
@@ -233,19 +250,14 @@ export default class Action{
         appWrapper.append(messageHolder)
     
         // Clear message
-        setTimeout(() => {
-            messageHolder.remove()
-        }, 1000)
+        // setTimeout(() => {
+        //     messageHolder.remove()
+        // }, 1000)
     
         // Spend an action point
         setTimeout(() => {
+            // canvas.style.transform = `unset`
             this.animationInit = false
-
-            if(this.mode === 'attack' || this.mode === 'skill' || this.mode === 'item'){
-                this.selectableSpace.splice(0)
-                console.log('clear selectable :>>>', this.selectableSpace)
-            }
-
             characterAnimationPhaseEnded()
         }, 1500)
     }
