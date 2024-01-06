@@ -1,4 +1,4 @@
-import { animationSignal } from './game.js'
+import { animationSignal, removeCharacter } from './game.js'
 import classes from './dataBase/class.js'
 import mob from './dataBase/mobs.js'
 import weapon from './dataBase/item/item_weapon.js'
@@ -46,6 +46,7 @@ export default class Character {
             switch(this.characterType){
                 case 2:
                     // Leave the body
+                    removeCharacter(2)
                 break    
                 case 3:
                     const fadeOut = [0.7, 1, 0.7, 0.5, 0.3, 0]
@@ -63,8 +64,10 @@ export default class Character {
                             stepCount += 1                            
                         }else{
                             clearInterval(enemyFadeOutTimer)
-                            this.characterImage = null
+                            // this.characterImage = null
                             ctx.globalAlpha = 1
+                            
+                            removeCharacter(3)
                         }
                     }, 100)
                 break
