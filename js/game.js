@@ -93,13 +93,6 @@ for(let i=0; i < backBtn.length; i++){
             backBtn[i].addEventListener('click', () => {
                 action.mode = ''
 
-                if(inspectingCharacter.characterType === 3){
-                    //Reset action menu option style
-                    for(let i=0; i < actionMenuOptions.length; i++){
-                        actionMenuOptions[i].style.display = 'block'
-                    }
-                }
-
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
             })
@@ -332,6 +325,11 @@ canvas.addEventListener('mousedown', async(event) =>{
             console.log('I am player')
 
             inspectingCharacter = player
+
+            //Reset action menu option style
+            for(let i=0; i < actionMenuOptions.length; i++){
+                actionMenuOptions[i].style.display = 'block'
+            }
 
             // Keep tracking player position
             playerPosition.row = row
