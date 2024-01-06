@@ -1,4 +1,10 @@
 import { animationSignal } from './game.js'
+import classes from './dataBase/class.js'
+import mob from './dataBase/mobs.js'
+import weapon from './dataBase/item/item_weapon.js'
+import armor from './dataBase/item/item_armor.js'
+import potion from './dataBase/item/item_potion.js'
+import key from './dataBase/item/item_key.js'
 
 export default class Character {
     /**
@@ -23,16 +29,6 @@ export default class Character {
         this.characterIsMoving = false
         this.destination = null
         this.walkableSpace = []
-        this.skills = []  
-        this.bag = []
-        this.equip = {
-            head: {},
-            body: {},
-            hand: {},
-            leg: {},
-            foot: {},
-            accerory: {}
-        }
         this.wait = false
     }
 
@@ -46,7 +42,7 @@ export default class Character {
         }
 
         // If the character is dead
-        if(this.attributes.hp <= 0){
+        if(this?.attributes?.hp <= 0){
             switch(this.characterType){
                 case 2:
                     // Leave the body
@@ -86,6 +82,15 @@ export default class Character {
      */
     setWalkableSpace(walkableSpace){
         this.walkableSpace = JSON.parse(JSON.stringify(walkableSpace))
+    }
+
+    setCharacterTileSize(tileSize){
+        this.tileSize = tileSize
+    }
+
+    setCharacterPosition(x, y){
+        this.x = x
+        this.y = y
     }
 
     /**
@@ -241,80 +246,75 @@ export default class Character {
      * @param {number} type - 2: player, 3: mob 
      * @returns 
      */
-    async #createCharacter(attributes, type){
-
-        let requestUrl = ""
-        let job
+    #createCharacter(attributes, type){
 
         switch(type){
-            case 2:
-                requestUrl = '../assets/data/class.json'
-            break    
-            case 3:
-                requestUrl = '../assets/data/mobs.json'
-            break
-        }
+            case 2:{
+                const job = classes.getOne(attributes.class)
+        
+                console.log(job)  
+                
+                // Assign the attributes to the object
+                if(job){
+                    this.id = Math.floor(Math.random() * 100)
+                    this.name = attributes.name
+                    this.lv = 1
+                    this.class = job.name
+                    this.attributes = {
+                        ...job.base_attribute,
+                        status: 'Healthy'
+                    }     
+                    this.#loadImage(type, job.id)     
 
-        // Find character class
-        const response = await fetch(requestUrl)
-
-        try {
-            const result = await response.json()
-            console.log(result)
-            console.log(typeof result)
-    
-            const classes = Object.values(result)
-    
-            console.log(classes)
-    
-            for(let i=0; i < classes.length; i++){
-                if(classes[i].id === attributes.class){
-                    job = classes[i]
-                    break
-                }
-            }
-    
-            console.log(job)  
-            
-            // Assign the attributes to the object
-            if(job){
-                this.id = Math.floor(Math.random * 100)
-                this.name = attributes.name
-                this.lv = 1
-                this.class = job.name
-                this.attributes = {
-                    ...job.base_attribute,
-                    status: 'Healthy'
-                }     
-                this.#loadImage(type, job.id)     
-            }
-
-            switch(type){
-                case 2:
                     // If the character in an a player, set the initial exp and the required points to level up
                     this.exp = 0
                     this.requiredExp = 100
                     this.bag = job.bag
+                    this.equip = {
+                        head: {},
+                        body: {},
+                        hand: {},
+                        leg: {},
+                        foot: {},
+                        accessory: {}
+                    }
 
                     // Equip with default setting
                     for(let i=0; i < job.bag.length; i++){
-                        if(job.bag[i].type === 3 || job.bag[i].type === 4){
-                            this.equip[`${job.bag[i].position}`] = { 
-                                id: job.bag[i].id,
-                                name: job.bag[i].name
-                             }
+                        if(job.bag[i].type === 3 ||job.bag[i].type === 4){
+                            const itemData = job.bag[i].type === 3? weapon.getOne(job.bag[i].id) : armor.getOne(job.bag[i].id)
+                            this.equip[itemData.position] = { 
+                                id: itemData.id,
+                                name: itemData.name
+                            }
                         }
                     }
-                break    
-                case 3:
+                }
+            }
+            break    
+            case 3:{
+                const job = mob.getOne(attributes.class)
+        
+                console.log(job)  
+                
+                // Assign the attributes to the object
+                if(job){
+                    this.id = Math.floor(Math.random() * 100)
+                    this.name = attributes.name
+                    this.lv = 1
+                    this.class = job.name
+                    this.attributes = {
+                        ...job.base_attribute,
+                        status: 'Healthy'
+                    }     
+                    this.#loadImage(type, job.id)     
+
                     // If the character in an enemy, set the given exp for player to gain
                     this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
                     this.drop = job.drop
-                break
+                }
             }
-        } catch (error) {
-            console.log(error)
-            return error
+            break
         }
     }
 
