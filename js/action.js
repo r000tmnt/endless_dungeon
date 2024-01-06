@@ -56,7 +56,7 @@ export default class Action{
 
     /**
      * Set text information for status dialog
-     * @param {object} inspectingCharacter - A set of data about the inspacting character 
+     * @param {object} inspectingCharacter - A set of data about the inspecting character 
      */
     setStatusWindow(inspectingCharacter){
         const statusWindow = document.getElementById('status')
@@ -206,7 +206,7 @@ export default class Action{
                     this.reachableDirections.splice(0)
 
                     // Spend an action point
-                    currentActingPlayer.attributes.ap -= 1
+                    // currentActingPlayer.attributes.ap -= 1
 
                     clearInterval(animationWatcher)
 
@@ -303,7 +303,7 @@ export default class Action{
                     if(this.reachableDirections.length){
                         // Start moving
                         currentActingPlayer.setWalkableSpace(this.selectableSpace)
-                        this.#beginAnimationPhase(currentActingPlayer)  
+                        this.#beginAnimationPhase(currentActingPlayer, characterAnimationPhaseEnded)  
                     }else{
                         // Spend an action point
                         characterAnimationPhaseEnded()  
