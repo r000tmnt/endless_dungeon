@@ -3,7 +3,7 @@ import TileMap from './TileMap.js';
 import Grid from './grid.js';
 import Action from './action.js';
 
-import { clearInventory } from './utils/inventory.js'
+import { constructInventoryWindow, clearInventory } from './utils/inventory.js'
 
 // #region Canvas element
 let canvas = document.getElementById('game');
@@ -48,16 +48,13 @@ let velocity = 1;
 
 // Create player object
 let player = null
-// console.log('player :>>>', player)
 // player.setSkills('slash')
 var playerPosition = {
     row: 0,
     col: 0
 }
-
 // Create enemy object
 let enemy = null
-// console.log('enemy :>>>', enemy)
 // enemy.setSkills('poison')
 
 var enemyPosition = {
@@ -192,13 +189,28 @@ const resize = () => {
     grid = new Grid(tileMap.map, tileSize, {})
 
     // Get the player position relative to the canvas size
-    player = tileMap.getPlayer(velocity)
+    if(player !== null){
+        player.setCharacterTileSize(tileSize)
+        player.setCharacterPosition(playerPosition.col * tileSize, playerPosition.row * tileSize)
+    }else{
+        player = tileMap.getPlayer(velocity)
+    }
+
+    console.log('player :>>>', player)
+
      playerPosition = {
         row: player.y / tileSize,
         col: player.x / tileSize
     }
+    if(enemy !== null){
+        enemy.setCharacterTileSize(tileSize)
+        enemy.setCharacterPosition(enemyPosition.col * tileSize, enemyPosition.row * tileSize)
+    }else{
+        enemy = tileMap.getEnemy(velocity)
+    }
 
-    enemy = tileMap.getEnemy(velocity)
+    console.log('enemy :>>>', enemy)
+
     enemyPosition = {
         row: enemy.y / tileSize,
         col: enemy.x / tileSize
@@ -223,27 +235,29 @@ const resize = () => {
     }
 
     characterName.style['font-size'] = fontSize + 'px';
+    characterLv.style['font-size'] = (fontSize / 2) + 'px';
+    characterAp.style['font-size'] = (fontSize / 2) + 'px';
 
     // Set phase transition style
-    phaseWrapper.style.width = (canvas.width -5) + 'px';
-    phaseWrapper.style.height = (canvas.height -10) + 'px';
+    phaseWrapper.style.width = canvas.width  + 'px';
+    phaseWrapper.style.height = canvas.height + 'px';
     phaseElement.style['font-size'] = fontSize + 'px';
 
     // Set status window style
-    statusWindow.style.width = (canvas.width -5)+ 'px';
-    statusWindow.style.height = (canvas.height -10) + 'px';
+    statusWindow.style.width = canvas.width + 'px';
+    statusWindow.style.height = canvas.height + 'px';
     statusWindow.style.padding = (fontSize / 2) + 'px';
 
     avatar.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
     avatar.style.height = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
 
     // Set inventory style
-    Inventory.style.width = (canvas.width -5)+ 'px';
-    Inventory.style.height = (canvas.height -10) + 'px';
+    Inventory.style.width = canvas.width + 'px';
+    Inventory.style.height = canvas.height + 'px';
     Inventory.style.padding = (fontSize / 2) + 'px';
 
     for(let i=0; i < backBtn.length; i++){
-        backBtn[i].style.transform = `translateX(-${(fontSize / 2) * 3}px)`
+        backBtn[i].style.transform = `translateX(-${fontSize / 2}px)`
         backBtn[i].style.top = (fontSize / 2) + 'px'        
     }
 
@@ -253,6 +267,18 @@ const resize = () => {
 
     console.log('canvas element :>>>', canvas)
     console.log('canvas position :>>>', canvasPosition)
+
+    // If the inventory window is shown
+    if(action.mode === 'item'){
+        // Clear items
+        clearInventory()
+        // Resize the window and items
+        constructInventoryWindow(player, canvasPosition)
+    }
+    
+    if(action.mode === 'status'){
+        // TODO: Resize status window
+    }
 }
 
 // First time drawing the canvas
