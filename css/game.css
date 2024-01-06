@@ -20,11 +20,17 @@
 
 body{
     font-family: "ＭＳ Ｐゴシック";
+    font-smooth: never;
+    -webkit-font-smoothing : none;
+    /* -webkit-text-stroke: 0.75px black; */
     display: flex;
     justify-content: center;
     background-color: gray;
     margin: 0;
     padding: 0;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-crips-edges;
+    image-rendering: crips-edges;
     image-rendering: pixelated;
 }
 
@@ -159,6 +165,10 @@ li{
     z-index: 15;
 }
 
+#status{
+    box-sizing: border-box;
+}
+
 #status > .status_header > img{
     border: 1px solid red;
     margin-right: 5%;
@@ -180,16 +190,24 @@ li{
     right: 0;
 }
 
+#item{
+    box-sizing: border-box;
+}
+
 #inventory{
     display: flex;
     flex-wrap: wrap;
     /* justify-content:space-between; */
     height: fit-content;
-    overflow-y: scroll;
+    /* overflow-y: scroll; */
+}
+
+.filter-group{
+    justify-content: space-around;
 }
 
 #itemAction{
-    width: 85%;
+    /* width: 85%; */
     border-top: 1px solid white;
 }
 
