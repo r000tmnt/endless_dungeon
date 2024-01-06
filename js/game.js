@@ -34,12 +34,6 @@ var turn = 1
 // 0 - player
 // 1 - enemy
 var turnType = 0
-
-// A exported function for other object to talk to the game engine
-export const animationSignal = (signal) => {
-    action.animationInit = signal
-}
-
 // #endregion
 
 // #region Game characters
@@ -67,6 +61,7 @@ var inspectingCharacter = null
 
 // #region UI element variables and functions
 // Get UI element and bind a click event
+const appWrapper = document.getElementById('wrapper')
 const turnCounter = document.getElementById('turn')
 turnCounter.innerText = 'Turn 1'
 
@@ -227,6 +222,9 @@ const resize = () => {
         actionMenuOptions[i].style['font-size'] = fontSize + 'px';
     }
 
+    appWrapper.style.width = canvas.width  + 'px';
+    appWrapper.style.height = canvas.height + 'px';
+
     characterName.style['font-size'] = fontSize + 'px';
     characterLv.style['font-size'] = (fontSize / 2) + 'px';
     characterAp.style['font-size'] = (fontSize / 2) + 'px';
@@ -301,7 +299,7 @@ canvas.addEventListener('mousedown', async(event) =>{
         // If there are selectable blocks in the array
         if(action.mode === 'move' || action.mode === 'attack'){
 
-            const movable = (action.mode === 'move')? await action.move(tileMap, row, col, playerPosition, player, characterAnimationPhaseEnded) : await action.attack(row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded)
+            const movable = (action.mode === 'move')? await action.move(tileMap, row, col, playerPosition, player, characterAnimationPhaseEnded) : await action.attack(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded)
 
             if(!movable){
                 if(!characterCaption.classList.contains('invisible')){
@@ -321,7 +319,7 @@ canvas.addEventListener('mousedown', async(event) =>{
 
         }else
         // if this tile is player
-        if((row * tileSize) === player.y && (col * tileSize) === player.x){
+        if((row * tileSize) === player?.y && (col * tileSize) === player?.x){
             console.log('I am player')
 
             inspectingCharacter = player
@@ -353,7 +351,7 @@ canvas.addEventListener('mousedown', async(event) =>{
             actionMenu.classList.add('action_menu_open')  
         }else
         // if this tile is enemy
-        if((row * tileSize) === enemy.y && (col * tileSize) === enemy.x){
+        if((row * tileSize) === enemy?.y && (col * tileSize) === enemy?.x){
             // Fill the element with a portion of the character info
             console.log('I am the enemy')
             inspectingCharacter = enemy
@@ -426,9 +424,7 @@ const characterAnimationPhaseEnded = async() => {
     // If it is the player's turn
     if(turnType === 0){
 
-        if(action.mode === 'stay' || action.mode === 'attack'){
-            player.attributes.ap -= 1
-        }
+        player.attributes.ap -= 1
 
         // if(action.mode === 'skill'){
         // TODO: Count the requrie action point of the skill
@@ -481,22 +477,16 @@ const characterAnimationPhaseEnded = async() => {
 const gameLoop = () => {
     tileMap.draw(canvas, ctx, action.selectableSpace, action.mode)
 
-    if(player !== undefined) {
+    if(player !== null) {
         player.draw(ctx)
-    }else{
-        console.log('player undefined')
     }
 
-    if(enemy !== undefined){
+    if(enemy !== null){
         enemy.draw(ctx)
-    }else{
-        console.log('enemy not found')
     }
 
-    if(grid !== undefined){
+    if(grid !== null){
         grid.draw(ctx)
-    }else{
-        console.log('grid close')
     }
 }
 
@@ -515,22 +505,30 @@ const nextTurn = () => {
         phaseWrapper.classList.remove('fade_in')
         phaseWrapper.classList.remove('fade_out')
         if(turnType === 0){
-            if(enemy.attributes.hp > 0){
+            if(enemy?.attributes?.hp > 0){
                 console.log('enemy phase')
                 enemy.wait = false
                 turnType = 1
                 enemy.attributes.ap = enemy.attributes.maxAp
                 enemyAI()                 
             }else{
+                turnType = 1
+                nextTurn()
                 // TODO: Display result screen
             }
         }else{
-            console.log('player phase')
-            player.wait = false
-            turnType = 0
-            player.attributes.ap = player.attributes.maxAp
-            turn += 1 
-            turnCounter.innerText = `Turn ${turn}`
+            if(player?.attributes?.hp > 0){
+                console.log('player phase')
+                player.wait = false
+                turnType = 0
+                player.attributes.ap = player.attributes.maxAp
+                turn += 1 
+                turnCounter.innerText = `Turn ${turn}`                
+            }else{
+                turnType = 0
+                nextTurn()
+                // TODO: Display result screen
+            }
         }            
     }, 1500)
 }
@@ -543,3 +541,19 @@ window.addEventListener('resize', resize, false);
 
 // 30 fps
 setInterval(gameLoop, 1000 / 30)
+
+// A exported function for other object to talk to the game engine
+export const animationSignal = (signal) => {
+    action.animationInit = signal
+}
+
+export const removeCharacter = (type) => {
+    switch(type){
+        case 2:
+            player = null
+        break;
+        case 3:
+            enemy = null
+        break
+    }
+}
