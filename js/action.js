@@ -139,13 +139,13 @@ export default class Action{
             if(enemyPosition.row === row && enemyPosition.col === col)
                 this.animationInit = true
 
-                const horizontalLine = Math.floor(tileMap.map.length / 2)
-                const verticalLine = Math.floor(tileMap.map[0].length / 2)
+                const horizontalLine = Math.floor(9 / 2)
+                const verticalLine = 16 / 2
 
-                const offsetX = (col > verticalLine)? col - verticalLine : verticalLine - col
-                const offsetY = (row > horizontalLine)? horizontalLine - row : row - horizontalLine 
+                const offsetX = (horizontalLine - col) * tileSize
+                const offsetY = (verticalLine - row) * tileSize  
 
-                canvas.style.transform = `scale(1.5) translate(${(offsetX * Math.floor(tileSize / 1.5))}px, ${offsetY * Math.floor(tileSize / 1.5)}px)`
+                canvas.style.transform = `scale(1.5) translate(${offsetX}px, ${offsetY}px)`
 
                 if(this.mode === 'attack' || this.mode === 'skill' || this.mode === 'item'){
                     this.selectableSpace.splice(0)
@@ -156,7 +156,7 @@ export default class Action{
                     this.messageConfig.message = await weaponAttack(player, enemy, tileMap, row, col)
                     const { message, style, size} = this.messageConfig
                     
-                    this.#displayMessage(canvas, message, Math.floor(size * 1.5), style,  Math.floor(enemy.x * 1.5), Math.floor(enemy.y - Math.floor(tileSize * 1.5) * 1.5), characterAnimationPhaseEnded)    
+                    this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize, characterAnimationPhaseEnded)    
                 }, 300)
         }else{
             this.selectableSpace.splice(0)
@@ -250,13 +250,13 @@ export default class Action{
         appWrapper.append(messageHolder)
     
         // Clear message
-        // setTimeout(() => {
-        //     messageHolder.remove()
-        // }, 1000)
+        setTimeout(() => {
+            messageHolder.remove()
+        }, 1000)
     
         // Spend an action point
         setTimeout(() => {
-            // canvas.style.transform = `unset`
+            canvas.style.transform = `unset`
             this.animationInit = false
             characterAnimationPhaseEnded()
         }, 1500)
