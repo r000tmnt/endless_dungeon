@@ -222,8 +222,8 @@ const resize = () => {
         actionMenuOptions[i].style['font-size'] = fontSize + 'px';
     }
 
-    appWrapper.style.width = canvas.width  + 'px';
-    appWrapper.style.height = canvas.height + 'px';
+    appWrapper.style.width = (tileSize * 9)  + 'px';
+    appWrapper.style.height = (tileSize * 16) + 'px';
 
     characterName.style['font-size'] = fontSize + 'px';
     characterLv.style['font-size'] = (fontSize / 2) + 'px';
