@@ -14,13 +14,13 @@ A demo of dungeon clawer game build with Html canvas and Javascript
         * [className].js
         - utils
             *[functionality].js
-    - css
-        * [className].css
-    - assets
-        - data
+        - dataBase
             * [typeName].json
             -item
                 * [item_type].json
+    - css
+        * [className].css
+    - assets
         - image
             - class
                 * [class_type_level].png
