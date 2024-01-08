@@ -102,17 +102,18 @@
             </table>
         </div>
 
+        <!-- Inventory -->
         <div id="item" class="menu absolute invisible">
             <div>INVENTORY</div>
             <button class="back absolute" data-action="item" type="button">BACK</button>
 
             <!-- filter -->
-            <nav class="flex filter-group">
-                <button class="filter" type="button">Equipment</button>
-                <button class="filter" type="button">Potion</button>
-                <button class="filter" type="button">Material</button>
-                <button class="filter" type="button">Key</button>
-            </nav>
+            <div class="flex filter-group">
+                <button class="filter" type="button" data-filter="3,4">Equipment</button>
+                <button class="filter" type="button" data-filter="0">Potion</button>
+                <button class="filter" type="button" data-filter="2">Material</button>
+                <button class="filter" type="button" data-filter="6">Key</button>                    
+            </div>
 
             <div id="inventory" class="flex">
                 <!-- items -->
