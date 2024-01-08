@@ -10,6 +10,11 @@ import potion from '../dataBase/item/item_potion.js'
 var selectedItem = {}
 
 /**
+ * The array of actived filter
+ */
+var filter = []
+
+/**
  * Get item data url from type
  * @param {number} itemType - A number represent the type of the item 
  * @returns A string of routes to get item data
@@ -192,6 +197,35 @@ const giveItem = (currentActingPlayer) => {
     // TODO: Give item to another player
 }
 
+const filterItem = (type) => {
+    // Check if the filter is selected
+    if(filter.findIndex(f => f === type) < 0){
+        filter.push(type)
+        // TODO: Change btn style
+    }else{
+        filter.splice(filterIndex, 1)
+        // TODO: Change btn style
+    }
+
+    const items = document.querySelectorAll('.item')
+
+    if(filter.length){
+        // Start filtering
+        items.forEach(i => {
+            if(filter.findIndex(f => f.includes(i.dataset.type)) >= 0){
+                i.style.display = 'block'
+            }else{
+                i.style.display = 'none'
+            }
+        })     
+    }else{
+        // Display all items in the inventory
+        items.forEach(i => {
+            i.style.display = 'block'
+        })  
+    }
+}
+
 export const resizeInventory = () => {
 
 }
@@ -225,6 +259,8 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
     const space = document.getElementById('inventory')
     const subMenu = document.getElementById('itemAction')
     const itemActions = subMenu.querySelectorAll('li')
+
+    const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
 
     // Loop through the player's bag
     for(let i=0; i < currentActingPlayer.bag.length; i++){
@@ -274,7 +310,6 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         console.log(item)
             
         // Set the size of each block
-        const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
         const itemBlockSize = Math.floor(canvasPosition.width / 100) * 26
         const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
 
@@ -283,7 +318,9 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         title.style.paddingBottom = (fontSize / 2) + 'px'
         filterButton.forEach(f => {
             f.style.fontSize = Math.floor(fontSize / 3) + 'px'
-            f.style.width = "22%"
+            f.style.width = `${(currentActingPlayer.tileSize * 9) * 0.05}px`
+            f.style.height = `${(currentActingPlayer.tileSize * 9) * 0.05}px`
+            f.addEventListener('click', () => filterItem(f.dataset.filter) )
         })
 
         itemCount.style.width = 'fit-content'
@@ -341,6 +378,8 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
             break;
         }
     }
+
+    subMenu.style.width = (currentActingPlayer.tileSize * 9) - fontSize + 'px'
 
     // Display inventory
     Inventory.classList.remove('invisible')
