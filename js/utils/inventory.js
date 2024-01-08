@@ -59,16 +59,26 @@ const showItemToolTip = (currentActingPlayer, hoverItem) => {
 
         for(let key in Object.entries(hoverItem.effect.base_attribute)){
             if(sameItem < 0){
+                const attributeTag = documnet.createElement('div')
+                const valueTage = document.createElement('span')
                 const itemToChange = Object.entries(equip).find(e => e.position === hoverItem.position)
 
-                const itemData = inventory.find(i => i.id === itemToChange.id)
+                const itemData = (hoverItem.type === 3)? weapon.getOne(itemToChange.id) : armor.getOne(itemToChange.id)
 
-                attributeChanges = (attributes[key] - itemData.effect.base_attribute[key]) + hoverItem.effect.base_attribute[key] 
+                if(itemData?.effect?.base_attribute[key]){
+                    attributeChanges = (attributes[key] - itemData.effect.base_attribute[key]) + hoverItem.effect.base_attribute[key] 
+                    attributeTag.innerText = `${key} `
+                    valueTage.innerText = attributeChanges
+                    valueTage.style.color = (attributeChanges > 0)? 'green' : 'red'
+                    toolTips[selectedItem.index].append(attributeTag)
+                    toolTips[selectedItem.index].append(valueTage)
+                }
             }
         } 
     }
     
     toolTips[selectedItem.index].style.visibility = 'visible'
+    // TODO: Hide previous shown toolTip
 }
 
 /**
@@ -294,17 +304,15 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         itemCount.innerText = currentActingPlayer.bag[i].amount
 
         // Check if item equipped
-        if(itemData.type === 3 || itemData.type === 4){
-            const equipped = Object.entries(currentActingPlayer.equip).findIndex(e => e.id === itemData.id)
+        const equipped = Object.values(currentActingPlayer.equip).findIndex(e => e.id === itemData.id)
 
-            if(equipped >= 0){
-                // Prepare to show a little text on the bottom left of the block
-                const equipBadge = document.createElement('div')
-                equipBadge.classList.add('.item-equip')
-                equipBadge.innerText = 'E'
-                equipBadge.style.width = 'fit-content'
-                item.append(equipBadge)
-            }
+        if(equipped >= 0){
+            // Prepare to show a little text on the bottom left of the block
+            const equipBadge = document.createElement('div')
+            equipBadge.classList.add('.item-equip')
+            equipBadge.innerText = 'E'
+            equipBadge.style.width = 'fit-content'
+            item.append(equipBadge)
         }
 
         console.log(item)
