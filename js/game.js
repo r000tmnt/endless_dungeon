@@ -41,19 +41,19 @@ var turnType = 0
 let velocity = 1;
 
 // Create player object
-let player = null
+let player = tileMap.getPlayer(velocity)
 // player.setSkills('slash')
 var playerPosition = {
-    row: 0,
-    col: 0
+    row: player.y / tileSize,
+    col: player.x / tileSize
 }
 // Create enemy object
-let enemy = null
+let enemy = tileMap.getEnemy(velocity)
 // enemy.setSkills('poison')
 
 var enemyPosition = {
-    row: 0,
-    col: 0
+    row: enemy.y / tileSize,
+    col: enemy.x / tileSize
 }
 
 var inspectingCharacter = null
@@ -177,25 +177,18 @@ const resize = () => {
     grid = new Grid(tileMap.map, tileSize, {})
 
     // Get the player position relative to the canvas size
-    if(player !== null){
-        player.setCharacterTileSize(tileSize)
-        player.setCharacterPosition(playerPosition.col * tileSize, playerPosition.row * tileSize)
-    }else{
-        player = tileMap.getPlayer(velocity)
-    }
+    player.setCharacterTileSize(tileSize)
+    player.setCharacterPosition(playerPosition.col * tileSize, playerPosition.row * tileSize)
 
     console.log('player :>>>', player)
 
-     playerPosition = {
+    playerPosition = {
         row: player.y / tileSize,
         col: player.x / tileSize
     }
-    if(enemy !== null){
-        enemy.setCharacterTileSize(tileSize)
-        enemy.setCharacterPosition(enemyPosition.col * tileSize, enemyPosition.row * tileSize)
-    }else{
-        enemy = tileMap.getEnemy(velocity)
-    }
+
+    enemy.setCharacterTileSize(tileSize)
+    enemy.setCharacterPosition(enemyPosition.col * tileSize, enemyPosition.row * tileSize)
 
     console.log('enemy :>>>', enemy)
 
@@ -475,6 +468,7 @@ const characterAnimationPhaseEnded = async() => {
 
 //  Initialize the game
 const gameLoop = () => {
+    console.log('rendering')
     tileMap.draw(canvas, ctx, action.selectableSpace, action.mode)
 
     if(player !== null) {
@@ -488,6 +482,9 @@ const gameLoop = () => {
     if(grid !== null){
         grid.draw(ctx)
     }
+
+    // Form a loop for rendering
+    window.requestAnimationFrame(gameLoop)
 }
 
 // Move to the next phase
@@ -540,7 +537,10 @@ window.addEventListener('resize', resize, false);
 // window.addEventListener('orientationchange', resize, false);
 
 // 30 fps
-setInterval(gameLoop, 1000 / 30)
+// setInterval(gameLoop, 1000 / 30)
+
+// Game running based on browser refresh rate
+window.requestAnimationFrame(gameLoop)
 
 // A exported function for other object to talk to the game engine
 export const animationSignal = (signal) => {
