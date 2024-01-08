@@ -30,6 +30,11 @@ export default {
                     "id": "armor_light_1",
                     "type": 4,
                     "amount": 1
+                },
+                {
+                    "id": "potion_health_1",
+                    "type": 0,
+                    "amount": 1
                 }
             ]
         }
