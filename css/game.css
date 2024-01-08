@@ -196,17 +196,28 @@ li{
     display: flex;
     flex-wrap: wrap;
     /* justify-content:space-between; */
-    height: fit-content;
     /* overflow-y: scroll; */
 }
 
 .filter-group{
-    justify-content: space-around;
+    /* flex-wrap: wrap; */
+    /* justify-content: space-around; */
+    align-items: center;
+    text-align: center;
+}
+
+.filter{
+    /* width: 23%;
+    height: 23%; */
+    margin: 1%;
 }
 
 #itemAction{
-    /* width: 85%; */
     border-top: 1px solid white;
+}
+
+#item-desc{
+    justify-content: space-around;
 }
 
 .item{
