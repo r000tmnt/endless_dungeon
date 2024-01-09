@@ -12,7 +12,7 @@ export default class TileMap {
 
     #image(fileName){
         const img = new Image();
-        img.src = `assets/images/env/${fileName}`;
+        img.src = `/assets/images/env/${fileName}`;
         return img
     }
 

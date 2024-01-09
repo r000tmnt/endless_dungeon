@@ -331,10 +331,10 @@ export default class Character {
 
         switch(type){
             case 2:
-                classImage.src = `../assets/images/class/${id}.png`
+                classImage.src = `/assets/images/class/${id}.png`
             break
             case 3:
-                classImage.src = `../assets/images/mob/${id}.png`
+                classImage.src = `/assets/images/mob/${id}.png`
             break
         }
 
