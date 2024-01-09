@@ -71,7 +71,7 @@ export const weaponAttack = async(player, enemy, tileMap, row, col) => {
 
     if(player.lv >= enemy.lv){
         LvDistance = player.lv - enemy.lv
-        Rates[0].value = player.attributes.spd + player.attributes.lck + damage + Math.floor(LvDistance/100)
+        Rates[0].value = player.attributes.spd + player.attributes.lck + damage + Math.floor(LvDistance/100) + 100
     }else{
         LvDistance = enemy.lv - player.lv
         Rates[0].value = Math.abs(LvDistance -(player.attributes.spd + damage) + Math.floor(LvDistance/100))
