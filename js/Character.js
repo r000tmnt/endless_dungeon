@@ -43,38 +43,43 @@ export default class Character {
 
         // If the character is dead
         if(this?.attributes?.hp <= 0){
-            switch(this.characterType){
-                case 2:
-                    // Leave the body
-                    removeCharacter(2)
-                break    
-                case 3:
-                    const fadeOut = [0.7, 1, 0.7, 0.5, 0.3, 0]
-                    // Remove body
-                    // for(let i=0; i < fadeOut.length; i++){
-                    //     ctx.globalAlpha = fadeOut[i];
-                    //     ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
-                    // }
-                    let stepCount = 0
-
-                    const enemyFadeOutTimer = setInterval(() => {
-                        if(stepCount !== (fadeOut.length - 1)){
-                            ctx.globalAlpha = fadeOut[stepCount];
-                            ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
-                            stepCount += 1                            
-                        }else{
-                            clearInterval(enemyFadeOutTimer)
-                            // this.characterImage = null
-                            ctx.globalAlpha = 1
-                            
-                            removeCharacter(3)
+            if(!this.characterIsMoving){
+                this.characterIsMoving = true
+                switch(this.characterType){
+                    case 2:
+                        // Leave the body
+                        removeCharacter(2)
+                    break    
+                    case 3:
+                        let alpha = 1
+    
+                        const enemyFadeOutTimer = () => {
+                            if(alpha > 0){
+                                console.log('blinking')
+                                // ctx.save()
+                                ctx.globalAlpha = alpha
+                                ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)  
+                                // ctx.restore()
+                                alpha -= 0.1
+                                setTimeout(() => {
+                                    window.requestAnimationFrame(enemyFadeOutTimer) 
+                                }, 100)
+                            }else{
+                                console.log('blinking finished')
+                                // clearInterval(enemyFadeOutTimer)
+                                // this.characterImage = null
+                                // ctx.globalAlpha = 1
+                                this.characterIsMoving = false
+                                removeCharacter(3)
+                            }
                         }
-                    }, 100)
-                break
+                        window.requestAnimationFrame(enemyFadeOutTimer)  
+                    break
+                } 
             }
         }else
         // If the image of the character is loaded
-        if(this.characterImage?.src?.length){
+        if(!this.characterIsMoving && this.characterImage?.src?.length){
             ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
         }
     }
