@@ -59,6 +59,7 @@ body{
 #wrapper{
     position: relative;
     overflow: hidden;
+    background-color: black;
 }
 
 #game{
