@@ -56,16 +56,16 @@ export default class Character {
                         const enemyFadeOutTimer = () => {
                             if(alpha > 0){
                                 console.log('blinking')
-                                // ctx.save()
                                 ctx.globalAlpha = alpha
-                                ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)  
-                                // ctx.restore()
-                                alpha -= 0.1
+                                ctx.save()
+                                ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
+                                alpha -= 0.01
                                 setTimeout(() => {
                                     window.requestAnimationFrame(enemyFadeOutTimer) 
-                                }, 100)
+                                }, 10)
                             }else{
                                 console.log('blinking finished')
+                                ctx.restore()
                                 // clearInterval(enemyFadeOutTimer)
                                 // this.characterImage = null
                                 // ctx.globalAlpha = 1
