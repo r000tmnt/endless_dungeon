@@ -45,9 +45,14 @@ const getItemType = (item) => {
     return data
 }
 
-const showItemToolTip = (currentActingPlayer, hoverItem) => {
+/**
+ * Display tooltip on the screen
+ * @param {object} currentActingPlayer - An object represend the current acting character 
+ * @param {object} hoverItem - The item you clicked 
+ * @param {htmlElement} - The element you clicked
+ */
+const showItemToolTip = (currentActingPlayer, hoverItem, target) => {
     const toolTips = document.querySelectorAll('.item-toolTip')
-
     let attributeChanges = 0
 
     const { attributes, equip } = currentActingPlayer
@@ -59,9 +64,9 @@ const showItemToolTip = (currentActingPlayer, hoverItem) => {
 
         for(let key in Object.entries(hoverItem.effect.base_attribute)){
             if(sameItem < 0){
-                const attributeTag = documnet.createElement('div')
-                const valueTage = document.createElement('span')
-                const itemToChange = Object.entries(equip).find(e => e.position === hoverItem.position)
+                const attributeTag = toolTips[selectedItem.index].children[0]
+                const valueTage = toolTips[selectedItem.index].children[1]
+                const itemToChange = Object.values(equip).find(e => e.id === hoverItem.id)
 
                 const itemData = (hoverItem.type === 3)? weapon.getOne(itemToChange.id) : armor.getOne(itemToChange.id)
 
@@ -74,11 +79,23 @@ const showItemToolTip = (currentActingPlayer, hoverItem) => {
                     toolTips[selectedItem.index].append(valueTage)
                 }
             }
-        } 
+        }      
+    }else{
+        // Display discription only
+        const attributeTag = toolTips[selectedItem.index].children[0]
+        attributeTag.innerText = hoverItem.effect.desc
     }
     
-    toolTips[selectedItem.index].style.visibility = 'visible'
-    // TODO: Hide previous shown toolTip
+    // Hide previous shown toolTip
+    
+    toolTips.forEach((t, index) => {
+        if(index !== selectedItem.index){
+            t.style.visibility = 'hidden'
+        }else{
+            t.style.visibility = 'visible'
+        }
+    })
+
 }
 
 /**
@@ -207,6 +224,10 @@ const giveItem = (currentActingPlayer) => {
     // TODO: Give item to another player
 }
 
+/**
+ * Filter inventory items
+ * @param {string} type - A string of number represent the type of the item
+ */
 const filterItem = (type) => {
     // Check if the filter is selected
     if(filter.findIndex(f => f === type) < 0){
@@ -236,10 +257,65 @@ const filterItem = (type) => {
     }
 }
 
-export const resizeInventory = () => {
+/**
+ * Resize inventory elements on the pgae
+ * @param {object} canvasPosition - An object contains information about the setting of the canvas element 
+ */
+export const resizeInventory = (canvasPosition) => {
+    const Inventory = document.getElementById('item')
+    const title = Inventory.children[0]
+    const filterButton = document.querySelectorAll('.filter')
+    const space = document.getElementById('inventory')
+    const subMenu = document.getElementById('itemAction')
+    // const itemActions = subMenu.querySelectorAll('li')
+    const items = document.querySelectorAll('.item')
+    const itemCounts = document.querySelectorAll('.item-count')
+    const itemEquips = document.querySelectorAll('.item-equip') 
+    // const itemToolTips = document.querySelectorAll('.item-toolTip')
 
+    const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
+
+    // Set the size of each block
+    const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
+    const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
+
+    // Apply size number
+    title.style.fontSize = fontSize + 'px'
+    title.style.paddingBottom = (fontSize / 2) + 'px'
+
+    space.style.maxHeight = (itemBlockSize * 3) + 'px'
+    space.style.padding = `${itemBlockMargin}px 0`
+    subMenu.style.width = canvasPosition.width - fontSize + 'px'
+
+    filterButton.forEach(f => {
+        f.style.fontSize = Math.floor(fontSize / 3) + 'px'
+        f.style.width = `${canvasPosition.width * 0.1}px`
+        f.style.height = `${canvasPosition.width * 0.1}px`
+        // f.addEventListener('click', () => filterItem(f.dataset.filter) )
+    })
+
+    items.forEach((item, index) => {
+        item.style.width = itemBlockSize + 'px'
+        item.style.height = itemBlockSize + 'px'
+        item.style.fontSize = (fontSize / 2) + 'px'
+        item.style.border = '1px dotted white'
+
+        itemCounts[index].style.width = 'fit-content'
+        itemCounts[index].style.fontSize = (fontSize / 2) + 'px'
+        itemCounts[index].style.padding = `0 ${fontSize / 4}px ${fontSize / 4}px 0`
+        itemCounts[index].classList.add('item-count')
+    })
+
+    itemEquips.forEach(equipBadge => {
+        equipBadge.style.fontSize = (fontSize / 2) + 'px'
+        equipBadge.style.width = 'fit-content'
+        equipBadge.style.padding = `0 0 ${fontSize / 4}px ${fontSize / 4}px`
+    })
 }
 
+/**
+ * Clear the inventory elements on the page
+ */
 export const clearInventory = () => {
     const subMenu = document.getElementById('itemAction')
 
@@ -264,19 +340,30 @@ export const clearInventory = () => {
 export const constructInventoryWindow = async(currentActingPlayer, canvasPosition) => {
     // Get UI elements
     const Inventory = document.getElementById('item')
-    const title = Inventory.children[0]
-    const filterButton = document.querySelectorAll('.filter')
     const space = document.getElementById('inventory')
     const subMenu = document.getElementById('itemAction')
     const itemActions = subMenu.querySelectorAll('li')
+    const filterButton = document.querySelectorAll('.filter')
 
     const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
+    // Set the size of each block
+    const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
+    const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
+
+    filterButton.forEach(f => {
+        f.style.fontSize = Math.floor(fontSize / 3) + 'px'
+        f.style.width = `${canvasPosition.width * 0.1}px`
+        f.style.height = `${canvasPosition.width * 0.1}px`
+        f.addEventListener('click', () => filterItem(f.dataset.filter) )
+    })
 
     // Loop through the player's bag
     for(let i=0; i < currentActingPlayer.bag.length; i++){
         const item = document.createElement('div')
         const itemCount = document.createElement('div')
         const itemToolTip = document.createElement('span')
+        const attributeTag = document.createElement('div')
+        const valueTage = document.createElement('span')
         // Get item data
         const itemData = getItemType(currentActingPlayer.bag[i])
 
@@ -286,6 +373,8 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         item.setAttribute('data-index', i)
 
         itemToolTip.classList.add('item-toolTip')
+        itemToolTip.append(attributeTag)
+        itemToolTip.append(valueTage)
 
         // Set long-press event
         item.addEventListener('long-press', () => {
@@ -294,9 +383,11 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
             openItemSubMenu( currentActingPlayer, itemData)
         })
 
-        // Set hover event
-        item.addEventListener('hover', () => {
-            showItemToolTip(currentActingPlayer, itemData)
+        // Set click event
+        item.addEventListener('click', (e) => {
+            selectedItem = itemData
+            selectedItem['index'] = i
+            showItemToolTip(currentActingPlayer, itemData, e.target)
         })
 
         // Setting inner text
@@ -309,30 +400,19 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         if(equipped >= 0){
             // Prepare to show a little text on the bottom left of the block
             const equipBadge = document.createElement('div')
-            equipBadge.classList.add('.item-equip')
+            equipBadge.classList.add('item-equip')
             equipBadge.innerText = 'E'
+            equipBadge.style.fontSize = (fontSize / 2) + 'px'
             equipBadge.style.width = 'fit-content'
+            equipBadge.style.padding = `0 0 ${fontSize / 4}px ${fontSize / 4}px`
             item.append(equipBadge)
         }
 
         console.log(item)
-            
-        // Set the size of each block
-        const itemBlockSize = Math.floor(canvasPosition.width / 100) * 26
-        const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
-
-        // Apply size number
-        title.style.fontSize = fontSize + 'px'
-        title.style.paddingBottom = (fontSize / 2) + 'px'
-        filterButton.forEach(f => {
-            f.style.fontSize = Math.floor(fontSize / 3) + 'px'
-            f.style.width = `${(currentActingPlayer.tileSize * 9) * 0.05}px`
-            f.style.height = `${(currentActingPlayer.tileSize * 9) * 0.05}px`
-            f.addEventListener('click', () => filterItem(f.dataset.filter) )
-        })
 
         itemCount.style.width = 'fit-content'
         itemCount.style.fontSize = (fontSize / 2) + 'px'
+        itemCount.style.padding = `0 ${fontSize / 4}px ${fontSize / 4}px 0`
         itemCount.classList.add('item-count')
 
         item.style.width = itemBlockSize + 'px'
@@ -346,8 +426,6 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         }
         
         item.classList.add('item')
-
-        space.style.padding = itemBlockMargin + 'px'
 
         // Append child to element
         item.append(itemToolTip)
@@ -387,7 +465,12 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         }
     }
 
-    subMenu.style.width = (currentActingPlayer.tileSize * 9) - fontSize + 'px'
+    // Hide scroll bar
+    space.style.overflowY = 'scroll'
+    space.classList.add('disable-scrollbars')
+    space.style.maxHeight = (itemBlockSize * 3) + 'px'
+    space.style.padding = `${itemBlockMargin}px 0`
+    subMenu.style.width = canvasPosition.width - fontSize + 'px'
 
     // Display inventory
     Inventory.classList.remove('invisible')
