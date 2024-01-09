@@ -3,7 +3,7 @@ import TileMap from './TileMap.js';
 import Grid from './grid.js';
 import Action from './action.js';
 
-import { constructInventoryWindow, clearInventory } from './utils/inventory.js'
+import { resizeInventory, clearInventory } from './utils/inventory.js'
 
 // #region Canvas element
 let canvas = document.getElementById('game');
@@ -254,10 +254,8 @@ const resize = () => {
 
     // If the inventory window is shown
     if(action.mode === 'item'){
-        // Clear items
-        clearInventory()
         // Resize the window and items
-        constructInventoryWindow(player, canvasPosition)
+        resizeInventory(canvasPosition)
     }
     
     if(action.mode === 'status'){
