@@ -252,11 +252,11 @@ export default class Action{
         // Clear message
         setTimeout(() => {
             messageHolder.remove()
+            canvas.style.transform = `unset`
         }, 1000)
     
         // Spend an action point
         setTimeout(() => {
-            canvas.style.transform = `unset`
             this.animationInit = false
             characterAnimationPhaseEnded()
         }, 1500)
