@@ -48,55 +48,54 @@ const getItemType = (item) => {
 /**
  * Display tooltip on the screen
  * @param {object} currentActingPlayer - An object represend the current acting character 
- * @param {object} hoverItem - The item you clicked 
- * @param {htmlElement} - The element you clicked
+ * @param {object} hoverItem - The item you clicked
  */
-const showItemToolTip = (currentActingPlayer, hoverItem, target) => {
-    const toolTips = document.querySelectorAll('.item-toolTip')
-    let attributeChanges = 0
+// const showItemToolTip = (currentActingPlayer, hoverItem) => {
+//     const toolTips = document.querySelectorAll('.item-toolTip')
+//     let attributeChanges = 0
 
-    const { attributes, equip } = currentActingPlayer
+//     const { attributes, equip } = currentActingPlayer
 
-    if(hoverItem.type === 3 || hoverItem.type === 4){
-        // Calculate attribute changes if equip
-        // If is the same item
-        const sameItem = Object.entries(equip).findIndex(e => e.id === hoverItem.id)
+//     if(hoverItem.type === 3 || hoverItem.type === 4){
+//         // Calculate attribute changes if equip
+//         // If is the same item
+//         const sameItem = Object.values(equip).findIndex(e => e.id === hoverItem.id)
 
-        for(let key in Object.entries(hoverItem.effect.base_attribute)){
-            if(sameItem < 0){
-                const attributeTag = toolTips[selectedItem.index].children[0]
-                const valueTage = toolTips[selectedItem.index].children[1]
-                const itemToChange = Object.values(equip).find(e => e.id === hoverItem.id)
+//         for(let [key, value] in Object.entries(hoverItem.effect.base_attribute)){
+//             if(sameItem < 0){
+//                 const attributeTag = toolTips[selectedItem.index].children[0]
+//                 const valueTage = toolTips[selectedItem.index].children[1]
+//                 const itemToChange = Object.values(equip).find(e => e.id === hoverItem.id)
 
-                const itemData = (hoverItem.type === 3)? weapon.getOne(itemToChange.id) : armor.getOne(itemToChange.id)
+//                 const itemData = (hoverItem.type === 3)? weapon.getOne(itemToChange.id) : armor.getOne(itemToChange.id)
 
-                if(itemData?.effect?.base_attribute[key]){
-                    attributeChanges = (attributes[key] - itemData.effect.base_attribute[key]) + hoverItem.effect.base_attribute[key] 
-                    attributeTag.innerText = `${key} `
-                    valueTage.innerText = attributeChanges
-                    valueTage.style.color = (attributeChanges > 0)? 'green' : 'red'
-                    toolTips[selectedItem.index].append(attributeTag)
-                    toolTips[selectedItem.index].append(valueTage)
-                }
-            }
-        }      
-    }else{
-        // Display discription only
-        const attributeTag = toolTips[selectedItem.index].children[0]
-        attributeTag.innerText = hoverItem.effect.desc
-    }
+//                 if(itemData?.effect?.base_attribute[key]){
+//                     attributeChanges = (attributes[key] - itemData.effect.base_attribute[key]) + hoverItem.effect.base_attribute[key] 
+//                     attributeTag.innerText = `${key} `
+//                     valueTage.innerText = attributeChanges
+//                     valueTage.style.color = (attributeChanges > 0)? 'green' : 'red'
+//                     toolTips[selectedItem.index].append(attributeTag)
+//                     toolTips[selectedItem.index].append(valueTage)
+//                 }
+//             }
+//         }      
+//     }else{
+//         // Display discription only
+//         const attributeTag = toolTips[selectedItem.index].children[0]
+//         attributeTag.innerText = hoverItem.effect.desc
+//     }
     
-    // Hide previous shown toolTip
+//     // Hide previous shown toolTip
     
-    toolTips.forEach((t, index) => {
-        if(index !== selectedItem.index){
-            t.style.visibility = 'hidden'
-        }else{
-            t.style.visibility = 'visible'
-        }
-    })
+//     toolTips.forEach((t, index) => {
+//         if(index !== selectedItem.index){
+//             t.style.visibility = 'hidden'
+//         }else{
+//             t.style.visibility = 'visible'
+//         }
+//     })
 
-}
+// }
 
 /**
  * Open a small menu when clicked on an item
@@ -110,16 +109,20 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
     // Item image or icon
     desc.children[0].src = ""
 
-    desc.children[1].style.whiteSpace = "pre-line"
+    while(desc.children[1].firstChild){
+        desc.children[1].removeChild(desc.children[1].firstChild)
+    }
+
     desc.children[1].innerText = `${clickedItem.name}\n${clickedItem.effect.desc}`
 
     // Check item type
     if(clickedItem.type === 3 || clickedItem.type === 4){
         // If the item is a weapon or armor
-        const { equip } = currentActingPlayer
+        const { equip, attributes } = currentActingPlayer
 
         const equipped = Object.entries(equip).findIndex(e => e.id === clickedItem.id)
 
+        // Hide or display options
         itemActions.forEach(i => {
             if(i.dataset.action === 'use'){
                 i.style.display = 'none'
@@ -132,6 +135,34 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
                 })
             }
         })
+        // Calculate attribute changes if equip
+        // If is the same item
+        const sameItem = Object.values(equip).findIndex(e => e.id === clickedItem.id)
+
+        for(let [key, value] of Object.entries(clickedItem.effect.base_attribute)){
+            if(sameItem < 0){
+                let attributeChanges = dp
+                const itemToChange = Object.values(equip).find(e => e.id === clickedItem.id)
+
+                const itemData = (clickedItem.type === 3)? weapon.getOne(itemToChange.id) : armor.getOne(itemToChange.id)
+
+                if(itemData?.effect?.base_attribute[key]){
+                    attributeChanges = (attributes[key] - itemData.effect.base_attribute[key]) + clickedItem.effect.base_attribute[key] 
+
+                    const attributeTag = `<div style="color:${(attributeChanges > currentActingPlayer.attributes[key])? 'green' : 'red'}">${key} ${attributeChanges}</div>`
+
+                    desc.children[1].insertAdjacentHTML('beforeend', attributeTag)
+                }
+            }else{
+                // Display current effected attributes
+                let attributeTag = ``
+                for(let [key, value] of Object.entries(selectedItem.effect.base_attribute)){
+                    attributeTag += `<div>${key} ${value}</div>`
+                }
+
+                desc.children[1].insertAdjacentHTML('beforeend', attributeTag)
+            }
+        }      
     }else{
         itemActions.forEach(i => {
             if(i.dataset.action === 'equip')
@@ -271,11 +302,16 @@ export const resizeInventory = (canvasPosition) => {
     const items = document.querySelectorAll('.item')
     const itemCounts = document.querySelectorAll('.item-count')
     const itemEquips = document.querySelectorAll('.item-equip') 
+    const desc = document.getElementById('item-desc')
     // const itemToolTips = document.querySelectorAll('.item-toolTip')
 
     const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
 
     // Set the size of each block
+    desc.children[0].style.width = (canvasPosition.width / 9) + 'px'
+    desc.children[0].style.height = (canvasPosition.width / 9) + 'px'
+    desc.children[1].style.whiteSpace = "pre-line"
+
     const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
     const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
 
@@ -344,9 +380,14 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
     const subMenu = document.getElementById('itemAction')
     const itemActions = subMenu.querySelectorAll('li')
     const filterButton = document.querySelectorAll('.filter')
+    const desc = document.getElementById('item-desc')
 
     const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
     // Set the size of each block
+    desc.children[0].style.width = currentActingPlayer.tileSize + 'px'
+    desc.children[0].style.height = currentActingPlayer.tileSize + 'px'
+    desc.children[1].style.whiteSpace = "pre-line"
+
     const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
     const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
 
@@ -361,9 +402,7 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
     for(let i=0; i < currentActingPlayer.bag.length; i++){
         const item = document.createElement('div')
         const itemCount = document.createElement('div')
-        const itemToolTip = document.createElement('span')
-        const attributeTag = document.createElement('div')
-        const valueTage = document.createElement('span')
+        // const itemToolTip = document.createElement('span')
         // Get item data
         const itemData = getItemType(currentActingPlayer.bag[i])
 
@@ -371,10 +410,11 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         item.setAttribute('data-type', itemData.type)
         item.setAttribute('data-limit', itemData.stackLimit)
         item.setAttribute('data-index', i)
+        item.setAttribute('data-long-press-delay', 500)
 
-        itemToolTip.classList.add('item-toolTip')
-        itemToolTip.append(attributeTag)
-        itemToolTip.append(valueTage)
+        // itemToolTip.classList.add('item-toolTip')
+        // itemToolTip.append(attributeTag)
+        // itemToolTip.append(valueTage)
 
         // Set long-press event
         item.addEventListener('long-press', () => {
@@ -384,11 +424,11 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         })
 
         // Set click event
-        item.addEventListener('click', (e) => {
-            selectedItem = itemData
-            selectedItem['index'] = i
-            showItemToolTip(currentActingPlayer, itemData, e.target)
-        })
+        // item.addEventListener('click', (e) => {
+        //     selectedItem = itemData
+        //     selectedItem['index'] = i
+        //     showItemToolTip(currentActingPlayer, itemData)
+        // })
 
         // Setting inner text
         item.innerText = itemData.name
@@ -428,7 +468,7 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         item.classList.add('item')
 
         // Append child to element
-        item.append(itemToolTip)
+        // item.append(itemToolTip)
         item.append(itemCount)
         space.append(item)
     }
