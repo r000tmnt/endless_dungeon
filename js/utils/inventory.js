@@ -90,7 +90,7 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
                 }
 
                 itemActions[i].addEventListener('click', () => {
-                    useItem(currentActingPlayer, clickedItem)
+                    useItem(currentActingPlayer, itemActions)
                 })
             break;
             case 'equip':
@@ -100,7 +100,7 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
             break;
             case 'drop':
                 itemActions[i].addEventListener('click', () => {
-                    dropItem(currentActingPlayer, clickedItem)
+                    dropItem(currentActingPlayer, itemActions)
                 })
             break;
             case 'give':
@@ -180,11 +180,12 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
 /**
  * Apply the item effect to the player
  * @param {object} currentActingPlayer - An object represent current acting player 
+ * @param {HTMLElementCollection} itemActions - A collection of sub menu button
  */
-const useItem = async(currentActingPlayer, clickedItem) => {
+const useItem = async(currentActingPlayer, itemActions) => {
 
-    if(Object.entries(clickedItem).length){
-        const { effect } = clickedItem
+    if(Object.entries(selectedItem).length){
+        const { effect } = selectedItem
         switch(effect.target){
             case 'status':
                 currentActingPlayer.attributes.status = 'Healthy'
@@ -203,13 +204,7 @@ const useItem = async(currentActingPlayer, clickedItem) => {
             break;
         }
 
-        // If the quantity of the item is greater than 1 
-        if(currentActingPlayer.bag[selectedItem.index].amount > 1){
-            currentActingPlayer.bag[selectedItem.index].amount -= 1
-        }else{
-            // Remove the item from the inventory
-            currentActingPlayer.bag.splice(selectedItem.index, 1)
-        }
+        removeItem(currentActingPlayer, itemActions)
     }
 }
 
@@ -249,26 +244,41 @@ const UnequipItem = (currentActingPlayer) => {
 /**
  * Drop the item from the player
  * @param {object} currentActingPlayer - An object represent current acting player 
+ * @param {HTMLElementCollection} itemActions - A collection of sub menu button 
  */
-const dropItem = (currentActingPlayer) => {
+const dropItem = (currentActingPlayer, itemActions) => {
     if(Object.entries(selectedItem).length){  
         // Leave an item on the ground, need an sprite to draw on the tile    
         setEvent({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, amount: 1}])
 
-        // Alter item amount or remove item
-        if(currentActingPlayer.bag[selectedItem.index].amount > 1){
-            currentActingPlayer.bag[selectedItem.index].amount -= 1
-        }else{
-            const items = document.querySelectorAll('.item')
-            currentActingPlayer.bag.splice(selectedItem.index, 1)
-            items[selectedItem.index].remove()
-        }  
+        removeItem(currentActingPlayer, itemActions)
     }
 }
 
 const giveItem = (currentActingPlayer) => {
     // TODO: Give item to another player
 }
+
+/**
+ * Alter the quantity or remove an item from the player
+ * @param {object} currentActingPlayer - An object represent current acting player 
+ * @param {HTMLElementCollection} itemActions - A collection of sub menu button 
+ */
+const removeItem = (currentActingPlayer, itemActions) => {
+    // Alter item amount or remove item
+    if(currentActingPlayer.bag[selectedItem.index].amount > 1){
+        const itemCount = document.querySelectorAll('.item-count')
+        currentActingPlayer.bag[selectedItem.index].amount -= 1
+        itemCount[selectedItem.index].innerText = currentActingPlayer.bag[selectedItem.index].amount
+    }else{
+        const items = document.querySelectorAll('.item')
+        currentActingPlayer.bag.splice(selectedItem.index, 1)
+        items[selectedItem.index].remove()
+
+        // Close sub menu
+        itemActions[itemActions.length - 1].click() 
+    } 
+} 
 
 /**
  * Filter inventory items
