@@ -131,6 +131,14 @@ li{
     visibility: hidden;
 }
 
+.display{
+    display: block;
+}
+
+.hide{
+    display: none;
+}
+
 .gauge{
     padding: 0;
 }
