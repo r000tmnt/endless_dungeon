@@ -75,6 +75,7 @@ body{
 }
 
 #action_menu{
+    position: absolute;
     transition: margin-left .1s ease-in-out;
 }
 
@@ -106,7 +107,7 @@ li{
     background: white;
     padding: 5px 5px 0 5px;
     bottom: 0;
-    width: 80%;
+    /* width: 80%; */
 }
 
 .caption_top > h5{
@@ -221,7 +222,14 @@ li{
     /* width: 23%;
     height: 23%; */
     margin: 1%;
+    background: #cccccc;
+    border: none;
 }
+
+.filtering{
+    background: #ffffff;
+}
+
 
 #itemAction{
     border-top: 1px solid white;
