@@ -115,6 +115,58 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
 
     desc.children[1].innerText = `${clickedItem.name}\n${clickedItem.effect.desc}`
 
+    // Set click event to sub menu buttons
+    for(let i=0; i < itemActions.length; i++){
+        switch(itemActions[i].dataset.action){
+            case 'use':
+                if(clickedItem.type === 0){
+                    const { attributes } = currentActingPlayer
+
+                    // Disable the element if the condition is not match
+                    switch(clickedItem.useCondition){
+                        case 'lower':
+                            if(attributes[clickedItem.effect.target] > attributes[clickedItem.useCondition.target]){
+                                itemActions[i].style.pointerEvents = 'none'
+                                itemActions[i].classList.add('no-event')
+                            }
+                        break;
+                        case 'equal':
+                            if(attributes[clickedItem.effect.target] !== attributes[clickedItem.useCondition.target]){
+                                itemActions[i].style.pointerEvents = 'none'
+                                itemActions[i].classList.add('no-event')
+                            }
+                        break;
+                    }
+                }
+
+                itemActions[i].addEventListener('click', () => {
+                    useItem(currentActingPlayer, clickedItem)
+                })
+            break;
+            case 'equip':
+                itemActions[i].addEventListener('click', () => {
+                    equipItem(currentActingPlayer, clickedItem)
+                })
+            break;
+            case 'drop':
+                itemActions[i].addEventListener('click', () => {
+                    dropItem(currentActingPlayer, clickedItem)
+                })
+            break;
+            case 'give':
+                itemActions[i].addEventListener('click', () => {
+                    giveItem(currentActingPlayer, clickedItem)
+                })
+            break;
+            case 'close':
+                itemActions[i].addEventListener('click', () => {
+                    subMenu.classList.remove('open_subWindow')
+                    subMenu.classList.add('invisible')
+                })
+            break;
+        }
+    }
+
     // Check item type
     if(clickedItem.type === 3 || clickedItem.type === 4){
         // If the item is a weapon or armor
@@ -179,11 +231,10 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
  * Apply the item effect to the player
  * @param {object} currentActingPlayer - An object represent current acting player 
  */
-const useItem = async(currentActingPlayer) => {
-    const itemData = inventory.find((item) => item.id === selectedItem.id)
+const useItem = async(currentActingPlayer, clickedItem) => {
 
-    if(Object.entries(itemData).length){
-        const { effect } = itemData
+    if(Object.entries(clickedItem).length){
+        const { effect } = clickedItem
         switch(effect.target){
             case 'status':
                 currentActingPlayer.attributes.status = 'Healthy'
@@ -200,6 +251,14 @@ const useItem = async(currentActingPlayer) => {
                     currentActingPlayer.attributes[`${effect.target}`] = Math.floor(currentActingPlayer.attributes[`${effect.target}`] * (effect.amount / 100)) 
                 }
             break;
+        }
+
+        // If the quantity of the item is greater than 1 
+        if(currentActingPlayer.bag[selectedItem.index].amount > 1){
+            currentActingPlayer.bag[selectedItem.index].amount -= 1
+        }else{
+            // Remove the item from the inventory
+            currentActingPlayer.bag.splice(selectedItem.index, 1)
         }
     }
 }
@@ -247,7 +306,8 @@ const dropItem = (currentActingPlayer) => {
             currentActingPlayer.bag[selectedItem.index].amount -= 1
         }else{
             currentActingPlayer.bag.splice(selectedItem.index, 1)
-        }        
+        }   
+        // TODO: Leave a item on the ground, need an sprite to draw on a tile     
     }
 }
 
@@ -471,38 +531,6 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         // item.append(itemToolTip)
         item.append(itemCount)
         space.append(item)
-    }
-
-    // Set click event to sub menu buttons
-    for(let i=0; i < itemActions.length; i++){
-        switch(itemActions[i].dataset.action){
-            case 'use':
-                itemActions[i].addEventListener('click', () => {
-                    useItem(currentActingPlayer)
-                })
-            break;
-            case 'equip':
-                itemActions[i].addEventListener('click', () => {
-                    equipItem(currentActingPlayer)
-                })
-            break;
-            case 'drop':
-                itemActions[i].addEventListener('click', () => {
-                    dropItem(currentActingPlayer)
-                })
-            break;
-            case 'give':
-                itemActions[i].addEventListener('click', () => {
-                    giveItem(currentActingPlayer)
-                })
-            break;
-            case 'close':
-                itemActions[i].addEventListener('click', () => {
-                    subMenu.classList.remove('open_subWindow')
-                    subMenu.classList.add('invisible')
-                })
-            break;
-        }
     }
 
     // Hide scroll bar
