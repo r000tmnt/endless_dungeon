@@ -37,8 +37,8 @@ export default class Character {
      * @param {function} ctx - canvas.getContext("2d")
      */
     draw(ctx){
-        if(!this.characterIsMoving && this.destination){
-            this.#move(this.destination)
+        if(this.destination !== null){
+            this.#move(ctx, this.destination)
         }
 
         // If the character is dead
@@ -48,34 +48,14 @@ export default class Character {
                 switch(this.characterType){
                     case 2:
                         // Leave the body
-                        removeCharacter(2)
+                        // removeCharacter(2)
                     break    
                     case 3:
-                        let alpha = 1
-    
-                        const enemyFadeOutTimer = () => {
-                            if(alpha > 0){
-                                console.log('blinking')
-                                ctx.globalAlpha = alpha
-                                ctx.save()
-                                ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
-                                alpha -= 0.01
-                                setTimeout(() => {
-                                    window.requestAnimationFrame(enemyFadeOutTimer) 
-                                }, 10)
-                            }else{
-                                console.log('blinking finished')
-                                ctx.restore()
-                                // clearInterval(enemyFadeOutTimer)
-                                // this.characterImage = null
-                                // ctx.globalAlpha = 1
-                                this.characterIsMoving = false
-                                removeCharacter(3)
-                            }
-                        }
-                        window.requestAnimationFrame(enemyFadeOutTimer)  
+                        this.#fadeOutTimer(ctx, this.characterType)
                     break
                 } 
+            }else{
+                this.#fadeOutTimer(ctx, this.characterType)
             }
         }else
         // If the image of the character is loaded
@@ -111,133 +91,61 @@ export default class Character {
 
     /**
      * Moving the character
+     * @param {object} ctx - Canvas context that inculdes various function to control the element
      * @param {object} destination - An object that represent a block which the character is going for
-     * @param {array} walkableSpace - A multi dimension array which represent all the blocks the character can reached 
      */
-    #move(destination){
-        console.log('destination :>>>', destination)
-        // col ====x, row === y
-        const { row, col } = destination
+    #move(ctx, destination){
+        if(!this.characterIsMoving){
+            console.log('destination :>>>', destination)
+            // col ====x, row === y
+            const { row, col } = destination
 
-        const currentRow = this.y / this.tileSize
-        const currentCol = this.x / this.tileSize
+            const currentRow = this.y / this.tileSize
+            const currentCol = this.x / this.tileSize
 
-        console.log('Init walking animation')
-        this.characterIsMoving = true
+            console.log('Init walking animation')
+            this.characterIsMoving = true
+            this.movingDirection = ''
+            this.destination_y = 0
+            this.destination_x = 0
 
-        // If the target is at the upper row
-        if(row < currentRow){
-            const destination_y = row * this.tileSize
-            this.#moveUp(destination_y)
+            // If the target is at the upper row
+            // If the target is at the deeper row
+            if(row < currentRow || row > currentRow){
+                this.destination_y = row * this.tileSize
+                this.destination_x = currentCol * this.tileSize
+                this.movingDirection = (row < currentRow)? 'top' : 'down'
+            }
+
+            // If the target is at the left side
+            // If the target is at the right side
+            if(col < currentCol || col > currentCol){
+                this.destination_x = col * this.tileSize
+                this.destination_y = currentRow * this.tileSize
+                this.movingDirection = (col < currentCol)? 'left' : 'right'           
+            }
+
+            animationSignal(true) 
+            this.#movementInterval(ctx)           
+        }else{
+            this.#movementInterval(ctx)
         }
-
-        // If the target is at the deeper row
-        if(row > currentRow){
-            const destination_y = row * this.tileSize
-            this.#moveDown(destination_y)
-        }
-
-        // If the target is at the left side
-        if(col < currentCol){
-            const destination_x = col * this.tileSize
-            this.#moveLeft(destination_x)            
-        }
-
-        // If the target is at the right side
-        if(col > currentCol){
-            const destination_x = col * this.tileSize
-            this.#moveRight(destination_x)  
-        }
-
+        // window.requestAnimationFrame(movementInterval)
     }
 
-    #moveUp(destination_y){
-        console.log('go up')        
-        // Tell the game engine the character is moving
-        animationSignal(true)
-        let movementInterval = setInterval(() => {
-            if(this.y !== destination_y){
-                this.y -= this.velocity
-            }else{
-                // Stop timer
-                this.characterIsMoving = false
-                clearInterval(movementInterval) 
-                if(this.destination !== null){
-                    if(this.y === (this.destination.row * this.tileSize)){
-                        if(this.x === (this.destination.col * this.tileSize)){
-                            this.#stopMoving()                                     
-                        }                                     
-                    }                    
-                } 
-            }
-        }, 10)
-    }
-
-    #moveDown(destination_y){
-        console.log('go down to y:>>>', destination_y)
-        // Tell the game engine the character is moving
-        animationSignal(true)
-        let movementInterval = setInterval(() => {
-            if(this.y !== destination_y){
-                this.y += this.velocity
-                console.log('y :>>>', this.y)
-            }else{
-                // Stop timer
-                this.characterIsMoving = false
-                clearInterval(movementInterval)  
-                if(this.destination !== null){
-                    if(this.y === (this.destination.row * this.tileSize)){
-                        if(this.x === (this.destination.col * this.tileSize)){
-                            this.#stopMoving()                                     
-                        }                                      
-                    }                    
-                }
-            }
-        }, 10)
-    }
-
-    #moveRight(destination_x){
-        console.log('go right')
-        // Tell the game engine the character is moving
-        animationSignal(true)
-        let movementInterval = setInterval(() => {
-            if(this.x !== destination_x){
-                this.x += this.velocity
-            }else{
-                // Stop timer            
-                this.characterIsMoving = false  
-                clearInterval(movementInterval)  
-                if(this.destination !== null){
-                    if(this.x === (this.destination.col * this.tileSize)){
-                        if(this.y === (this.destination.row * this.tileSize)){
-                            this.#stopMoving()                                     
-                        }                                    
-                    }                    
-                }
-            }
-        }, 10)
-    }
-
-    #moveLeft(destination_x){    
-        console.log('go left')        
-        // Tell the game engine the character is moving
-        animationSignal(true)
-        let movementInterval = setInterval(() => {
-            if(this.x !== destination_x){
-                this.x -= this.velocity
-            }else{
-                // Stop timer       
-                this.characterIsMoving = false 
-                clearInterval(movementInterval)
-                if(this.destination !== null){
-                    if(this.x === (this.destination.col * this.tileSize)){
-                        if(this.y === (this.destination.row * this.tileSize)){
-                            this.#stopMoving()                                     
-                        }                              
-                    }                    
-                }
-            }
-        }, 10)
+    #movementInterval = (ctx) => {
+        if(this.y !== this.destination_y){
+            this.y = (this.movingDirection === 'top')? this.y - this.velocity : this.y + this.velocity
+            ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
+        }else if(this.x !== this.destination_x){
+            this.x = (this.movingDirection === 'left')? this.x - this.velocity : this.x + this.velocity
+        }else{
+            // Stop timer
+            this.characterIsMoving = false
+            if(this.y === this.destination_y && this.x === this.destination_x){
+                this.#stopMoving()                                     
+            }  
+        }
     }
 
     #stopMoving(){
@@ -246,6 +154,21 @@ export default class Character {
         this.destination = null 
         // Tell the game engine to unfreeze other objects
         animationSignal(false)
+    }
+
+    #fadeOutTimer = (ctx, characterType) => {
+        if(this.alpha > 0){
+            console.log('blinking')
+            ctx.save()
+            ctx.globalAlpha = this.alpha
+            ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
+            ctx.restore()
+            this.alpha -= 0.01
+        }else{
+            console.log('blinking finished')
+            this.characterIsMoving = false
+            removeCharacter(characterType)
+        }
     }
 
     /**
@@ -333,7 +256,7 @@ export default class Character {
      */
     #loadImage(type, id){
         const classImage = new Image()
-
+        this.alpha = 1
         switch(type){
             case 2:
                 classImage.src = `/assets/images/class/${id}.png`
