@@ -103,6 +103,19 @@
             </table>
         </div>
 
+        <!-- Skill window -->
+        <div id="skill" class="menu absolute invisible">
+            <div>Skill</div>
+
+            <ul class="learned-skills">
+                <!-- skills -->
+            </ul>
+
+            <div>
+                <button type="button">Confirm</button>
+            </div>
+        </div>
+
         <!-- Inventory -->
         <div id="item" class="menu absolute invisible">
             <div>INVENTORY</div>
@@ -134,6 +147,20 @@
                     <li class="action sub-action" data-action="give">Give</li>
                     <li class="action sub-action" data-action="close">Close</li>
                 </ul>
+            </div>
+        </div>
+
+        <!-- Pick up item window -->
+        <div id="pickUp" class="menu absolute invisible">
+            <div>Pick up</div>
+            <button class="back absolute" data-action="item" type="button">BACK</button>
+
+            <ul class="dropeed-items">
+                <!-- items -->
+            </ul>
+
+            <div>
+                <button type="button" disabled="true">Confirm</button>
             </div>
         </div>
 
