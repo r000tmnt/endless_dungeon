@@ -267,3 +267,8 @@ li{
     top: 10px;
     padding: 0 5px;
 }
+
+.no-event{
+    pointer-events: none;
+    background: #cccccc;
+}
