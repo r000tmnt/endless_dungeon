@@ -198,9 +198,9 @@ const resize = () => {
     }
 
     //set actionMenu wrapper width and height
-    actionMenu.style.width = Math.floor( 40 * Math.floor(canvas.width / 100)) + 'px';
+    actionMenu.style.width = Math.floor( 30 * Math.floor(canvas.width / 100)) + 'px';
 
-    const fontSize = Math.floor( 10 * Math.floor(canvas.width / 100))
+    const fontSize = Math.floor( 8 * Math.floor(canvas.width / 100))
 
     action.setFontSize(fontSize)
 
@@ -217,7 +217,8 @@ const resize = () => {
 
     appWrapper.style.width = (tileSize * 9)  + 'px';
     appWrapper.style.height = (tileSize * 16) + 'px';
-
+    
+    characterCaption.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px'
     characterName.style['font-size'] = fontSize + 'px';
     characterLv.style['font-size'] = (fontSize / 2) + 'px';
     characterAp.style['font-size'] = (fontSize / 2) + 'px';
@@ -336,9 +337,25 @@ canvas.addEventListener('mousedown', async(event) =>{
             }
 
             // Display the element
+            // Shift UI position based on the character position
+            if(playerPosition.row > 8 && playerPosition.row < 16){
+                if(playerPosition.col > 0 && playerPosition.col < Math.floor(9/2)){
+                    characterCaption.style.left = ((tileSize * 9) - characterCaption.clientWidth) + 'px'
+                }else{
+                    characterCaption.style.left = 'unset'
+                }
+            }
             characterCaption.classList.remove('invisible') 
         
             // Open UI element
+            // Shift UI position based on the character position
+            if(playerPosition.row > 0 && playerPosition.row < 8){
+                if(playerPosition.col > 0 && playerPosition.col < Math.floor(9/2)){
+                    actionMenu.style.left = (tileSize * 6) + 'px'
+                }else{
+                    actionMenu.style.left = 'unset'
+                }
+            }
             actionMenu.classList.add('action_menu_open')  
         }else
         // if this tile is enemy
