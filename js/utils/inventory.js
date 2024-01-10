@@ -2,6 +2,8 @@ import weapon from '../dataBase/item/item_weapon.js'
 import armor from '../dataBase/item/item_armor.js'
 import key from '../dataBase/item/item_key.js'
 import potion from '../dataBase/item/item_potion.js'
+
+import { setEvent } from '../game.js'
 // and more ...
 
 /**
@@ -46,58 +48,6 @@ const getItemType = (item) => {
 }
 
 /**
- * Display tooltip on the screen
- * @param {object} currentActingPlayer - An object represend the current acting character 
- * @param {object} hoverItem - The item you clicked
- */
-// const showItemToolTip = (currentActingPlayer, hoverItem) => {
-//     const toolTips = document.querySelectorAll('.item-toolTip')
-//     let attributeChanges = 0
-
-//     const { attributes, equip } = currentActingPlayer
-
-//     if(hoverItem.type === 3 || hoverItem.type === 4){
-//         // Calculate attribute changes if equip
-//         // If is the same item
-//         const sameItem = Object.values(equip).findIndex(e => e.id === hoverItem.id)
-
-//         for(let [key, value] in Object.entries(hoverItem.effect.base_attribute)){
-//             if(sameItem < 0){
-//                 const attributeTag = toolTips[selectedItem.index].children[0]
-//                 const valueTage = toolTips[selectedItem.index].children[1]
-//                 const itemToChange = Object.values(equip).find(e => e.id === hoverItem.id)
-
-//                 const itemData = (hoverItem.type === 3)? weapon.getOne(itemToChange.id) : armor.getOne(itemToChange.id)
-
-//                 if(itemData?.effect?.base_attribute[key]){
-//                     attributeChanges = (attributes[key] - itemData.effect.base_attribute[key]) + hoverItem.effect.base_attribute[key] 
-//                     attributeTag.innerText = `${key} `
-//                     valueTage.innerText = attributeChanges
-//                     valueTage.style.color = (attributeChanges > 0)? 'green' : 'red'
-//                     toolTips[selectedItem.index].append(attributeTag)
-//                     toolTips[selectedItem.index].append(valueTage)
-//                 }
-//             }
-//         }      
-//     }else{
-//         // Display discription only
-//         const attributeTag = toolTips[selectedItem.index].children[0]
-//         attributeTag.innerText = hoverItem.effect.desc
-//     }
-    
-//     // Hide previous shown toolTip
-    
-//     toolTips.forEach((t, index) => {
-//         if(index !== selectedItem.index){
-//             t.style.visibility = 'hidden'
-//         }else{
-//             t.style.visibility = 'visible'
-//         }
-//     })
-
-// }
-
-/**
  * Open a small menu when clicked on an item
  * @param {object} currentActingPlayer - An object represent current acting player 
  * @param {object} clickedItem - An object represent the selected item  
@@ -123,9 +73,9 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
                     const { attributes } = currentActingPlayer
 
                     // Disable the element if the condition is not match
-                    switch(clickedItem.useCondition){
+                    switch(clickedItem.useCondition.compare){
                         case 'lower':
-                            if(attributes[clickedItem.effect.target] > attributes[clickedItem.useCondition.target]){
+                            if(attributes[clickedItem.effect.target] >= attributes[clickedItem.useCondition.target]){
                                 itemActions[i].style.pointerEvents = 'none'
                                 itemActions[i].classList.add('no-event')
                             }
@@ -301,13 +251,18 @@ const UnequipItem = (currentActingPlayer) => {
  * @param {object} currentActingPlayer - An object represent current acting player 
  */
 const dropItem = (currentActingPlayer) => {
-    if(Object.entries(selectedItem).length){
+    if(Object.entries(selectedItem).length){  
+        // Leave an item on the ground, need an sprite to draw on the tile    
+        setEvent({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, amount: 1}])
+
+        // Alter item amount or remove item
         if(currentActingPlayer.bag[selectedItem.index].amount > 1){
             currentActingPlayer.bag[selectedItem.index].amount -= 1
         }else{
+            const items = document.querySelectorAll('.item')
             currentActingPlayer.bag.splice(selectedItem.index, 1)
-        }   
-        // TODO: Leave a item on the ground, need an sprite to draw on a tile     
+            items[selectedItem.index].remove()
+        }  
     }
 }
 
@@ -320,8 +275,9 @@ const giveItem = (currentActingPlayer) => {
  * @param {string} type - A string of number represent the type of the item
  */
 const filterItem = (type) => {
+    const filterIndex = filter.findIndex(f => f === type)
     // Check if the filter is selected
-    if(filter.findIndex(f => f === type) < 0){
+    if(filterIndex < 0){
         filter.push(type)
         // TODO: Change btn style
     }else{
@@ -438,7 +394,6 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
     const Inventory = document.getElementById('item')
     const space = document.getElementById('inventory')
     const subMenu = document.getElementById('itemAction')
-    const itemActions = subMenu.querySelectorAll('li')
     const filterButton = document.querySelectorAll('.filter')
     const desc = document.getElementById('item-desc')
 
@@ -455,7 +410,14 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
         f.style.fontSize = Math.floor(fontSize / 3) + 'px'
         f.style.width = `${canvasPosition.width * 0.1}px`
         f.style.height = `${canvasPosition.width * 0.1}px`
-        f.addEventListener('click', () => filterItem(f.dataset.filter) )
+        f.addEventListener('click', () => {
+            filterItem(f.dataset.filter)
+            if(f.classList.contains('filtering')){
+                f.classList.remove('filtering')
+            }else{
+                f.classList.add('filtering')
+            }
+        })
     })
 
     // Loop through the player's bag
