@@ -13,6 +13,10 @@ export default{
                 "amount": 10,
                 "desc": "Restore 10 points of health."
             },
+            "useCondition": {
+                "compare": "lower",
+                "target": "maxHp" 
+            },
             "prefix": [],
             "suffix": []
         },
@@ -29,6 +33,10 @@ export default{
                 "amount": 10,
                 "desc": "Restore 10 points of mana."
             },
+            "useCondition": {
+                "compare": "lower",
+                "target": "maxMp" 
+            },
             "prefix": [],
             "suffix": []
         },
@@ -44,6 +52,10 @@ export default{
                 "target": "status",
                 "amount": 0,
                 "desc": "Remove the poison."
+            },
+            "useCondition": {
+                "compare": "equal",
+                "target": "Poison" 
             },
             "prefix": [],
             "suffix": []
