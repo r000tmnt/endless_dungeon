@@ -119,7 +119,7 @@ export const weaponAttack = async(player, enemy, tileMap, row, col) => {
             }
             // Check if the enemy is defeated
             if(enemy.attributes.hp <= 0){
-                tileMap.removeEnemy(row, col)
+                tileMap.removeCharacter(row, col)
 
                 gainExp(player, enemy)
             }
