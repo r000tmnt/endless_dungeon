@@ -48,6 +48,15 @@ export default class TileMap {
         3: { walkable: false },
     }
 
+    event = [
+        // {
+        //     position: [], // [y, x],
+        //     item: [], // { id: xxxx, amount: 1 }
+        //     dialogue: [], // String for the scene
+        //     trigger: "stepOn" // "stepOn", "beside", "inRange"
+        // }
+    ]
+
     //負責渲染於畫面的函式
     draw(canvas, ctx, selectableSpace, actionMode){
         // console.log(walkableSpace)
@@ -177,8 +186,45 @@ export default class TileMap {
 
     }
 
-    // Remove an enemy on the tile map
-    removeEnemy(row, col){
+    // Set an event on the tile
+    setEventOnTile = (position, item = [], dialogue = [], trigger = 'stepOn') => {
+        const eventIndex = this.event.findIndex(e => e.position.x === position.x && e.position.y === position.y)
+        
+        // If it is a new event
+        if(eventIndex < 0){
+            this.event.push({position, item, dialogue, trigger})
+        }else{
+            // Modify existing event
+            item.forEach(i => {
+                const itemExist = this.event[eventIndex].item.findIndex(ei => ei.id === i.id)
+                if(itemExist >= 0){
+                    this.event[eventIndex].item[itemExist].amount += i.amount
+                }else{
+                    this.event[eventIndex].item.push(i)
+                }
+            })
+
+            if(dialogue.length) this.event[eventIndex].dialogue = dialogue
+
+            if(trigger.length) this.event[eventIndex].trigger = trigger
+        }
+    }
+
+    copyEventToTile(oldPosition, newPosition, item = [], dialogue = []){
+        // TODO: Alter event position if needed
+    }
+
+    // Remove an event on the tile
+    clearEventOnTile = (position) => {
+        const eventIndex = this.event.findIndex(e => e.position.x === position.x && e.position.y === position.y)
+
+        if(eventIndex >= 0){
+            this.event.splice(eventIndex, 1)
+        }
+    }
+
+    // Remove a character on the tile map
+    removeCharacter(row, col){
         this.map[row][col] = 0
     }
 
