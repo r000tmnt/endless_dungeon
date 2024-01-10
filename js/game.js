@@ -93,8 +93,10 @@ for(let i=0; i < backBtn.length; i++){
             })
         break;
         case 'item':
-            backBtn[i].addEventListener('click', () => {
+            backBtn[i].addEventListener('click', async() => {
                 action.mode = ''
+                // Check if the tile has an event
+                await checkIfStepOnTheEvent(player.x, player.y)
                 Inventory.classList.add('invisible')
                 Inventory.classList.remove('open_window')
                 actionMenu.classList.add('action_menu_open')
@@ -127,6 +129,9 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 await action.setInventoryWindow(player, canvasPosition)
             })
         break; 
+        case 'pick':
+            // Display a window of dropped items
+        break;
         case 'status':
             actionMenuOptions[i].addEventListener('click', () => {
                 action.setStatusWindow(inspectingCharacter)
@@ -321,6 +326,9 @@ canvas.addEventListener('mousedown', async(event) =>{
                 actionMenuOptions[i].style.display = 'block'
             }
 
+            // Check if the tile has an event
+            await checkIfStepOnTheEvent(player.x, player.y)
+
             // Keep tracking player position
             playerPosition.row = row
             playerPosition.col = col
@@ -427,6 +435,13 @@ const enemyAI = async() => {
     await action.enemyMove(tileMap, enemyPosition, moveSpeed, sight, playerPosition, enemy, characterAnimationPhaseEnded )
 }
 
+// Check if the tile has an event
+const checkIfStepOnTheEvent = async(x, y) => {
+    const event = tileMap.event.find(e => e.position.x === x && e.position.y === y && e.trigger === 'stepOn')
+
+    actionMenuOptions[4].style.display = (event === undefined)? 'none' : 'block'
+}
+
 // Thing to do after animation ended
 const characterAnimationPhaseEnded = async() => {
     // If it is the player's turn
@@ -442,6 +457,9 @@ const characterAnimationPhaseEnded = async() => {
 
         playerPosition.row = player.y / tileSize
         playerPosition.col = player.x / tileSize  
+
+        // Check if the tile has an event
+        await checkIfStepOnTheEvent(player.x, player.y)
 
         // If the player is ran out of action point, move to the enemy phase
         if(player.attributes.ap === 0) {
@@ -571,4 +589,8 @@ export const removeCharacter = (type) => {
             enemy = null
         break
     }
+}
+
+export const setEvent = (position, item, dialogue) => {
+    tileMap.setEventOnTile(position, item, dialogue)
 }
