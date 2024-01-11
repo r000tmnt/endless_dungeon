@@ -1,4 +1,5 @@
 import Character from "./Character.js";
+import { getItemType } from './utils/inventory.js'
 
 // class - 物件創建的模板
 export default class TileMap {
@@ -51,7 +52,7 @@ export default class TileMap {
     event = [
         // {
         //     position: [], // [y, x],
-        //     item: [], // { id: xxxx, amount: 1 }
+        //     item: [], // { id: xxxx, type: 0, amount: 1 }
         //     dialogue: [], // String for the scene
         //     trigger: "stepOn" // "stepOn", "beside", "inRange"
         // }
@@ -197,8 +198,20 @@ export default class TileMap {
             // Modify existing event
             item.forEach(i => {
                 const itemExist = this.event[eventIndex].item.findIndex(ei => ei.id === i.id)
+                // If there's the same item on the ground
                 if(itemExist >= 0){
-                    this.event[eventIndex].item[itemExist].amount += i.amount
+                    const itemData = getItemType(this.event[eventIndex])
+
+                    // If the amount of item is less then the limit and will not surpass if stack up
+                    if(this.event[eventIndex].item[itemExist].amount < itemData.stackLimit && (this.event[eventIndex].item[itemExist].amount + i.amount) < itemData.stackLimit ){
+                        // Stack the item
+                        this.event[eventIndex].item[itemExist].amount += i.amount
+                    }else{
+                        // Stack up to the limit
+
+                        // Append to another space
+                        this.event[eventIndex].item.push({ id: i.id, type: i.type, amount: Math.abs(itemData.stackLimit - (this.event[eventIndex].item[itemExist].amount + i.amount))})
+                    }
                 }else{
                     this.event[eventIndex].item.push(i)
                 }
