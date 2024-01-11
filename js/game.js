@@ -80,6 +80,7 @@ const statusWindow = document.getElementById('status')
 const backBtn = document.getElementsByClassName('back')
 const avatar = document.getElementById('avatar')
 const Inventory = document.getElementById('item')
+const pickUpWindow = document.getElementById('pickUp')
 
 // Back button click event
 for(let i=0; i < backBtn.length; i++){
@@ -229,27 +230,32 @@ const resize = () => {
     characterAp.style['font-size'] = (fontSize / 2) + 'px';
 
     // Set phase transition style
-    phaseWrapper.style.width = canvas.width  + 'px';
-    phaseWrapper.style.height = canvas.height + 'px';
+    phaseWrapper.style.width = (tileSize * 9) + 'px'
+    phaseWrapper.style.height = (tileSize * 16) + 'px' 
     phaseElement.style['font-size'] = fontSize + 'px';
 
     // Set status window style
-    statusWindow.style.width = canvas.width + 'px';
-    statusWindow.style.height = canvas.height + 'px';
+    statusWindow.style.width = (tileSize * 9) + 'px'
+    statusWindow.style.height = (tileSize * 16) + 'px' ;
     statusWindow.style.padding = (fontSize / 2) + 'px';
 
     avatar.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
     avatar.style.height = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
 
     // Set inventory style
-    Inventory.style.width = canvas.width + 'px';
-    Inventory.style.height = canvas.height + 'px';
+    Inventory.style.width = (tileSize * 9) + 'px'
+    Inventory.style.height = (tileSize * 16) + 'px' 
     Inventory.style.padding = (fontSize / 2) + 'px';
 
     for(let i=0; i < backBtn.length; i++){
         backBtn[i].style.transform = `translateX(-${fontSize / 2}px)`
         backBtn[i].style.top = (fontSize / 2) + 'px'        
     }
+
+    // Set pick up window style
+    pickUpWindow.style.width = (tileSize * 9) + 'px' 
+    pickUpWindow.style.height = (tileSize * 16) + 'px' 
+    pickUpWindow.style.padding = (fontSize / 2) + 'px';
 
     // Get canvas position after resize
     ctx = canvas.getContext("2d");
