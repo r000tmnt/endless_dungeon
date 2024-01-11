@@ -17,35 +17,9 @@ var selectedItem = {}
 var filter = []
 
 /**
- * Get item data url from type
- * @param {number} itemType - A number represent the type of the item 
- * @returns A string of routes to get item data
+ * Dropped items to take
  */
-const getItemType = (item) => {
-    let data = {}
-    switch(item.type){
-        case 0:
-            data = potion.getOne(item.id)
-        break;
-        case 1:
-        break;
-        case 2:
-        break;
-        case 3:
-            data = weapon.getOne(item.id)
-        break;
-        case 4:
-            data = armor.getOne(item.id)
-        break;
-        case 5:
-        break;
-        case 6:
-            data = key.getOne(item.id)
-        break;
-    }
-
-    return data
-}
+var itemsToTake = []
 
 /**
  * Open a small menu when clicked on an item
@@ -249,7 +223,7 @@ const UnequipItem = (currentActingPlayer) => {
 const dropItem = (currentActingPlayer, itemActions) => {
     if(Object.entries(selectedItem).length){  
         // Leave an item on the ground, need an sprite to draw on the tile    
-        setEvent({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, amount: 1}])
+        setEvent({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, type: currentActingPlayer.bag[selectedItem.index].type, amount: 1}])
 
         removeItem(currentActingPlayer, itemActions)
     }
@@ -312,6 +286,51 @@ const filterItem = (type) => {
             i.style.display = 'block'
         })  
     }
+}
+
+const stackItemWithAppend = (currentActingPlayer, inventoryIndex, itemData, leftOver) => {
+    // Stack up to the limit
+    currentActingPlayer.bag[inventoryIndex].amount += (item.amount - leftOver)
+
+    // Check if the bag is full or not
+    if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
+        // Append to the new block
+        currentActingPlayer.bag.push({ id: itemData.id, type: itemData.type, amount: leftOver })
+    }else{
+        // Kepp the event with modify state
+        item.amount = leftOver
+    }
+}
+
+/**
+ * Get item data url from type
+ * @param {number} itemType - A number represent the type of the item 
+ * @returns A string of routes to get item data
+ */
+export const getItemType = (item) => {
+    let data = {}
+    switch(item.type){
+        case 0:
+            data = potion.getOne(item.id)
+        break;
+        case 1:
+        break;
+        case 2:
+        break;
+        case 3:
+            data = weapon.getOne(item.id)
+        break;
+        case 4:
+            data = armor.getOne(item.id)
+        break;
+        case 5:
+        break;
+        case 6:
+            data = key.getOne(item.id)
+        break;
+    }
+
+    return data
 }
 
 /**
@@ -515,4 +534,95 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
     // Display inventory
     Inventory.classList.remove('invisible')
     Inventory.classList.add('open_window')
+}
+
+export const constructPickUpWindow = (currentActingPlayer, canvasPosition, eventItem) => {
+    const pickUpWindow = document.getElementById('pickUp')
+    const droppedItems = document.querySelector('.dropped-items')
+    const btn = document.querySelector('.btn-group').children[0]
+
+    const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
+
+    const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
+    const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
+
+    // Set confirm botton style
+    btn.style.fontSize = fontSize + 'px'
+    btn.style.margin = "0 auto"
+    btn.disabled = 'true'
+    
+    // Set botton click event
+    btn.addEventListener('click', () => {
+        itemsToTake.forEach(item => {
+            // Check if there's the same item
+            const inventoryIndex = currentActingPlayer.bag.findIndex(b => b.id === item.id)
+            if(inventoryIndex >= 0){
+                const itemData = getItemType(currentActingPlayer.bag[inventoryIndex])
+
+                const leftOver = itemData.stackLimit - (currentActingPlayer.bag[inventoryIndex].amount + item.amount)
+
+                // If the item is stackable and will not surpass the limit if added
+                if(currentActingPlayer.bag[inventoryIndex].amount < itemData.stackLimit && leftOver >= 0){
+                    // Stack the item
+                    currentActingPlayer.bag[inventoryIndex].amount += item.amount
+                }else 
+                // If there are available space in the bag
+                if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
+                    stackItemWithAppend(currentActingPlayer, inventoryIndex, itemData, Math.abs(leftOver))
+                }
+            }else
+            // If the bag is not full
+            if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
+                // Take the item
+                currentActingPlayer.bag.push(item)
+            }else{
+                console.log('No rooms left')
+                // Display message
+            }
+        })
+    })
+
+    // Loop through dropped items
+    for(let i=0; i < eventItem.length; i++){
+        const item = document.createElement('div')
+        const itemCount = document.createElement('div')
+        // const itemToolTip = document.createElement('span')
+        // Get item data
+        const itemData = getItemType(currentActingPlayer.bag[i])
+
+        item.setAttribute('data-id', itemData.id)
+        item.setAttribute('data-type', itemData.type)
+        item.setAttribute('data-limit', itemData.stackLimit)
+        item.setAttribute('data-index', i)
+
+        // Setting inner text
+        item.innerText = itemData.name
+        itemCount.innerText = currentActingPlayer.bag[i].amount
+
+        console.log(item)
+
+        itemCount.style.width = 'fit-content'
+        itemCount.style.fontSize = (fontSize / 2) + 'px'
+        itemCount.style.padding = `0 ${fontSize / 4}px ${fontSize / 4}px 0`
+        itemCount.classList.add('item-count')
+
+        item.style.width = itemBlockSize + 'px'
+        item.style.height = itemBlockSize + 'px'
+        item.style.fontSize = (fontSize / 2) + 'px'
+        item.style.border = '1px dotted white'
+
+        // If the index is the middle column
+        if(((i + (i+1)) % 3) === 0){
+            item.style.margin = `0 ${itemBlockMargin}px`
+        }
+        
+        item.classList.add('item')
+
+        // Append child to element
+        // item.append(itemToolTip)
+        item.append(itemCount)
+        droppedItems.append(item)
+    }
+
+    pickUpWindow.classList.remove('invisible')
 }
