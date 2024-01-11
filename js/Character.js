@@ -201,6 +201,7 @@ export default class Character {
                     this.exp = 0
                     this.requiredExp = 100
                     this.bag = job.bag
+                    this.bagLimit = 100
                     this.equip = {
                         head: {},
                         body: {},
