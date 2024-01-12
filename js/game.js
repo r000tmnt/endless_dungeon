@@ -112,6 +112,7 @@ for(let i=0; i < backBtn.length; i++){
                 pickUpWindow.classList.add('invisible')
                 pickUpWindow.classList.remove('open_window')
                 actionMenu.classList.add('action_menu_open')
+                clearPickUpWindow()
             })
         break;
     }
