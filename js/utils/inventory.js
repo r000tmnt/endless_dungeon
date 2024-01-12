@@ -288,20 +288,6 @@ const filterItem = (type) => {
     }
 }
 
-const stackItemWithAppend = (currentActingPlayer, inventoryIndex, itemData, leftOver) => {
-    // Stack up to the limit
-    currentActingPlayer.bag[inventoryIndex].amount += (item.amount - leftOver)
-
-    // Check if the bag is full or not
-    if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
-        // Append to the new block
-        currentActingPlayer.bag.push({ id: itemData.id, type: itemData.type, amount: leftOver })
-    }else{
-        // Kepp the event with modify state
-        item.amount = leftOver
-    }
-}
-
 /**
  * Get item data url from type
  * @param {number} itemType - A number represent the type of the item 
@@ -395,6 +381,49 @@ export const resizeInventory = (canvasPosition) => {
 }
 
 /**
+ * Resize pick up elements on the pgae
+ * @param {object} canvasPosition - An object contains information about the setting of the canvas element 
+ */
+export const resizePickUp = (canvasPosition) => {
+    const pickUpWindow = document.getElementById('pickUp')
+    const title = pickUpWindow.children[0]
+    const droppedItems = document.querySelector('.dropped-items')
+    const btn = document.querySelector('.btn-group').children[0]
+    const items = document.querySelectorAll('.item')
+    const itemCounts = document.querySelectorAll('.item-count')
+
+    const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
+
+    const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
+    const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
+
+    title.style.fontSize = fontSize + 'px'
+    title.style.paddingBottom = (fontSize / 2) + 'px'
+
+    // Set confirm botton style
+    btn.style.fontSize = fontSize + 'px'
+    btn.style.margin = "0 auto"
+    btn.disabled = 'true'
+
+    items.forEach((item, index) => {
+        itemCounts[index].style.width = 'fit-content'
+        itemCounts[index].style.fontSize = (fontSize / 2) + 'px'
+        itemCounts[index].style.padding = `0 ${fontSize / 4}px ${fontSize / 4}px 0`
+        itemCounts[index].classList.add('item-count')
+
+        item.style.width = itemBlockSize + 'px'
+        item.style.height = itemBlockSize + 'px'
+        item.style.fontSize = (fontSize / 2) + 'px'
+        item.style.border = '1px dotted white'
+
+        // If the index is the middle column
+        if(((i + (i+1)) % 3) === 0){
+            item.style.margin = `0 ${itemBlockMargin}px`
+        }
+    })
+}
+
+/**
  * Clear the inventory elements on the page
  */
 export const clearInventory = () => {
@@ -414,13 +443,25 @@ export const clearInventory = () => {
 }
 
 /**
+ * Clear the pick up window elements on the page
+ */
+export const clearPickUpWindow = () => {
+    const droppedItems = document.querySelector('.dropped-items')
+
+    while(droppedItems.firstChild){
+        droppedItems.removeChild(droppedItems.firstChild)
+    }
+}
+
+/**
  * Append the all the items in to the inventory window 
  * @param {object} currentActingPlayer - An object represent current acting player 
- * @param {object} canvasPosition - Am object contains information about the canvas setting
+ * @param {object} canvasPosition - An object contains information about the canvas setting
  */
-export const constructInventoryWindow = async(currentActingPlayer, canvasPosition) => {
+export const constructInventoryWindow = (currentActingPlayer, canvasPosition) => {
     // Get UI elements
     const Inventory = document.getElementById('item')
+    const title = Inventory.children[0]
     const space = document.getElementById('inventory')
     const subMenu = document.getElementById('itemAction')
     const filterButton = document.querySelectorAll('.filter')
@@ -431,6 +472,9 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
     desc.children[0].style.width = currentActingPlayer.tileSize + 'px'
     desc.children[0].style.height = currentActingPlayer.tileSize + 'px'
     desc.children[1].style.whiteSpace = "pre-line"
+
+    title.style.fontSize = fontSize + 'px'
+    title.style.paddingBottom = (fontSize / 2) + 'px'
 
     const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
     const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
@@ -536,8 +580,15 @@ export const constructInventoryWindow = async(currentActingPlayer, canvasPositio
     Inventory.classList.add('open_window')
 }
 
+/**
+ * Append the all the items in to the pickup window 
+ * @param {object} currentActingPlayer - An object represent current acting player 
+ * @param {object} canvasPosition - An object contains information about the canvas setting
+ * @param {object} eventItem -An object represents dropped items on the tile
+ */
 export const constructPickUpWindow = (currentActingPlayer, canvasPosition, eventItem) => {
     const pickUpWindow = document.getElementById('pickUp')
+    const title = pickUpWindow.children[0]
     const droppedItems = document.querySelector('.dropped-items')
     const btn = document.querySelector('.btn-group').children[0]
 
@@ -545,6 +596,9 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
 
     const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
     const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
+
+    title.style.fontSize = fontSize + 'px'
+    title.style.paddingBottom = (fontSize / 2) + 'px'
 
     // Set confirm botton style
     btn.style.fontSize = fontSize + 'px'
@@ -568,7 +622,17 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
                 }else 
                 // If there are available space in the bag
                 if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
-                    stackItemWithAppend(currentActingPlayer, inventoryIndex, itemData, Math.abs(leftOver))
+                    // Stack up to the limit
+                    currentActingPlayer.bag[inventoryIndex].amount = itemData.stackLimit
+
+                    // Check if the bag is full or not
+                    if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
+                        // Append to the new block
+                        currentActingPlayer.bag.push({ id: itemData.id, type: itemData.type, amount: Math.abs(leftOver) })
+                    }else{
+                        // Kepp the event with modify state
+                        item.amount = Math.abs(leftOver)
+                    }
                 }
             }else
             // If the bag is not full
@@ -588,16 +652,28 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
         const itemCount = document.createElement('div')
         // const itemToolTip = document.createElement('span')
         // Get item data
-        const itemData = getItemType(currentActingPlayer.bag[i])
+        const itemData = getItemType(eventItem[i])
 
         item.setAttribute('data-id', itemData.id)
         item.setAttribute('data-type', itemData.type)
         item.setAttribute('data-limit', itemData.stackLimit)
         item.setAttribute('data-index', i)
 
+        item.addEventListener('click', () => {
+            const itemSelected = itemsToTake.findIndex(i => i.id === itemData.id)
+            // If the item is selected
+            if(itemSelected >= 0){
+                // Remove from the array
+                itemsToTake.splice(itemSelected, 1)
+            }else{
+                // Append to the array
+                itemsToTake.push(item)
+            }
+        })
+
         // Setting inner text
         item.innerText = itemData.name
-        itemCount.innerText = currentActingPlayer.bag[i].amount
+        itemCount.innerText = eventItem[i].amount
 
         console.log(item)
 
@@ -625,4 +701,5 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
     }
 
     pickUpWindow.classList.remove('invisible')
+    pickUpWindow.classList.add('open_window')
 }
