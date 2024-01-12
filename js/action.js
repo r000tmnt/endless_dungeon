@@ -61,9 +61,9 @@ export default class Action{
      * @param {object} canvasPosition - An object contains information about the canvas setting
      * @param {object} eventItem -An object represents dropped items on the tile
      */
-    async setPickUpWindow(currentActingPlayer, canvasPosition, eventItem){
+    async setPickUpWindow(currentActingPlayer, canvasPosition, eventItem, tileMap){
         this.mode = 'pick'
-        constructPickUpWindow(currentActingPlayer, canvasPosition, eventItem)
+        constructPickUpWindow(currentActingPlayer, canvasPosition, eventItem, tileMap)
     }
 
     resizeStatusWindow(tileSize){
