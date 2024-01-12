@@ -54,6 +54,34 @@ export default class Action{
         constructInventoryWindow(currentActingPlayer, canvasPosition)
     }
 
+    
+    /**
+     * Set pick up widow style and display it
+     * @param {object} currentActingPlayer - An object represent current acting player 
+     * @param {object} canvasPosition - An object contains information about the canvas setting
+     * @param {object} eventItem -An object represents dropped items on the tile
+     */
+    async setPickUpWindow(currentActingPlayer, canvasPosition, eventItem){
+        this.mode = 'pick'
+        constructPickUpWindow(currentActingPlayer, canvasPosition, eventItem)
+    }
+
+    resizeStatusWindow(tileSize){
+        const statusWindow = document.getElementById('status')
+        const statusInfo = document.getElementById('info')
+        const statusLv = statusWindow.children[2]
+        const statusTable = statusWindow.children[3]
+        const fontSize = Math.floor( 10 * Math.floor((tileSize * 9) / 100))
+
+        statusInfo.style.fontSize = Math.floor(fontSize / 2) + 'px' 
+        statusLv.style.fontSize = Math.floor(fontSize / 2) + 'px' 
+        const tableNode = statusTable.querySelectorAll('td')
+
+        for(let i=0; i < tableNode.length; i++){
+            tableNode[i].style.fontSize = Math.floor(fontSize / 2) + 'px'
+        }
+    }
+
     /**
      * Set text information for status dialog
      * @param {object} inspectingCharacter - A set of data about the inspecting character 
@@ -63,6 +91,7 @@ export default class Action{
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]
+        const fontSize = Math.floor( 10 * Math.floor((inspectingCharacter.tileSize * 9) / 100))
 
         this.mode = 'status'
 
@@ -71,9 +100,12 @@ export default class Action{
         // Insert status information
         statusInfo.children[0].innerText = inspectingCharacter.name
         statusInfo.children[1].innerText = inspectingCharacter.class
+        statusInfo.style.fontSize = Math.floor(fontSize / 2) + 'px' 
         statusLv.innerText = `LV ${inspectingCharacter.lv}`
+        statusLv.style.fontSize = Math.floor(fontSize / 2) + 'px' 
 
         for(let i=0; i < tableNode.length; i++){
+            tableNode[i].style.fontSize = Math.floor(fontSize / 2) + 'px'
             if(tableNode[i].dataset.attribute !== undefined){
                 switch(tableNode[i].dataset.attribute){
                     case 'hp':
