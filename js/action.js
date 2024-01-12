@@ -1,6 +1,6 @@
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
 import { weaponAttack } from './utils/battle.js';
-import { constructInventoryWindow } from './utils/inventory.js';
+import { constructInventoryWindow, constructPickUpWindow } from './utils/inventory.js';
 
 export default class Action{
     constructor(mode, selectableSpace, reachableDirections, steps, animationInit){
@@ -207,11 +207,12 @@ export default class Action{
         // Loop through the array and find if the position matches
         for(let i=0; i < this.selectableSpace.length; i++){
             if(inRange){
-                break
+                break // Escape outer loop if true
             }else{
                 for(let j=0; j < this.selectableSpace[i].length; j++){
                     if(this.selectableSpace[i][j][0] === row && this.selectableSpace[i][j][1] === col){
-                        inRange = true   
+                        inRange = true  
+                        break // Escape inner loop if ture
                     }
                 }
             }
