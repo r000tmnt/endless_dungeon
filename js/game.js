@@ -145,7 +145,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
             actionMenuOptions[i].addEventListener('click', async() => {
                 actionMenu.classList.remove('action_menu_open')
                 const event = tileMap.getEventOnTile({x: player.x, y: player.y})
-                await action.setPickUpWindow(player, canvasPosition, event.item)
+                await action.setPickUpWindow(player, canvasPosition, event.item, tileMap)
             })
         break;
         case 'status':
