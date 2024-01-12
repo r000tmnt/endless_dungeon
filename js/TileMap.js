@@ -208,7 +208,7 @@ export default class TileMap {
                         this.event[eventIndex].item[itemExist].amount += i.amount
                     }else{
                         // Stack up to the limit
-
+                        this.event[eventIndex].item[itemExist].amount = itemData.stackLimit
                         // Append to another space
                         this.event[eventIndex].item.push({ id: i.id, type: i.type, amount: Math.abs(itemData.stackLimit - (this.event[eventIndex].item[itemExist].amount + i.amount))})
                     }
@@ -225,6 +225,10 @@ export default class TileMap {
 
     copyEventToTile(oldPosition, newPosition, item = [], dialogue = []){
         // TODO: Alter event position if needed
+    }
+
+    getEventOnTile = (position) => {
+        return this.event.find(e => e.position.x === position.x && e.position.y === position.y)
     }
 
     // Remove an event on the tile
