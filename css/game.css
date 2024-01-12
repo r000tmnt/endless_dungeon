@@ -177,14 +177,11 @@ li{
 }
 
 .menu{
+    box-sizing: border-box;
     background-color: black;
     color: white;
     transition: all .3s ease-in-out;
     z-index: 15;
-}
-
-#status{
-    box-sizing: border-box;
 }
 
 #status > .status_header > img{
@@ -206,10 +203,6 @@ li{
 
 .back{
     right: 0;
-}
-
-#item{
-    box-sizing: border-box;
 }
 
 #inventory{
@@ -250,7 +243,7 @@ li{
 .item{
     flex: 0 0 30%;
     position: relative;
-    /* border: 1px solid rgba(211, 211, 211, .7); */
+    border: 1px dotted white;
 }
 
 .item-equip{
@@ -284,7 +277,17 @@ li{
     padding: 0 5px;
 }
 
+.item-selected{
+    border: 1px solid yellow;
+}
+
 .no-event{
     pointer-events: none;
     background: #cccccc;
+}
+
+.btn-group{
+    text-align: center;
+    position: fixed;
+    bottom: 0;
 }

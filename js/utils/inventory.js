@@ -513,6 +513,10 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
 
         // Set long-press event
         item.addEventListener('long-press', () => {
+            if(selectedItem?.index >= 0){
+                space.children[selectedItem.index].classList.remove('item-selected')
+            }
+            item.classList.add('item-selected')
             selectedItem = itemData
             selectedItem['index'] = i
             openItemSubMenu( currentActingPlayer, itemData)
@@ -553,7 +557,6 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
         item.style.width = itemBlockSize + 'px'
         item.style.height = itemBlockSize + 'px'
         item.style.fontSize = (fontSize / 2) + 'px'
-        item.style.border = '1px dotted white'
 
         // If the index is the middle column
         if(((i + (i+1)) % 3) === 0){
@@ -590,7 +593,7 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
     const pickUpWindow = document.getElementById('pickUp')
     const title = pickUpWindow.children[0]
     const droppedItems = document.querySelector('.dropped-items')
-    const btn = document.querySelector('.btn-group').children[0]
+    const btn = document.querySelector('.btn-group')
 
     const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
 
@@ -601,9 +604,11 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
     title.style.paddingBottom = (fontSize / 2) + 'px'
 
     // Set confirm botton style
-    btn.style.fontSize = fontSize + 'px'
-    btn.style.margin = "0 auto"
-    btn.disabled = 'true'
+    btn.style.width = (canvasPosition.width - (Math.floor(fontSize / 2) * 2)) + 'px'
+    btn.style.padding = `${Math.floor(fontSize / 2)}px 0`
+    btn.children[0].style.fontSize = fontSize + 'px'
+    btn.children[0].style.margin = "0 auto"
+    btn.children[0].disabled = 'true'
     
     // Set botton click event
     btn.addEventListener('click', () => {
@@ -665,9 +670,13 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
             if(itemSelected >= 0){
                 // Remove from the array
                 itemsToTake.splice(itemSelected, 1)
+                item.classList.remove('item-selected')
+                if(!itemsToTake.length) btn.children[0].disabled = 'true'
             }else{
                 // Append to the array
                 itemsToTake.push(item)
+                item.classList.add('item-selected')
+                btn.children[0].disabled = 'false'
             }
         })
 
@@ -685,7 +694,6 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
         item.style.width = itemBlockSize + 'px'
         item.style.height = itemBlockSize + 'px'
         item.style.fontSize = (fontSize / 2) + 'px'
-        item.style.border = '1px dotted white'
 
         // If the index is the middle column
         if(((i + (i+1)) % 3) === 0){
