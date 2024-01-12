@@ -238,6 +238,7 @@ const giveItem = (currentActingPlayer) => {
  * @param {object} currentActingPlayer - An object represent current acting player 
  * @param {HTMLElementCollection} itemActions - A collection of sub menu button 
  */
+// TODO: Redesign function to remove item on the screen
 const removeItem = (currentActingPlayer, itemActions) => {
     // Alter item amount or remove item
     if(currentActingPlayer.bag[selectedItem.index].amount > 1){
