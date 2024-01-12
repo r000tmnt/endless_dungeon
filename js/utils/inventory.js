@@ -589,7 +589,7 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
  * @param {object} canvasPosition - An object contains information about the canvas setting
  * @param {object} eventItem -An object represents dropped items on the tile
  */
-export const constructPickUpWindow = (currentActingPlayer, canvasPosition, eventItem) => {
+export const constructPickUpWindow = (currentActingPlayer, canvasPosition, eventItem, tileMap) => {
     const pickUpWindow = document.getElementById('pickUp')
     const title = pickUpWindow.children[0]
     const droppedItems = document.querySelector('.dropped-items')
@@ -608,11 +608,11 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
     btn.style.padding = `${Math.floor(fontSize / 2)}px 0`
     btn.children[0].style.fontSize = fontSize + 'px'
     btn.children[0].style.margin = "0 auto"
-    btn.children[0].disabled = 'true'
+    btn.children[0].setAttribute('disabled', 'true')
     
     // Set botton click event
-    btn.addEventListener('click', () => {
-        itemsToTake.forEach(item => {
+    btn.children[0].addEventListener('click', () => {
+        itemsToTake.forEach((item, index) => {
             // Check if there's the same item
             const inventoryIndex = currentActingPlayer.bag.findIndex(b => b.id === item.id)
             if(inventoryIndex >= 0){
@@ -644,6 +644,25 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
             if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
                 // Take the item
                 currentActingPlayer.bag.push(item)
+                
+                // Get the index of displayed item
+                const itemIndex = Array.from(document.querySelectorAll('.item')).findIndex(i => i.dataset.id === item.id)
+
+                // Remove the item on the screen
+                droppedItems.removeChild(droppedItems.children[itemIndex])
+        
+                // Remove the item in the array
+                itemsToTake.splice(index, 1)
+
+                // If there are no more items left
+                if(!document.querySelectorAll('.item').length){
+                    // Remove the event on the tile
+                    tileMap.clearEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y})
+
+                    // Close pick up window
+                    pickUpWindow.classList.add('invisible')
+                    pickUpWindow.classList.remove('open_window')
+                }
             }else{
                 console.log('No rooms left')
                 // Display message
@@ -664,6 +683,7 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
         item.setAttribute('data-limit', itemData.stackLimit)
         item.setAttribute('data-index', i)
 
+        // Bind click event
         item.addEventListener('click', () => {
             const itemSelected = itemsToTake.findIndex(i => i.id === itemData.id)
             // If the item is selected
@@ -671,12 +691,12 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
                 // Remove from the array
                 itemsToTake.splice(itemSelected, 1)
                 item.classList.remove('item-selected')
-                if(!itemsToTake.length) btn.children[0].disabled = 'true'
+                if(!itemsToTake.length) btn.children[0].setAttribute('disabled', 'ture')
             }else{
                 // Append to the array
-                itemsToTake.push(item)
+                itemsToTake.push(itemData)
                 item.classList.add('item-selected')
-                btn.children[0].disabled = 'false'
+                btn.children[0].removeAttribute('disabled')
             }
         })
 
