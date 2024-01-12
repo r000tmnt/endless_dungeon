@@ -3,7 +3,7 @@ import TileMap from './TileMap.js';
 import Grid from './grid.js';
 import Action from './action.js';
 
-import { resizeInventory, clearInventory } from './utils/inventory.js'
+import { resizeInventory, clearInventory, resizePickUp, clearPickUpWindow } from './utils/inventory.js'
 
 // #region Canvas element
 let canvas = document.getElementById('game');
@@ -104,6 +104,16 @@ for(let i=0; i < backBtn.length; i++){
                 clearInventory()
             })
         break;
+        case 'pick':
+            backBtn[i].addEventListener('click', async() => {
+                action.mode = ''
+                // Check if the tile has an event
+                await checkIfStepOnTheEvent(player.x, player.y)
+                pickUpWindow.classList.add('invisible')
+                pickUpWindow.classList.remove('open_window')
+                actionMenu.classList.add('action_menu_open')
+            })
+        break;
     }
 }
 
@@ -131,7 +141,11 @@ for(let i=0; i < actionMenuOptions.length; i++){
             })
         break; 
         case 'pick':
-            // Display a window of dropped items
+            actionMenuOptions[i].addEventListener('click', async() => {
+                actionMenu.classList.remove('action_menu_open')
+                const event = tileMap.getEventOnTile({x: player.x, y: player.y})
+                await action.setPickUpWindow(player, canvasPosition, event.item)
+            })
         break;
         case 'status':
             actionMenuOptions[i].addEventListener('click', () => {
@@ -264,14 +278,18 @@ const resize = () => {
     console.log('canvas element :>>>', canvas)
     console.log('canvas position :>>>', canvasPosition)
 
-    // If the inventory window is shown
-    if(action.mode === 'item'){
-        // Resize the window and items
-        resizeInventory(canvasPosition)
-    }
-    
-    if(action.mode === 'status'){
-        // TODO: Resize status window
+    switch(action.mode){
+        case 'item':
+            resizeInventory(canvasPosition)
+        break;
+        case 'status':
+            action.resizeStatusWindow(tileSize)
+        break;
+        case 'pick':
+            resizePickUp(canvasPosition)
+        break;
+        case 'skill':
+        break;
     }
 }
 
