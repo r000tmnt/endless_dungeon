@@ -222,40 +222,40 @@ const resize = () => {
     //set actionMenu wrapper width and height
     actionMenu.style.width = Math.floor( 30 * Math.floor(canvas.width / 100)) + 'px';
 
-    setting.general.fontSize = Math.floor( 8 * Math.floor(canvas.width / 100))
+    const fontSize = setting.general.fontSize = Math.floor( 8 * Math.floor(canvas.width / 100))
     setting.inventory.itemBlockSize = Math.floor(canvas.width / 100) * 30
     setting.inventory.itemBlockMargin = Math.floor((setting.inventory.itemBlockSize  / 100) * 10)
 
-    action.setFontSize(setting.general.fontSize)
+    action.setFontSize(fontSize)
 
     // calculation the percentage of the attribute
     for(let i=0; i < gauges.length; i++){
         // console.log(gauges[i].firstElementChild)
-        gauges[i].firstElementChild.style.height = (setting.general.fontSize / 2) + 'px';
+        gauges[i].firstElementChild.style.height = (fontSize / 2) + 'px';
     }
 
     // action menu child font size
     for(let i=0; i < actionMenuOptions.length; i++){
-        actionMenuOptions[i].style['font-size'] = setting.general.fontSize + 'px';
+        actionMenuOptions[i].style['font-size'] = fontSize + 'px';
     }
 
     appWrapper.style.width = (tileSize * 9)  + 'px';
     appWrapper.style.height = (tileSize * 16) + 'px';
     
     characterCaption.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px'
-    characterName.style['font-size'] = setting.general.fontSize + 'px';
-    characterLv.style['font-size'] = (setting.general.fontSize / 2) + 'px';
-    characterAp.style['font-size'] = (setting.general.fontSize / 2) + 'px';
+    characterName.style['font-size'] = fontSize + 'px';
+    characterLv.style['font-size'] = (fontSize / 2) + 'px';
+    characterAp.style['font-size'] = (fontSize / 2) + 'px';
 
     // Set phase transition style
     phaseWrapper.style.width = (tileSize * 9) + 'px'
     phaseWrapper.style.height = (tileSize * 16) + 'px' 
-    phaseElement.style['font-size'] = setting.general.fontSize + 'px';
+    phaseElement.style['font-size'] = fontSize + 'px';
 
     // Set status window style
     statusWindow.style.width = (tileSize * 9) + 'px'
     statusWindow.style.height = (tileSize * 16) + 'px' ;
-    statusWindow.style.padding = (setting.general.fontSize / 2) + 'px';
+    statusWindow.style.padding = (fontSize / 2) + 'px';
 
     avatar.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
     avatar.style.height = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
@@ -263,17 +263,17 @@ const resize = () => {
     // Set inventory style
     Inventory.style.width = (tileSize * 9) + 'px'
     Inventory.style.height = (tileSize * 16) + 'px' 
-    Inventory.style.padding = (setting.general.fontSize / 2) + 'px';
+    Inventory.style.padding = (fontSize / 2) + 'px';
 
     for(let i=0; i < backBtn.length; i++){
-        backBtn[i].style.transform = `translateX(-${setting.general.fontSize / 2}px)`
-        backBtn[i].style.top = (setting.general.fontSize / 2) + 'px'        
+        backBtn[i].style.transform = `translateX(-${fontSize / 2}px)`
+        backBtn[i].style.top = (fontSize / 2) + 'px'        
     }
 
     // Set pick up window style
     pickUpWindow.style.width = (tileSize * 9) + 'px' 
     pickUpWindow.style.height = (tileSize * 16) + 'px' 
-    pickUpWindow.style.padding = (setting.general.fontSize / 2) + 'px';
+    pickUpWindow.style.padding = (fontSize / 2) + 'px';
 
     // Get canvas position after resize
     ctx = canvas.getContext("2d");
