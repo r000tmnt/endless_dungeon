@@ -205,11 +205,11 @@ li{
     right: 0;
 }
 
-#inventory{
+#inventory, #dropped-items{
     display: flex;
     flex-wrap: wrap;
     /* justify-content:space-between; */
-    /* overflow-y: scroll; */
+    overflow-y: scroll;
 }
 
 .filter-group{
