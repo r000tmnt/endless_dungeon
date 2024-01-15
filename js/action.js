@@ -1,6 +1,7 @@
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
 import { weaponAttack } from './utils/battle.js';
 import { constructInventoryWindow, constructPickUpWindow } from './utils/inventory.js';
+import setting from './utils/setting.js';
 
 export default class Action{
     constructor(mode, selectableSpace, reachableDirections, steps, animationInit){
@@ -66,12 +67,12 @@ export default class Action{
         constructPickUpWindow(currentActingPlayer, canvasPosition, eventItem, tileMap)
     }
 
-    resizeStatusWindow(tileSize){
+    resizeStatusWindow(){
         const statusWindow = document.getElementById('status')
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]
-        const fontSize = Math.floor( 10 * Math.floor((tileSize * 9) / 100))
+        const { fontSize } = setting.general
 
         statusInfo.style.fontSize = Math.floor(fontSize / 2) + 'px' 
         statusLv.style.fontSize = Math.floor(fontSize / 2) + 'px' 
@@ -91,7 +92,7 @@ export default class Action{
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]
-        const fontSize = Math.floor( 10 * Math.floor((inspectingCharacter.tileSize * 9) / 100))
+        const { fontSize } = setting.general
 
         this.mode = 'status'
 
