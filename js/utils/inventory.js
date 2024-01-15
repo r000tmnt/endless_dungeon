@@ -4,6 +4,7 @@ import key from '../dataBase/item/item_key.js'
 import potion from '../dataBase/item/item_potion.js'
 
 import { setEvent } from '../game.js'
+import setting from './setting.js'
 // and more ...
 
 /**
@@ -20,6 +21,18 @@ var filter = []
  * Dropped items to take
  */
 var itemsToTake = []
+
+const createEquipTag = () => {
+    const { fontSize } = setting.general
+    const equipBadge = document.createElement('div')
+    equipBadge.classList.add('item-equip')
+    equipBadge.innerText = 'E'
+    equipBadge.style.fontSize = (fontSize / 2) + 'px'
+    equipBadge.style.width = 'fit-content'
+    equipBadge.style.padding = `0 0 ${fontSize / 4}px ${fontSize / 4}px`    
+
+    return equipBadge
+}
 
 /**
  * Open a small menu when clicked on an item
@@ -39,64 +52,12 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
 
     desc.children[1].innerText = `${clickedItem.name}\n${clickedItem.effect.desc}`
 
-    // Set click event to sub menu buttons
-    for(let i=0; i < itemActions.length; i++){
-        switch(itemActions[i].dataset.action){
-            case 'use':
-                if(clickedItem.type === 0){
-                    const { attributes } = currentActingPlayer
-
-                    // Disable the element if the condition is not match
-                    switch(clickedItem.useCondition.compare){
-                        case 'lower':
-                            if(attributes[clickedItem.effect.target] >= attributes[clickedItem.useCondition.target]){
-                                itemActions[i].style.pointerEvents = 'none'
-                                itemActions[i].classList.add('no-event')
-                            }
-                        break;
-                        case 'equal':
-                            if(attributes[clickedItem.effect.target] !== attributes[clickedItem.useCondition.target]){
-                                itemActions[i].style.pointerEvents = 'none'
-                                itemActions[i].classList.add('no-event')
-                            }
-                        break;
-                    }
-                }
-
-                itemActions[i].addEventListener('click', () => {
-                    useItem(currentActingPlayer, itemActions)
-                })
-            break;
-            case 'equip':
-                itemActions[i].addEventListener('click', () => {
-                    equipItem(currentActingPlayer, clickedItem)
-                })
-            break;
-            case 'drop':
-                itemActions[i].addEventListener('click', () => {
-                    dropItem(currentActingPlayer, itemActions)
-                })
-            break;
-            case 'give':
-                itemActions[i].addEventListener('click', () => {
-                    giveItem(currentActingPlayer, clickedItem)
-                })
-            break;
-            case 'close':
-                itemActions[i].addEventListener('click', () => {
-                    subMenu.classList.remove('open_subWindow')
-                    subMenu.classList.add('invisible')
-                })
-            break;
-        }
-    }
-
     // Check item type
     if(clickedItem.type === 3 || clickedItem.type === 4){
         // If the item is a weapon or armor
         const { equip, attributes } = currentActingPlayer
 
-        const equipped = Object.entries(equip).findIndex(e => e.id === clickedItem.id)
+        const equipped = Object.values(equip).findIndex(e => e.id === clickedItem.id)
 
         // Hide or display options
         itemActions.forEach(i => {
@@ -104,11 +65,9 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
                 i.style.display = 'none'
             }
 
-            if(equipped >= 0 && i.dataset.action === 'equip'){
-                i.innerText = 'Unequip'
-                i.addEventListener('click', () => {
-                    UnequipItem(currentActingPlayer)
-                })
+            if(i.dataset.action === 'equip'){
+                i.innerText = equipped >= 0? 'Unequip' : 'Equip'
+                i.style.display = 'block'
             }
         })
         // Calculate attribute changes if equip
@@ -117,18 +76,23 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
 
         for(let [key, value] of Object.entries(clickedItem.effect.base_attribute)){
             if(sameItem < 0){
-                let attributeChanges = dp
+                let attributeChanges = 0
                 const itemToChange = Object.values(equip).find(e => e.id === clickedItem.id)
 
-                const itemData = (clickedItem.type === 3)? weapon.getOne(itemToChange.id) : armor.getOne(itemToChange.id)
+                // If the player is not equip with the item in the position
+                if(itemToChange !== undefined){
+                    const itemData = (clickedItem.type === 3)? weapon.getOne(itemToChange.id) : armor.getOne(itemToChange.id)
 
-                if(itemData?.effect?.base_attribute[key]){
-                    attributeChanges = (attributes[key] - itemData.effect.base_attribute[key]) + clickedItem.effect.base_attribute[key] 
-
-                    const attributeTag = `<div style="color:${(attributeChanges > currentActingPlayer.attributes[key])? 'green' : 'red'}">${key} ${attributeChanges}</div>`
-
-                    desc.children[1].insertAdjacentHTML('beforeend', attributeTag)
+                    if(itemData?.effect?.base_attribute[key]){
+                        attributeChanges = (attributes[key] - itemData.effect.base_attribute[key]) + clickedItem.effect.base_attribute[key] 
+                    }                    
+                }else{
+                    attributeChanges = attributes[key] + clickedItem.effect.base_attribute[key] 
                 }
+
+                const attributeTag = `<div style="color:${(attributeChanges > currentActingPlayer.attributes[key])? 'green' : 'red'}">${key} ${attributeChanges}</div>`
+
+                desc.children[1].insertAdjacentHTML('beforeend', attributeTag)
             }else{
                 // Display current effected attributes
                 let attributeTag = ``
@@ -186,15 +150,23 @@ const useItem = async(currentActingPlayer, itemActions) => {
  * Equip the item to the player
  * @param {object} currentActingPlayer - An object represent current acting player 
  */
-const equipItem = (currentActingPlayer) => {
+const equipItem = (currentActingPlayer, itemActions) => {
     if(Object.entries(selectedItem).length){
-        const itemData = inventory.find((item) => item.id === selectedItem.id)
         currentActingPlayer.equip[selectedItem.position] = { id: selectedItem.id, name: selectedItem.name }
 
         // Apply equipment bonus
-        for(let key in Object.entries(itemData.effect.base_attribute)){
-            currentActingPlayer.attributes[key] += itemData.effect.base_attribute[key]
-        }        
+        for(let key in Object.entries(selectedItem.effect.base_attribute)){
+            currentActingPlayer.attributes[key] += selectedItem.effect.base_attribute[key]
+        }  
+
+        // Create E tag
+        const equipBadge = createEquipTag()    
+
+        // Insert E tag as the first child
+        document.querySelectorAll('.item')[selectedItem.index].insertBefore(equipBadge, document.querySelectorAll('.item')[selectedItem.index].children[0])
+
+        // Close sub menu
+        itemActions[itemActions.length - 1].click()
     }
 }
 
@@ -202,16 +174,21 @@ const equipItem = (currentActingPlayer) => {
  * Unequip the item from the player
  * @param {object} currentActingPlayer - An object represent current acting player 
  */
-const UnequipItem = (currentActingPlayer) => {
+const UnequipItem = (currentActingPlayer, itemActions) => {
     if(Object.entries(selectedItem).length){
-        const itemData = inventory.find((item) => item.id === selectedItem.id)
         // clear slot
         currentActingPlayer.equip[selectedItem.position] = { }
 
         // Remove equipment bonus
-        for(let key in Object.entries(itemData.effect.base_attribute)){
-            currentActingPlayer.attributes[key] -= itemData.effect.base_attribute[key]
-        }        
+        for(let [key, value] of Object.entries(selectedItem.effect.base_attribute)){
+            currentActingPlayer.attributes[key] -= selectedItem.effect.base_attribute[key]
+        }  
+
+        // Remove E tag
+        document.querySelectorAll('.item')[selectedItem.index].children[0].remove()
+
+        // Close sub menu
+        itemActions[itemActions.length - 1].click()
     }
 }
 
@@ -224,6 +201,13 @@ const dropItem = (currentActingPlayer, itemActions) => {
     if(Object.entries(selectedItem).length){  
         // Leave an item on the ground, need an sprite to draw on the tile    
         setEvent({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, type: currentActingPlayer.bag[selectedItem.index].type, amount: 1}])
+
+        // If the item is equipped
+        const equipped = Object.values(currentActingPlayer.equip).findIndex(e => e.id === selectedItem.id)
+
+        if(equipped >= 0){
+            UnequipItem(currentActingPlayer)
+        }
 
         removeItem(currentActingPlayer, itemActions)
     }
@@ -246,9 +230,23 @@ const removeItem = (currentActingPlayer, itemActions) => {
         currentActingPlayer.bag[selectedItem.index].amount -= 1
         itemCount[selectedItem.index].innerText = currentActingPlayer.bag[selectedItem.index].amount
     }else{
-        const items = document.querySelectorAll('.item')
+        let items = document.querySelectorAll('.item')
         currentActingPlayer.bag.splice(selectedItem.index, 1)
         items[selectedItem.index].remove()
+
+        const { itemBlockMargin } = setting.inventory
+
+        // Rearrange the style start with the index
+        for(let i = selectedItem.index, items = document.querySelectorAll('.item'); i < items.length; i++){
+            // If the index is the middle column
+            if(((i + (i+1)) % 3) === 0){
+                items[i].style.margin = `0 ${itemBlockMargin}px`
+            }else{
+                items[i].style.margin = `unset`
+            }
+        }
+
+        selectedItem.index = -1
 
         // Close sub menu
         itemActions[itemActions.length - 1].click() 
@@ -465,10 +463,13 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
     const title = Inventory.children[0]
     const space = document.getElementById('inventory')
     const subMenu = document.getElementById('itemAction')
+    const itemActions = subMenu.querySelectorAll('li')
     const filterButton = document.querySelectorAll('.filter')
     const desc = document.getElementById('item-desc')
 
-    const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
+    const { fontSize } = setting.general
+    const { itemBlockSize, itemBlockMargin } = setting.inventory
+
     // Set the size of each block
     desc.children[0].style.width = currentActingPlayer.tileSize + 'px'
     desc.children[0].style.height = currentActingPlayer.tileSize + 'px'
@@ -476,9 +477,6 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
 
     title.style.fontSize = fontSize + 'px'
     title.style.paddingBottom = (fontSize / 2) + 'px'
-
-    const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
-    const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
 
     filterButton.forEach(f => {
         f.style.fontSize = Math.floor(fontSize / 3) + 'px'
@@ -539,12 +537,7 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
 
         if(equipped >= 0){
             // Prepare to show a little text on the bottom left of the block
-            const equipBadge = document.createElement('div')
-            equipBadge.classList.add('item-equip')
-            equipBadge.innerText = 'E'
-            equipBadge.style.fontSize = (fontSize / 2) + 'px'
-            equipBadge.style.width = 'fit-content'
-            equipBadge.style.padding = `0 0 ${fontSize / 4}px ${fontSize / 4}px`
+            const equipBadge = createEquipTag() 
             item.append(equipBadge)
         }
 
@@ -572,9 +565,64 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
         space.append(item)
     }
 
-    // Hide scroll bar
-    space.style.overflowY = 'scroll'
-    space.classList.add('disable-scrollbars')
+    // Loop through sub menu buttons
+    // Set click event to sub menu buttons
+    for(let i=0; i < itemActions.length; i++){
+        switch(itemActions[i].dataset.action){
+            case 'use':
+                if(selectedItem.type === 0){
+                    const { attributes } = currentActingPlayer
+
+                    // Disable the element if the condition is not match
+                    switch(selectedItem.useCondition.compare){
+                        case 'lower':
+                            if(attributes[selectedItem.effect.target] >= attributes[selectedItem.useCondition.target]){
+                                itemActions[i].style.pointerEvents = 'none'
+                                itemActions[i].classList.add('no-event')
+                            }
+                        break;
+                        case 'equal':
+                            if(attributes[selectedItem.effect.target] !== attributes[selectedItem.useCondition.target]){
+                                itemActions[i].style.pointerEvents = 'none'
+                                itemActions[i].classList.add('no-event')
+                            }
+                        break;
+                    }
+                }
+
+                itemActions[i].addEventListener('click', () => {
+                    useItem(currentActingPlayer, itemActions)
+                })
+            break;
+            case 'equip':
+                itemActions[i].addEventListener('click', () => {
+                    if(itemActions[i].innerText === 'Unequip'){
+                        UnequipItem(currentActingPlayer, itemActions)
+                    }else{
+                        equipItem(currentActingPlayer, itemActions)
+                    }
+                })
+            break;
+            case 'drop':
+                itemActions[i].addEventListener('click', () => {
+                    dropItem(currentActingPlayer, itemActions)
+                })
+            break;
+            case 'give':
+                itemActions[i].addEventListener('click', () => {
+                    giveItem(currentActingPlayer)
+                })
+            break;
+            case 'close':
+                itemActions[i].addEventListener('click', () => {
+                    subMenu.classList.remove('open_subWindow')
+                    subMenu.classList.add('invisible')
+                })
+            break;
+        }
+    }
+
+    // Apply style to the item wrapper
     space.style.maxHeight = (itemBlockSize * 3) + 'px'
     space.style.padding = `${itemBlockMargin}px 0`
     subMenu.style.width = canvasPosition.width - fontSize + 'px'
@@ -596,10 +644,8 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
     const droppedItems = document.querySelector('.dropped-items')
     const btn = document.querySelector('.btn-group')
 
-    const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
-
-    const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
-    const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
+    const { fontSize } = setting.general
+    const { itemBlockSize, itemBlockMargin } = setting.inventory
 
     title.style.fontSize = fontSize + 'px'
     title.style.paddingBottom = (fontSize / 2) + 'px'
@@ -728,6 +774,10 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
         item.append(itemCount)
         droppedItems.append(item)
     }
+
+    // Apply style to the item wrapper
+    droppedItems.style.maxHeight = (itemBlockSize * 3) + 'px'
+    droppedItems.style.padding = `${itemBlockMargin}px 0`
 
     pickUpWindow.classList.remove('invisible')
     pickUpWindow.classList.add('open_window')
