@@ -2,6 +2,7 @@
 import TileMap from './TileMap.js';
 import Grid from './grid.js';
 import Action from './action.js';
+import Range from './range.js';
 
 import { resizeInventory, clearInventory, resizePickUp, clearPickUpWindow } from './utils/inventory.js'
 import setting from './utils/setting.js';
@@ -24,6 +25,8 @@ let tileSize = Math.floor(canvas.width / 9);
 let tileMap = new TileMap(tileSize);
 
 let grid = new Grid(tileMap.map, tileSize, {});
+
+let range = new Range(tileMap.map, tileSize)
 
 let action = new Action('', [], [], 0, false);
 // console.log(tileMap)
@@ -196,7 +199,8 @@ const resize = () => {
     // Set up tile size according to the canvas width
     tileSize = Math.floor(canvas.width / 9);
     tileMap.changeTileSize(tileSize)
-    grid = new Grid(tileMap.map, tileSize, {})
+    grid.setTileSize(tileSize)
+    range.setTileSize(tileSize)
 
     // Get the player position relative to the canvas size
     if(player !== null){
@@ -533,7 +537,11 @@ const characterAnimationPhaseEnded = async() => {
 //  Initialize the game
 const gameLoop = () => {
     console.log('rendering')
-    tileMap.draw(canvas, ctx, action.selectableSpace, action.mode)
+    tileMap.draw(canvas, ctx)
+
+    if(action.selectableSpace.length){
+        range.draw(ctx, action.selectableSpace, action.mode)
+    }
 
     if(player !== null) {
         player.draw(ctx)
@@ -618,6 +626,7 @@ export const removeCharacter = (type) => {
         break;
         case 3:
             enemy = null
+            enemyPosition = null
         break
     }
 }
