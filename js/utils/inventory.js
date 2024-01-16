@@ -22,8 +22,7 @@ var filter = []
  */
 var itemsToTake = []
 
-const createEquipTag = () => {
-    const { fontSize } = setting.general
+const createEquipTag = (fontSize) => {
     const equipBadge = document.createElement('div')
     equipBadge.classList.add('item-equip')
     equipBadge.innerText = 'E'
@@ -155,15 +154,18 @@ const equipItem = (currentActingPlayer, itemActions) => {
         currentActingPlayer.equip[selectedItem.position] = { id: selectedItem.id, name: selectedItem.name }
 
         // Apply equipment bonus
-        for(let key in Object.entries(selectedItem.effect.base_attribute)){
+        for(let [key, value] of Object.entries(selectedItem.effect.base_attribute)){
             currentActingPlayer.attributes[key] += selectedItem.effect.base_attribute[key]
         }  
 
+        const { fontSize } = setting.general
+
         // Create E tag
-        const equipBadge = createEquipTag()    
+        const equipBadge = createEquipTag(fontSize)    
 
         // Insert E tag as the first child
-        document.querySelectorAll('.item')[selectedItem.index].insertBefore(equipBadge, document.querySelectorAll('.item')[selectedItem.index].children[0])
+        const equipItem = document.querySelectorAll('.item')[selectedItem.index]
+        equipItem.insertBefore(equipBadge, equipItem.children[0])
 
         // Close sub menu
         itemActions[itemActions.length - 1].click()
@@ -203,9 +205,7 @@ const dropItem = (currentActingPlayer, itemActions) => {
         setEvent({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, type: currentActingPlayer.bag[selectedItem.index].type, amount: 1}])
 
         // If the item is equipped
-        const equipped = Object.values(currentActingPlayer.equip).findIndex(e => e.id === selectedItem.id)
-
-        if(equipped >= 0){
+        if(Object.values(currentActingPlayer.equip).findIndex(e => e.id === selectedItem.id) >= 0){
             UnequipItem(currentActingPlayer)
         }
 
@@ -533,11 +533,9 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
         itemCount.innerText = currentActingPlayer.bag[i].amount
 
         // Check if item equipped
-        const equipped = Object.values(currentActingPlayer.equip).findIndex(e => e.id === itemData.id)
-
-        if(equipped >= 0){
+        if(Object.values(currentActingPlayer.equip).findIndex(e => e.id === itemData.id) >= 0){
             // Prepare to show a little text on the bottom left of the block
-            const equipBadge = createEquipTag() 
+            const equipBadge = createEquipTag(fontSize) 
             item.append(equipBadge)
         }
 
