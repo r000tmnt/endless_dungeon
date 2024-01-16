@@ -7,7 +7,7 @@ export default class TileMap {
     constructor(tileSize){
         this.tileSize = tileSize;
         this.wall = this.#image("wall.png")
-        // this.player = this.#image("fighter.png")
+        this.item = this.#image("item.png")
         // this.enemy = this.#image("zombie.png")
     }
 
@@ -23,6 +23,7 @@ export default class TileMap {
     // 1 - wall
     // 2 - player
     // 3 - zombie
+    // 4 - item
     map = [
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -102,13 +103,11 @@ export default class TileMap {
                 case 1:
                     img = this.wall;
                 break;
-                case 2:
-                    // img = this.player;
-                    
-                break;
                 case 3:
-                    // img = this.enemy;
                     this.map[currentRow][column] = 0
+                break;
+                case 4:
+                    img = this.item;
                 break;
                 default:
                 break;
@@ -238,6 +237,14 @@ export default class TileMap {
         if(eventIndex >= 0){
             this.event.splice(eventIndex, 1)
         }
+    }
+
+    changeTile = (row, col, type) => {
+        this.map[row][col] = type
+    }
+
+    changeTileSize = (size) => {
+        this.tileSize = size
     }
 
     // Remove a character on the tile map
