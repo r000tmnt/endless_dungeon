@@ -2,6 +2,8 @@ import weapon from '../dataBase/item/item_weapon.js'
 import armor from '../dataBase/item/item_armor.js'
 import key from '../dataBase/item/item_key.js'
 import potion from '../dataBase/item/item_potion.js'
+import material from '../dataBase/item/item_material.js'
+import other from '../dataBase/item/item_other.js'
 
 import { setEvent } from '../game.js'
 import setting from './setting.js'
@@ -299,8 +301,10 @@ export const getItemType = (item) => {
             data = potion.getOne(item.id)
         break;
         case 1:
+            data = other.getOne(item.id)
         break;
         case 2:
+            data = material.getOne(item.id)
         break;
         case 3:
             data = weapon.getOne(item.id)
@@ -335,16 +339,15 @@ export const resizeInventory = (canvasPosition) => {
     const desc = document.getElementById('item-desc')
     // const itemToolTips = document.querySelectorAll('.item-toolTip')
 
-    const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
+    const { fontSize } = setting.general
+
+    const { itemBlockSize , itemBlockMargin } = setting.inventory
 
     // Set the size of each block
     desc.children[0].style.width = (canvasPosition.width / 9) + 'px'
     desc.children[0].style.height = (canvasPosition.width / 9) + 'px'
     desc.children[1].style.whiteSpace = "pre-line"
-
-    const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
-    const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
-
+    
     // Apply size number
     title.style.fontSize = fontSize + 'px'
     title.style.paddingBottom = (fontSize / 2) + 'px'
@@ -386,15 +389,14 @@ export const resizeInventory = (canvasPosition) => {
 export const resizePickUp = (canvasPosition) => {
     const pickUpWindow = document.getElementById('pickUp')
     const title = pickUpWindow.children[0]
-    const droppedItems = document.querySelector('.dropped-items')
+    // const droppedItems = document.querySelector('.dropped-items')
     const btn = document.querySelector('.btn-group').children[0]
     const items = document.querySelectorAll('.item')
     const itemCounts = document.querySelectorAll('.item-count')
 
-    const fontSize = Math.floor( 10 * Math.floor(canvasPosition.width / 100))
+    const { fontSize } = setting.general
 
-    const itemBlockSize = Math.floor(canvasPosition.width / 100) * 30
-    const itemBlockMargin = Math.floor((itemBlockSize / 100) * 10)
+    const { itemBlockSize , itemBlockMargin } = setting.inventory
 
     title.style.fontSize = fontSize + 'px'
     title.style.paddingBottom = (fontSize / 2) + 'px'
@@ -445,7 +447,7 @@ export const clearInventory = () => {
  * Clear the pick up window elements on the page
  */
 export const clearPickUpWindow = () => {
-    const droppedItems = document.querySelector('.dropped-items')
+    const droppedItems = document.getElementById('dropped-items')
 
     while(droppedItems.firstChild){
         droppedItems.removeChild(droppedItems.firstChild)
@@ -639,7 +641,7 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
 export const constructPickUpWindow = (currentActingPlayer, canvasPosition, eventItem, tileMap) => {
     const pickUpWindow = document.getElementById('pickUp')
     const title = pickUpWindow.children[0]
-    const droppedItems = document.querySelector('.dropped-items')
+    const droppedItems = document.getElementById('dropped-items')
     const btn = document.querySelector('.btn-group')
 
     const { fontSize } = setting.general
