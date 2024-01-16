@@ -1,4 +1,4 @@
-import { animationSignal, removeCharacter } from './game.js'
+import { animationSignal, removeCharacter, setTile } from './game.js'
 import classes from './dataBase/class.js'
 import mob from './dataBase/mobs.js'
 import weapon from './dataBase/item/item_weapon.js'
@@ -168,6 +168,11 @@ export default class Character {
             console.log('blinking finished')
             this.characterIsMoving = false
             removeCharacter(characterType)
+
+            // Display item image
+            if(this?.bag?.length || this?.drop?.length){
+                setTile(Math.floor(this.y / this.tileSize), Math.floor(this.x / this.tileSize), 4)
+            }
         }
     }
 
