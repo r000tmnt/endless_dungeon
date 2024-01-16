@@ -219,6 +219,10 @@ export default class Character {
                                 id: itemData.id,
                                 name: itemData.name
                             }
+                            // Change attribute value
+                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
+                                this.attributes[key] += itemData.effect.base_attribute[key]
+                            }
                         }
                     }
                 }
