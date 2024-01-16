@@ -139,6 +139,7 @@ export default class Character {
             ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
         }else if(this.x !== this.destination_x){
             this.x = (this.movingDirection === 'left')? this.x - this.velocity : this.x + this.velocity
+            ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
         }else{
             // Stop timer
             this.characterIsMoving = false
