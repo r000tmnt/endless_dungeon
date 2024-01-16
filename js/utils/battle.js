@@ -1,3 +1,5 @@
+import { setEvent } from "../game"
+
 import weapon from "../dataBase/item/item_weapon"
 
 // Player gain expirence upon enemy defeated
@@ -153,6 +155,9 @@ export const weaponAttack = async(player, enemy, tileMap, row, col) => {
                 tileMap.removeCharacter(row, col)
 
                 gainExp(player, enemy)
+
+                // Leave the item on the ground
+                setEvent({x: enemy.x, y: enemy.y}, enemy.drop)
             }
             // Stop for loop
             break;
