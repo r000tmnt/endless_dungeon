@@ -195,29 +195,32 @@ const resize = () => {
 
     // Set up tile size according to the canvas width
     tileSize = Math.floor(canvas.width / 9);
-    tileMap = new TileMap(tileSize)
+    tileMap.changeTileSize(tileSize)
     grid = new Grid(tileMap.map, tileSize, {})
 
     // Get the player position relative to the canvas size
-    player.setCharacterTileSize(tileSize)
-    player.setCharacterPosition(playerPosition.col * tileSize, playerPosition.row * tileSize)
+    if(player !== null){
+        player.setCharacterTileSize(tileSize)
+        player.setCharacterPosition(playerPosition.col * tileSize, playerPosition.row * tileSize)
 
+        playerPosition = {
+            row: player.y / tileSize,
+            col: player.x / tileSize
+        }        
+    }
     console.log('player :>>>', player)
 
-    playerPosition = {
-        row: player.y / tileSize,
-        col: player.x / tileSize
+    if(enemy !== null){
+        enemy.setCharacterTileSize(tileSize)
+        enemy.setCharacterPosition(enemyPosition.col * tileSize, enemyPosition.row * tileSize)  
+        
+        enemyPosition = {
+            row: enemy.y / tileSize,
+            col: enemy.x / tileSize
+        }
     }
-
-    enemy.setCharacterTileSize(tileSize)
-    enemy.setCharacterPosition(enemyPosition.col * tileSize, enemyPosition.row * tileSize)
 
     console.log('enemy :>>>', enemy)
-
-    enemyPosition = {
-        row: enemy.y / tileSize,
-        col: enemy.x / tileSize
-    }
 
     //set actionMenu wrapper width and height
     actionMenu.style.width = Math.floor( 30 * Math.floor(canvas.width / 100)) + 'px';
@@ -621,4 +624,8 @@ export const removeCharacter = (type) => {
 
 export const setEvent = (position, item, dialogue) => {
     tileMap.setEventOnTile(position, item, dialogue)
+}
+
+export const setTile = (row, col, type) => {
+    tileMap.changeTile(row, col, type)
 }
