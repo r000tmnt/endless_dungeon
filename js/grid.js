@@ -34,4 +34,8 @@ export default class Grid {
     setPointedBlock(pointedBlock){
         this.pointedBlock = pointedBlock
     }
+
+    setTileSize(size){
+        this.tileSize = size
+    }
 }
