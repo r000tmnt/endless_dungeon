@@ -22,18 +22,21 @@ export default{
             "base_skills": [],
             "drop": [
                 {
-                    "name": "Gold",
+                    "id": "currency_1",
                     "amount": 1,
+                    "type": 1,
                     "rate": 70
                 },
                 {
-                    "name": "Rotten meat",
+                    "id": "material_meat_2",
                     "amount": 1,
+                    "type": 2,
                     "rate": 50
                 },
                 {
-                    "name": "key",
+                    "id": "key_dark_1",
                     "amount": 1,
+                    "type": 6,
                     "rate": 100
                 }
             ]
