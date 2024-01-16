@@ -1,5 +1,7 @@
+import tile from "../dataBase/tile"
+
 /**
- * 
+ * Get the distance between point A and point B
  * @param {int} x - x axis of the start point 
  * @param {int} y - y axis of the start point
  * @param {object} target - x(col) and y(row) position of the target
@@ -42,22 +44,22 @@ export const getDirections = (tileMap, x, y, target) => {
     const reachableDirections = []
 
     // TOP
-    if(tileMap.map[y - 1][x] === 0){
+    if(tile.getOne(tileMap.map[y - 1][x])){
         reachableDirections.push({ cost: getDistance(x, y-1, target), x, y: y-1 })
     }
 
     // DOWN
-    if(tileMap.map[y + 1][x] === 0){
+    if(tile.getOne(tileMap.map[y + 1][x])){
         reachableDirections.push({ cost: getDistance(x, y+1, target), x, y: y+1 })
     }  
 
     // LEFT
-    if(tileMap.map[y][x - 1] === 0){
+    if(tile.getOne(tileMap.map[y][x - 1])){
         reachableDirections.push({ cost: getDistance(x-1, y, target), x: x-1, y })
     }
 
     //RIGHT
-    if(tileMap.map[y][x + 1] === 0){
+    if(tile.getOne(tileMap.map[y][x + 1])){
         reachableDirections.push({ cost: getDistance(x+1, y, target), x: x+1, y })
     }
 
@@ -174,8 +176,10 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
 
                 console.log(`checking tile map row:${inspectRow} col:${inspectCol} :>>>`, tileMap.map[inspectRow][inspectCol])
 
+                const walkable = tile.getOne(tileMap.map[inspectRow][inspectCol])
+
                 // Check if the block is walkable
-                if(tileMap.map[inspectRow][inspectCol] === 0 && !onTheSameBlock){
+                if(walkable && !onTheSameBlock){
                     availableSpace[availableSpace.length - 1].push([inspectRow, inspectCol])
                 }
             }else{
@@ -221,8 +225,10 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
 
                 let onTheSameBlock = (enemyPosition !== null)? enemyPosition.row === inspectRow && enemyPosition.col === inspectCol : false
 
+                const walkable = tile.getOne(tileMap.map[inspectRow][inspectCol])
+                
                 // Check if the block is walkable
-                if(tileMap.map[inspectRow][inspectCol] === 0 && !onTheSameBlock){
+                if(walkable && !onTheSameBlock){
                     availableSpace[availableSpace.length -1].push([inspectRow, inspectCol])
                 }
             }else{
