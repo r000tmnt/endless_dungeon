@@ -1,3 +1,5 @@
+import weapon from "../dataBase/item/item_weapon"
+
 // Player gain expirence upon enemy defeated
 const gainExp = (player, enemy) => {
     // Remove the enemy on the screen
@@ -64,9 +66,38 @@ export const weaponAttack = async(player, enemy, tileMap, row, col) => {
         }
     ]
 
-    // Need something to know if the attck is base on skill or not
-    const damage = (player.attributes.str + Math.floor(player.attributes.str * ( 1/100 ))) - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))
+    const dmgRange = []
+    let damage = 1 // Min dmg
 
+    // Calulate damage without weapon
+    if(player.equip.hand?.id !== undefined){
+        const itemData = weapon.getOne(player.equip.hand.id)
+
+        // Need something to know if the attck is base on skill or not
+        const minDmg = ((player.attributes.str + Math.floor(player.attributes.str * ( itemData.effect.base_attribute.str/100 ))) - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))) + itemData.effect.base_damage.min
+
+        const maxDmg = minDmg + (itemData.effect.base_damage.max - itemData.effect.base_damage.min)
+
+        for(let i = minDmg; i <= maxDmg; i++){
+            dmgRange.push(i)
+        }
+
+        damage = dmgRange[Math.floor(Math.random() * dmgRange.length)]        
+    }else{
+        // Calulate damage without weapon
+        // Need something to know if the attck is base on skill or not
+        const minDmg = ((player.attributes.str + player.attributes.str) - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))) + 1
+
+        const maxDmg = minDmg + 2
+
+        for(let i = minDmg; i <= maxDmg; i++){
+            dmgRange.push(i)
+        }
+
+        damage = dmgRange[Math.floor(Math.random() * dmgRange.length)]  
+    }
+    
+    console.log('dmgRange :>>>', dmgRange)
     console.log('possible damage :>>>', damage)
 
     if(player.lv >= enemy.lv){
