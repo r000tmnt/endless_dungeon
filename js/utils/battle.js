@@ -86,7 +86,7 @@ export const weaponAttack = async(player, enemy, tileMap, row, col) => {
     }else{
         // Calulate damage without weapon
         // Need something to know if the attck is base on skill or not
-        const minDmg = ((player.attributes.str + player.attributes.str) - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))) + 1
+        const minDmg = (player.attributes.str - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))) + 1
 
         const maxDmg = minDmg + 2
 
