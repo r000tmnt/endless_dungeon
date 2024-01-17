@@ -279,8 +279,8 @@ const resize = () => {
     characterAp.style['font-size'] = (fontSize / 2) + 'px';
 
     // Set phase transition style
-    phaseWrapper.style.width = appWrapper.style.clientWidth + 'px'
-    phaseWrapper.style.height = appWrapper.style.clientHeigth + 'px' 
+    phaseWrapper.style.width = cameraWidth + 'px'
+    phaseWrapper.style.height = cameraHeight + 'px' 
     phaseElement.style['font-size'] = fontSize + 'px';
 
     statusWindow.style.width = cameraWidth + 'px'
