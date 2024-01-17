@@ -291,3 +291,51 @@ li{
     position: absolute;
     bottom: 0;
 }
+
+#silder{
+    background: black;
+    /* color: white; */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#slider > p {
+    text-align: center;
+}
+
+#slider > div {
+    justify-content: center;
+}
+
+#range {
+    -webkit-appearance: none;
+    appearance: none;
+    background: lightgray;
+    height: 0.5rem;
+    border-radius: 10px;
+}
+
+#range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 50%;
+    background: grey;
+    cursor: pointer;
+}
+
+#range::-webkit-slider-runnable-track {
+    /* background: #053a5f; */
+    height: 0.5rem;
+  }
+
+#range::-moz-range-thumb {
+    border-radius: 50%;
+    background: grey;
+    cursor: pointer;
+}
+
+#range::-moz-range-track {
+    /* background: #053a5f; */
+    height: 0.5rem;
+  }
