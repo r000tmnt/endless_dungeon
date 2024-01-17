@@ -202,16 +202,25 @@ const UnequipItem = (currentActingPlayer, itemActions) => {
  * @param {HTMLElementCollection} itemActions - A collection of sub menu button 
  */
 const dropItem = (currentActingPlayer, itemActions) => {
-    if(Object.entries(selectedItem).length){  
+    if(Object.entries(selectedItem).length){
+        const value = Number(document.getElementById('range').getAttribute('value')) 
+
         // Leave an item on the ground, need an sprite to draw on the tile    
-        setEvent({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, type: currentActingPlayer.bag[selectedItem.index].type, amount: 1}])
+        setEvent({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, type: currentActingPlayer.bag[selectedItem.index].type, amount: value}])
 
         // If the item is equipped
         if(Object.values(currentActingPlayer.equip).findIndex(e => e.id === selectedItem.id) >= 0){
-            UnequipItem(currentActingPlayer)
+            UnequipItem(currentActingPlayer, itemActions)
+        }else{
+            // Close sub menu
+            itemActions[itemActions.length - 1].click()
         }
 
-        removeItem(currentActingPlayer, itemActions)
+        // Hide slider
+        const slider = document.getElementById('slider')
+        slider.classList.add('invisible')
+
+        removeItem(currentActingPlayer, value)
     }
 }
 
@@ -221,15 +230,15 @@ const giveItem = (currentActingPlayer) => {
 
 /**
  * Alter the quantity or remove an item from the player
- * @param {object} currentActingPlayer - An object represent current acting player 
- * @param {HTMLElementCollection} itemActions - A collection of sub menu button 
+ * @param {object} currentActingPlayer - An object represent current acting player
+ * @param {number} value - A number to deduct
  */
 // TODO: Redesign function to remove item on the screen
-const removeItem = (currentActingPlayer, itemActions) => {
+const removeItem = (currentActingPlayer, value) => {
     // Alter item amount or remove item
     if(currentActingPlayer.bag[selectedItem.index].amount > 1){
         const itemCount = document.querySelectorAll('.item-count')
-        currentActingPlayer.bag[selectedItem.index].amount -= 1
+        currentActingPlayer.bag[selectedItem.index].amount -= value
         itemCount[selectedItem.index].innerText = currentActingPlayer.bag[selectedItem.index].amount
     }else{
         let items = document.querySelectorAll('.item')
@@ -249,9 +258,6 @@ const removeItem = (currentActingPlayer, itemActions) => {
         }
 
         selectedItem.index = -1
-
-        // Close sub menu
-        itemActions[itemActions.length - 1].click() 
     } 
 } 
 
@@ -460,7 +466,9 @@ export const resizeInventory = (canvasPosition) => {
     const itemCounts = document.querySelectorAll('.item-count')
     const itemEquips = document.querySelectorAll('.item-equip') 
     const desc = document.getElementById('item-desc')
-    // const itemToolTips = document.querySelectorAll('.item-toolTip')
+    const slider = document.getElementById('slider')
+    const range = document.getElementById('range')
+    const btns = slider.children[2].getElementsByTagName('button')
 
     const { fontSize } = setting.general
 
@@ -510,6 +518,28 @@ export const resizeInventory = (canvasPosition) => {
         equipBadge.style.width = 'fit-content'
         equipBadge.style.padding = `0 0 ${fontSize / 4}px ${fontSize / 4}px`
     })
+
+    // If the slider is shown
+    if(!slider.classList.contains('invisible')){
+        // Resize slider
+        range.style.width = ((canvasPosition.width - fontSize) - itemBlockMargin) + 'px'
+        range.setAttribute('max', selectedItem.amount)
+
+        // Set the size of each block
+        slider.style.width = (canvasPosition.width - fontSize) + 'px'
+        slider.style.fontSize = fontSize + 'px'
+
+        // Blind input event
+        range.oninput = function() {
+            slider.children[1].innerText = this.value;
+        }
+
+        Array.from(btns).forEach(btn => {
+            btn.style.margin = `0 ${fontSize / 2}px`
+            btn.style.fontSize = (fontSize / 2) + 'px'
+            btn.style.width = Math.floor(canvasPosition.width * (30 / 100)) + 'px'
+        })
+    }
 }
 
 /**
@@ -604,7 +634,6 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
     const { fontSize } = setting.general
     const { itemBlockSize, itemBlockMargin } = setting.inventory
 
-    // Set the size of each block
     desc.children[0].style.width = currentActingPlayer.tileSize + 'px'
     desc.children[0].style.height = currentActingPlayer.tileSize + 'px'
     desc.children[1].style.whiteSpace = "pre-line"
@@ -644,6 +673,7 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
             item.classList.add('item-selected')
             selectedItem = itemData
             selectedItem['index'] = i
+            selectedItem['amount'] = currentActingPlayer.bag[i].amount
             openItemSubMenu( currentActingPlayer, itemData)
         })
 
@@ -724,12 +754,49 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
             break;
             case 'drop':
                 itemActions[i].addEventListener('click', () => {
-                    dropItem(currentActingPlayer, itemActions)
+                    // Open slider
+                    const slider = document.getElementById('slider')
+                    const range = document.getElementById('range')
+                    const btns = slider.children[2].getElementsByTagName('button')
+
+                    range.style.width = ((canvasPosition.width - fontSize) - itemBlockMargin) + 'px'
+                    range.setAttribute('max', selectedItem.amount)
+
+                    // Set the size of each block
+                    slider.style.width = (canvasPosition.width - fontSize) + 'px'
+                    slider.style.fontSize = fontSize + 'px'
+
+                    // Blind input event
+                    range.oninput = function() {
+                        slider.children[1].innerText = this.value;
+                    }
+
+                    Array.from(btns).forEach(btn => {
+                        btn.style.margin = `0 ${fontSize / 2}px`
+                        btn.style.fontSize = (fontSize / 2) + 'px'
+                        btn.style.width = Math.floor(canvasPosition.width * (30 / 100)) + 'px'
+                    })
+
+                    // Cancel button
+                    btns[0].addEventListener('click', () => {
+                        // Reset slider
+                        slider.classList.add('invisible')
+                        subMenu.classList.remove('invisible')
+                        range.setAttribute('value', 1)
+                    })
+
+                    // Confirm button
+                    btns[1].addEventListener('click', () => {
+                        dropItem(currentActingPlayer, itemActions)
+                    })
+
+                    slider.classList.remove('invisible')
+                    subMenu.classList.add('invisible')
                 })
             break;
             case 'give':
                 itemActions[i].addEventListener('click', () => {
-                    giveItem(currentActingPlayer)
+                    giveItem(currentActingPlayer, canvasPosition)
                 })
             break;
             case 'close':
