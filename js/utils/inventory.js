@@ -239,7 +239,7 @@ const removeItem = (currentActingPlayer, itemActions) => {
         const { itemBlockMargin } = setting.inventory
 
         // Rearrange the style start with the index
-        for(let i = selectedItem.index, items = document.querySelectorAll('.item'); i < items.length; i++){
+        for(let i = selectedItem.index, items = document.querySelectorAll('.item').length; i < items; i++){
             // If the index is the middle column
             if(((i + (i+1)) % 3) === 0){
                 items[i].style.margin = `0 ${itemBlockMargin}px`
@@ -290,13 +290,136 @@ const filterItem = (type) => {
 }
 
 /**
+ * Pick up item on the ground
+ * @param {object} currentActingPlayer - An object represents current acting player
+ * @param {object} tileMap - An object contains information about the tileMap
+ */
+const pickUpItem = (currentActingPlayer, tileMap) => {
+    const pickUpWindow = document.getElementById('pickUp')
+    const droppedItems = document.getElementById('dropped-items')
+    const items = document.querySelectorAll('.item')
+
+    // 1. Check if there's the same item in the bag
+    // 2. check if the item will surpass the stack limit
+
+    itemsToTake.forEach((item, index) => {
+        // Get the index of displayed item
+        const itemIndex = Array.from(items).findIndex(i => i.dataset.id === item.id)
+
+        // Check if there's the same item
+        const inventoryIndex = currentActingPlayer.bag.findIndex(b => b.id === item.id)
+        if(inventoryIndex >= 0){
+            const itemData = getItemType(currentActingPlayer.bag[inventoryIndex])
+
+            const leftOver = itemData.stackLimit - (currentActingPlayer.bag[inventoryIndex].amount + item.amount)
+
+            // If the item is stackable and will not surpass the limit if added
+            if((currentActingPlayer.bag[inventoryIndex].amount + item.amount) <= itemData.stackLimit){
+                // Stack the item
+                currentActingPlayer.bag[inventoryIndex].amount += item.amount
+
+                // Remove the item on the screen
+                droppedItems.removeChild(items[itemIndex])
+        
+                // Remove the item in the array
+                itemsToTake.splice(index, 1)
+
+                // If there are no more items left
+                if(!document.querySelectorAll('.item').length){
+                    // Remove the event on the tile
+                    tileMap.clearEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y})
+
+                    // Close pick up window
+                    pickUpWindow.classList.add('invisible')
+                    pickUpWindow.classList.remove('open_window')
+                }
+            }else{
+                // Stack up to the limit
+                currentActingPlayer.bag[inventoryIndex].amount = itemData.stackLimit
+
+                // If there are available space in the bag
+                if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
+                    // Take the item
+                    currentActingPlayer.bag.push({ id: item.id, type: item.type, amount: Math.abs(leftOver) })
+                    
+                    // Remove the item on the screen
+                    droppedItems.removeChild(items[itemIndex])
+            
+                    // Remove the item in the array
+                    itemsToTake.splice(index, 1)
+
+                    // If there are no more items left
+                    if(!document.querySelectorAll('.item').length){
+                        // Remove the event on the tile
+                        tileMap.clearEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y})
+
+                        // Close pick up window
+                        pickUpWindow.classList.add('invisible')
+                        pickUpWindow.classList.remove('open_window')
+                    }
+                }else{
+                    // Kepp the event with modify state
+                    itemsToTake[index].amount = Math.abs(leftOver)
+                    droppedItems.children[itemIndex].children[1] = Math.abs(leftOver)
+                }
+            }
+        // If there are available space in the bag
+        }else if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
+            // Take the item
+            currentActingPlayer.bag.push({ id: item.id, type: item.type, amount: item.amount })
+
+            // Remove the item on the screen
+            droppedItems.removeChild(items[itemIndex])
+    
+            // Remove the item in the array
+            itemsToTake.splice(index, 1)
+
+            // If there are no more items left
+            if(!document.querySelectorAll('.item').length){
+                // Remove the event on the tile
+                tileMap.clearEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y})
+
+                // Close pick up window
+                pickUpWindow.classList.add('invisible')
+                pickUpWindow.classList.remove('open_window')
+            }
+        }
+    })
+
+    // If there are items left
+    if(document.querySelectorAll('.item').length){
+        // Collect items after modification
+        let leftItems = Array.from(document.querySelectorAll('.item')).map(d => {
+            return { id: d.dataset.id, type: d.dataset.type, amount: d.dataset.amount }
+        })
+
+        // Modify the event on the tile
+        tileMap.modifyEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y}, leftItems)
+
+        // Rearrange the style start with the index
+        for(let i = 0, items = document.querySelectorAll('.item').length; i < items; i++){
+            if(items[i] === undefined){
+            continue  // Jump to the next one
+            }
+
+            // If the index is the middle column
+            if(((i + (i+1)) % 3) === 0){
+                items[i].style.margin = `0 ${itemBlockMargin}px`
+            }else{
+                items[i].style.margin = `unset`
+            }
+        }
+    }
+}
+
+/**
  * Get item data url from type
  * @param {number} itemType - A number represent the type of the item 
  * @returns A string of routes to get item data
  */
 export const getItemType = (item) => {
     let data = {}
-    switch(item.type){
+    switch(Number(item.type)){
         case 0:
             data = potion.getOne(item.id)
         break;
@@ -373,6 +496,13 @@ export const resizeInventory = (canvasPosition) => {
         itemCounts[index].style.fontSize = (fontSize / 2) + 'px'
         itemCounts[index].style.padding = `0 ${fontSize / 4}px ${fontSize / 4}px 0`
         itemCounts[index].classList.add('item-count')
+
+        // If the index is the middle column
+        if(((index + (index+1)) % 3) === 0){
+            item.style.margin = `${itemBlockMargin}px`
+        }else{
+            item.style.margin = `${itemBlockMargin}px 0`
+        }
     })
 
     itemEquips.forEach(equipBadge => {
@@ -418,8 +548,10 @@ export const resizePickUp = (canvasPosition) => {
         item.style.border = '1px dotted white'
 
         // If the index is the middle column
-        if(((i + (i+1)) % 3) === 0){
-            item.style.margin = `0 ${itemBlockMargin}px`
+        if(((index + (index+1)) % 3) === 0){
+            item.style.margin = `${itemBlockMargin}px`
+        }else{
+            item.style.margin = `${itemBlockMargin}px 0`
         }
     })
 }
@@ -502,15 +634,7 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
         // Get item data
         const itemData = getItemType(currentActingPlayer.bag[i])
 
-        item.setAttribute('data-id', itemData.id)
-        item.setAttribute('data-type', itemData.type)
-        item.setAttribute('data-limit', itemData.stackLimit)
-        item.setAttribute('data-index', i)
         item.setAttribute('data-long-press-delay', 500)
-
-        // itemToolTip.classList.add('item-toolTip')
-        // itemToolTip.append(attributeTag)
-        // itemToolTip.append(valueTage)
 
         // Set long-press event
         item.addEventListener('long-press', () => {
@@ -522,13 +646,6 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
             selectedItem['index'] = i
             openItemSubMenu( currentActingPlayer, itemData)
         })
-
-        // Set click event
-        // item.addEventListener('click', (e) => {
-        //     selectedItem = itemData
-        //     selectedItem['index'] = i
-        //     showItemToolTip(currentActingPlayer, itemData)
-        // })
 
         // Setting inner text
         item.innerText = itemData.name
@@ -554,7 +671,9 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
 
         // If the index is the middle column
         if(((i + (i+1)) % 3) === 0){
-            item.style.margin = `0 ${itemBlockMargin}px`
+            item.style.margin = `${itemBlockMargin}px`
+        }else{
+            item.style.margin = `${itemBlockMargin}px 0`
         }
         
         item.classList.add('item')
@@ -659,62 +778,7 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
     
     // Set botton click event
     btn.children[0].addEventListener('click', () => {
-        itemsToTake.forEach((item, index) => {
-            // Check if there's the same item
-            const inventoryIndex = currentActingPlayer.bag.findIndex(b => b.id === item.id)
-            if(inventoryIndex >= 0){
-                const itemData = getItemType(currentActingPlayer.bag[inventoryIndex])
-
-                const leftOver = itemData.stackLimit - (currentActingPlayer.bag[inventoryIndex].amount + item.amount)
-
-                // If the item is stackable and will not surpass the limit if added
-                if(currentActingPlayer.bag[inventoryIndex].amount < itemData.stackLimit && leftOver >= 0){
-                    // Stack the item
-                    currentActingPlayer.bag[inventoryIndex].amount += item.amount
-                }else 
-                // If there are available space in the bag
-                if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
-                    // Stack up to the limit
-                    currentActingPlayer.bag[inventoryIndex].amount = itemData.stackLimit
-
-                    // Check if the bag is full or not
-                    if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
-                        // Append to the new block
-                        currentActingPlayer.bag.push({ id: itemData.id, type: itemData.type, amount: Math.abs(leftOver) })
-                    }else{
-                        // Kepp the event with modify state
-                        item.amount = Math.abs(leftOver)
-                    }
-                }
-            }else
-            // If the bag is not full
-            if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
-                // Take the item
-                currentActingPlayer.bag.push(item)
-                
-                // Get the index of displayed item
-                const itemIndex = Array.from(document.querySelectorAll('.item')).findIndex(i => i.dataset.id === item.id)
-
-                // Remove the item on the screen
-                droppedItems.removeChild(droppedItems.children[itemIndex])
-        
-                // Remove the item in the array
-                itemsToTake.splice(index, 1)
-
-                // If there are no more items left
-                if(!document.querySelectorAll('.item').length){
-                    // Remove the event on the tile
-                    tileMap.clearEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y})
-
-                    // Close pick up window
-                    pickUpWindow.classList.add('invisible')
-                    pickUpWindow.classList.remove('open_window')
-                }
-            }else{
-                console.log('No rooms left')
-                // Display message
-            }
-        })
+        pickUpItem(currentActingPlayer, tileMap)
     })
 
     // Loop through dropped items
@@ -728,7 +792,7 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
         item.setAttribute('data-id', itemData.id)
         item.setAttribute('data-type', itemData.type)
         item.setAttribute('data-limit', itemData.stackLimit)
-        item.setAttribute('data-index', i)
+        item.setAttribute('data-amount', eventItem[i].amount)
 
         // Bind click event
         item.addEventListener('click', () => {
@@ -741,7 +805,7 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
                 if(!itemsToTake.length) btn.children[0].setAttribute('disabled', 'ture')
             }else{
                 // Append to the array
-                itemsToTake.push(itemData)
+                itemsToTake.push(eventItem[i])
                 item.classList.add('item-selected')
                 btn.children[0].removeAttribute('disabled')
             }
@@ -764,7 +828,9 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
 
         // If the index is the middle column
         if(((i + (i+1)) % 3) === 0){
-            item.style.margin = `0 ${itemBlockMargin}px`
+            item.style.margin = `${itemBlockMargin}px`
+        }else{
+            item.style.margin = `${itemBlockMargin}px 0`
         }
         
         item.classList.add('item')
