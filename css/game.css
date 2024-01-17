@@ -288,6 +288,6 @@ li{
 
 .btn-group{
     text-align: center;
-    position: fixed;
+    position: absolute;
     bottom: 0;
 }
