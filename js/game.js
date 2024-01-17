@@ -136,6 +136,8 @@ for(let i=0; i < actionMenuOptions.length; i++){
         case 'attack':
             actionMenuOptions[i].addEventListener('click', async() => {
                 actionMenu.classList.remove('action_menu_open')
+                // Hide the element
+                characterCaption.classList.add('invisible')  
                 await action.setAttack(tileMap, playerPosition, 1)
             })
         break;   
@@ -334,6 +336,7 @@ canvas.addEventListener('mousedown', async(event) =>{
             const movable = (action.mode === 'move')? await action.move(tileMap, row, col, playerPosition, player, characterAnimationPhaseEnded) : await action.attack(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded)
 
             if(!movable){
+                // Cancel action
                 if(!characterCaption.classList.contains('invisible')){
                     characterCaption.classList.add('invisible') 
                 }else{
@@ -345,6 +348,8 @@ canvas.addEventListener('mousedown', async(event) =>{
                 }else{
                     actionMenu.classList.add('action_menu_open') 
                 }
+
+                action.mode = ''
             }else{
                 characterCaption.classList.add('invisible') 
             }
