@@ -3,12 +3,36 @@ export default{
         {
             "id": "skill_slash_1",
             "name": "Slash",
-            "effects":
+            "weapon": "sword",
+            "cost": {
+                "attribute": "mp",
+                "value": 3
+            },
+            "effect":
             {
                 "type": "dmg",
+                "range": 1,
                 "base_on_attribute": "str",
                 "multiply_as": "solid",
-                "base_dmg": 10
+                "base_dmg": 10,
+                "desc": "A quick and powerful strick with sword"
+            }
+        },
+        {
+            "id": "poison_1",
+            "name": "Poison bite",
+            "weapon": "none",
+            "cost": {
+                "attribute": "mp",
+                "value": 1
+            },
+            "effect": {
+                "type": "status",
+                "range": 1,
+                "base_on_attribute": "luk",
+                "multiply_as": "solid",
+                "base_dmg": 3,
+                "desc": "Bite the enemy. Cause the foe to get poisoned"
             }
         }
     ],

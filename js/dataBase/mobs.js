@@ -19,7 +19,9 @@ export default{
                 "moveSpeed": 1,
                 "sight": 3
             },
-            "base_skills": [],
+            "skill": [
+                "poison_1"
+            ],
             "drop": [
                 {
                     "id": "currency_1",

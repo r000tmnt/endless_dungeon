@@ -4,7 +4,14 @@ import Grid from './grid.js';
 import Action from './action.js';
 import Range from './range.js';
 
-import { resizeInventory, clearInventory, resizePickUp, clearPickUpWindow } from './utils/inventory.js'
+import {
+    constructInventoryWindow, 
+    constructPickUpWindow,
+    resizeInventory, 
+    clearInventory, 
+    resizePickUp, 
+    clearPickUpWindow 
+} from './utils/inventory.js'
 import setting from './utils/setting.js';
 
 // #region Canvas element
@@ -46,14 +53,12 @@ let velocity = 1;
 
 // Create player object
 let player = tileMap.getPlayer(velocity)
-// player.setSkills('slash')
 var playerPosition = {
     row: player.y / tileSize,
     col: player.x / tileSize
 }
 // Create enemy object
 let enemy = tileMap.getEnemy(velocity)
-// enemy.setSkills('poison')
 
 var enemyPosition = {
     row: enemy.y / tileSize,
@@ -81,14 +86,23 @@ const characterAp = document.getElementById('ap')
 const characterCaptionAttributes = ['hp', 'mp']
 const gauges = document.querySelectorAll('.gauge')
 const statusWindow = document.getElementById('status')
-const backBtn = document.getElementsByClassName('back')
 const avatar = document.getElementById('avatar')
+const backBtn = document.getElementsByClassName('back')
 const Inventory = document.getElementById('item')
 const pickUpWindow = document.getElementById('pickUp')
+const skillWindow = document.getElementById('skill')
 
 // Back button click event
 for(let i=0; i < backBtn.length; i++){
     switch(backBtn[i].dataset.action){
+        case 'skill':
+            backBtn[i].addEventListener('click', () => {
+                action.mode = ''
+
+                skillWindow.classList.add('invisible')
+                skillWindow.classList.remove('open_window')
+            })
+        break;
         case 'status':
             backBtn[i].addEventListener('click', () => {
                 action.mode = ''
@@ -104,7 +118,6 @@ for(let i=0; i < backBtn.length; i++){
                 await checkIfStepOnTheEvent(player.x, player.y)
                 Inventory.classList.add('invisible')
                 Inventory.classList.remove('open_window')
-                actionMenu.classList.add('action_menu_open')
                 clearInventory()
             })
         break;
@@ -115,7 +128,6 @@ for(let i=0; i < backBtn.length; i++){
                 await checkIfStepOnTheEvent(player.x, player.y)
                 pickUpWindow.classList.add('invisible')
                 pickUpWindow.classList.remove('open_window')
-                actionMenu.classList.add('action_menu_open')
                 clearPickUpWindow()
             })
         break;
@@ -141,17 +153,24 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 await action.setAttack(tileMap, playerPosition, 1)
             })
         break;   
+        case "skill":
+            actionMenuOptions[i].addEventListener('click', () => {
+                action.setSKillWindow(player, tileMap, playerPosition)
+            })
+        break;
         case 'item':
             actionMenuOptions[i].addEventListener('click', async() => {
-                actionMenu.classList.remove('action_menu_open')
-                await action.setInventoryWindow(player, canvasPosition)
+                action.mode = 'item'
+                const { width } = setting.general.camera
+                constructInventoryWindow(player, width)
             })
         break; 
         case 'pick':
             actionMenuOptions[i].addEventListener('click', async() => {
-                actionMenu.classList.remove('action_menu_open')
                 const event = tileMap.getEventOnTile({x: player.x, y: player.y})
-                await action.setPickUpWindow(player, canvasPosition, event.item, tileMap)
+                action.mode = 'pick'
+                const { width, height } = setting.general.camera
+                constructPickUpWindow(player, width, height, event.item, tileMap)
             })
         break;
         case 'status':
@@ -204,6 +223,9 @@ const resize = () => {
     grid.setTileSize(tileSize)
     range.setTileSize(tileSize)
 
+    const cameraWidth = setting.general.camera.width = tileSize * 9 
+    const cameraHeight = setting.general.camera.height = tileSize * 16 
+
     // Get the player position relative to the canvas size
     if(player !== null){
         player.setCharacterTileSize(tileSize)
@@ -229,10 +251,10 @@ const resize = () => {
     console.log('enemy :>>>', enemy)
 
     //set actionMenu wrapper width and height
-    actionMenu.style.width = Math.floor( 30 * Math.floor(canvas.width / 100)) + 'px';
+    actionMenu.style.width = Math.floor( 30 * Math.floor(cameraWidth / 100)) + 'px';
 
-    const fontSize = setting.general.fontSize = Math.floor( 8 * Math.floor(canvas.width / 100))
-    setting.inventory.itemBlockSize = Math.floor(canvas.width / 100) * 30
+    const fontSize = setting.general.fontSize = Math.floor( 8 * Math.floor(cameraWidth / 100))
+    setting.inventory.itemBlockSize = Math.floor(cameraWidth / 100) * 30
     setting.inventory.itemBlockMargin = Math.floor((setting.inventory.itemBlockSize  / 100) * 10)
 
     action.setFontSize(fontSize)
@@ -248,8 +270,8 @@ const resize = () => {
         actionMenuOptions[i].style['font-size'] = fontSize + 'px';
     }
 
-    appWrapper.style.width = (tileSize * 9)  + 'px';
-    appWrapper.style.height = (tileSize * 16) + 'px';
+    appWrapper.style.width = cameraWidth  + 'px';
+    appWrapper.style.height = cameraHeight + 'px';
     
     characterCaption.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px'
     characterName.style['font-size'] = fontSize + 'px';
@@ -257,21 +279,25 @@ const resize = () => {
     characterAp.style['font-size'] = (fontSize / 2) + 'px';
 
     // Set phase transition style
-    phaseWrapper.style.width = (tileSize * 9) + 'px'
-    phaseWrapper.style.height = (tileSize * 16) + 'px' 
+    phaseWrapper.style.width = appWrapper.style.clientWidth + 'px'
+    phaseWrapper.style.height = appWrapper.style.clientHeigth + 'px' 
     phaseElement.style['font-size'] = fontSize + 'px';
 
-    // Set status window style
-    statusWindow.style.width = (tileSize * 9) + 'px'
-    statusWindow.style.height = (tileSize * 16) + 'px' ;
+    statusWindow.style.width = cameraWidth + 'px'
+    statusWindow.style.height = cameraHeight + 'px' ;
     statusWindow.style.padding = (fontSize / 2) + 'px';
 
-    avatar.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
-    avatar.style.height = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px';
+    avatar.style.width = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
+    avatar.style.height = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
+
+    // Set skill window style
+    skillWindow.style.width = cameraWidth + 'px'
+    skillWindow.style.height = cameraHeight + 'px' 
+    skillWindow.style.padding = (fontSize / 2) + 'px';
 
     // Set inventory style
-    Inventory.style.width = (tileSize * 9) + 'px'
-    Inventory.style.height = (tileSize * 16) + 'px' 
+    Inventory.style.width = cameraWidth + 'px'
+    Inventory.style.height = cameraHeight + 'px' 
     Inventory.style.padding = (fontSize / 2) + 'px';
 
     for(let i=0; i < backBtn.length; i++){
@@ -280,8 +306,8 @@ const resize = () => {
     }
 
     // Set pick up window style
-    pickUpWindow.style.width = (tileSize * 9) + 'px' 
-    pickUpWindow.style.height = (tileSize * 16) + 'px' 
+    pickUpWindow.style.width = cameraWidth + 'px' 
+    pickUpWindow.style.height = cameraHeight + 'px' 
     pickUpWindow.style.padding = (fontSize / 2) + 'px';
 
     // Get canvas position after resize
@@ -293,15 +319,16 @@ const resize = () => {
 
     switch(action.mode){
         case 'item':
-            resizeInventory(canvasPosition)
+            resizeInventory(cameraWidth, fontSize)
         break;
         case 'status':
-            action.resizeStatusWindow()
+            action.resizeStatusWindow(cameraWidth, cameraHeight, fontSize)
         break;
         case 'pick':
-            resizePickUp(canvasPosition)
+            resizePickUp(fontSize, cameraWidth)
         break;
         case 'skill':
+            action.resizeSkillWindow(fontSize)
         break;
     }
 }

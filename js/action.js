@@ -1,6 +1,6 @@
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
 import { weaponAttack } from './utils/battle.js';
-import { constructInventoryWindow, constructPickUpWindow } from './utils/inventory.js';
+import skills from './dataBase/skills.js';
 import setting from './utils/setting.js';
 
 export default class Action{
@@ -41,38 +41,81 @@ export default class Action{
         this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, attackRange)
     }
 
+    /**
+     * Prepare a range of blocks for skill
+     * @param {object} tileMap - An object represent the tile map
+     * @param {object} playerPosition - An object represent player's position
+     * @param {number} skillRange - A number indicated the amount of blocks for each direction in straight line  
+     */
+    async setSkillRange(tileMap, playerPosition, skillRange){
+        this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillRange)
+    }
+
+    resizeSkillWindow(fontSize){
+        const skillWindow = document.getElementById('skill')
+        const skillList = document.querySelectorAll('.skill')
+
+        skillList.forEach(skill => {
+            skill.style.fontSize = (fontSize / 2) + 'px'
+        })
+    }
+
     // TODO: Skill menu
-    setSKillWindow(){}
+    setSKillWindow(currentActingPlayer, tileMap, playerPosition){
+        this.mode = 'skill'
+        
+        const skillWindow = document.getElementById('skill')
+        const skillList = document.querySelector('.learned-skills')
+        const { fontSize } = setting.general
+        const { width } = setting.general.camera
 
-    /**
-     * Set inventory style and display it
-     * @param {object} currentActingPlayer - An object represent the current acting player 
-     * @param {object} canvasPosition - An object contains information about the canvas 
-     * @returns 
-     */
-    async setInventoryWindow(currentActingPlayer, canvasPosition){
-        this.mode = 'item'
-        constructInventoryWindow(currentActingPlayer, canvasPosition)
+        for(let i=0; i < currentActingPlayer.skill.length; i++){
+            const skillData = skills.getOne(currentActingPlayer.skill[i])
+            const skill = document.createElement('li')
+            const skillName = document.createElement('span')
+            const skillCost = document.createElement('span')
+            const skillDesc = document.createElement('span')
+            skill.classList.add('flex')
+            skill.classList.add('skill')
+            skill.style.fontSize = fontSize + 'px'
+            skill.style.height = Math.floor(width * (30/100)) + 'px'
+            skill.style.boxSizing = 'border-box'
+            skill.style.padding = `${fontSize / 2}px 0`            
+
+            skillName.innerText = skillData.name
+            skillCost.innerText = `${skillData.cost.attribute}: ${skillData.cost.value}`
+            skillDesc.innerText = skillData.effect.desc
+
+            skill.addEventListener('click', async() => {
+                // Get skill effect range
+                await this.setSkillRange(tileMap, playerPosition, skillData.effect.range)
+                // Close skill window
+                skillWindow.classList.add('invisible')
+            })
+
+            skill.append(skillName)
+            skill.append(skillCost)
+            skill.append(skillDesc)
+            skillList.append(skill)
+        }
+        skillWindow.classList.remove('invisible')
+        skillWindow.classList.add('open_window')
     }
 
-    
-    /**
-     * Set pick up widow style and display it
-     * @param {object} currentActingPlayer - An object represent current acting player 
-     * @param {object} canvasPosition - An object contains information about the canvas setting
-     * @param {object} eventItem -An object represents dropped items on the tile
-     */
-    async setPickUpWindow(currentActingPlayer, canvasPosition, eventItem, tileMap){
-        this.mode = 'pick'
-        constructPickUpWindow(currentActingPlayer, canvasPosition, eventItem, tileMap)
-    }
-
-    resizeStatusWindow(){
+    resizeStatusWindow(canvasPosition){
         const statusWindow = document.getElementById('status')
+        const avatar = document.getElementById('avatar')
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]
         const { fontSize } = setting.general
+
+        statusWindow.style.width = cameraWidth + 'px'
+        statusWindow.style.height = canvasPosition.height + 'px' ;
+        statusWindow.style.padding = (fontSize / 2) + 'px';
+
+        avatar.style.width = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
+        avatar.style.height = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
 
         statusInfo.style.fontSize = Math.floor(fontSize / 2) + 'px' 
         statusLv.style.fontSize = Math.floor(fontSize / 2) + 'px' 
@@ -89,6 +132,7 @@ export default class Action{
      */
     setStatusWindow(inspectingCharacter){
         const statusWindow = document.getElementById('status')
+        const avatar = document.getElementById('avatar')
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]

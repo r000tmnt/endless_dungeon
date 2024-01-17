@@ -455,7 +455,7 @@ export const getItemType = (item) => {
  * Resize inventory elements on the pgae
  * @param {object} canvasPosition - An object contains information about the setting of the canvas element 
  */
-export const resizeInventory = (canvasPosition) => {
+export const resizeInventory = (cameraWidth, fontSize) => {
     const Inventory = document.getElementById('item')
     const title = Inventory.children[0]
     const filterButton = document.querySelectorAll('.filter')
@@ -470,13 +470,11 @@ export const resizeInventory = (canvasPosition) => {
     const range = document.getElementById('range')
     const btns = slider.children[2].getElementsByTagName('button')
 
-    const { fontSize } = setting.general
-
     const { itemBlockSize , itemBlockMargin } = setting.inventory
 
     // Set the size of each block
-    desc.children[0].style.width = (canvasPosition.width / 9) + 'px'
-    desc.children[0].style.height = (canvasPosition.width / 9) + 'px'
+    desc.children[0].style.width = (cameraWidth / 9) + 'px'
+    desc.children[0].style.height = (cameraWidth / 9) + 'px'
     desc.children[1].style.whiteSpace = "pre-line"
     
     // Apply size number
@@ -485,12 +483,12 @@ export const resizeInventory = (canvasPosition) => {
 
     space.style.maxHeight = (itemBlockSize * 3) + 'px'
     space.style.padding = `${itemBlockMargin}px 0`
-    subMenu.style.width = canvasPosition.width - fontSize + 'px'
+    subMenu.style.width = cameraWidth - fontSize + 'px'
 
     filterButton.forEach(f => {
         f.style.fontSize = Math.floor(fontSize / 3) + 'px'
-        f.style.width = `${canvasPosition.width * 0.1}px`
-        f.style.height = `${canvasPosition.width * 0.1}px`
+        f.style.width = `${cameraWidth * 0.1}px`
+        f.style.height = `${cameraWidth * 0.1}px`
         // f.addEventListener('click', () => filterItem(f.dataset.filter) )
     })
 
@@ -522,11 +520,11 @@ export const resizeInventory = (canvasPosition) => {
     // If the slider is shown
     if(!slider.classList.contains('invisible')){
         // Resize slider
-        range.style.width = ((canvasPosition.width - fontSize) - itemBlockMargin) + 'px'
+        range.style.width = ((cameraWidth - fontSize) - itemBlockMargin) + 'px'
         range.setAttribute('max', selectedItem.amount)
 
         // Set the size of each block
-        slider.style.width = (canvasPosition.width - fontSize) + 'px'
+        slider.style.width = (cameraWidth - fontSize) + 'px'
         slider.style.fontSize = fontSize + 'px'
 
         // Blind input event
@@ -537,7 +535,7 @@ export const resizeInventory = (canvasPosition) => {
         Array.from(btns).forEach(btn => {
             btn.style.margin = `0 ${fontSize / 2}px`
             btn.style.fontSize = (fontSize / 2) + 'px'
-            btn.style.width = Math.floor(canvasPosition.width * (30 / 100)) + 'px'
+            btn.style.width = Math.floor(cameraWidth * (30 / 100)) + 'px'
         })
     }
 }
@@ -546,25 +544,26 @@ export const resizeInventory = (canvasPosition) => {
  * Resize pick up elements on the pgae
  * @param {object} canvasPosition - An object contains information about the setting of the canvas element 
  */
-export const resizePickUp = (canvasPosition) => {
+export const resizePickUp = (fontSize, cameraWidth) => {
     const pickUpWindow = document.getElementById('pickUp')
     const title = pickUpWindow.children[0]
     // const droppedItems = document.querySelector('.dropped-items')
-    const btn = document.querySelector('.btn-group').children[0]
+    const btn = document.querySelector('.btn-group')
     const items = document.querySelectorAll('.item')
     const itemCounts = document.querySelectorAll('.item-count')
-
-    const { fontSize } = setting.general
 
     const { itemBlockSize , itemBlockMargin } = setting.inventory
 
     title.style.fontSize = fontSize + 'px'
     title.style.paddingBottom = (fontSize / 2) + 'px'
 
+    btn.style.width = (cameraWidth - (Math.floor(fontSize / 2) * 2)) + 'px'
+    btn.style.padding = `${Math.floor(fontSize / 2)}px 0`
+
     // Set confirm botton style
-    btn.style.fontSize = fontSize + 'px'
-    btn.style.margin = "0 auto"
-    btn.disabled = 'true'
+    btn.children[0].style.fontSize = fontSize + 'px'
+    btn.children[0].style.margin = "0 auto"
+    // btn.disabled = 'true'
 
     items.forEach((item, index) => {
         itemCounts[index].style.width = 'fit-content'
@@ -619,9 +618,10 @@ export const clearPickUpWindow = () => {
 /**
  * Append the all the items in to the inventory window 
  * @param {object} currentActingPlayer - An object represent current acting player 
- * @param {object} canvasPosition - An object contains information about the canvas setting
+ * @param {number} cameraWidth - The width of camera
+ * @param {number} cameraHeight - The heigth of camera
  */
-export const constructInventoryWindow = (currentActingPlayer, canvasPosition) => {
+export const constructInventoryWindow = (currentActingPlayer, cameraWidth) => {
     // Get UI elements
     const Inventory = document.getElementById('item')
     const title = Inventory.children[0]
@@ -643,8 +643,8 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
 
     filterButton.forEach(f => {
         f.style.fontSize = Math.floor(fontSize / 3) + 'px'
-        f.style.width = `${canvasPosition.width * 0.1}px`
-        f.style.height = `${canvasPosition.width * 0.1}px`
+        f.style.width = `${cameraWidth * 0.1}px`
+        f.style.height = `${cameraWidth * 0.1}px`
         f.addEventListener('click', () => {
             filterItem(f.dataset.filter)
             if(f.classList.contains('filtering')){
@@ -759,11 +759,11 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
                     const range = document.getElementById('range')
                     const btns = slider.children[2].getElementsByTagName('button')
 
-                    range.style.width = ((canvasPosition.width - fontSize) - itemBlockMargin) + 'px'
+                    range.style.width = ((cameraWidth - fontSize) - itemBlockMargin) + 'px'
                     range.setAttribute('max', selectedItem.amount)
 
                     // Set the size of each block
-                    slider.style.width = (canvasPosition.width - fontSize) + 'px'
+                    slider.style.width = (cameraWidth - fontSize) + 'px'
                     slider.style.fontSize = fontSize + 'px'
 
                     // Blind input event
@@ -774,7 +774,7 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
                     Array.from(btns).forEach(btn => {
                         btn.style.margin = `0 ${fontSize / 2}px`
                         btn.style.fontSize = (fontSize / 2) + 'px'
-                        btn.style.width = Math.floor(canvasPosition.width * (30 / 100)) + 'px'
+                        btn.style.width = Math.floor(cameraWidth * (30 / 100)) + 'px'
                     })
 
                     // Cancel button
@@ -796,7 +796,7 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
             break;
             case 'give':
                 itemActions[i].addEventListener('click', () => {
-                    giveItem(currentActingPlayer, canvasPosition)
+                    giveItem(currentActingPlayer)
                 })
             break;
             case 'close':
@@ -811,7 +811,7 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
     // Apply style to the item wrapper
     space.style.maxHeight = (itemBlockSize * 3) + 'px'
     space.style.padding = `${itemBlockMargin}px 0`
-    subMenu.style.width = canvasPosition.width - fontSize + 'px'
+    subMenu.style.width = cameraWidth - fontSize + 'px'
 
     // Display inventory
     Inventory.classList.remove('invisible')
@@ -821,10 +821,11 @@ export const constructInventoryWindow = (currentActingPlayer, canvasPosition) =>
 /**
  * Append the all the items in to the pickup window 
  * @param {object} currentActingPlayer - An object represent current acting player 
- * @param {object} canvasPosition - An object contains information about the canvas setting
+ * @param {number} cameraWidth - The width of camera
+ * @param {number} cameraHeight - The heigth of camera
  * @param {object} eventItem -An object represents dropped items on the tile
  */
-export const constructPickUpWindow = (currentActingPlayer, canvasPosition, eventItem, tileMap) => {
+export const constructPickUpWindow = (currentActingPlayer, cameraWidth, cameraHeight, eventItem, tileMap) => {
     const pickUpWindow = document.getElementById('pickUp')
     const title = pickUpWindow.children[0]
     const droppedItems = document.getElementById('dropped-items')
@@ -837,7 +838,7 @@ export const constructPickUpWindow = (currentActingPlayer, canvasPosition, event
     title.style.paddingBottom = (fontSize / 2) + 'px'
 
     // Set confirm botton style
-    btn.style.width = (canvasPosition.width - (Math.floor(fontSize / 2) * 2)) + 'px'
+    btn.style.width = (cameraWidth - (Math.floor(fontSize / 2) * 2)) + 'px'
     btn.style.padding = `${Math.floor(fontSize / 2)}px 0`
     btn.children[0].style.fontSize = fontSize + 'px'
     btn.children[0].style.margin = "0 auto"

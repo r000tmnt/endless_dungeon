@@ -207,6 +207,7 @@ export default class Character {
                     this.exp = 0
                     this.requiredExp = 100
                     this.bag = job.bag
+                    this.skill = job.skill
                     this.bagLimit = 100
                     this.equip = {
                         head: {},
@@ -254,6 +255,7 @@ export default class Character {
                     // If the character in an enemy, set the given exp for player to gain
                     this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
                     this.drop = job.drop
+                    this.skill = job.skill
                 }
             }
             break

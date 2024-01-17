@@ -19,7 +19,6 @@ export default {
                 "moveSpeed": 3,
                 "sight": 5
             },
-            "base_skills": [],
             "bag": [
                 {
                     "id": "sword_1",
@@ -36,6 +35,9 @@ export default {
                     "type": 0,
                     "amount": 1
                 }
+            ],
+            "skill": [
+                "skill_slash_1"
             ]
         }
     ],

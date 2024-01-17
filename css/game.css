@@ -339,3 +339,7 @@ li{
     /* background: #053a5f; */
     height: 0.5rem;
   }
+
+  .learned-skills > li {
+    background: unset;
+  }
