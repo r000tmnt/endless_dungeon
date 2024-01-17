@@ -4,7 +4,10 @@ export default{
             "id": "currency_1",
             "name": "Gold",
             "stackLimit": 5000,
-            "type": 1
+            "type": 1,
+            "effect": {
+                "desc": "A coin to exchange for somthing."
+            }
         },
     ],
 

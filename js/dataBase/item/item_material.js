@@ -4,7 +4,15 @@ export default{
             "id": "material_meat_2",
             "name": "Rotten meat",
             "stackLimit": 10,
-            "type": 2
+            "type": 2,
+            "effect": {
+                "lv": 1,
+                "type": 2,
+                "target": "status",
+                "amount": "Poison",
+                "rate": 70,
+                "desc": "Please don't eat it."
+            }
         },
     ],
 
