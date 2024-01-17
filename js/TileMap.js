@@ -199,6 +199,35 @@ export default class TileMap {
         }
     }
 
+    // Modify an event on the tile
+    modifyEventOnTile = (position, item = [], dialogue = [], trigger = 'stepOn') => {
+        const eventIndex = this.event.findIndex(e => e.position.x === position.x && e.position.y === position.y)
+        
+        // If it is a new event
+        if(eventIndex < 0){
+            this.event.push({position, item, dialogue, trigger})
+        }else{
+            // Modify existing event
+            if(this.event[eventIndex].item.length !== item.length){
+                this.event[eventIndex].item = item
+            }else{
+                item.forEach(i => {
+                    const itemExist = this.event[eventIndex].item.findIndex(ei => ei.id === i.id)
+                    // If there's the same item on the ground
+                    if(itemExist >= 0){
+                        this.event[eventIndex].item[itemExist].amount = i.amount
+                    }else{
+                        console.log('item not found')
+                    }
+                })                
+            }
+
+            if(dialogue.length) this.event[eventIndex].dialogue = dialogue
+
+            if(trigger.length) this.event[eventIndex].trigger = trigger
+        }
+    }
+
     copyEventToTile(oldPosition, newPosition, item = [], dialogue = []){
         // TODO: Alter event position if needed
     }
