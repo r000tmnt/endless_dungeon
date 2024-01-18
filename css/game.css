@@ -75,6 +75,7 @@ body{
 }
 
 #action_menu{
+    width: 30%;
     position: absolute;
     transition: margin-left .1s ease-in-out;
 }
@@ -338,6 +339,10 @@ li{
 #range::-moz-range-track {
     /* background: #053a5f; */
     height: 0.5rem;
+  }
+  
+  .learned-skills{
+    overflow-y: scroll;
   }
 
   .learned-skills > li {
