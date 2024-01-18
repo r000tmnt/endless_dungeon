@@ -167,16 +167,25 @@ export const weaponAttack = async(player, enemy, tileMap, row, col) => {
             resultMessage = 'MISS!'
         }
     }
+}
 
-    return resultMessage
+export const skillAttack = async(skill, player, enemy, tileMap, row, col) => {
+    let LvDistance = 0
 
-    // resultMessage 
+    const Rates = [
+        {
+            name: 'hitRate',
+            value: 0
+        },
+        {
+            name: 'evadeRate',
+            value: enemy.attributes.spd + enemy.attributes.def
+        },
+        {
+            name: 'criticalRate',
+            value: player.attributes.lck
+        }
+    ]
 
-    // characterCaption.classList.add('invisible') 
-    // actionMenu.classList.remove('action_menu_open') 
-    // playerAttackRange.splice(0)
-
-    // const { message, style, size} = messageConfig
-
-    // displayMessage(message, size, style,  enemy.x, (enemy.y - tileSize))
+    // Calculare weapon and attribute bonus
 }
