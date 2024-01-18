@@ -4,7 +4,7 @@ export default{
             "id": "skill_slash_1",
             "name": "Slash",
             "weapon": "sword",
-            "type": "offence",
+            "type": "offense",
             "cost": {
                 "attribute": "mp",
                 "value": 3
@@ -23,7 +23,7 @@ export default{
             "id": "poison_1",
             "name": "Poison bite",
             "weapon": "none",
-            "type": "offence",
+            "type": "offense",
             "cost": {
                 "attribute": "mp",
                 "value": 1

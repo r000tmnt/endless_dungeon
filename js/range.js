@@ -21,7 +21,7 @@ export default class Range {
                 case 'attack': case 'skill':
                     this.fillStyle = 'rgba(255, 0, 0, 0.5)'
                     
-                    if(skillType === 'defence'){
+                    if(skillType === 'defense'){
                         this.fillStyle = 'rgba(0, 0, 255, 0.5)'
                     }
                 break;
