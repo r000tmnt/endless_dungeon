@@ -164,8 +164,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
         case 'item':
             actionMenuOptions[i].addEventListener('click', async() => {
                 action.mode = 'item'
-                const { width } = setting.general.camera
-                constructInventoryWindow(player, width)
+                constructInventoryWindow(player)
             })
         break; 
         case 'pick':
@@ -357,20 +356,29 @@ canvas.addEventListener('mousedown', async(event) =>{
                 await action.command(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded)
 
             if(!movable){
-                // Cancel action
-                if(!characterCaption.classList.contains('invisible')){
-                    characterCaption.classList.add('invisible') 
-                }else{
-                    characterCaption.classList.remove('invisible') 
-                }
 
-                if(actionMenu.classList.contains('action_menu_open')){
-                    actionMenu.classList.remove('action_menu_open') 
+                if(action.mode === 'skill'){
+                    // Back to skill window
+                    action.setSKillWindow(player, tileMap, playerPosition)
+                }else if(action.mode === 'item'){
+                    // Back to inventory
+                    constructInventoryWindow(player)
                 }else{
-                    actionMenu.classList.add('action_menu_open') 
-                }
+                    // Cancel action
+                    if(!characterCaption.classList.contains('invisible')){
+                        characterCaption.classList.add('invisible') 
+                    }else{
+                        characterCaption.classList.remove('invisible') 
+                    }
 
-                action.mode = ''
+                    if(actionMenu.classList.contains('action_menu_open')){
+                        actionMenu.classList.remove('action_menu_open') 
+                    }else{
+                        actionMenu.classList.add('action_menu_open') 
+                    }
+
+                    action.mode = ''                    
+                }
             }else{
                 characterCaption.classList.add('invisible') 
             }
