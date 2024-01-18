@@ -255,7 +255,6 @@ export default class Action{
                             player.attributes[attribute] -= value
 
                             this.messageConfig.message = await skillAttack(this.selectedSkill, player, enemy, tileMap, row, col)
-
                         break;
                         case 'item':
                         break;
