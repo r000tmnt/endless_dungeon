@@ -105,18 +105,46 @@ export default class Action{
             skillInfo.append(skillLabel)
             skillInfo.append(skillDesc)
 
-            if(currentActingPlayer.attributes[skillData.cost.attribute] > skillData.cost.value ){
-                skill.addEventListener('click', async() => {
-                    // Keep the skill
-                    this.selectedSkill = skillData
-                    // Get skill effect range
-                    this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillData.effect.range)
-                    // Close skill window
-                    skillWindow.classList.add('invisible')
-                })                
+            if(skill.weapon !== 'none'){
+                // If the required resource is enough and equip with the weapon that the skill needs
+                if(currentActingPlayer.attributes[skillData.cost.attribute] > skillData.cost.value && 
+                    currentActingPlayer.equip.hand?.id.includes(skillData.weapon)
+                ){
+                    skill.addEventListener('click', async() => {
+                        // Keep the skill
+                        this.selectedSkill = skillData
+                        // Get skill effect range
+                        this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillData.effect.range)
+                        // Close skill window
+                        skillWindow.classList.add('invisible')
+                        
+                        setTimeout(() => {
+                            this.clearSkillWindow()
+                        }, 300)
+                    })                
+                }else{
+                    // No click event if not usable
+                    skill.style.color = 'grey'
+                }                
             }else{
-                // No click event if not usable
-                skill.style.color = 'grey'
+                // Other skill that don't require weapon
+                if(currentActingPlayer.attributes[skillData.cost.attribute] > skillData.cost.value){
+                    skill.addEventListener('click', async() => {
+                        // Keep the skill
+                        this.selectedSkill = skillData
+                        // Get skill effect range
+                        this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillData.effect.range)
+                        // Close skill window
+                        skillWindow.classList.add('invisible')
+                        
+                        setTimeout(() => {
+                            this.clearSkillWindow()
+                        }, 300)
+                    }) 
+                }else{
+                    // No click event if not usable
+                    skill.style.color = 'grey'
+                }  
             }
 
             skill.append(skillIcon)
