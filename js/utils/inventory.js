@@ -618,10 +618,8 @@ export const clearPickUpWindow = () => {
 /**
  * Append the all the items in to the inventory window 
  * @param {object} currentActingPlayer - An object represent current acting player 
- * @param {number} cameraWidth - The width of camera
- * @param {number} cameraHeight - The heigth of camera
  */
-export const constructInventoryWindow = (currentActingPlayer, cameraWidth) => {
+export const constructInventoryWindow = (currentActingPlayer) => {
     // Get UI elements
     const Inventory = document.getElementById('item')
     const title = Inventory.children[0]
@@ -632,6 +630,7 @@ export const constructInventoryWindow = (currentActingPlayer, cameraWidth) => {
     const desc = document.getElementById('item-desc')
 
     const { fontSize } = setting.general
+    const { width } = setting.general.camera
     const { itemBlockSize, itemBlockMargin } = setting.inventory
 
     desc.children[0].style.width = currentActingPlayer.tileSize + 'px'
@@ -643,8 +642,8 @@ export const constructInventoryWindow = (currentActingPlayer, cameraWidth) => {
 
     filterButton.forEach(f => {
         f.style.fontSize = Math.floor(fontSize / 3) + 'px'
-        f.style.width = `${cameraWidth * 0.1}px`
-        f.style.height = `${cameraWidth * 0.1}px`
+        f.style.width = `${width * 0.1}px`
+        f.style.height = `${width * 0.1}px`
         f.addEventListener('click', () => {
             filterItem(f.dataset.filter)
             if(f.classList.contains('filtering')){
