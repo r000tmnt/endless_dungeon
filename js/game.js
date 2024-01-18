@@ -1,4 +1,3 @@
-// import Character from './Character.js';
 import TileMap from './TileMap.js';
 import Grid from './grid.js';
 import Action from './action.js';
@@ -13,6 +12,9 @@ import {
     clearPickUpWindow 
 } from './utils/inventory.js'
 import setting from './utils/setting.js';
+
+// aspect ratio
+const aspectRatio = 9 / 16
 
 // #region Canvas element
 let canvas = document.getElementById('game');
@@ -54,15 +56,15 @@ let velocity = 1;
 // Create player object
 let player = tileMap.getPlayer(velocity)
 var playerPosition = {
-    row: player.y / tileSize,
-    col: player.x / tileSize
+    row: parseInt(player.y / tileSize),
+    col: parseInt(player.x / tileSize)
 }
 // Create enemy object
 let enemy = tileMap.getEnemy(velocity)
 
 var enemyPosition = {
-    row: enemy.y / tileSize,
-    col: enemy.x / tileSize
+    row: parseInt(enemy.y / tileSize),
+    col: parseInt(enemy.x / tileSize)
 }
 
 var inspectingCharacter = null
@@ -75,10 +77,7 @@ const turnCounter = document.getElementById('turn')
 turnCounter.innerText = 'Turn 1'
 
 const actionMenu = document.getElementById('action_menu');
-
-// const actionMenuHolder = actionMenu.getElementByIdy('action_list')
 const actionMenuOptions = actionMenu.getElementsByTagName('li')
-
 const characterCaption = document.getElementById('characterCaption')
 const characterName = document.getElementById('name')
 const characterLv = document.getElementById('lv')
@@ -96,17 +95,18 @@ const skillWindow = document.getElementById('skill')
 for(let i=0; i < backBtn.length; i++){
     switch(backBtn[i].dataset.action){
         case 'skill':
-            backBtn[i].addEventListener('click', () => {
+            backBtn[i].addEventListener('click', async() => {
                 action.mode = ''
-
+                await checkIfStepOnTheEvent(player.x, player.y)
                 skillWindow.classList.add('invisible')
                 skillWindow.classList.remove('open_window')
+                action.clearSkillWindow()
             })
         break;
         case 'status':
-            backBtn[i].addEventListener('click', () => {
+            backBtn[i].addEventListener('click', async() => {
                 action.mode = ''
-
+                await checkIfStepOnTheEvent(player.x, player.y)
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
             })
@@ -155,6 +155,9 @@ for(let i=0; i < actionMenuOptions.length; i++){
         break;   
         case "skill":
             actionMenuOptions[i].addEventListener('click', () => {
+                actionMenu.classList.remove('action_menu_open')
+                // Hide the element
+                characterCaption.classList.add('invisible') 
                 action.setSKillWindow(player, tileMap, playerPosition)
             })
         break;
@@ -193,32 +196,22 @@ for(let i=0; i < actionMenuOptions.length; i++){
 
 const resize = () => {
     console.log('resize')
-    // aspect ratio
-    const aspectRatio = 9 / 16
-
-    // const deviceWidthToDeviceHeight = deviceWidth / deviceHeight
 
     deviceWidth = window.innerWidth
     deviceHeight = window.innerHeight
 
-    // canvas.style.width = (deviceHeight * aspectRatio) + 'px'
-    // canvas.style.height = deviceHeight + 'px'
-
     if(deviceHeight <= 768){
-        canvas.width = Math.floor(deviceHeight * aspectRatio)
-        canvas.height = deviceHeight        
+        deviceWidth = Math.floor(deviceHeight * aspectRatio)       
     }else
 
     if(deviceWidth <= 500){
-        canvas.width = deviceWidth
-        canvas.height = Math.floor(deviceWidth * (16/9))
+        deviceHeight = Math.floor(deviceWidth * (16/9))
     }else{
-        canvas.width = Math.floor(deviceHeight * aspectRatio)
-        canvas.height = deviceHeight  
+        deviceWidth = Math.floor(deviceHeight * aspectRatio)
     }
 
     // Set up tile size according to the canvas width
-    tileSize = Math.floor(canvas.width / 9);
+    tileSize = Math.floor(deviceWidth / 9);
     tileMap.changeTileSize(tileSize)
     grid.setTileSize(tileSize)
     range.setTileSize(tileSize)
@@ -232,9 +225,9 @@ const resize = () => {
         player.setCharacterPosition(playerPosition.col * tileSize, playerPosition.row * tileSize)
 
         playerPosition = {
-            row: player.y / tileSize,
-            col: player.x / tileSize
-        }        
+            row: parseInt(player.y / tileSize),
+            col: parseInt(player.x / tileSize)
+        }    
     }
     console.log('player :>>>', player)
 
@@ -243,26 +236,25 @@ const resize = () => {
         enemy.setCharacterPosition(enemyPosition.col * tileSize, enemyPosition.row * tileSize)  
         
         enemyPosition = {
-            row: enemy.y / tileSize,
-            col: enemy.x / tileSize
+            row: parseInt(enemy.y / tileSize),
+            col: parseInt(enemy.x / tileSize)
         }
     }
 
     console.log('enemy :>>>', enemy)
 
-    //set actionMenu wrapper width and height
-    actionMenu.style.width = Math.floor( 30 * Math.floor(cameraWidth / 100)) + 'px';
-
     const fontSize = setting.general.fontSize = Math.floor( 8 * Math.floor(cameraWidth / 100))
     setting.inventory.itemBlockSize = Math.floor(cameraWidth / 100) * 30
     setting.inventory.itemBlockMargin = Math.floor((setting.inventory.itemBlockSize  / 100) * 10)
+
+    const fontsize_sm = setting.general.fontSize_sm = Math.floor(fontSize / 2)
 
     action.setFontSize(fontSize)
 
     // calculation the percentage of the attribute
     for(let i=0; i < gauges.length; i++){
         // console.log(gauges[i].firstElementChild)
-        gauges[i].firstElementChild.style.height = (fontSize / 2) + 'px';
+        gauges[i].firstElementChild.style.height = fontsize_sm + 'px';
     }
 
     // action menu child font size
@@ -275,8 +267,8 @@ const resize = () => {
     
     characterCaption.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px'
     characterName.style['font-size'] = fontSize + 'px';
-    characterLv.style['font-size'] = (fontSize / 2) + 'px';
-    characterAp.style['font-size'] = (fontSize / 2) + 'px';
+    characterLv.style['font-size'] = fontsize_sm + 'px';
+    characterAp.style['font-size'] = fontsize_sm + 'px';
 
     // Set phase transition style
     phaseWrapper.style.width = cameraWidth + 'px'
@@ -285,7 +277,7 @@ const resize = () => {
 
     statusWindow.style.width = cameraWidth + 'px'
     statusWindow.style.height = cameraHeight + 'px' ;
-    statusWindow.style.padding = (fontSize / 2) + 'px';
+    statusWindow.style.padding = fontsize_sm + 'px';
 
     avatar.style.width = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
     avatar.style.height = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
@@ -293,22 +285,22 @@ const resize = () => {
     // Set skill window style
     skillWindow.style.width = cameraWidth + 'px'
     skillWindow.style.height = cameraHeight + 'px' 
-    skillWindow.style.padding = (fontSize / 2) + 'px';
+    skillWindow.style.padding = fontsize_sm + 'px';
 
     // Set inventory style
     Inventory.style.width = cameraWidth + 'px'
     Inventory.style.height = cameraHeight + 'px' 
-    Inventory.style.padding = (fontSize / 2) + 'px';
+    Inventory.style.padding = fontsize_sm + 'px';
 
     for(let i=0; i < backBtn.length; i++){
-        backBtn[i].style.transform = `translateX(-${fontSize / 2}px)`
-        backBtn[i].style.top = (fontSize / 2) + 'px'        
+        backBtn[i].style.transform = `translateX(-${fontsize_sm}px)`
+        backBtn[i].style.top = fontsize_sm + 'px'        
     }
 
     // Set pick up window style
     pickUpWindow.style.width = cameraWidth + 'px' 
     pickUpWindow.style.height = cameraHeight + 'px' 
-    pickUpWindow.style.padding = (fontSize / 2) + 'px';
+    pickUpWindow.style.padding = fontsize_sm + 'px';
 
     // Get canvas position after resize
     ctx = canvas.getContext("2d");
@@ -322,13 +314,13 @@ const resize = () => {
             resizeInventory(cameraWidth, fontSize)
         break;
         case 'status':
-            action.resizeStatusWindow(cameraWidth, cameraHeight, fontSize)
+            action.resizeStatusWindow()
         break;
         case 'pick':
             resizePickUp(fontSize, cameraWidth)
         break;
         case 'skill':
-            action.resizeSkillWindow(fontSize)
+            action.resizeSkillWindow(fontSize, fontsize_sm)
         break;
     }
 }
@@ -358,9 +350,11 @@ canvas.addEventListener('mousedown', async(event) =>{
     // If not playing animation
     if(!action.animationInit){
         // If there are selectable blocks in the array
-        if(action.mode === 'move' || action.mode === 'attack'){
+        if(action.mode === 'move' || action.mode === 'attack' || action.mode === 'skill' || action.mode === 'item'){
 
-            const movable = (action.mode === 'move')? await action.move(tileMap, row, col, playerPosition, player, characterAnimationPhaseEnded) : await action.attack(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded)
+            const movable = (action.mode === 'move')? 
+                await action.move(tileMap, row, col, playerPosition, player, characterAnimationPhaseEnded) : 
+                await action.command(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded)
 
             if(!movable){
                 // Cancel action
@@ -397,8 +391,7 @@ canvas.addEventListener('mousedown', async(event) =>{
             await checkIfStepOnTheEvent(player.x, player.y)
 
             // Keep tracking player position
-            playerPosition.row = row
-            playerPosition.col = col
+            playerPosition = { row, col }
 
             // Fill the element with a portion of the character info
             characterName.innerText = player.name
@@ -572,7 +565,7 @@ const gameLoop = () => {
     tileMap.draw(canvas, ctx)
 
     if(action.selectableSpace.length){
-        range.draw(ctx, action.selectableSpace, action.mode)
+        range.draw(ctx, action.selectableSpace, action.mode, action.selectedSkill.type)
     }
 
     if(player !== null) {
