@@ -43,6 +43,88 @@ const levelUp = (player) => {
     console.log('player status after level up :>>>', player)
 }
 
+const calculateHitRate = (player, enemy, damage, tileMap, row, col) => {
+    let hitRate = player.attributes.spd + player.attributes.lck + damage
+    let evadeRate = enemy.attributes.spd + enemy.attributes.def
+    let critRate =  player.attributes.lck * player.attributes.int
+
+    let LvDistance = 0, totalRate = 0
+    let resultMessage = ''
+
+    if(player.lv >= enemy.lv){
+        LvDistance = player.lv - enemy.lv
+        hitRate = hitRate + Math.floor(hitRate * (LvDistance/100))
+    }else{
+        LvDistance = enemy.lv - player.lv
+        hitRate = Math.abs(hitRate - Math.floor(hitRate * (LvDistance/100)))
+    }
+
+    totalRate = hitRate + evadeRate
+
+    const hitRates = [ { name: 'hitRate', value: hitRate }, { name: 'evadeRate', value: evadeRate } ]
+
+    for(let i=0; i < hitRates.length; i++){
+        hitRates[i].value = hitRates[i].value / totalRate
+    }
+
+    // Sort in ascending order for accuracy
+    hitRates.sort((a, b) => a.value - b.value)
+
+    const firstDiceRoll = hitRates[Math.floor(Math.random() * hitRates.length)]
+
+    console.log('Hit rates :>>>', hitRates)
+    console.log('totalRate :>>>', totalRate)
+    console.log('First dice roll :>>>', firstDiceRoll)
+
+    if(firstDiceRoll.name === 'hitRate'){
+        // Check if crit
+        totalRate = hitRate + critRate
+
+        const critRates = [ { name: 'hitRate', value: hitRate }, { name: 'critRate', value: critRate} ]
+    
+        for(let i=0; i < critRates.length; i++){
+            critRates[i].value = critRates[i].value / totalRate
+        }
+    
+        // Sort in ascending order for accuracy
+        critRates.sort((a, b) => a.value - b.value)
+    
+        const secondDiceRoll = critRates[Math.floor(Math.random() * hitRates.length)]
+    
+        console.log('Crit rates :>>>', critRates)
+        console.log('totalRate :>>>', totalRate)
+        console.log('Second dice roll :>>>', secondDiceRoll)
+
+        if(secondDiceRoll.name === 'critRate'){
+            console.log('crit!')
+            const criticalHit = Math.round(damage * 1.5)
+            resultMessage = String(criticalHit)
+            enemy.attributes.hp -= criticalHit
+            console.log('enmey hp:>>>', enemy.attributes.hp)
+        }else{
+            console.log('hit!')
+            resultMessage = String(damage)
+            enemy.attributes.hp -= damage
+            console.log('enmey hp:>>>', enemy.attributes.hp)
+        }
+    }else{
+        console.log('miss!')
+        resultMessage = 'MISS!'
+    }
+
+    // Check if the enemy is defeated
+    if(enemy.attributes.hp <= 0){
+        tileMap.removeCharacter(row, col)
+
+        gainExp(player, enemy)
+
+        // Leave the item on the ground
+        setEvent({x: enemy.x, y: enemy.y}, enemy.drop)
+    }
+
+    return resultMessage
+}
+
 /**
  * 
  * @param {object} player - An object contains player attributes 
@@ -50,32 +132,14 @@ const levelUp = (player) => {
  * @returns 
  */
 export const weaponAttack = async(player, enemy, tileMap, row, col) => {
-    // Calculate damage and probability
-    let LvDistance = 0
-
-    const Rates = [
-        {
-            name: 'hitRate',
-            value: 0
-        },
-        {
-            name: 'evadeRate',
-            value: enemy.attributes.spd + enemy.attributes.def
-        },
-        {
-            name: 'criticalRate',
-            value: player.attributes.lck
-        }
-    ]
-
     const dmgRange = []
     let damage = 1 // Min dmg
 
-    // Calulate damage without weapon
+    // Calulate damage with weapon
     if(player.equip.hand?.id !== undefined){
         const itemData = weapon.getOne(player.equip.hand.id)
 
-        // Need something to know if the attck is base on skill or not
+        // Need something to know if the attck is enhanced by skill or not
         const minDmg = ((player.attributes.str + Math.floor(player.attributes.str * ( itemData.effect.base_attribute.str/100 ))) - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))) + itemData.effect.base_damage.min
 
         const maxDmg = minDmg + (itemData.effect.base_damage.max - itemData.effect.base_damage.min)
@@ -102,90 +166,37 @@ export const weaponAttack = async(player, enemy, tileMap, row, col) => {
     console.log('dmgRange :>>>', dmgRange)
     console.log('possible damage :>>>', damage)
 
-    if(player.lv >= enemy.lv){
-        LvDistance = player.lv - enemy.lv
-        Rates[0].value = player.attributes.spd + player.attributes.lck + damage + Math.floor(LvDistance/100) + 100
-    }else{
-        LvDistance = enemy.lv - player.lv
-        Rates[0].value = Math.abs(LvDistance -(player.attributes.spd + damage) + Math.floor(LvDistance/100))
-    }
-
-    const totalRate = Rates.reduce((accu, current) => accu + current.value, 0)
-
-    console.log('Initial rate :>>>', Rates)
-    console.log('totalRate :>>>', totalRate)
-
-    for(let i=0; i < Rates.length; i++){
-        Rates[i].value = Rates[i].value / totalRate
-    }
-
-    // Sort in ascending order for accuracy
-    Rates.sort((a, b) => a.value - b.value)
-
-    console.log('Final rate :>>>', Rates)
-
-    const random = Math.random()
-
-    let resultMessage = ''
-
-    for(let i=0; i < Rates.length; i++){
-        console.log('random :>>>', random)
-        if(random <= Rates[i].value){
-            switch(Rates[i].name){
-                case 'hitRate':
-                    console.log('hit!')
-                    resultMessage = String(damage)
-                    enemy.attributes.hp -= damage
-                    console.log('enmey hp:>>>', enemy.attributes.hp)
-                break;
-                case 'evadeRate':
-                    console.log('miss!')
-                    resultMessage = 'MISS!'
-                break;
-                case 'criticalRate':
-                    console.log('crit!')
-                    const criticalHit = Math.round(damage * 1.5)
-                    resultMessage = String(criticalHit)
-                    enemy.attributes.hp -= criticalHit
-                    console.log('enmey hp:>>>', enemy.attributes.hp)
-                break;
-            }
-            // Check if the enemy is defeated
-            if(enemy.attributes.hp <= 0){
-                tileMap.removeCharacter(row, col)
-
-                gainExp(player, enemy)
-
-                // Leave the item on the ground
-                setEvent({x: enemy.x, y: enemy.y}, enemy.drop)
-            }
-            // Stop for loop
-            break;
-        // If loop to the late one and still miss anything
-        }else if(i === (Rates.length - 1)){
-            console.log('nothing!')
-            resultMessage = 'MISS!'
-        }
-    }
+    return calculateHitRate(player, enemy, damage, tileMap, row, col)
 }
 
 export const skillAttack = async(skill, player, enemy, tileMap, row, col) => {
-    let LvDistance = 0
+    const dmgRange = []
+    let damage = 1 // Min dmg
 
-    const Rates = [
-        {
-            name: 'hitRate',
-            value: 0
-        },
-        {
-            name: 'evadeRate',
-            value: enemy.attributes.spd + enemy.attributes.def
-        },
-        {
-            name: 'criticalRate',
-            value: player.attributes.lck
-        }
-    ]
+    const { base_on_attribute, multiply_as, base_dmg } = skill.effect
 
     // Calculare weapon and attribute bonus
+    const itemData = weapon.getOne(player.equip.hand.id)      
+
+    // Need something to know if the attck is enhanced by skill or not
+    let minDmg = ((player.attributes[base_on_attribute] + Math.floor(player.attributes.str * ( itemData.effect.base_attribute[base_on_attribute]/100 ))) - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))) + itemData.effect.base_damage.min
+
+    if(multiply_as === 'solid'){
+        minDmg += base_dmg
+    }else{
+        minDmg += Math.floor(minDmg * (base_dmg / 100))
+    }
+
+    const maxDmg = minDmg + (itemData.effect.base_damage.max - itemData.effect.base_damage.min)
+
+    for(let i = minDmg; i <= maxDmg; i++){
+        dmgRange.push(i)
+    }
+
+    damage = dmgRange[Math.floor(Math.random() * dmgRange.length)] 
+
+    console.log('dmgRange :>>>', dmgRange)
+    console.log('possible damage :>>>', damage)
+
+    return calculateHitRate(player, enemy, damage, tileMap, row, col)
 }
