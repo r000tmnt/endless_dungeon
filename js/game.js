@@ -500,7 +500,7 @@ const enemyAI = async() => {
 
     const { moveSpeed, sight } = enemy.attributes
 
-    await action.enemyMove(tileMap, enemyPosition, moveSpeed, sight, playerPosition, enemy, characterAnimationPhaseEnded )
+    await action.enemyMakeDecision(canvas, tileMap, enemyPosition, moveSpeed, sight, playerPosition, enemy, player, characterAnimationPhaseEnded )
 }
 
 // Check if the tile has an event

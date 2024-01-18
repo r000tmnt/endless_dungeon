@@ -105,47 +105,27 @@ export default class Action{
             skillInfo.append(skillLabel)
             skillInfo.append(skillDesc)
 
-            if(skill.weapon !== 'none'){
-                // If the required resource is enough and equip with the weapon that the skill needs
-                if(currentActingPlayer.attributes[skillData.cost.attribute] > skillData.cost.value && 
-                    currentActingPlayer.equip.hand?.id.includes(skillData.weapon)
-                ){
-                    skill.addEventListener('click', async() => {
-                        // Keep the skill
-                        this.selectedSkill = skillData
-                        // Get skill effect range
-                        this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillData.effect.range)
-                        // Close skill window
-                        skillWindow.classList.add('invisible')
-                        
-                        setTimeout(() => {
-                            this.clearSkillWindow()
-                        }, 300)
-                    })                
-                }else{
-                    // No click event if not usable
-                    skill.style.color = 'grey'
-                }                
+            // If the required resource is enough and equip with the weapon that the skill needs
+            if(currentActingPlayer.attributes[skillData.cost.attribute] >= skillData.cost.value && 
+               currentActingPlayer.equip.hand?.id.includes(skillData.weapon) ||
+               skill.weapon === 'none'
+            ){
+                skill.addEventListener('click', async() => {
+                    // Keep the skill
+                    this.selectedSkill = skillData
+                    // Get skill effect range
+                    this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillData.effect.range)
+                    // Close skill window
+                    skillWindow.classList.add('invisible')
+                    
+                    setTimeout(() => {
+                        this.clearSkillWindow()
+                    }, 300)
+                })                
             }else{
-                // Other skill that don't require weapon
-                if(currentActingPlayer.attributes[skillData.cost.attribute] > skillData.cost.value){
-                    skill.addEventListener('click', async() => {
-                        // Keep the skill
-                        this.selectedSkill = skillData
-                        // Get skill effect range
-                        this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillData.effect.range)
-                        // Close skill window
-                        skillWindow.classList.add('invisible')
-                        
-                        setTimeout(() => {
-                            this.clearSkillWindow()
-                        }, 300)
-                    }) 
-                }else{
-                    // No click event if not usable
-                    skill.style.color = 'grey'
-                }  
-            }
+                // No click event if not usable
+                skill.style.color = 'grey'
+            } 
 
             skill.append(skillIcon)
             skill.append(skillInfo)
@@ -304,7 +284,7 @@ export default class Action{
         this.#beginAnimationPhase(currentActingPlayer, characterAnimationPhaseEnded)
     }
 
-    async #checkIfInRange(row, col) {
+    async #checkIfInRange(row, col,) {
         let inRange = false
         // Loop through the array and find if the position matches
         for(let i=0; i < this.selectableSpace.length; i++){
@@ -397,84 +377,170 @@ export default class Action{
         }, 1500)
     }
 
-    async enemyMove(tileMap, enemyPosition, moveSpeed, sight, playerPosition,currentActingPlayer, characterAnimationPhaseEnded) {
+    async enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded){
+        this.mode = 'move'
         // get walkable space
         await this.setMove(tileMap, enemyPosition, moveSpeed, playerPosition)
 
-        // if(this.selectableSpace.length) this.mode = 'search'
+        // Decide which block to take as destination
+        const allDistance = []
 
-        const enemySight = await getAvailableSpace(tileMap, enemyPosition, sight)
+        this.selectableSpace.forEach(layer => {
+            layer.forEach(block => {
+                allDistance.push({ cost: getDistance(block[1], block[0], playerPosition), x: block[1], y: block[0] }) 
+            })
+        }) 
 
-        // find where to go
-        const findXandY = async() => {
-            let playerDetect = false
-            console.log('enemyAI finding player')
-            // Check if the player is in the visible range
-            for(let i = 0; i < enemySight.length; i++){
+        console.log('all distance :>>>', allDistance)
 
-                // if player is in the range, break the loop
-                if(playerDetect){
-                    break
-                }else{
-                    for(let block = 0; block < enemySight[i].length; block++){
-                        if(enemySight[i][block][0] === playerPosition.row && enemySight[i][block][1] === playerPosition.col){
-                            playerDetect = true
-                        }  
-                    }                
-                }
-
-            }
-            
-            if(playerDetect){
-                console.log('enemyAI found player')            
-
-                // Decide which block to take as destination
-                const allDistance = []
-
-                this.selectableSpace.forEach(layer => {
-                    layer.forEach(block => {
-                        allDistance.push({ cost: getDistance(block[1], block[0], playerPosition), x: block[1], y: block[0] }) 
-                    })
-                }) 
-
-                console.log('all distance :>>>', allDistance)
-
-                const shortest = allDistance.findIndex(d => d.cost === Math.min(...allDistance.map(r => r.cost)))
+        const shortest = allDistance.findIndex(d => d.cost === Math.min(...allDistance.map(r => r.cost)))
 
 
-                if(shortest >= 0){
-                    this.reachableDirections = await prepareDirections(tileMap, enemyPosition, { row: allDistance[shortest].y, col: allDistance[shortest].x }, this.reachableDirections)
+        if(shortest >= 0){
+            console.log('shortest :>>>', allDistance[shortest])
+            this.reachableDirections = await prepareDirections(tileMap, enemyPosition, { row: allDistance[shortest].y, col: allDistance[shortest].x }, this.reachableDirections)
 
-                    console.log("reachableDirections :>>>", this.reachableDirections)
+            console.log("reachableDirections :>>>", this.reachableDirections)
 
-                    if(this.reachableDirections.length){
-                        // Start moving
-                        currentActingPlayer.setWalkableSpace(this.selectableSpace)
-                        this.#beginAnimationPhase(currentActingPlayer, characterAnimationPhaseEnded)  
-                    }else{
-                        // Spend an action point
-                        characterAnimationPhaseEnded()  
-                    }                   
-                }else{
-                    console.log('Player out of reach')
-
-                    await this.#randomSteps(tileMap, currentActingPlayer, enemyPosition, characterAnimationPhaseEnded)
-                }
+            if(this.reachableDirections.length){
+                // Start moving
+                enemy.setWalkableSpace(this.selectableSpace)
+                this.#beginAnimationPhase(enemy, characterAnimationPhaseEnded)  
             }else{
-                console.log('enemyAI can not find the player')
+                // Spend an action point
+                characterAnimationPhaseEnded()  
+            }                   
+        }else{
+            console.log('Player out of reach')
 
-                await this.#randomSteps(tileMap, currentActingPlayer, enemyPosition, characterAnimationPhaseEnded)
+            await this.#randomSteps(tileMap, enemy, enemyPosition, characterAnimationPhaseEnded)
+        }  
+    }
+
+    async enemyAction(enemy){
+        const possibleActions = [{ name: 'attack', value: 50 }, { name: 'skill', value: 50 }, { name: 'stay', value: 30 }]
+
+        possibleActions.forEach(a => {
+            if(a.name === enemy.prefer_action){
+                a.value += 100
             }
-        } 
+        })
 
-        // Init the function
-        await findXandY()
+        const totalRate = possibleActions.reduce((accu, current) => accu + current.value, 0)
+
+        for(let i=0; i < possibleActions.length; i++){
+            possibleActions[i].value = possibleActions[i].value / totalRate
+        }
+
+        // Sort in ascending order for accuracy
+        possibleActions.sort((a, b) => a.value - b.value)
+
+        console.log('possible action :>>>', possibleActions)
+
+        const random = Math.random()
+
+        let actionToTake = {}
+
+        for(let i=0; i < possibleActions.length; i++){
+            if(random <= possibleActions[i].value){
+                actionToTake = possibleActions[i]
+                break
+            }
+        }
+
+        return !Object.entries(actionToTake).length? possibleActions[0] : actionToTake
+    }
+
+    async enemyMakeDecision(canvas, tileMap, enemyPosition, moveSpeed, sight, playerPosition, enemy, player, characterAnimationPhaseEnded) {
+        this.mode = 'search'
+
+        const { row, col } = playerPosition
+
+        this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, sight)
+
+        let playerDetect = await this.#checkIfInRange(row, col)
+            
+        if(playerDetect){
+            console.log('enemyAI found player') 
+
+            // let attackRange = 1 
+            let possibleAction = await this.enemyAction(enemy)
+
+            this.mode = possibleAction.name
+
+            console.log('enemy take action :>>>', this.mode)
+
+            switch(possibleAction.name){
+                case 'attack': {
+                    this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, 1)
+
+                    const actable = await this.command(canvas, row, col, enemy, player, playerPosition, enemy.tileSize, tileMap, characterAnimationPhaseEnded)
+
+                    if(!actable){
+                        // Move
+                        await this.enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded)
+                    }
+                }
+                break;
+                case 'skill':{
+                    // Collect skill that fits the requiremnet
+                    const useableSkills = enemy.skill.map(s => {
+                        const skillData = skills.getOne(s)
+                        if(skillData.weapon === 'none'){
+                            return skillData                      
+                        }
+                        
+                        if(enemy.attributes[s.cost.attribute] >= skillData.cost .value && enemy.equip?.hand?.id.includes(skillData.weapon)){
+                            return skillData
+                        }
+                    })
+
+                    // Calaculate Each use rate
+                    const skillUseRate = useableSkills.map(s => {
+                        return { name: s.id, value: (enemy.prefer_skill_type === s.weapon)? 80 : 50}
+                    })
+
+                    // Combine numbers
+                    const totalRate = skillUseRate.reduce((accu, current) => accu + current.value, 0)
+
+                    for(let i=0; i < skillUseRate.length; i++){
+                        skillUseRate[i].value = skillUseRate[i].value / totalRate
+                    }
+            
+                    // Sort in ascending order for accuracy
+                    skillUseRate.sort((a, b) => a.value - b.value)
+            
+                    console.log('possible skill :>>>', skillUseRate)
+
+                    const finalDicision = skillUseRate[Math.floor(Math.random() * skillUseRate.length)]
+
+                    // Get skill effect range
+                    this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, finalDicision.effect.range)
+
+                    const actable = await this.command(canvas, row, col, enemy, player, playerPosition, enemy.tileSize, tileMap, characterAnimationPhaseEnded)
+
+                    if(!actable){
+                        // Move
+                        await this.enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded)
+                    }
+                }
+                break;
+                case 'stay':
+                    // Spend an action point
+                    characterAnimationPhaseEnded()  
+                break;
+            }
+        }else{
+            console.log('enemyAI can not find the player')
+            // Move
+            await this.enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded)
+        }
     }
 
     /**
      * Randomly decide x and y
      */
-    async #randomSteps(tileMap, currentActingPlayer, enemyPosition, characterAnimationPhaseEnded){
+    async #randomSteps(tileMap, enemy, enemyPosition, characterAnimationPhaseEnded){
 
         const row =  Math.floor( Math.random() * this.selectableSpace.length)
         console.log("row :>>>", row)
@@ -491,8 +557,8 @@ export default class Action{
             
             if(this.reachableDirections.length){
                 // Start moving
-                currentActingPlayer.setWalkableSpace(this.selectableSpace)
-                this.#beginAnimationPhase(currentActingPlayer, characterAnimationPhaseEnded)  
+                enemy.setWalkableSpace(this.selectableSpace)
+                this.#beginAnimationPhase(enemy, characterAnimationPhaseEnded)  
             }else{
                 // Spend an action point
                 characterAnimationPhaseEnded()

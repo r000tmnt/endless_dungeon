@@ -4,6 +4,8 @@ export default{
             "id": "mob_zombie_1",
             "name": "Zombie",
             "prefer_attributes": [ "str" ],
+            "prefer_action": "attack",
+            "prefer_skill_type": "none",
             "base_attribute": {
                 "hp": 10, 
                 "mp": 3,

@@ -27,7 +27,9 @@ export default class Range {
                 break;
                 case 'item':
                     this.fillStyle = 'rgba(0, 0, 255, 0.5)'
-
+                break;
+                case 'search':
+                    this.fillStyle = 'rgba(0, 255, 0, 0.5)'
                 break;
             }   
             

@@ -256,6 +256,8 @@ export default class Character {
                     this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
                     this.drop = job.drop
                     this.skill = job.skill
+                    this.prefer_skill_type = job.prefer_skill_type
+                    this.prefer_action = job.prefer_action
                 }
             }
             break
