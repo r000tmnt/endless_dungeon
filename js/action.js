@@ -1,5 +1,5 @@
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
-import { weaponAttack } from './utils/battle.js';
+import { skillAttack, weaponAttack } from './utils/battle.js';
 import skills from './dataBase/skills.js';
 import setting from './utils/setting.js';
 
@@ -14,7 +14,8 @@ export default class Action{
             message: '',
             style: 'yellow',
             size: 0,
-        }
+        },
+        this.selectedSkill = {}
     }
 
     /**
@@ -41,22 +42,21 @@ export default class Action{
         this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, attackRange)
     }
 
-    /**
-     * Prepare a range of blocks for skill
-     * @param {object} tileMap - An object represent the tile map
-     * @param {object} playerPosition - An object represent player's position
-     * @param {number} skillRange - A number indicated the amount of blocks for each direction in straight line  
-     */
-    async setSkillRange(tileMap, playerPosition, skillRange){
-        this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillRange)
+    clearSkillWindow(){
+        const skillList = document.querySelector('.learned-skills')
+        while(skillList.firstChild){
+            skillList.removeChild(skillList.firstChild)
+        }
     }
 
-    resizeSkillWindow(fontSize){
-        const skillWindow = document.getElementById('skill')
+    resizeSkillWindow(fontSize, fontSize_sm){
         const skillList = document.querySelectorAll('.skill')
+        const title = document.getElementById('skill').children[0]
+
+        title.style.fontSize = fontSize + 'px'
 
         skillList.forEach(skill => {
-            skill.style.fontSize = (fontSize / 2) + 'px'
+            skill.style.fontSize = fontSize_sm + 'px'
         })
     }
 
@@ -65,64 +65,82 @@ export default class Action{
         this.mode = 'skill'
         
         const skillWindow = document.getElementById('skill')
+        const title = skillWindow.children[0]
         const skillList = document.querySelector('.learned-skills')
-        const { fontSize } = setting.general
+        const { fontSize, fontSize_sm } = setting.general
         const { width } = setting.general.camera
+        const skillItemHeight = Math.floor(width * (30/100))
+
+        title.style.fontSize = fontSize + 'px'
 
         for(let i=0; i < currentActingPlayer.skill.length; i++){
             const skillData = skills.getOne(currentActingPlayer.skill[i])
             const skill = document.createElement('li')
+            const skillIcon = document.createElement('img')
+            const skillInfo = document.createElement('div')
+            const skillLabel = document.createElement('div')
             const skillName = document.createElement('span')
             const skillCost = document.createElement('span')
             const skillDesc = document.createElement('span')
             skill.classList.add('flex')
             skill.classList.add('skill')
             skill.style.fontSize = fontSize + 'px'
-            skill.style.height = Math.floor(width * (30/100)) + 'px'
+            skill.style.height = skillItemHeight + 'px'
             skill.style.boxSizing = 'border-box'
-            skill.style.padding = `${fontSize / 2}px 0`            
+            skill.style.padding = `${fontSize_sm}px`  
+
+            skillIcon.style.width = tileMap.tileSize + 'px'
+            skillIcon.style.height = tileMap.tileSize + 'px'
+            skillIcon.style.margin = `0 ${fontSize_sm}px`
 
             skillName.innerText = skillData.name
             skillCost.innerText = `${skillData.cost.attribute}: ${skillData.cost.value}`
             skillDesc.innerText = skillData.effect.desc
 
-            skill.addEventListener('click', async() => {
-                // Get skill effect range
-                await this.setSkillRange(tileMap, playerPosition, skillData.effect.range)
-                // Close skill window
-                skillWindow.classList.add('invisible')
-            })
+            skillLabel.classList.add('flex')
+            skillLabel.style.justifyContent = 'space-between'
+            skillLabel.append(skillName)
+            skillLabel.append(skillCost)
 
-            skill.append(skillName)
-            skill.append(skillCost)
-            skill.append(skillDesc)
+            skillInfo.append(skillLabel)
+            skillInfo.append(skillDesc)
+
+            if(currentActingPlayer.attributes[skillData.cost.attribute] > skillData.cost.value ){
+                skill.addEventListener('click', async() => {
+                    // Keep the skill
+                    this.selectedSkill = skillData
+                    // Get skill effect range
+                    this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillData.effect.range)
+                    // Close skill window
+                    skillWindow.classList.add('invisible')
+                })                
+            }else{
+                // No click event if not usable
+                skill.style.color = 'grey'
+            }
+
+            skill.append(skillIcon)
+            skill.append(skillInfo)
             skillList.append(skill)
         }
+        skillList.style.maxHeight = (skillItemHeight * 3) + 'px'
         skillWindow.classList.remove('invisible')
         skillWindow.classList.add('open_window')
     }
 
-    resizeStatusWindow(canvasPosition){
+    resizeStatusWindow(){
         const statusWindow = document.getElementById('status')
-        const avatar = document.getElementById('avatar')
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]
-        const { fontSize } = setting.general
+        const { fontSize_sm } = setting.general
 
-        statusWindow.style.width = cameraWidth + 'px'
-        statusWindow.style.height = canvasPosition.height + 'px' ;
-        statusWindow.style.padding = (fontSize / 2) + 'px';
-
-        avatar.style.width = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
-        avatar.style.height = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
-
-        statusInfo.style.fontSize = Math.floor(fontSize / 2) + 'px' 
-        statusLv.style.fontSize = Math.floor(fontSize / 2) + 'px' 
+        statusInfo.style.fontSize = fontSize_sm + 'px' 
+        statusLv.style.fontSize = fontSize_sm + 'px' 
         const tableNode = statusTable.querySelectorAll('td')
 
         for(let i=0; i < tableNode.length; i++){
-            tableNode[i].style.fontSize = Math.floor(fontSize / 2) + 'px'
+            tableNode[i].style.fontSize = fontSize_sm + 'px'
         }
     }
 
@@ -136,7 +154,7 @@ export default class Action{
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]
-        const { fontSize } = setting.general
+        const { fontSize_sm } = setting.general
 
         this.mode = 'status'
 
@@ -145,12 +163,12 @@ export default class Action{
         // Insert status information
         statusInfo.children[0].innerText = inspectingCharacter.name
         statusInfo.children[1].innerText = inspectingCharacter.class
-        statusInfo.style.fontSize = Math.floor(fontSize / 2) + 'px' 
+        statusInfo.style.fontSize = fontSize_sm + 'px' 
         statusLv.innerText = `LV ${inspectingCharacter.lv}`
-        statusLv.style.fontSize = Math.floor(fontSize / 2) + 'px' 
+        statusLv.style.fontSize = fontSize_sm + 'px' 
 
         for(let i=0; i < tableNode.length; i++){
-            tableNode[i].style.fontSize = Math.floor(fontSize / 2) + 'px'
+            tableNode[i].style.fontSize = fontSize_sm + 'px'
             if(tableNode[i].dataset.attribute !== undefined){
                 switch(tableNode[i].dataset.attribute){
                     case 'hp':
@@ -209,7 +227,7 @@ export default class Action{
         return inRange
     }
     
-    async attack(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded){
+    async command(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded){
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
@@ -224,13 +242,25 @@ export default class Action{
 
                 canvas.style.transform = `scale(1.5) translate(${offsetX}px, ${offsetY}px)`
 
-                if(this.mode === 'attack' || this.mode === 'skill' || this.mode === 'item'){
-                    this.selectableSpace.splice(0)
-                    console.log('clear selectable :>>>', this.selectableSpace)
-                }
+                this.selectableSpace.splice(0)
+                console.log('clear selectable :>>>', this.selectableSpace)
 
                 setTimeout(async() => {
-                    this.messageConfig.message = await weaponAttack(player, enemy, tileMap, row, col)
+                    switch(this.mode){
+                        case 'attack':
+                            this.messageConfig.message = await weaponAttack(player, enemy, tileMap, row, col)
+                        break;
+                        case 'skill':
+                            const { attribute, value } = this.selectedSkill
+                            player.attributes[attribute] -= value
+
+                            this.messageConfig.message = await skillAttack(this.selectedSkill, player, enemy, tileMap, row, col)
+
+                        break;
+                        case 'item':
+                        break;
+                    }
+
                     const { message, style, size} = this.messageConfig
                     
                     this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize, characterAnimationPhaseEnded)    
