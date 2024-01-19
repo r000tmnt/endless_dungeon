@@ -186,6 +186,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 // Hide the element
                 characterCaption.classList.add('invisible')
                 setTimeout(() => {
+                    player.attributes.ap -= 1
                     action.stay(player, characterAnimationPhaseEnded)
                 }, 500)
             })
@@ -395,6 +396,8 @@ canvas.addEventListener('mousedown', async(event) =>{
                 actionMenuOptions[i].style.display = 'block'
             }
 
+            checkAp()
+
             // Check if the tile has an event
             await checkIfStepOnTheEvent(player.x, player.y)
 
@@ -510,13 +513,19 @@ const checkIfStepOnTheEvent = async(x, y) => {
     actionMenuOptions[4].style.display = (event === undefined)? 'none' : 'block'
 }
 
+const checkAp = () => {
+    // If player's ap is not enough to use skill
+    if(player.attributes.ap < 2){
+        actionMenuOptions[2].classList.add('no-event')
+    }else{
+        actionMenuOptions[2].classList.remove('no-event')
+    }
+}
+
 // Thing to do after animation ended
 const characterAnimationPhaseEnded = async() => {
     // If it is the player's turn
     if(turnType === 0){
-
-        player.attributes.ap -= 1
-
         // if(action.mode === 'skill'){
         // TODO: Count the requrie action point of the skill
         // }
@@ -536,16 +545,12 @@ const characterAnimationPhaseEnded = async() => {
             nextTurn()
         }else{
             grid.setPointedBlock({ ...playerPosition })
+            checkAp()
             // Display Action options
             actionMenu.classList.add('action_menu_open')
             characterCaption.classList.remove('invisible')
         }
     }else{
-        // if(action.mode === 'skill'){
-        // TODO: Count the requrie action point of the skill
-        // }
-        enemy.attributes.ap -= 1 
-
         enemyPosition.row = enemy.y / tileSize
         enemyPosition.col = enemy.x / tileSize  
         // characterAp.innerText = `AP: ${player.attributes.ap}`
