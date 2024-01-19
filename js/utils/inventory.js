@@ -126,7 +126,7 @@ const setItemSpace = async(currentActingPlayer, enemyPosition, tileMap) => {
     const Inventory = document.getElementById('item')
     const itemUseRange = await getAvailableSpace(
         tileMap,
-        { row: parseInt(currentActingPlayer.y / currentActingPlayer.tileSize), col: parseInt(currentActingPlayer.y / currentActingPlayer.tileSize) },
+        { row: parseInt(currentActingPlayer.y / currentActingPlayer.tileSize), col: parseInt(currentActingPlayer.x / currentActingPlayer.tileSize) },
         selectedItem.effect.range, selectedItem.effect?.dmg? null: enemyPosition
     )
 
