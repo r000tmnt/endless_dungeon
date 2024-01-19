@@ -15,7 +15,7 @@ export default{
                 "range": 1,
                 "base_on_attribute": "str",
                 "multiply_as": "solid",
-                "base_dmg": 10,
+                "base_number": 10,
                 "desc": "A quick and powerful strick with sword"
             }
         },
@@ -33,7 +33,7 @@ export default{
                 "range": 1,
                 "base_on_attribute": "luk",
                 "multiply_as": "solid",
-                "base_dmg": 3,
+                "base_number": 3,
                 "desc": "Bite the enemy. Cause the foe to get poisoned"
             }
         }

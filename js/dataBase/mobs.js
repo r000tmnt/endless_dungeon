@@ -15,6 +15,7 @@ export default{
                 "def": 5, 
                 "int": 2,
                 "spd": 2, 
+                "spi": 2,
                 "ap": 2,
                 "lck": 2,
                 "maxAp": 2,

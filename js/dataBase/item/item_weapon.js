@@ -14,7 +14,7 @@ export default {
                 "base_attribute": {
                     "str": 1
                 },
-                "desc": "A sword made out of wood, often use for practice."
+                "desc": "A sword made out of wood,\noften use for practice."
             },
             "prefix": [],
             "suffix": []

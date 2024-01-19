@@ -127,6 +127,28 @@ const calculateHitRate = (player, enemy, damage, tileMap, row, col) => {
     return resultMessage
 }
 
+const calculateEnemyMagicDefense = (enemy) => {
+    let defense = 0
+
+    for(let[key, value] of Object.entries(enemy.equip)){
+        if(enemy.equip[key]?.id !== undefined){
+            const itemData = armor.getOne(enemy.equip[key].id)
+
+            if(itemData && itemData.effect.base_attribute?.spi !== undefined){
+                defense += Math.floor(enemy.attributes.spi * ( itemData.effect.base_attribute.spi/100 ))
+            }
+        }
+    }
+
+    if(defense === 0){
+        defense = enemy.attributes.spi + Math.floor(enemy.attributes.spi * (1/100))
+    }else{
+        defense += enemy.attributes.spi
+    }
+
+    return defense
+}
+
 // Calculate enemy defense value
 const calculateEnemyDefense = (enemy) => {
     let defense = 0
@@ -205,28 +227,56 @@ export const skillAttack = async(skill, player, enemy, tileMap, row, col) => {
     const dmgRange = []
     let damage = 1 // Min dmg
 
-    const { base_on_attribute, multiply_as, base_dmg } = skill.effect
+    const { base_on_attribute, multiply_as, base_number } = skill.effect
 
-    // Calculare weapon and attribute bonus
-    const itemData = weapon.getOne(player.equip.hand.id)      
+    if(skill.type === 'dmg' || skill.type === 'magic'){
+        const enemyDefense = (skill.type === 'dmg')? calculateEnemyDefense(enemy) : calculateEnemyMagicDefense(enemy)
 
-    // Need something to know if the attck is enhanced by skill or not
-    let minDmg = ((player.attributes[base_on_attribute] + Math.floor(player.attributes.str * ( itemData.effect.base_attribute[base_on_attribute]/100 ))) - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))) + itemData.effect.base_damage.min
+        // Calculare weapon and attribute bonus
+        if(player.equip?.hand?.id !== undefined){
+            const itemData = weapon.getOne(player.equip.hand.id)      
 
-    if(multiply_as === 'solid'){
-        minDmg += base_dmg
+            // Need something to know if the attck is enhanced by skill or not
+            let minDmg = ((player.attributes[base_on_attribute] + Math.floor(player.attributes[base_on_attribute] * ( itemData.effect.base_attribute[base_on_attribute]/100 ))) - enemyDefense ) + itemData.effect.base_damage.min
+
+            if(multiply_as === 'solid'){
+                minDmg += base_number
+            }else{
+                minDmg += Math.floor(minDmg * (base_number / 100))
+            }
+
+            const maxDmg = minDmg + (itemData.effect.base_damage.max - itemData.effect.base_damage.min)
+
+            for(let i = minDmg; i <= maxDmg; i++){
+                dmgRange.push(i)
+            }
+
+            damage = dmgRange[Math.floor(Math.random() * dmgRange.length)]         
+        }else{
+            // Without weapon
+            // Need something to know if the attck is enhanced by skill or not
+            let minDmg = (player.attributes[base_on_attribute] - enemyDefense) + 1
+
+            if(minDmg <= 0) minDmg = 1
+    
+            const maxDmg = minDmg + 2
+    
+            for(let i = minDmg; i <= maxDmg; i++){
+                dmgRange.push(i)
+            }
+    
+            damage = dmgRange[Math.floor(Math.random() * dmgRange.length)]    
+        }
     }else{
-        minDmg += Math.floor(minDmg * (base_dmg / 100))
+        // Support skill
+        if(multiply_as === 'solid'){
+            damage = base_number
+        }
+
+        if(multiply_as === 'percentage'){
+            damage += Math.floor(enemy.attributes[base_on_attribute] * (base_number / 100))
+        }
     }
-
-    const maxDmg = minDmg + (itemData.effect.base_damage.max - itemData.effect.base_damage.min)
-
-    for(let i = minDmg; i <= maxDmg; i++){
-        dmgRange.push(i)
-    }
-
-    damage = dmgRange[Math.floor(Math.random() * dmgRange.length)] 
-
     console.log('dmgRange :>>>', dmgRange)
     console.log('possible damage :>>>', damage)
 

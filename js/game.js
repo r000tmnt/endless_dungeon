@@ -101,6 +101,7 @@ for(let i=0; i < backBtn.length; i++){
                 skillWindow.classList.add('invisible')
                 skillWindow.classList.remove('open_window')
                 action.clearSkillWindow()
+                displayUIElement()
             })
         break;
         case 'status':
@@ -109,6 +110,7 @@ for(let i=0; i < backBtn.length; i++){
                 await checkIfStepOnTheEvent(player.x, player.y)
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
+                displayUIElement()
             })
         break;
         case 'item':
@@ -119,6 +121,7 @@ for(let i=0; i < backBtn.length; i++){
                 Inventory.classList.add('invisible')
                 Inventory.classList.remove('open_window')
                 clearInventory()
+                displayUIElement()
             })
         break;
         case 'pick':
@@ -129,6 +132,7 @@ for(let i=0; i < backBtn.length; i++){
                 pickUpWindow.classList.add('invisible')
                 pickUpWindow.classList.remove('open_window')
                 clearPickUpWindow()
+                displayUIElement()
             })
         break;
     }
@@ -139,39 +143,32 @@ for(let i=0; i < actionMenuOptions.length; i++){
     switch(actionMenuOptions[i].dataset.action){
         case 'move':
             actionMenuOptions[i].addEventListener('click', async() => {
-                actionMenu.classList.remove('action_menu_open')
-                // Hide the element
-                characterCaption.classList.add('invisible')  
+                hideUIElement() 
                 await action.setMove(tileMap, playerPosition, player.attributes.moveSpeed, enemyPosition)           
             })
         break;
         case 'attack':
             actionMenuOptions[i].addEventListener('click', async() => {
-                actionMenu.classList.remove('action_menu_open')
-                // Hide the element
-                characterCaption.classList.add('invisible')  
+                hideUIElement() 
                 await action.setAttack(tileMap, playerPosition, 1)
             })
         break;   
         case "skill":
             actionMenuOptions[i].addEventListener('click', () => {
-                actionMenu.classList.remove('action_menu_open')
-                // Hide the element
-                characterCaption.classList.add('invisible') 
+                hideUIElement()
                 action.setSKillWindow(player, tileMap, playerPosition)
             })
         break;
         case 'item':
             actionMenuOptions[i].addEventListener('click', async() => {
-                actionMenu.classList.remove('action_menu_open')
-                // Hide the element
-                characterCaption.classList.add('invisible') 
+                hideUIElement()
                 action.mode = 'item'
                 constructInventoryWindow(player, enemyPosition, tileMap)
             })
         break; 
         case 'pick':
             actionMenuOptions[i].addEventListener('click', async() => {
+                hideUIElement()
                 const event = tileMap.getEventOnTile({x: player.x, y: player.y})
                 action.mode = 'pick'
                 const { width, height } = setting.general.camera
@@ -180,14 +177,13 @@ for(let i=0; i < actionMenuOptions.length; i++){
         break;
         case 'status':
             actionMenuOptions[i].addEventListener('click', () => {
+                hideUIElement()
                 action.setStatusWindow(inspectingCharacter)
             })
         break;
         case 'stay':
             actionMenuOptions[i].addEventListener('click', async() => {
-                actionMenu.classList.remove('action_menu_open')
-                // Hide the element
-                characterCaption.classList.add('invisible')
+                hideUIElement()
                 setTimeout(() => {
                     player.attributes.ap -= 1
                     action.stay(player, characterAnimationPhaseEnded)
@@ -196,6 +192,16 @@ for(let i=0; i < actionMenuOptions.length; i++){
     }
 }
 // #endregion
+
+const displayUIElement = () => {
+    actionMenu.classList.add('action_menu_open')
+    characterCaption.classList.remove('invisible') 
+}
+
+const hideUIElement = () => {
+    actionMenu.classList.remove('action_menu_open')
+    characterCaption.classList.add('invisible') 
+}
 
 const resize = () => {
     console.log('resize')
@@ -247,10 +253,11 @@ const resize = () => {
     console.log('enemy :>>>', enemy)
 
     const fontSize = setting.general.fontSize = Math.floor( 8 * Math.floor(cameraWidth / 100))
+    const fontSize_md = setting.general.fontSize_md = Math.floor(fontSize * 0.5)
     setting.inventory.itemBlockSize = Math.floor(cameraWidth / 100) * 30
     setting.inventory.itemBlockMargin = Math.floor((setting.inventory.itemBlockSize  / 100) * 10)
 
-    const fontsize_sm = setting.general.fontSize_sm = Math.floor(fontSize / 2)
+    const fontsize_sm = setting.general.fontSize_sm = Math.floor(fontSize * 0.25)
 
     action.setFontSize(fontSize)
 
@@ -268,7 +275,7 @@ const resize = () => {
     appWrapper.style.width = cameraWidth  + 'px';
     appWrapper.style.height = cameraHeight + 'px';
     
-    characterCaption.style.width = Math.floor( 50 * Math.floor(canvas.width / 100)) + 'px'
+    characterCaption.style.width = Math.floor(50 * (cameraWidth / 100)) + 'px'
     characterName.style['font-size'] = fontSize + 'px';
     characterLv.style['font-size'] = fontsize_sm + 'px';
     characterAp.style['font-size'] = fontsize_sm + 'px';
@@ -314,7 +321,7 @@ const resize = () => {
 
     switch(action.mode){
         case 'item':
-            resizeInventory(cameraWidth, fontSize)
+            resizeInventory(cameraWidth, fontSize, fontsize_sm)
         break;
         case 'status':
             action.resizeStatusWindow()
@@ -323,7 +330,7 @@ const resize = () => {
             resizePickUp(fontSize, cameraWidth)
         break;
         case 'skill':
-            action.resizeSkillWindow(fontSize, fontsize_sm)
+            action.resizeSkillWindow(fontSize, fontSize_md, fontsize_sm, cameraWidth)
         break;
     }
 }
@@ -427,7 +434,6 @@ canvas.addEventListener('mousedown', async(event) =>{
                     characterCaption.style.left = 'unset'
                 }
             }
-            characterCaption.classList.remove('invisible') 
         
             // Open UI element
             // Shift UI position based on the character position
@@ -438,7 +444,8 @@ canvas.addEventListener('mousedown', async(event) =>{
                     actionMenu.style.left = 'unset'
                 }
             }
-            actionMenu.classList.add('action_menu_open')  
+
+            displayUIElement()
         }else
         // if this tile is enemy
         if((row * tileSize) === enemy?.y && (col * tileSize) === enemy?.x){

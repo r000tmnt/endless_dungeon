@@ -54,6 +54,26 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
 
     desc.children[1].innerText = `${clickedItem.name}\n${clickedItem.effect.desc}`
 
+    if(clickedItem.type === 0){
+        const { attributes } = currentActingPlayer
+
+        // Disable the element if the condition is not match
+        switch(clickedItem.useCondition.compare){
+            case 'lower':
+                if(attributes[clickedItem.effect.target] >= attributes[clickedItem.useCondition.target]){
+                    itemActions[0].style.pointerEvents = 'none'
+                    itemActions[0].classList.add('no-event')
+                }
+            break;
+            case 'equal':
+                if(attributes[clickedItem.effect.target] !== attributes[clickedItem.useCondition.target]){
+                    itemActions[0].style.pointerEvents = 'none'
+                    itemActions[0].classList.add('no-event')
+                }
+            break;
+        }
+    }
+
     // Check item type
     if(clickedItem.type === 3 || clickedItem.type === 4){
         // If the item is a weapon or armor
@@ -62,16 +82,10 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
         const equipped = Object.values(equip).findIndex(e => e.id === clickedItem.id)
 
         // Hide or display options
-        itemActions.forEach(i => {
-            if(i.dataset.action === 'use'){
-                i.style.display = 'none'
-            }
+        itemActions[0].style.display = 'none'
+        itemActions[1].innerText = equipped >= 0? 'Unequip' : 'Equip'
+        itemActions[1].style.display = 'block'
 
-            if(i.dataset.action === 'equip'){
-                i.innerText = equipped >= 0? 'Unequip' : 'Equip'
-                i.style.display = 'block'
-            }
-        })
         // Calculate attribute changes if equip
         // If is the same item
         const sameItem = Object.values(equip).findIndex(e => e.id === clickedItem.id)
@@ -447,7 +461,7 @@ export const getItemType = (item) => {
  * Resize inventory elements on the pgae
  * @param {object} canvasPosition - An object contains information about the setting of the canvas element 
  */
-export const resizeInventory = (cameraWidth, fontSize) => {
+export const resizeInventory = (cameraWidth, fontSize, fontSize_sm) => {
     const Inventory = document.getElementById('item')
     const title = Inventory.children[0]
     const filterButton = document.querySelectorAll('.filter')
@@ -467,6 +481,7 @@ export const resizeInventory = (cameraWidth, fontSize) => {
     // Set the size of each block
     desc.children[0].style.width = (cameraWidth / 9) + 'px'
     desc.children[0].style.height = (cameraWidth / 9) + 'px'
+    desc.children[0].style.margin = fontSize_sm + 'px'
     desc.children[1].style.whiteSpace = "pre-line"
     
     // Apply size number
@@ -608,6 +623,9 @@ export const clearPickUpWindow = () => {
 }
 
 export const useItem = (currentActingPlayer) => {
+    let resultMessage = ''
+    // let style = 'green'
+
     if(Object.entries(selectedItem).length){
         const { effect } = selectedItem
 
@@ -616,23 +634,39 @@ export const useItem = (currentActingPlayer) => {
         switch(effect.target){
             case 'status':
                 currentActingPlayer.attributes.status = 'Healthy'
+                resultMessage = 'RECOVER'
                 // TODO: Stop status timer?
             break;
             case 'all':
                 currentActingPlayer.attributes.hp = currentActingPlayer.attributes.maxHp
                 currentActingPlayer.attributes.mp = currentActingPlayer.attributes.maxMp
+
+                resultMessage = `${currentActingPlayer.attributes.maxHp},${currentActingPlayer.attributes.maxMp},${currentActingPlayer.attributes.maxAp},${RECOVER}`
             break;
             default:
                 if(effect.type === 0){
                     currentActingPlayer.attributes[`${effect.target}`] += effect.amount
+
+                    resultMessage = effect.amount
                 }else{
-                    currentActingPlayer.attributes[`${effect.target}`] = Math.floor(currentActingPlayer.attributes[`${effect.target}`] * (effect.amount / 100)) 
+                    let effect = ''
+                    if(effect.target === 'hp'){
+                        effect = Math.floor(currentActingPlayer.attributes.maxHp * (effect.amount / 100))
+                    }else{
+                        effect = Math.floor(currentActingPlayer.attributes.maxMp * (effect.amount / 100))
+                    }
+ 
+                    currentActingPlayer.attributes[`${effect.target}`] += effect                  
+
+                    resultMessage = effect
                 }
             break;
         }
 
         removeItem(currentActingPlayer, itemActions)
     }
+
+    return resultMessage
 }
 
 /**
@@ -649,12 +683,13 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
     const filterButton = document.querySelectorAll('.filter')
     const desc = document.getElementById('item-desc')
 
-    const { fontSize } = setting.general
+    const { fontSize, fontSize_sm } = setting.general
     const { width } = setting.general.camera
     const { itemBlockSize, itemBlockMargin } = setting.inventory
 
     desc.children[0].style.width = currentActingPlayer.tileSize + 'px'
     desc.children[0].style.height = currentActingPlayer.tileSize + 'px'
+    desc.children[0].style.margin = fontSize_sm + 'px'
     desc.children[1].style.whiteSpace = "pre-line"
 
     title.style.fontSize = fontSize + 'px'
@@ -738,26 +773,6 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
     for(let i=0; i < itemActions.length; i++){
         switch(itemActions[i].dataset.action){
             case 'use':
-                if(selectedItem.type === 0){
-                    const { attributes } = currentActingPlayer
-
-                    // Disable the element if the condition is not match
-                    switch(selectedItem.useCondition.compare){
-                        case 'lower':
-                            if(attributes[selectedItem.effect.target] >= attributes[selectedItem.useCondition.target]){
-                                itemActions[i].style.pointerEvents = 'none'
-                                itemActions[i].classList.add('no-event')
-                            }
-                        break;
-                        case 'equal':
-                            if(attributes[selectedItem.effect.target] !== attributes[selectedItem.useCondition.target]){
-                                itemActions[i].style.pointerEvents = 'none'
-                                itemActions[i].classList.add('no-event')
-                            }
-                        break;
-                    }
-                }
-
                 itemActions[i].addEventListener('click', () => {
                     setItemSpace(currentActingPlayer, enemyPosition, tileMap)
                 })

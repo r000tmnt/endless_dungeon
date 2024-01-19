@@ -13,6 +13,7 @@ export default {
                 "def": 7, 
                 "int": 5,
                 "spd": 5, 
+                "spi": 5,
                 "ap": 3,
                 "lck": 5,
                 "maxAp": 3,

@@ -1,3 +1,8 @@
+:root{
+    --msgColor: yellow;
+    --fontSize: 16px;
+}
+
 @keyframes fade_in {
     0%{
       opacity: 0;  
@@ -13,9 +18,34 @@
         visibility: visible;
         opacity: 1;  
       }
-      100%{
-          opacity: 0;
-      }
+    100%{
+        opacity: 0;
+    }
+}
+
+@keyframes statusMessage_move_x {
+    0%{
+        transform: translateX(5%);
+    }
+    75%{
+        transform: translateX(-25%);
+    }
+    100%{
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes statusMessage_move_y {
+    0%{
+        transform: scale(1.1) translateY(0);
+    }
+    75%{
+        animation-timing-function: cubic-bezier(.2,.9,.96,1.43);
+        transform: scale(1.3) translateY(-20%);
+    }
+    100%{
+        transform: scale(1.3) translateY(0);
+    }
 }
 
 body{
@@ -104,6 +134,21 @@ li{
     padding: 5px
 }
 
+#skillName{
+    width: 100%;
+    text-align: center;
+    top: 0;
+}
+
+#skillName > p{
+    width: fit-content;
+    margin:  0 auto;
+    opacity: 0;
+    color: white;
+    background: black;
+    transition: all .1s ease-in-out;
+}
+
 #characterCaption{
     background: white;
     padding: 5px 5px 0 5px;
@@ -170,11 +215,23 @@ li{
 }
 
 .fade_in{
-    animation: fade_in .5s ease-in-out forwards;
+    animation: fade_in 1s ease-in-out forwards;
 }
 
 .fade_out{
     animation: fade_out .5s ease-in-out forwards;
+}
+
+.statusMessage{
+    animation: statusMessage_move_x .5s ease-in forwards;
+}
+
+.statusMessage::after{
+    content: attr(data-message);
+    display: block;
+    color: var(--msgColor);
+    font-size:  var(--fontSize);
+    animation: statusMessage_move_y .5s ease-out forwards;
 }
 
 .menu{
@@ -238,7 +295,7 @@ li{
 }
 
 #item-desc{
-    justify-content: space-around;
+    justify-content: space-between;
 }
 
 .item{

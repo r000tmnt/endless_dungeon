@@ -50,14 +50,21 @@ export default class Action{
         }
     }
 
-    resizeSkillWindow(fontSize, fontSize_sm){
-        const skillList = document.querySelectorAll('.skill')
+    resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, width){
+        const skillList = document.querySelector('.learned-skill')
+        const skills = document.querySelectorAll('.skill')
         const title = document.getElementById('skill').children[0]
 
+        const skillItemHeight = Math.floor(width * (30/100))
         title.style.fontSize = fontSize + 'px'
 
-        skillList.forEach(skill => {
-            skill.style.fontSize = fontSize_sm + 'px'
+        skillList.style.maxHeight = (skillItemHeight * 3) + 'px'
+
+        skills.forEach(skill => {
+            skill.style.fontSize = fontSize + 'px'
+            skill.style.height = skillItemHeight + 'px'
+            skill.style.padding = `${fontSize_sm}px` 
+            skill.children[1].children[1].style.fontSize = fontSize_md + 'px'
         })
     }
 
@@ -68,7 +75,7 @@ export default class Action{
         const skillWindow = document.getElementById('skill')
         const title = skillWindow.children[0]
         const skillList = document.querySelector('.learned-skills')
-        const { fontSize, fontSize_sm } = setting.general
+        const { fontSize, fontSize_md, fontSize_sm } = setting.general
         const { width } = setting.general.camera
         const skillItemHeight = Math.floor(width * (30/100))
 
@@ -97,6 +104,7 @@ export default class Action{
             skillName.innerText = skillData.name
             skillCost.innerText = `${skillData.cost.attribute}: ${skillData.cost.value}`
             skillDesc.innerText = skillData.effect.desc
+            skillDesc.style.fontSize = fontSize_md + 'px'
 
             skillLabel.classList.add('flex')
             skillLabel.style.justifyContent = 'space-between'
@@ -142,14 +150,14 @@ export default class Action{
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]
-        const { fontSize_sm } = setting.general
+        const { fontSize_md } = setting.general
 
-        statusInfo.style.fontSize = fontSize_sm + 'px' 
-        statusLv.style.fontSize = fontSize_sm + 'px' 
+        statusInfo.style.fontSize = fontSize_md + 'px' 
+        statusLv.style.fontSize = fontSize_md + 'px' 
         const tableNode = statusTable.querySelectorAll('td')
 
         for(let i=0; i < tableNode.length; i++){
-            tableNode[i].style.fontSize = fontSize_sm + 'px'
+            tableNode[i].style.fontSize = fontSize_md + 'px'
         }
     }
 
@@ -159,11 +167,11 @@ export default class Action{
      */
     setStatusWindow(inspectingCharacter){
         const statusWindow = document.getElementById('status')
-        const avatar = document.getElementById('avatar')
+        //const avatar = document.getElementById('avatar')
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]
-        const { fontSize_sm } = setting.general
+        const { fontSize_md } = setting.general
 
         this.mode = 'status'
 
@@ -172,12 +180,12 @@ export default class Action{
         // Insert status information
         statusInfo.children[0].innerText = inspectingCharacter.name
         statusInfo.children[1].innerText = inspectingCharacter.class
-        statusInfo.style.fontSize = fontSize_sm + 'px' 
+        statusInfo.style.fontSize = fontSize_md + 'px' 
         statusLv.innerText = `LV ${inspectingCharacter.lv}`
-        statusLv.style.fontSize = fontSize_sm + 'px' 
+        statusLv.style.fontSize = fontSize_md + 'px' 
 
         for(let i=0; i < tableNode.length; i++){
-            tableNode[i].style.fontSize = fontSize_sm + 'px'
+            tableNode[i].style.fontSize = fontSize_md + 'px'
             if(tableNode[i].dataset.attribute !== undefined){
                 switch(tableNode[i].dataset.attribute){
                     case 'hp':
@@ -273,14 +281,26 @@ export default class Action{
                     break;
                     case 'item':
                         player.attributes.ap -= 1
-                        useItem(player)
+                        this.messageConfig.message = useItem(player)
+                        this.messageConfig.style = 'rgb(0, 255, 0)'
                     break;
                 }
 
-                setTimeout(async() => {
-                    const { message, style, size} = this.messageConfig   
-                    this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize, characterAnimationPhaseEnded)    
-                }, 300)
+                const { message, style, size} = this.messageConfig 
+
+                if(message.includes(',')){
+                    message = message.split(',')
+
+                    message.forEach(msg => {
+                        setTimeout(() => {
+                            this.#displayMessage(canvas, msg, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize, characterAnimationPhaseEnded) 
+                        }, 300)
+                    })
+                }else{
+                    setTimeout(() => {  
+                        this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize, characterAnimationPhaseEnded)    
+                    }, 300)
+                }
         }else{
             this.selectableSpace.splice(0)
         }
@@ -362,28 +382,50 @@ export default class Action{
     // Text information about damage, heal, poisoned... etc
     #displayMessage(canvas, message, size, style, x, y, characterAnimationPhaseEnded) {
         const appWrapper = document.getElementById('wrapper')
+        const skillName = document.getElementById('skillName').children[0]
+
+        if(this.mode === 'skill'){
+            skillName.innerText = this.selectedSkill.name;
+            skillName.style.fontSize = size + 'px'
+            skillName.style.padding = size / 2 + 'px'
+            skillName.classList.remove('invisible')
+            skillName.style.opacity = 1
+        }
+
         const messageHolder = document.createElement('span')
-        messageHolder.innerText = message
+        messageHolder.setAttribute('data-message', message) 
+        messageHolder.style.opacity = 1
         messageHolder.style.fontSize = (size / 2) + 'px'
+        document.documentElement.style.setProperty('--fontSize', (size / 2) + 'px')
         messageHolder.style.fontWeight = 'bold'
         messageHolder.style.color = style
         messageHolder.style.textAlign = 'center'
         messageHolder.style.position = 'absolute',
         messageHolder.style.top = y + 'px'
         messageHolder.style.left = x + 'px'
+        messageHolder.style.transition = 'all .5s ease-in-out'
         appWrapper.append(messageHolder)
-    
+
+        // Mwssage animation
+        messageHolder.classList.add('statusMessage');
+        
         // Clear message
         setTimeout(() => {
-            messageHolder.remove()
+            if(this.mode === 'skill'){
+                skillName.style.opacity = 0
+            }
+            messageHolder.style.opacity = 0
             canvas.style.transform = `unset`
+
+            setTimeout(() => {
+                if(this.mode === 'skill'){
+                    skillName.classList.add('invisible')              
+                }
+                messageHolder.remove()
+                this.animationInit = false
+                characterAnimationPhaseEnded()
+            }, 500)            
         }, 1000)
-    
-        // Spend an action point
-        setTimeout(() => {
-            this.animationInit = false
-            characterAnimationPhaseEnded()
-        }, 1500)
     }
 
     async enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded){
@@ -528,17 +570,15 @@ export default class Action{
 
                     const random = Math.random()
 
-                    let finalDicision = {}
-
                     for(let i=0; i< skillUseRate.length; i++){
                         if(random <= skillUseRate[i].value){
-                           finalDicision = skillUseRate[i]
+                           this.selectedSkill = skillUseRate[i]
                            break 
                         }
                     }
 
                     // Get skill effect range
-                    this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, finalDicision.effect.range)
+                    this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, this.selectedSkill.effect.range)
 
                     const actable = await this.command(canvas, row, col, enemy, player, playerPosition, enemy.tileSize, tileMap, characterAnimationPhaseEnded)
 
