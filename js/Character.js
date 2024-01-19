@@ -252,7 +252,15 @@ export default class Character {
                     }     
                     this.#loadImage(type, job.id)     
 
-                    // If the character in an enemy, set the given exp for player to gain
+                    this.equip = {
+                        head: {},
+                        body: {},
+                        hand: {},
+                        leg: {},
+                        foot: {},
+                        accessory: {}
+                    }
+                    // If the character is an enemy, set the given exp for player to gain
                     this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
                     this.drop = job.drop
                     this.skill = job.skill
