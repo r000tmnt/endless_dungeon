@@ -163,8 +163,11 @@ for(let i=0; i < actionMenuOptions.length; i++){
         break;
         case 'item':
             actionMenuOptions[i].addEventListener('click', async() => {
+                actionMenu.classList.remove('action_menu_open')
+                // Hide the element
+                characterCaption.classList.add('invisible') 
                 action.mode = 'item'
-                constructInventoryWindow(player)
+                constructInventoryWindow(player, enemyPosition, tileMap)
             })
         break; 
         case 'pick':
@@ -675,4 +678,8 @@ export const setEvent = (position, item, dialogue) => {
 
 export const setTile = (row, col, type) => {
     tileMap.changeTile(row, col, type)
+}
+
+export const setRange = (range) => {
+    action.setSelectableSpace(range)
 }

@@ -2,6 +2,7 @@ import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathF
 import { skillAttack, weaponAttack } from './utils/battle.js';
 import skills from './dataBase/skills.js';
 import setting from './utils/setting.js';
+import { useItem } from './utils/inventory.js'
 
 export default class Action{
     constructor(mode, selectableSpace, reachableDirections, steps, animationInit){
@@ -206,6 +207,10 @@ export default class Action{
         this.messageConfig.size = size
     }
 
+    setSelectableSpace(space){
+        this.selectableSpace = space
+    }
+
     /**
      * Get walkable directions and start moving
      * @param {object} tileMap - An object represent the tile map
@@ -267,6 +272,8 @@ export default class Action{
                         this.messageConfig.message = await skillAttack(this.selectedSkill, player, enemy, tileMap, row, col)
                     break;
                     case 'item':
+                        player.attributes.ap -= 1
+                        useItem(player)
                     break;
                 }
 

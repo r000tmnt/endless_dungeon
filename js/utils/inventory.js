@@ -5,7 +5,8 @@ import potion from '../dataBase/item/item_potion.js'
 import material from '../dataBase/item/item_material.js'
 import other from '../dataBase/item/item_other.js'
 
-import { setEvent } from '../game.js'
+import { setEvent, setRange } from '../game.js'
+import { getAvailableSpace } from '../utils/pathFinding.js'
 import setting from './setting.js'
 // and more ...
 
@@ -121,30 +122,21 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
  * @param {object} currentActingPlayer - An object represent current acting player 
  * @param {HTMLElementCollection} itemActions - A collection of sub menu button
  */
-const useItem = async(currentActingPlayer, itemActions) => {
+const setItemSpace = async(currentActingPlayer, enemyPosition, tileMap) => {
+    const Inventory = document.getElementById('item')
+    const itemUseRange = await getAvailableSpace(
+        tileMap,
+        { row: parseInt(currentActingPlayer.y / currentActingPlayer.tileSize), col: parseInt(currentActingPlayer.y / currentActingPlayer.tileSize) },
+        selectedItem.effect.range, selectedItem.effect?.dmg? null: enemyPosition
+    )
 
-    if(Object.entries(selectedItem).length){
-        const { effect } = selectedItem
-        switch(effect.target){
-            case 'status':
-                currentActingPlayer.attributes.status = 'Healthy'
-                // TODO: Stop status timer?
-            break;
-            case 'all':
-                currentActingPlayer.attributes.hp = currentActingPlayer.attributes.maxHp
-                currentActingPlayer.attributes.mp = currentActingPlayer.attributes.maxMp
-            break;
-            default:
-                if(effect.type === 0){
-                    currentActingPlayer.attributes[`${effect.target}`] += effect.amount
-                }else{
-                    currentActingPlayer.attributes[`${effect.target}`] = Math.floor(currentActingPlayer.attributes[`${effect.target}`] * (effect.amount / 100)) 
-                }
-            break;
-        }
+    setRange(itemUseRange)
 
-        removeItem(currentActingPlayer, itemActions)
-    }
+    // Hide inventory
+    Inventory.classList.add('invisible')
+    Inventory.classList.remove('open_window')
+
+    clearInventory()
 }
 
 /**
@@ -615,11 +607,39 @@ export const clearPickUpWindow = () => {
     }
 }
 
+export const useItem = (currentActingPlayer) => {
+    if(Object.entries(selectedItem).length){
+        const { effect } = selectedItem
+
+        const itemActions = subMenu.querySelectorAll('li')
+
+        switch(effect.target){
+            case 'status':
+                currentActingPlayer.attributes.status = 'Healthy'
+                // TODO: Stop status timer?
+            break;
+            case 'all':
+                currentActingPlayer.attributes.hp = currentActingPlayer.attributes.maxHp
+                currentActingPlayer.attributes.mp = currentActingPlayer.attributes.maxMp
+            break;
+            default:
+                if(effect.type === 0){
+                    currentActingPlayer.attributes[`${effect.target}`] += effect.amount
+                }else{
+                    currentActingPlayer.attributes[`${effect.target}`] = Math.floor(currentActingPlayer.attributes[`${effect.target}`] * (effect.amount / 100)) 
+                }
+            break;
+        }
+
+        removeItem(currentActingPlayer, itemActions)
+    }
+}
+
 /**
  * Append the all the items in to the inventory window 
  * @param {object} currentActingPlayer - An object represent current acting player 
  */
-export const constructInventoryWindow = (currentActingPlayer) => {
+export const constructInventoryWindow = (currentActingPlayer, enemyPosition, tileMap) => {
     // Get UI elements
     const Inventory = document.getElementById('item')
     const title = Inventory.children[0]
@@ -739,7 +759,7 @@ export const constructInventoryWindow = (currentActingPlayer) => {
                 }
 
                 itemActions[i].addEventListener('click', () => {
-                    useItem(currentActingPlayer, itemActions)
+                    setItemSpace(currentActingPlayer, enemyPosition, tileMap)
                 })
             break;
             case 'equip':
@@ -810,7 +830,7 @@ export const constructInventoryWindow = (currentActingPlayer) => {
     // Apply style to the item wrapper
     space.style.maxHeight = (itemBlockSize * 3) + 'px'
     space.style.padding = `${itemBlockMargin}px 0`
-    subMenu.style.width = cameraWidth - fontSize + 'px'
+    subMenu.style.width = width - fontSize + 'px'
 
     // Display inventory
     Inventory.classList.remove('invisible')

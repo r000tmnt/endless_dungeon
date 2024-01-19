@@ -2,10 +2,9 @@ export default class Range {
     constructor(map, tileSize){
         this.map = map
         this.tileSize = tileSize
-        this.fillStyle = ''
     }
 
-    draw(ctx, selectableSpace, actionMode, skillType){
+    draw(ctx, selectableSpace, actionMode, skillType = ''){
 
         // Change the globalCompositeOperation to destination-over so that anything
         // that is drawn on to the canvas from this point on is drawn at the back
@@ -16,20 +15,21 @@ export default class Range {
             
             switch(actionMode){
                 case 'move':
-                    this.fillStyle = 'green'
+                    ctx.fillStyle = 'green'
                 break;
                 case 'attack': case 'skill':
-                    this.fillStyle = 'rgba(255, 0, 0, 0.5)'
+                    ctx.fillStyle = 'rgba(255, 0, 0, 0.5)'
                     
                     if(skillType === 'defense'){
-                        this.fillStyle = 'rgba(0, 0, 255, 0.5)'
+                        ctx.fillStyle = 'rgba(0, 0, 255, 0.5)'
                     }
                 break;
                 case 'item':
-                    this.fillStyle = 'rgba(0, 0, 255, 0.5)'
+                    ctx.fillStyle = 'rgba(0, 0, 255, 0.5)'
+                    console.log('action item :>>>', selectableSpace)
                 break;
                 case 'search':
-                    this.fillStyle = 'rgba(0, 255, 0, 0.5)'
+                    ctx.fillStyle = 'rgba(0, 255, 0, 0.5)'
                 break;
             }   
             
@@ -47,7 +47,7 @@ export default class Range {
             for(let block = 0; block < selectableSpace[layer].length; block++){
                 const row = selectableSpace[layer][block][0]
                 const col = selectableSpace[layer][block][1]
-                ctx.fillStyle = this.fillStyle;
+
                 ctx.fillRect( // x, y, width, height
                     col * this.tileSize,
                     row * this.tileSize,

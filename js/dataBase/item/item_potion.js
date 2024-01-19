@@ -9,6 +9,7 @@ export default{
                 "lv": 1,
                 "rare": "N",
                 "type": 0,
+                "range": 1,
                 "target": "hp",
                 "amount": 10,
                 "desc": "Restore 10 points of health."
@@ -29,6 +30,7 @@ export default{
                 "lv": 1,
                 "rare": "N",
                 "type": 0,
+                "range": 1,
                 "target": "mp",
                 "amount": 10,
                 "desc": "Restore 10 points of mana."
@@ -49,6 +51,7 @@ export default{
                 "lv": 1,
                 "rare": "N",
                 "type": 0,
+                "range": 1,
                 "target": "status",
                 "amount": 0,
                 "desc": "Remove the poison."
@@ -69,6 +72,7 @@ export default{
                 "lv": 1,
                 "rare": "N",
                 "type": 1,
+                "range": 1,
                 "target": "all",
                 "amount": 10,
                 "desc": "Revive the character with 10% of health."
