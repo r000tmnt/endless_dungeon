@@ -220,6 +220,7 @@ export default class Action{
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
+            currentActingPlayer.attributes.ap -= 1
             this.reachableDirections = await prepareDirections(tileMap, playerPosition, { row, col }, this.reachableDirections)
             // characterCaption.classList.remove('visible')
 
@@ -255,6 +256,7 @@ export default class Action{
 
                 switch(this.mode){
                     case 'attack':
+                        player.attributes.ap -= 1
                         this.messageConfig.message = await weaponAttack(player, enemy, tileMap, row, col)
                     break;
                     case 'skill':
@@ -379,6 +381,7 @@ export default class Action{
 
     async enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded){
         this.mode = 'move'
+        enemy.attributes.ap -= 1 
         // get walkable space
         await this.setMove(tileMap, enemyPosition, moveSpeed, playerPosition)
 
@@ -419,6 +422,10 @@ export default class Action{
 
     async enemyAction(enemy){
         const possibleActions = [{ name: 'attack', value: 50 }, { name: 'skill', value: 50 }, { name: 'stay', value: 30 }]
+
+        if(enemy.attributes.ap < 2){
+            possibleActions.splice(1, 1)
+        }
 
         possibleActions.forEach(a => {
             if(a.name === enemy.prefer_action){
