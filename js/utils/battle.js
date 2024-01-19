@@ -1,6 +1,7 @@
 import { setEvent } from "../game"
 
 import weapon from "../dataBase/item/item_weapon"
+import armor from "../dataBase/item/item_armor"
 
 // Player gain expirence upon enemy defeated
 const gainExp = (player, enemy) => {
@@ -43,6 +44,7 @@ const levelUp = (player) => {
     console.log('player status after level up :>>>', player)
 }
 
+// Calculate Hit rate and Crit rate
 const calculateHitRate = (player, enemy, damage, tileMap, row, col) => {
     let hitRate = player.attributes.spd + player.attributes.lck + damage
     let evadeRate = enemy.attributes.spd + enemy.attributes.def
@@ -125,6 +127,29 @@ const calculateHitRate = (player, enemy, damage, tileMap, row, col) => {
     return resultMessage
 }
 
+// Calculate enemy defense value
+const calculateEnemyDefense = (enemy) => {
+    let defense = 0
+
+    for(let[key, value] of Object.entries(enemy.equip)){
+        if(enemy.equip[key]?.id !== undefined){
+            const itemData = armor.getOne(enemy.equip[key].id)
+
+            if(itemData && itemData.effect.base_attribute?.def !== undefined){
+                defense += Math.floor(enemy.attributes.def * ( itemData.effect.base_attribute.def/100 ))
+            }
+        }
+    }
+
+    if(defense === 0){
+        defense = enemy.attributes.def + Math.floor(enemy.attributes.def * (1/100))
+    }else{
+        defense += enemy.attributes.def
+    }
+
+    return defense
+}
+
 /**
  * 
  * @param {object} player - An object contains player attributes 
@@ -134,13 +159,18 @@ const calculateHitRate = (player, enemy, damage, tileMap, row, col) => {
 export const weaponAttack = async(player, enemy, tileMap, row, col) => {
     const dmgRange = []
     let damage = 1 // Min dmg
+    const enemyDefense = calculateEnemyDefense(enemy)
+
+    console.log('enemy defense :>>>', enemyDefense)
 
     // Calulate damage with weapon
-    if(player.equip.hand?.id !== undefined){
+    if(player.equip?.hand?.id !== undefined){
         const itemData = weapon.getOne(player.equip.hand.id)
 
         // Need something to know if the attck is enhanced by skill or not
-        const minDmg = ((player.attributes.str + Math.floor(player.attributes.str * ( itemData.effect.base_attribute.str/100 ))) - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))) + itemData.effect.base_damage.min
+        let minDmg = ((player.attributes.str + Math.floor(player.attributes.str * ( itemData.effect.base_attribute.str/100 ))) - enemyDefense) + itemData.effect.base_damage.min
+
+        if(minDmg <= 0) minDmg = 1
 
         const maxDmg = minDmg + (itemData.effect.base_damage.max - itemData.effect.base_damage.min)
 
@@ -152,7 +182,9 @@ export const weaponAttack = async(player, enemy, tileMap, row, col) => {
     }else{
         // Calulate damage without weapon
         // Need something to know if the attck is base on skill or not
-        const minDmg = (player.attributes.str - (enemy.attributes.def  + Math.floor(enemy.attributes.def * ( 1/100 )))) + 1
+        let minDmg = (player.attributes.str - enemyDefense) + 1
+
+        if(minDmg <= 0) minDmg = 1
 
         const maxDmg = minDmg + 2
 
