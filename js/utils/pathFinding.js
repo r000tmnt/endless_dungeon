@@ -135,19 +135,17 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
     // 3
     // 1
 
+    // The array for the first layer
+    availableSpace.push([])
     
     // get upper half circle
     for(let i = 1; i <= (diameter - 2); i += 2){
-
-        // If the previous layer is empty, remove the array
-        if(availableSpace.length){
-            if(!availableSpace[availableSpace.length - 1].length){
-                availableSpace.splice(availableSpace.length - 1, 1)
-            }
+        const layer = availableSpace.length
+        // If the previous layer isn't empty
+        if(layer > 0 && availableSpace[layer - 1].length){
+            // Add an array for the new layer
+            availableSpace.push([])
         }
-
-        // Add an array for the layer
-        availableSpace.push([])
         
         // Layer counting
         let rowCount = (i - 2) < 0? 0 : (i -1) / 2
@@ -190,16 +188,12 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
 
     //get other half circle
     for(let i = diameter; i >= 1; i += -2){
-
-        // If the previous layer is empty, remove the array
-        if(availableSpace.length){
-            if(!availableSpace[availableSpace.length - 1].length){
-                availableSpace.splice(availableSpace.length - 1, 1)
-            }
+        const layer = availableSpace.length
+        // If the previous layer isn't empty
+        if(layer > 0 && availableSpace[layer - 1].length){
+            // Add an array for the new layer
+            availableSpace.push([])
         }
-
-        // Add an array for the layer
-        availableSpace.push([])
 
         let rowCount = (i < diameter)? (diameter - i) / 2 : 0
         for(let block = 1; block <= i; block++){
