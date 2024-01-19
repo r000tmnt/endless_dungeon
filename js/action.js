@@ -253,23 +253,23 @@ export default class Action{
                 this.selectableSpace.splice(0)
                 console.log('clear selectable :>>>', this.selectableSpace)
 
+                switch(this.mode){
+                    case 'attack':
+                        this.messageConfig.message = await weaponAttack(player, enemy, tileMap, row, col)
+                    break;
+                    case 'skill':
+                        const { attribute, value } = this.selectedSkill
+                        player.attributes[attribute] -= value
+                        player.attributes.ap -= 2
+
+                        this.messageConfig.message = await skillAttack(this.selectedSkill, player, enemy, tileMap, row, col)
+                    break;
+                    case 'item':
+                    break;
+                }
+
                 setTimeout(async() => {
-                    switch(this.mode){
-                        case 'attack':
-                            this.messageConfig.message = await weaponAttack(player, enemy, tileMap, row, col)
-                        break;
-                        case 'skill':
-                            const { attribute, value } = this.selectedSkill
-                            player.attributes[attribute] -= value
-
-                            this.messageConfig.message = await skillAttack(this.selectedSkill, player, enemy, tileMap, row, col)
-                        break;
-                        case 'item':
-                        break;
-                    }
-
-                    const { message, style, size} = this.messageConfig
-                    
+                    const { message, style, size} = this.messageConfig   
                     this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize, characterAnimationPhaseEnded)    
                 }, 300)
         }else{
@@ -497,7 +497,7 @@ export default class Action{
 
                     // Calaculate Each use rate
                     const skillUseRate = useableSkills.map(s => {
-                        return { name: s.id, value: (enemy.prefer_skill_type === s.weapon)? 80 : 50}
+                        return {...s, value: (enemy.prefer_skill_type === s.weapon)? 80 : 50}
                     })
 
                     // Combine numbers
@@ -512,7 +512,16 @@ export default class Action{
             
                     console.log('possible skill :>>>', skillUseRate)
 
-                    const finalDicision = skillUseRate[Math.floor(Math.random() * skillUseRate.length)]
+                    const random = Math.random()
+
+                    let finalDicision = {}
+
+                    for(let i=0; i< skillUseRate.length; i++){
+                        if(random <= skillUseRate[i].value){
+                           finalDicision = skillUseRate[i]
+                           break 
+                        }
+                    }
 
                     // Get skill effect range
                     this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, finalDicision.effect.range)
