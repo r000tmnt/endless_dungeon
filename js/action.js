@@ -1,8 +1,9 @@
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
-import { skillAttack, weaponAttack } from './utils/battle.js';
+import { skillAttack, weaponAttack, gainExp } from './utils/battle.js';
 import skills from './dataBase/skills.js';
 import setting from './utils/setting.js';
 import { useItem } from './utils/inventory.js'
+import { setEvent } from "./game.js"
 
 export default class Action{
     constructor(mode, selectableSpace, reachableDirections, steps, animationInit){
@@ -148,41 +149,41 @@ export default class Action{
     resizeStatusWindow(){
         const statusWindow = document.getElementById('status')
         const statusInfo = document.getElementById('info')
-        const statusLv = statusWindow.children[2]
         const statusTable = statusWindow.children[3]
-        const { fontSize_md } = setting.general
+        const { fontSize_md, fontSize_sm } = setting.general
 
         statusInfo.style.fontSize = fontSize_md + 'px' 
-        statusLv.style.fontSize = fontSize_md + 'px' 
-        const tableNode = statusTable.querySelectorAll('td')
+        const tableNode = statusTable.querySelectorAll('.status-node')
+        const statusToggle = document.querySelectorAll('.attribute-toggle')
 
         for(let i=0; i < tableNode.length; i++){
             tableNode[i].style.fontSize = fontSize_md + 'px'
         }
+
+        for(let i=0; i < statusToggle.length; i++){
+            statusToggle[i].style.fontSize = fontSize_md + 'px'
+            statusToggle[i].children[0].style.margin = `0 ${fontSize_sm}px`
+            statusToggle[i].children[0].style.padding = `${fontSize_sm / 2}px`
+            statusToggle[i].children[1].style.margin = `0 ${fontSize_sm}px`
+            statusToggle[i].children[1].style.padding = `${fontSize_sm / 2}px`
+        }
     }
 
-    /**
-     * Set text information for status dialog
-     * @param {object} inspectingCharacter - A set of data about the inspecting character 
-     */
-    setStatusWindow(inspectingCharacter){
-        const statusWindow = document.getElementById('status')
-        //const avatar = document.getElementById('avatar')
-        const statusInfo = document.getElementById('info')
-        const statusLv = statusWindow.children[2]
-        const statusTable = statusWindow.children[3]
-        const { fontSize_md } = setting.general
+    resetStatusWindow(){
+        const statusToggle = document.querySelectorAll('.attribute-toggle')
+        statusToggle.forEach(t => t.classList.add('invisible'))
+    }
 
-        this.mode = 'status'
+    lockPlusToggle(statusToggle){
+        statusToggle.forEach(t => t.children[1].classList.add('no-event'))
+    }
 
-        const tableNode = statusTable.querySelectorAll('td')
+    unLockPlusToggle(statusToggle){
+        statusToggle.forEach(t => t.children[1].classList.remove('no-event'))
+    }
 
-        // Insert status information
-        statusInfo.children[0].innerText = inspectingCharacter.name
-        statusInfo.children[1].innerText = inspectingCharacter.class
-        statusInfo.style.fontSize = fontSize_md + 'px' 
-        statusLv.innerText = `LV ${inspectingCharacter.lv}`
-        statusLv.style.fontSize = fontSize_md + 'px' 
+    setStatusList(inspectingCharacter, fontSize_md){
+        const tableNode = document.getElementById('status').children[3].querySelectorAll('.status-node')
 
         for(let i=0; i < tableNode.length; i++){
             tableNode[i].style.fontSize = fontSize_md + 'px'
@@ -206,12 +207,93 @@ export default class Action{
                 }
             }
         }
+    }
+
+    /**
+     * Set text information for status dialog
+     * @param {object} inspectingCharacter - A set of data about the inspecting character 
+     */
+    setStatusWindow(inspectingCharacter){
+        const statusWindow = document.getElementById('status')
+        const statusInfo = document.getElementById('info')
+        const statusLv = statusWindow.children[2].children[0]
+        const statusPt = statusWindow.children[2].children[1]
+        
+        const { fontSize_md, fontSize_sm } = setting.general
+
+        this.mode = 'status'
+
+        statusInfo.style.fontSize = fontSize_md + 'px' 
+
+        // Insert status information
+        statusInfo.children[0].innerText = inspectingCharacter.name
+        statusInfo.children[1].innerText = inspectingCharacter.class
+        statusLv.innerText = `LV ${inspectingCharacter.lv}`
+        statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
+
+        this.setStatusList(inspectingCharacter, fontSize_md)
+
+        // If there're points to spend
+        if(inspectingCharacter.pt > 0){
+            const statusToggle = document.querySelectorAll('.attribute-toggle')
+            // Keep a copy of player attributes before changes
+            // const statusBackUp = JSON.parse(JSON.stringify(inspectingCharacter.attributes))
+            const statusAlterCount = {}
+
+            for(let i=0; i < statusToggle.length; i++){
+                statusToggle[i].style.fontSize = fontSize_md + 'px'
+                statusToggle[i].classList.remove('invisible')
+                const attr = statusToggle[i].dataset.attribute
+                if(attr !== undefined){
+                    statusAlterCount[attr] = 0
+                    // minus
+                    const minusBtn = statusToggle[i].children[0]
+                    minusBtn.classList.add('no-event')
+                    minusBtn.addEventListener('click', () => {
+                        inspectingCharacter.attributes[attr] -= 1
+                        statusAlterCount[attr] -= 1
+                        inspectingCharacter.pt += 1
+                        statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
+
+                        // Change the number on the screen
+                        this.setStatusList(inspectingCharacter, fontSize_md)
+
+                        if(inspectingCharacter.pt > 0){
+                            this.unLockPlusToggle(statusToggle)
+                        }
+                    })
+
+                    minusBtn.style.margin = `0 ${fontSize_sm}px`
+                    minusBtn.style.padding = `${fontSize_sm / 2}px`
+
+                    // plus
+                    const plusBtn = statusToggle[i].children[1]
+                    plusBtn.addEventListener('click', () => {
+                        inspectingCharacter.attributes[attr] += 1
+                        statusAlterCount[attr] += 1
+                        inspectingCharacter.pt -= 1
+                        statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
+                        minusBtn.classList.remove('no-event')
+
+                        // Change the number on the screen
+                        this.setStatusList(inspectingCharacter, fontSize_md)
+
+                        if(inspectingCharacter.pt === 0){
+                            this.lockPlusToggle(statusToggle)
+                        }
+                    })
+
+                    plusBtn.style.margin = `0 ${fontSize_sm}px`
+                    plusBtn.style.padding = `${fontSize_sm / 2}px`
+                }
+            }
+        }
 
         statusWindow.classList.remove('invisible')
         statusWindow.classList.add('open_window')
     }
 
-    setFontSize = (size) => {
+    setFontSize(size){
         this.messageConfig.size = size
     }
 
@@ -293,14 +375,47 @@ export default class Action{
 
                     message.forEach(msg => {
                         setTimeout(() => {
-                            this.#displayMessage(canvas, msg, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize, characterAnimationPhaseEnded) 
+                            this.#displayMessage(canvas, msg, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize,) 
                         }, 300)
                     })
                 }else{
                     setTimeout(() => {  
-                        this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize, characterAnimationPhaseEnded)    
+                        this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize)    
                     }, 300)
                 }
+
+                // Wait for damage animation to finish
+                setTimeout(() => {
+                    // Check if the enemy is defeated
+                    if(enemy.attributes.hp <= 0){
+                        tileMap.removeCharacter(row, col)
+
+                        // Calculate item drop rate
+                        if(player.characterType === 2){
+                            gainExp(player, enemy, characterAnimationPhaseEnded)
+                        
+                            const totalDropRate = enemy.drop.reduce((accu, current) => accu + current.rate, 0)
+
+                            enemy.drop.forEach(item => {
+                                item.rate = item.rate / totalDropRate
+                            });
+
+                            const randomDrop = Math.random()
+
+                            const dropItems = enemy.drop.filter(item => randomDrop <= item.rate)
+
+                            console.log('random item drop :>>>', dropItems)
+                            
+                            // Leave the item on the ground
+                            if(dropItems.length) setEvent({x: enemy.x, y: enemy.y}, dropItems)
+                        }else if(enemy.bag.length){
+                            // Leave the player's item on the ground
+                            setEvent({x: enemy.x, y: enemy.y}, enemy.bag)            
+                        }
+                    }else{
+                        characterAnimationPhaseEnded()
+                    }
+                }, 1500)
         }else{
             this.selectableSpace.splice(0)
         }
@@ -380,7 +495,7 @@ export default class Action{
     }
 
     // Text information about damage, heal, poisoned... etc
-    #displayMessage(canvas, message, size, style, x, y, characterAnimationPhaseEnded) {
+    #displayMessage(canvas, message, size, style, x, y) {
         const appWrapper = document.getElementById('wrapper')
         const skillName = document.getElementById('skillName').children[0]
 
@@ -423,7 +538,6 @@ export default class Action{
                 }
                 messageHolder.remove()
                 this.animationInit = false
-                characterAnimationPhaseEnded()
             }, 500)            
         }, 1000)
     }
