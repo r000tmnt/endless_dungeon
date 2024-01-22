@@ -1,22 +1,9 @@
-import { setEvent } from "../game"
-
 import weapon from "../dataBase/item/item_weapon"
 import armor from "../dataBase/item/item_armor"
-
-// Player gain expirence upon enemy defeated
-const gainExp = (player, enemy) => {
-    // Remove the enemy on the screen
-    if(player.exp !== undefined){
-        player.exp += enemy.givenExp
-
-        if(player.exp >= player.requiredExp){
-            levelUp(player)
-        }        
-    }
-}
+import setting from "./setting"
 
 // Player level up if the exp reached the required amount
-const levelUp = (player) => {
+const levelUp = (player, characterAnimationPhaseEnded) => {
     // Player level up
     // Extend the required exp for the next level
     player.requiredExp += player.requiredExp * 1.5
@@ -24,24 +11,31 @@ const levelUp = (player) => {
     // Give player a few points to spend
     player.pt = 5
 
-    const grows = [0, 1, 3, 5,]
+    const grows = [0, 1, 3]
 
     // A list of attributes that are allow to growth on level up
-    const attributeList = ['maxHp', 'maxMp', 'str', 'def', 'spd', 'int', 'lck']
+    const attributeList = ['maxHp', 'maxMp', 'str', 'def', 'spd', 'int', 'lck', 'spi']
 
-    console.log('player status before level up :>>>', player)
+    console.log('player status before level up :>>>', player.attributes)
 
     // Randomly apply attributes growth
-    for(let key in Object.entries(player.attributes)){
-        const allowIndex = attributeList.findIndex(a => a === key)
-
+    for(let attr of attributeList){
+        console.log('key :>>>', attr)
+        const allowIndex = attributeList.findIndex(a => a === attr)
+        const preferIndex = player.prefer_attributes.findIndex(a => attr.includes(a))
         if(allowIndex >= 0){
             const randomGrowth = Math.floor(Math.random() * (grows.length -1))
-            player.attribute[key] += grows[randomGrowth]
+            player.attributes[attr] += grows[randomGrowth]
+        }
+
+        // Guarantee attribute growth
+        if(preferIndex >= 0){
+            player.attributes[attr] += 1
         }
     }
 
-    console.log('player status after level up :>>>', player)
+    characterAnimationPhaseEnded()
+    console.log('player status after level up :>>>', player.attributes)
 }
 
 // Calculate Hit rate and Crit rate
@@ -112,34 +106,6 @@ const calculateHitRate = (player, enemy, damage, tileMap, row, col) => {
     }else{
         console.log('miss!')
         resultMessage = 'MISS!'
-    }
-
-    // Check if the enemy is defeated
-    if(enemy.attributes.hp <= 0){
-        tileMap.removeCharacter(row, col)
-
-        gainExp(player, enemy)
-
-        // Calculate item drop rate
-        if(player.characterType === 2){
-            const totalDropRate = enemy.drop.reduce((accu, current) => accu + current.rate, 0)
-
-            enemy.drop.forEach(item => {
-                item.rate = item.rate / totalDropRate
-            });
-
-            const randomDrop = Math.random()
-
-            const dropItems = enemy.drop.filter(item => randomDrop <= item.rate)
-
-            console.log('random item drop :>>>', dropItems)
-            
-            // Leave the item on the ground
-            if(dropItems.length) setEvent({x: enemy.x, y: enemy.y}, dropItems)
-        }else if(enemy.bag.length){
-            // Leave the player's item on the ground
-            setEvent({x: enemy.x, y: enemy.y}, enemy.bag)            
-        }
     }
 
     return resultMessage
@@ -299,4 +265,49 @@ export const skillAttack = async(skill, player, enemy, tileMap, row, col) => {
     console.log('possible damage :>>>', damage)
 
     return calculateHitRate(player, enemy, damage, tileMap, row, col)
+}
+
+// Player gain expirence upon enemy defeated
+export const gainExp = (player, enemy, characterAnimationPhaseEnded) => {
+    // Remove the enemy on the screen
+    if(player.exp !== undefined){
+        player.exp += enemy.givenExp
+
+        if(player.exp >= player.requiredExp){
+            // Prepare level up message
+            const { fontSize, fontSize_sm } = setting.general
+            const appWrapper = document.getElementById('wrapper')
+            const message = document.createElement('span')
+            message.classList.add('absolute')
+            message.style.opacity = 0
+            message.style.fontSize = fontSize + 'px'
+            message.style.fontWeight = 'bold'
+            message.style.padding = fontSize_sm + 'px'
+            message.style.color = 'white'
+            message.style.backgrounf = 'black'
+            message.style.top = player.y + 'px'
+            message.style.left = player.x + 'px'
+            message.style.transition = 'all .5s ease-in-out'
+            message.innerText = 'LEVEL UP'
+            appWrapper.append(message)
+
+            // Display level up message
+            setTimeout(() => {
+                message.style.opacity = 1
+                message.style.top = (player.y - fontSize) + 'px'
+
+                // Delete level up message
+                setTimeout(() => {
+                    message.style.opacity = 0
+                    message.style.top = (player.y - (fontSize * 2)) + 'px'
+                    levelUp(player, characterAnimationPhaseEnded)
+
+                    setTimeout(() => message.remove(), 500)
+                }, 500)                
+            }, 500)
+
+        }else{
+            characterAnimationPhaseEnded()
+        }   
+    }
 }
