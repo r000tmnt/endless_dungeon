@@ -201,10 +201,12 @@ export default class Character {
                         ...job.base_attribute,
                         status: 'Healthy'
                     }     
+                    this.prefer_attributes = job.prefer_attributes
                     this.#loadImage(type, job.id)     
 
                     // If the character in an a player, set the initial exp and the required points to level up
-                    this.exp = 0
+                    this.exp = 95
+                    this.pt = 0
                     this.requiredExp = 100
                     this.bag = job.bag
                     this.skill = job.skill
@@ -250,6 +252,7 @@ export default class Character {
                         ...job.base_attribute,
                         status: 'Healthy'
                     }     
+                    this.prefer_attributes = job.prefer_attributes
                     this.#loadImage(type, job.id)     
 
                     this.equip = {
