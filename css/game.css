@@ -175,6 +175,7 @@ li{
 }
 
 .hint{
+    display: none;
     animation: hint .5s ease-in-out infinite;
 }
 
