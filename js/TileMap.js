@@ -165,66 +165,55 @@ export default class TileMap {
 
     // Set an event on the tile
     setEventOnTile = (position, item = [], dialogue = [], trigger = 'stepOn') => {
-        const eventIndex = this.event.findIndex(e => e.position.x === position.x && e.position.y === position.y)
-        
-        // If it is a new event
-        if(eventIndex < 0){
-            this.event.push({position, item, dialogue, trigger})
-        }else{
-            // Modify existing event
-            item.forEach(i => {
-                const itemExist = this.event[eventIndex].item.findIndex(ei => ei.id === i.id)
-                // If there's the same item on the ground
-                if(itemExist >= 0){
-                    const itemData = getItemType(this.event[eventIndex])
-
-                    // If the amount of item is less then the limit and will not surpass if stack up
-                    if(this.event[eventIndex].item[itemExist].amount < itemData.stackLimit && (this.event[eventIndex].item[itemExist].amount + i.amount) < itemData.stackLimit ){
-                        // Stack the item
-                        this.event[eventIndex].item[itemExist].amount += i.amount
-                    }else{
-                        // Stack up to the limit
-                        this.event[eventIndex].item[itemExist].amount = itemData.stackLimit
-                        // Append to another space
-                        this.event[eventIndex].item.push({ id: i.id, type: i.type, amount: Math.abs(itemData.stackLimit - (this.event[eventIndex].item[itemExist].amount + i.amount))})
-                    }
-                }else{
-                    this.event[eventIndex].item.push(i)
-                }
-            })
-
-            if(dialogue.length) this.event[eventIndex].dialogue = dialogue
-
-            if(trigger.length) this.event[eventIndex].trigger = trigger
-        }
+        this.event.push({position, item, dialogue, trigger})
     }
 
-    // Modify an event on the tile
-    modifyEventOnTile = (position, item = [], dialogue = [], trigger = 'stepOn') => {
+    // Modify the event on the tile
+    modifyEventOnTile = (mode, position, item = [], dialogue = [], trigger = 'stepOn') => {
         const eventIndex = this.event.findIndex(e => e.position.x === position.x && e.position.y === position.y)
-        
-        // If it is a new event
-        if(eventIndex < 0){
-            this.event.push({position, item, dialogue, trigger})
-        }else{
-            // Modify existing event
-            if(this.event[eventIndex].item.length !== item.length){
+
+        switch(mode){
+            case 'replace':
                 this.event[eventIndex].item = item
-            }else{
+                if(dialogue.length) this.event[eventIndex].dialogue = dialogue
+                if(trigger.length) this.event[eventIndex].trigger = trigger
+            break;
+            case 'modify':
+                // Modify existing event
                 item.forEach(i => {
                     const itemExist = this.event[eventIndex].item.findIndex(ei => ei.id === i.id)
                     // If there's the same item on the ground
                     if(itemExist >= 0){
-                        this.event[eventIndex].item[itemExist].amount = i.amount
+                        const itemData = getItemType(this.event[eventIndex].item)
+
+                        // If the amount of item is less then the limit and will not surpass if stack up
+                        if((this.event[eventIndex].item[itemExist].amount + i.amount) < itemData.stackLimit){
+                            // Stack the item
+                            this.event[eventIndex].item[itemExist].amount += i.amount
+                        }else{
+                            // Stack up to the limit
+                            this.event[eventIndex].item[itemExist].amount = itemData.stackLimit
+                            // Append to another space
+                            this.event[eventIndex].item.push({ id: i.id, type: i.type, amount: Math.abs(itemData.stackLimit - (this.event[eventIndex].item[itemExist].amount + i.amount))})
+                        }
                     }else{
-                        console.log('item not found')
+                        this.event[eventIndex].item.push(i)
                     }
-                })                
-            }
-
-            if(dialogue.length) this.event[eventIndex].dialogue = dialogue
-
-            if(trigger.length) this.event[eventIndex].trigger = trigger
+                }) 
+                if(dialogue.length) this.event[eventIndex].dialogue = dialogue
+                if(trigger.length) this.event[eventIndex].trigger = trigger
+            break;
+            case 'remove':
+                this.event.splice(eventIndex, 1)
+                
+                // Remove image
+                let ctx = document.getElementById('game').getContext("2d");
+                ctx.save()
+                ctx.globalAlpha = 0
+                ctx.drawImage(this.item, position.x, position.y, this.tileSize, this.tileSize)
+                ctx.restore()
+                this.map[parseInt(position.y / this.tileSize)][parseInt(position.x / this.tileSize)] = 0
+            break;
         }
     }
 
@@ -235,16 +224,6 @@ export default class TileMap {
     getEventOnTile = (position) => {
         return this.event.find(e => e.position.x === position.x && e.position.y === position.y)
     }
-
-    // Remove an event on the tile
-    clearEventOnTile = (position) => {
-        const eventIndex = this.event.findIndex(e => e.position.x === position.x && e.position.y === position.y)
-
-        if(eventIndex >= 0){
-            this.event.splice(eventIndex, 1)
-        }
-    }
-
     changeTile = (row, col, type) => {
         this.map[row][col] = type
     }
