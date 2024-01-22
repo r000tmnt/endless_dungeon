@@ -120,8 +120,26 @@ const calculateHitRate = (player, enemy, damage, tileMap, row, col) => {
 
         gainExp(player, enemy)
 
-        // Leave the item on the ground
-        setEvent({x: enemy.x, y: enemy.y}, enemy.drop)
+        // Calculate item drop rate
+        if(player.characterType === 2){
+            const totalDropRate = enemy.drop.reduce((accu, current) => accu + current.rate, 0)
+
+            enemy.drop.forEach(item => {
+                item.rate = item.rate / totalDropRate
+            });
+
+            const randomDrop = Math.random()
+
+            const dropItems = enemy.drop.filter(item => randomDrop <= item.rate)
+
+            console.log('random item drop :>>>', dropItems)
+            
+            // Leave the item on the ground
+            if(dropItems.length) setEvent({x: enemy.x, y: enemy.y}, dropItems)
+        }else if(enemy.bag.length){
+            // Leave the player's item on the ground
+            setEvent({x: enemy.x, y: enemy.y}, enemy.bag)            
+        }
     }
 
     return resultMessage
