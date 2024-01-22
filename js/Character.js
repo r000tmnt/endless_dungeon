@@ -254,7 +254,7 @@ export default class Character {
                     }     
                     this.prefer_attributes = job.prefer_attributes
                     this.#loadImage(type, job.id)     
-
+                    this.pt = 0
                     this.equip = {
                         head: {},
                         body: {},
