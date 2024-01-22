@@ -63,56 +63,104 @@
 
             <button class="back absolute" data-action="status" type="button">BACK</button>
 
-            <p>LV</p>
+            <div class="flex" style="justify-content: space-between">
+                <p>LV</p>
+                <p><!-- Points --></p>
+            </div>
+            
             <!-- Seperator -->
             <table id="attributes">
                 <tbody>
                     <tr>
                         <td>HP :</td>
-                        <td data-attribute="hp"></td>
-                        <td>AP :</td>
-                        <td data-attribute="ap"></td>
+                        <td class="status-node" data-attribute="hp"></td>
+                        <td class="invisible attribute-toggle" data-attribute="maxHp">
+                            <span>-</span>
+                            <span>+</span>
+                        </td>
                     </tr>
                     <tr>
                         <td>MP :</td>
-                        <td data-attribute="mp"></td>
-                        <td>INT :</td>
-                        <td data-attribute="int"></td>
+                        <td class="status-node" data-attribute="mp"></td>
+                        <td class="invisible attribute-toggle" data-attribute="maxMp">
+                            <span>-</span>
+                            <span>+</span>
+                        </td>
                     </tr>
                     <tr>
                         <td>STR :</td>
-                        <td data-attribute="str"></td>
-                        <td>SPD :</td>
-                        <td data-attribute="spd"></td>
-                    </tr>
+                        <td class="status-node" data-attribute="str"></td>
+                        <td class="invisible attribute-toggle" data-attribute="str">
+                            <span>-</span>
+                            <span>+</span>
+                        </td>
+                    </tr>   
                     <tr>
                         <td>DEF :</td>
-                        <td data-attribute="def"></td>
-                        <td>EXP :</td>
-                        <td data-attribute="exp"></td></td>
+                        <td class="status-node" data-attribute="def"></td>
+                        <td class="invisible attribute-toggle" data-attribute="def">
+                            <span>-</span>
+                            <span>+</span>
+                        </td>                        
                     </tr>
                     <tr>
-                        <td>LCK :</td>
-                        <td data-attribute="lck"></td></td>
-                        <!-- VIW as sight -->
-                        <td>VIW :</td>
-                        <td data-attribute="sight"></td></td>
+                        <td>INT :</td>
+                        <td class="status-node" data-attribute="int"></td>                        
+                        <td class="invisible attribute-toggle" data-attribute="int">
+                            <span>-</span>
+                            <span>+</span>
+                        </td> 
+                    </tr>           
+                    <tr>
+                        <td>SPD :</td>
+                        <td class="status-node" data-attribute="spd"></td>      
+                        <td class="invisible attribute-toggle" data-attribute="spd">
+                            <span>-</span>
+                            <span>+</span>
+                        </td>                   
                     </tr>
                     <tr>
-                        <td>MOV :</td>
-                        <td data-attribute="moveSpeed"></td>
-                        <td>STA :</td>
-                        <td data-attribute="status"></td>
-                    </tr>
+                        <td>LUCK :</td>
+                        <td class="status-node" data-attribute="lck"></td></td>
+                        <td class="invisible attribute-toggle" data-attribute="lck">
+                            <span>-</span>
+                            <span>+</span>
+                        </td>  
+                    </tr>     
                     <tr>
                         <!-- Spirit as magic defense-->
                         <td>SPI :</td>
-                        <td data-attribute="spi"></td>
-                        <!-- <td>STA :</td>
-                        <td data-attribute="status"></td> -->
+                        <td class="status-node" data-attribute="spi"></td>
+                        <td class="invisible attribute-toggle" data-attribute="spi">
+                            <span>-</span>
+                            <span>+</span>
+                        </td> 
+                    </tr>       
+                    <tr>
+                        <td>AP :</td>
+                        <td class="status-node" data-attribute="ap"></td>                        
+                    </tr>        
+                    <tr>
+                        <!-- VIEW as sight -->
+                        <td>VIEW :</td>
+                        <td class="status-node"  data-attribute="sight"></td></td>                        
                     </tr>
+                    <tr>
+                        <td>MOVE :</td>
+                        <td class="status-node"  data-attribute="moveSpeed"></td>
+                    </tr>
+                    <tr>
+                        <td>STAT :</td>
+                        <td class="status-node"  data-attribute="status"></td>                        
+                    </tr>                    
+                    <tr>
+                        <td>EXP :</td>
+                        <td class="status-node" data-attribute="exp"></td></td>
+                    </tr>                    
                 </tbody>
             </table>
+
+
         </div>
 
         <!-- Skill window -->
