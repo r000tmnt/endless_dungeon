@@ -3,6 +3,11 @@
     --fontSize: 16px;
 }
 
+@keyframes hint {
+    0%{ opacity: 1; }
+    100%{ opacity: 0; }
+}
+
 @keyframes fade_in {
     0%{
       opacity: 0;  
@@ -167,6 +172,10 @@ li{
 
 #characterCaption > ul > li{
     margin: 3px 0;
+}
+
+.hint{
+    animation: hint .5s ease-in-out infinite;
 }
 
 .visible{
@@ -404,4 +413,14 @@ li{
 
   .learned-skills > li {
     background: unset;
+  }
+
+  .attribute-toggle{
+    color: white;
+  }
+
+  .attribute-toggle > span{
+    /* margin: 0 1%;
+    padding: 1%; */
+    border: 1px solid white;
   }
