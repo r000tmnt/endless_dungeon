@@ -309,13 +309,12 @@ const filterItem = (type) => {
 const pickUpItem = (currentActingPlayer, tileMap) => {
     const pickUpWindow = document.getElementById('pickUp')
     const droppedItems = document.getElementById('dropped-items')
-    const items = document.querySelectorAll('.item')
-
     // 1. Check if there's the same item in the bag
     // 2. check if the item will surpass the stack limit
 
     itemsToTake.forEach((item, index) => {
         // Get the index of displayed item
+        const items = document.querySelectorAll('.item')
         const itemIndex = Array.from(items).findIndex(i => i.dataset.id === item.id)
 
         // Check if there's the same item
@@ -332,19 +331,6 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
 
                 // Remove the item on the screen
                 droppedItems.removeChild(items[itemIndex])
-        
-                // Remove the item in the array
-                itemsToTake.splice(index, 1)
-
-                // If there are no more items left
-                if(!document.querySelectorAll('.item').length){
-                    // Remove the event on the tile
-                    tileMap.clearEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y})
-
-                    // Close pick up window
-                    pickUpWindow.classList.add('invisible')
-                    pickUpWindow.classList.remove('open_window')
-                }
             }else{
                 // Stack up to the limit
                 currentActingPlayer.bag[inventoryIndex].amount = itemData.stackLimit
@@ -356,19 +342,6 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
                     
                     // Remove the item on the screen
                     droppedItems.removeChild(items[itemIndex])
-            
-                    // Remove the item in the array
-                    itemsToTake.splice(index, 1)
-
-                    // If there are no more items left
-                    if(!document.querySelectorAll('.item').length){
-                        // Remove the event on the tile
-                        tileMap.clearEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y})
-
-                        // Close pick up window
-                        pickUpWindow.classList.add('invisible')
-                        pickUpWindow.classList.remove('open_window')
-                    }
                 }else{
                     // Kepp the event with modify state
                     itemsToTake[index].amount = Math.abs(leftOver)
@@ -382,37 +355,30 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
 
             // Remove the item on the screen
             droppedItems.removeChild(items[itemIndex])
-    
-            // Remove the item in the array
-            itemsToTake.splice(index, 1)
-
-            // If there are no more items left
-            if(!document.querySelectorAll('.item').length){
-                // Remove the event on the tile
-                tileMap.clearEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y})
-
-                // Close pick up window
-                pickUpWindow.classList.add('invisible')
-                pickUpWindow.classList.remove('open_window')
-            }
         }
     })
 
+    //Remove all the items in the array
+    itemsToTake.splice(0)
+    const items = document.querySelectorAll('.item')
+
     // If there are items left
-    if(document.querySelectorAll('.item').length){
+    if(items.length){
         // Collect items after modification
-        let leftItems = Array.from(document.querySelectorAll('.item')).map(d => {
+        let leftItems = Array.from(items).map(d => {
             return { id: d.dataset.id, type: d.dataset.type, amount: d.dataset.amount }
         })
 
         // Modify the event on the tile
-        tileMap.modifyEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y}, leftItems)
+        tileMap.modifyEventOnTile('modfify', {x: currentActingPlayer.x, y: currentActingPlayer.y}, leftItems)
 
         // Rearrange the style start with the index
-        for(let i = 0, items = document.querySelectorAll('.item').length; i < items; i++){
+        for(let i = 0; i < items.length; i++){
             if(items[i] === undefined){
-            continue  // Jump to the next one
+                continue  // Jump to the next one
             }
+
+            items[i].classList.remove('item-selected')
 
             // If the index is the middle column
             if(((i + (i+1)) % 3) === 0){
@@ -421,6 +387,13 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
                 items[i].style.margin = `unset`
             }
         }
+    }else{
+        // Remove the event on the tile
+        tileMap.modifyEventOnTile('remove', {x: currentActingPlayer.x, y: currentActingPlayer.y})
+
+        // Close pick up window
+        pickUpWindow.classList.add('invisible')
+        pickUpWindow.classList.remove('open_window')
     }
 }
 
@@ -609,6 +582,8 @@ export const clearInventory = () => {
     while(space.firstChild){
         space.removeChild(space.firstChild)
     }
+
+    itemsToTake.splice(0)
 }
 
 /**
