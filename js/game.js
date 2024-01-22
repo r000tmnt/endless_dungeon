@@ -110,6 +110,7 @@ for(let i=0; i < backBtn.length; i++){
                 await checkIfStepOnTheEvent(player.x, player.y)
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
+                action.resetStatusWindow()
                 displayUIElement()
             })
         break;
@@ -253,11 +254,11 @@ const resize = () => {
     console.log('enemy :>>>', enemy)
 
     const fontSize = setting.general.fontSize = Math.floor( 8 * Math.floor(cameraWidth / 100))
-    const fontSize_md = setting.general.fontSize_md = Math.floor(fontSize * 0.5)
+    const fontSize_md = setting.general.fontSize_md = Math.floor(fontSize * 0.75)
     setting.inventory.itemBlockSize = Math.floor(cameraWidth / 100) * 30
     setting.inventory.itemBlockMargin = Math.floor((setting.inventory.itemBlockSize  / 100) * 10)
 
-    const fontsize_sm = setting.general.fontSize_sm = Math.floor(fontSize * 0.25)
+    const fontsize_sm = setting.general.fontSize_sm = Math.floor(fontSize * 0.5)
 
     action.setFontSize(fontSize)
 
@@ -350,6 +351,67 @@ const getPosition = (event) => {
     return { row, col }
 }
 
+const prepareCharacterCaption = (inspectingCharacter) => {
+    // Fill the element with a portion of the character info
+    characterName.innerText = inspectingCharacter.name
+    characterLv.innerText = `LV ${inspectingCharacter.lv}`
+    characterAp.innerText = `AP: ${inspectingCharacter.attributes.ap}`
+
+    // Display arrow symbol if there are points to spend
+    if(inspectingCharacter.pt > 0){
+        const hint = document.querySelector('.hint')
+        hint.style.fontSize = setting.general.fontSize_sm + 'px'
+        hint.style.display = 'block'
+    }else{
+        // Hide arrow symbol
+        const hint = document.querySelector('.hint')
+        hint.style.display = 'none'
+    }
+
+    // calculation the percentage of the attribute
+    for(let i=0; i < gauges.length; i++){
+        // console.log(gauges[i].firstElementChild)
+        gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], inspectingCharacter) + '%';
+    }
+
+    // Shift UI position based on the character position
+    if(inspectingCharacter.characterType === 2){
+        if(playerPosition.row > 8 && playerPosition.row < 16){
+            if(playerPosition.col > 0 && playerPosition.col < Math.floor(9/2)){
+                characterCaption.style.left = ((tileSize * 9) - characterCaption.clientWidth) + 'px'
+            }else{
+                characterCaption.style.left = 'unset'
+            }
+        }
+    
+        // Shift UI position based on the character position
+        if(playerPosition.row > 0 && playerPosition.row < 8){
+            if(playerPosition.col > 0 && playerPosition.col < Math.floor(9/2)){
+                actionMenu.style.left = (tileSize * 6) + 'px'
+            }else{
+                actionMenu.style.left = 'unset'
+            }
+        }                    
+    }else{
+        if(enemyPosition.row > 8 && enemyPosition.row < 16){
+            if(enemyPosition.col > 0 && enemyPosition.col < Math.floor(9/2)){
+                characterCaption.style.left = ((tileSize * 9) - characterCaption.clientWidth) + 'px'
+            }else{
+                characterCaption.style.left = 'unset'
+            }
+        }
+    
+        // Shift UI position based on the character position
+        if(enemyPosition.row > 0 && enemyPosition.row < 8){
+            if(enemyPosition.col > 0 && enemyPosition.col < Math.floor(9/2)){
+                actionMenu.style.left = (tileSize * 6) + 'px'
+            }else{
+                actionMenu.style.left = 'unset'
+            }
+        } 
+    }
+}
+
 // get mouse position and divide by tile size to see where the row and the column it clicked
 canvas.addEventListener('mousedown', async(event) =>{
     const { row, col } = getPosition(event)
@@ -414,36 +476,7 @@ canvas.addEventListener('mousedown', async(event) =>{
             // Keep tracking player position
             playerPosition = { row, col }
 
-            // Fill the element with a portion of the character info
-            characterName.innerText = player.name
-            characterLv.innerText = `LV ${player.lv}`
-            characterAp.innerText = `AP: ${player.attributes.ap}`
-
-            // calculation the percentage of the attribute
-            for(let i=0; i < gauges.length; i++){
-                // console.log(gauges[i].firstElementChild)
-                gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], player) + '%';
-            }
-
-            // Display the element
-            // Shift UI position based on the character position
-            if(playerPosition.row > 8 && playerPosition.row < 16){
-                if(playerPosition.col > 0 && playerPosition.col < Math.floor(9/2)){
-                    characterCaption.style.left = ((tileSize * 9) - characterCaption.clientWidth) + 'px'
-                }else{
-                    characterCaption.style.left = 'unset'
-                }
-            }
-        
-            // Open UI element
-            // Shift UI position based on the character position
-            if(playerPosition.row > 0 && playerPosition.row < 8){
-                if(playerPosition.col > 0 && playerPosition.col < Math.floor(9/2)){
-                    actionMenu.style.left = (tileSize * 6) + 'px'
-                }else{
-                    actionMenu.style.left = 'unset'
-                }
-            }
+            prepareCharacterCaption(inspectingCharacter)
 
             displayUIElement()
         }else
@@ -460,21 +493,10 @@ canvas.addEventListener('mousedown', async(event) =>{
                }
             }
 
+            prepareCharacterCaption(inspectingCharacter)
+
             // Open UI element
-            actionMenu.classList.add('action_menu_open')  
-
-            characterName.innerText = enemy.name
-            characterLv.innerText = `LV ${enemy.lv}`
-            characterAp.innerText = `AP: ${enemy.attributes.ap}`
-
-            // calculation the percentage of the attribute
-            for(let i=0; i < gauges.length; i++){
-                // console.log(gauges[i].firstElementChild)
-                gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], enemy) + '%';
-            }
-
-            // Display the element
-            characterCaption.classList.remove('invisible') 
+            displayUIElement()
         }else{
             if(!characterCaption.classList.contains('invisible')){
                 characterCaption.classList.add('invisible') 
@@ -536,17 +558,14 @@ const checkAp = () => {
 const characterAnimationPhaseEnded = async() => {
     // If it is the player's turn
     if(turnType === 0){
-        // if(action.mode === 'skill'){
-        // TODO: Count the requrie action point of the skill
-        // }
-
-        characterAp.innerText = `AP: ${player.attributes.ap}`
 
         playerPosition.row = player.y / tileSize
         playerPosition.col = player.x / tileSize  
 
         // Check if the tile has an event
         await checkIfStepOnTheEvent(player.x, player.y)
+
+        prepareCharacterCaption(player)
 
         // If the player is ran out of action point, move to the enemy phase
         if(player.attributes.ap === 0) {
