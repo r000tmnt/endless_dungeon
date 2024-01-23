@@ -101,6 +101,7 @@ for(let i=0; i < backBtn.length; i++){
                 skillWindow.classList.add('invisible')
                 skillWindow.classList.remove('open_window')
                 action.clearSkillWindow()
+                prepareCharacterCaption(inspectingCharacter)
                 displayUIElement()
             })
         break;
@@ -111,6 +112,7 @@ for(let i=0; i < backBtn.length; i++){
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
                 action.resetStatusWindow()
+                prepareCharacterCaption(inspectingCharacter)
                 displayUIElement()
             })
         break;
@@ -122,6 +124,7 @@ for(let i=0; i < backBtn.length; i++){
                 Inventory.classList.add('invisible')
                 Inventory.classList.remove('open_window')
                 clearInventory()
+                prepareCharacterCaption(inspectingCharacter)
                 displayUIElement()
             })
         break;
@@ -133,6 +136,7 @@ for(let i=0; i < backBtn.length; i++){
                 pickUpWindow.classList.add('invisible')
                 pickUpWindow.classList.remove('open_window')
                 clearPickUpWindow()
+                prepareCharacterCaption(inspectingCharacter)
                 displayUIElement()
             })
         break;
@@ -202,6 +206,46 @@ const displayUIElement = () => {
 const hideUIElement = () => {
     actionMenu.classList.remove('action_menu_open')
     characterCaption.classList.add('invisible') 
+}
+
+const prepareCharacterCaption = (inspectingCharacter) => {
+    // Fill the element with a portion of the character info
+    characterName.innerText = inspectingCharacter.name
+    characterLv.innerText = `LV ${inspectingCharacter.lv}`
+    characterAp.innerText = `AP: ${inspectingCharacter.attributes.ap}`
+
+    // Display arrow symbol if there are points to spend
+    if(inspectingCharacter.pt > 0){
+        const hint = document.querySelector('.hint')
+        hint.style.fontSize = setting.general.fontSize_sm + 'px'
+        hint.style.display = 'block'
+    }else{
+        // Hide arrow symbol
+        const hint = document.querySelector('.hint')
+        hint.style.display = 'none'
+    }
+
+    // calculation the percentage of the attribute
+    for(let i=0; i < gauges.length; i++){
+        // console.log(gauges[i].firstElementChild)
+        gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], inspectingCharacter) + '%';
+    }
+
+    const position = (inspectingCharacter.characterType === 2)? playerPosition : enemyPosition
+
+    // Shift UI position based on the character position
+    if(position.row > 7 && position.col < Math.floor(9/2)){
+        characterCaption.style.left = ((tileSize * 9) - characterCaption.clientWidth) + 'px'
+    }else{
+        characterCaption.style.left = 'unset'
+    }
+
+    // Shift UI position based on the character position
+    if(position.row < 7 && position.col < Math.floor(9/2)){
+        actionMenu.style.left = (tileSize * 6) + 'px'
+    }else{
+        actionMenu.style.left = 'unset'
+    }  
 }
 
 const resize = () => {
@@ -320,6 +364,8 @@ const resize = () => {
     console.log('canvas element :>>>', canvas)
     console.log('canvas position :>>>', canvasPosition)
 
+    if(!characterCaption.classList.contains('invisible')) prepareCharacterCaption(inspectingCharacter)
+
     switch(action.mode){
         case 'item':
             resizeInventory(cameraWidth, fontSize, fontsize_sm)
@@ -349,67 +395,6 @@ const getPosition = (event) => {
     let col = parseInt( positionX / tileSize)
 
     return { row, col }
-}
-
-const prepareCharacterCaption = (inspectingCharacter) => {
-    // Fill the element with a portion of the character info
-    characterName.innerText = inspectingCharacter.name
-    characterLv.innerText = `LV ${inspectingCharacter.lv}`
-    characterAp.innerText = `AP: ${inspectingCharacter.attributes.ap}`
-
-    // Display arrow symbol if there are points to spend
-    if(inspectingCharacter.pt > 0){
-        const hint = document.querySelector('.hint')
-        hint.style.fontSize = setting.general.fontSize_sm + 'px'
-        hint.style.display = 'block'
-    }else{
-        // Hide arrow symbol
-        const hint = document.querySelector('.hint')
-        hint.style.display = 'none'
-    }
-
-    // calculation the percentage of the attribute
-    for(let i=0; i < gauges.length; i++){
-        // console.log(gauges[i].firstElementChild)
-        gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], inspectingCharacter) + '%';
-    }
-
-    // Shift UI position based on the character position
-    if(inspectingCharacter.characterType === 2){
-        if(playerPosition.row > 8 && playerPosition.row < 16){
-            if(playerPosition.col > 0 && playerPosition.col < Math.floor(9/2)){
-                characterCaption.style.left = ((tileSize * 9) - characterCaption.clientWidth) + 'px'
-            }else{
-                characterCaption.style.left = 'unset'
-            }
-        }
-    
-        // Shift UI position based on the character position
-        if(playerPosition.row > 0 && playerPosition.row < 8){
-            if(playerPosition.col > 0 && playerPosition.col < Math.floor(9/2)){
-                actionMenu.style.left = (tileSize * 6) + 'px'
-            }else{
-                actionMenu.style.left = 'unset'
-            }
-        }                    
-    }else{
-        if(enemyPosition.row > 8 && enemyPosition.row < 16){
-            if(enemyPosition.col > 0 && enemyPosition.col < Math.floor(9/2)){
-                characterCaption.style.left = ((tileSize * 9) - characterCaption.clientWidth) + 'px'
-            }else{
-                characterCaption.style.left = 'unset'
-            }
-        }
-    
-        // Shift UI position based on the character position
-        if(enemyPosition.row > 0 && enemyPosition.row < 8){
-            if(enemyPosition.col > 0 && enemyPosition.col < Math.floor(9/2)){
-                actionMenu.style.left = (tileSize * 6) + 'px'
-            }else{
-                actionMenu.style.left = 'unset'
-            }
-        } 
-    }
 }
 
 // get mouse position and divide by tile size to see where the row and the column it clicked
