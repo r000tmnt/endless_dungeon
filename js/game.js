@@ -550,6 +550,7 @@ const characterAnimationPhaseEnded = async() => {
         // Check if the tile has an event
         await checkIfStepOnTheEvent(player.x, player.y)
 
+        player.animation = ''
         prepareCharacterCaption(player)
 
         // If the player is ran out of action point, move to the enemy phase
