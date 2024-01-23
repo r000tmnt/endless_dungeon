@@ -383,7 +383,9 @@ export default class Action{
                 const offsetX = (horizontalLine - col) * tileSize
                 const offsetY = (verticalLine - row) * tileSize  
 
-                canvas.style.transform = `scale(1.5) translate(${offsetX}px, ${offsetY}px)`
+                if(this.mode !== 'item'){
+                    canvas.style.transform = `scale(1.5) translate(${offsetX}px, ${offsetY}px)`
+                }
 
                 this.selectableSpace.splice(0)
                 console.log('clear selectable :>>>', this.selectableSpace)
@@ -391,7 +393,7 @@ export default class Action{
                 switch(this.mode){
                     case 'attack':
                         player.attributes.ap -= 1
-                        this.messageConfig.message = await weaponAttack(player, enemy, tileMap, row, col)
+                        this.messageConfig.message = await weaponAttack(player, enemy)
                     break;
                     case 'skill':
                         const { attribute, value } = this.selectedSkill
@@ -399,12 +401,14 @@ export default class Action{
                         player.attributes.ap -= 2
                         player.attributes.mp -= this.selectedSkill.cost.value
 
-                        this.messageConfig.message = await skillAttack(this.selectedSkill, player, enemy, tileMap, row, col)
+                        this.messageConfig.message = await skillAttack(this.selectedSkill, player, enemy)
                     break;
                     case 'item':
                         player.attributes.ap -= 1
-                        this.messageConfig.message = useItem(player)
-                        this.messageConfig.style = 'rgb(0, 255, 0)'
+                        player.animation = 'item'
+                        const { message, type } = useItem(player)
+                        this.messageConfig.message = message
+                        this.messageConfig.style = (type === 0)? 'rgb(0, 255, 0)' : 'yellow'
                     break;
                 }
 
@@ -420,7 +424,11 @@ export default class Action{
                     })
                 }else{
                     setTimeout(() => {  
-                        this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize)    
+                        if(this.mode === 'item'){
+                            this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, player.x, player.y - tileSize)    
+                        }else{
+                            this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize)                                
+                        }
                     }, 300)
                 }
 
@@ -552,8 +560,9 @@ export default class Action{
         messageHolder.style.opacity = 1
         messageHolder.style.fontSize = (size / 2) + 'px'
         document.documentElement.style.setProperty('--fontSize', (size / 2) + 'px')
+        document.documentElement.style.setProperty('--msgColor', style)
         messageHolder.style.fontWeight = 'bold'
-        messageHolder.style.color = style
+        // messageHolder.style.color = style
         messageHolder.style.textAlign = 'center'
         messageHolder.style.position = 'absolute',
         messageHolder.style.top = y + 'px'
