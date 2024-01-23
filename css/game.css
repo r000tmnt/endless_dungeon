@@ -417,6 +417,7 @@ li{
   }
 
   .attribute-toggle{
+    justify-content: start;
     color: white;
   }
 
