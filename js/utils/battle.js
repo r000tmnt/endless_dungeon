@@ -39,13 +39,13 @@ const levelUp = (player, characterAnimationPhaseEnded) => {
 }
 
 // Calculate Hit rate and Crit rate
-const calculateHitRate = (player, enemy, damage, tileMap, row, col) => {
+const calculateHitRate = (player, enemy, damage) => {
     let hitRate = player.attributes.spd + player.attributes.lck + damage
     let evadeRate = enemy.attributes.spd + enemy.attributes.def
     let critRate =  player.attributes.lck * player.attributes.int
 
     let LvDistance = 0, totalRate = 0
-    let resultMessage = ''
+    let message = '', style = 'yellow'
 
     if(player.lv >= enemy.lv){
         LvDistance = player.lv - enemy.lv
@@ -94,21 +94,22 @@ const calculateHitRate = (player, enemy, damage, tileMap, row, col) => {
         if(secondDiceRoll.name === 'critRate'){
             console.log('crit!')
             const criticalHit = Math.round(damage * 1.5)
-            resultMessage = String(criticalHit)
+            message = String(criticalHit)
+            style = 'orange'
             enemy.attributes.hp -= criticalHit
             console.log('enmey hp:>>>', enemy.attributes.hp)
         }else{
             console.log('hit!')
-            resultMessage = String(damage)
+            message = String(damage)
             enemy.attributes.hp -= damage
             console.log('enmey hp:>>>', enemy.attributes.hp)
         }
     }else{
         console.log('miss!')
-        resultMessage = 'MISS!'
+        message = 'MISS!'
     }
 
-    return resultMessage
+    return { message, style }
 }
 
 const calculateEnemyMagicDefense = (enemy) => {
@@ -162,7 +163,7 @@ const calculateEnemyDefense = (enemy) => {
  * @param {object} enemy - An object contains enemy attributes 
  * @returns 
  */
-export const weaponAttack = async(player, enemy, tileMap, row, col) => {
+export const weaponAttack = async(player, enemy) => {
     const dmgRange = []
     let damage = 1 // Min dmg
     const enemyDefense = calculateEnemyDefense(enemy)
@@ -204,10 +205,10 @@ export const weaponAttack = async(player, enemy, tileMap, row, col) => {
     console.log('dmgRange :>>>', dmgRange)
     console.log('possible damage :>>>', damage)
 
-    return calculateHitRate(player, enemy, damage, tileMap, row, col)
+    return calculateHitRate(player, enemy, damage)
 }
 
-export const skillAttack = async(skill, player, enemy, tileMap, row, col) => {
+export const skillAttack = async(skill, player, enemy) => {
     const dmgRange = []
     let damage = 1 // Min dmg
 
@@ -264,7 +265,7 @@ export const skillAttack = async(skill, player, enemy, tileMap, row, col) => {
     console.log('dmgRange :>>>', dmgRange)
     console.log('possible damage :>>>', damage)
 
-    return calculateHitRate(player, enemy, damage, tileMap, row, col)
+    return calculateHitRate(player, enemy, damage)
 }
 
 // Player gain expirence upon enemy defeated
