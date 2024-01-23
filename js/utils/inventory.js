@@ -599,49 +599,53 @@ export const clearPickUpWindow = () => {
 
 export const useItem = (currentActingPlayer) => {
     let resultMessage = ''
-    // let style = 'green'
 
-    if(Object.entries(selectedItem).length){
-        const { effect } = selectedItem
+    const { effect } = selectedItem
 
-        const itemActions = subMenu.querySelectorAll('li')
+    // const itemActions = document.getElementById('itemAction').querySelectorAll('li')
 
-        switch(effect.target){
-            case 'status':
-                currentActingPlayer.attributes.status = 'Healthy'
-                resultMessage = 'RECOVER'
-                // TODO: Stop status timer?
-            break;
-            case 'all':
-                currentActingPlayer.attributes.hp = currentActingPlayer.attributes.maxHp
-                currentActingPlayer.attributes.mp = currentActingPlayer.attributes.maxMp
+    switch(effect.target){
+        case 'status':
+            currentActingPlayer.attributes.status = 'Healthy'
+            resultMessage = 'RECOVER'
+            // TODO: Stop status timer?
+        break;
+        case 'all':
+            currentActingPlayer.attributes.hp = currentActingPlayer.attributes.maxHp
+            currentActingPlayer.attributes.mp = currentActingPlayer.attributes.maxMp
 
-                resultMessage = `${currentActingPlayer.attributes.maxHp},${currentActingPlayer.attributes.maxMp},${currentActingPlayer.attributes.maxAp},${RECOVER}`
-            break;
-            default:
-                if(effect.type === 0){
-                    currentActingPlayer.attributes[`${effect.target}`] += effect.amount
+            resultMessage = `${currentActingPlayer.attributes.maxHp},${currentActingPlayer.attributes.maxMp},${currentActingPlayer.attributes.maxAp},${RECOVER}`
+        break;
+        default:
+            if(effect.type === 0){
+                currentActingPlayer.attributes[`${effect.target}`] += effect.amount
 
-                    resultMessage = effect.amount
+                resultMessage = String(effect.amount)
+            }else{
+                let effect = ''
+                if(effect.target === 'hp'){
+                    effect = Math.floor(currentActingPlayer.attributes.maxHp * (effect.amount / 100))
                 }else{
-                    let effect = ''
-                    if(effect.target === 'hp'){
-                        effect = Math.floor(currentActingPlayer.attributes.maxHp * (effect.amount / 100))
-                    }else{
-                        effect = Math.floor(currentActingPlayer.attributes.maxMp * (effect.amount / 100))
-                    }
- 
-                    currentActingPlayer.attributes[`${effect.target}`] += effect                  
-
-                    resultMessage = effect
+                    effect = Math.floor(currentActingPlayer.attributes.maxMp * (effect.amount / 100))
                 }
-            break;
-        }
 
-        removeItem(currentActingPlayer, itemActions)
+                currentActingPlayer.attributes[`${effect.target}`] += effect                  
+
+                resultMessage = String(effect)
+            }
+        break;
     }
 
-    return resultMessage
+    // Deduct item quantity
+    currentActingPlayer.bag[selectedItem.index].amount -= 1
+    if(currentActingPlayer.bag[selectedItem.index].amount === 0){
+        // Remove the item if it hits zero
+        currentActingPlayer.bag.splice(selectedItem.index, 1)
+    }
+
+    // removeItem(currentActingPlayer, itemActions)
+
+    return { message: resultMessage, type: effect.type }
 }
 
 /**
