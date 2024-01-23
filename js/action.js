@@ -151,10 +151,15 @@ export default class Action{
         const statusInfo = document.getElementById('info')
         const statusTable = statusWindow.children[3]
         const { fontSize_md, fontSize_sm } = setting.general
-
-        statusInfo.style.fontSize = fontSize_md + 'px' 
+        // const { height } = setting.general.camera
+        
         const tableNode = statusTable.querySelectorAll('.status-node')
         const statusToggle = document.querySelectorAll('.attribute-toggle')
+
+        statusTable.style.fontSize = fontSize_md + 'px'
+        statusTable.style.fontSize = fontSize_md + 'px'
+        // statusTable.style.maxHeight = (statusTable.clientHeight - (height - statusTable.clientHeight)) + 'px'
+        statusInfo.style.fontSize = fontSize_md + 'px' 
 
         for(let i=0; i < tableNode.length; i++){
             tableNode[i].style.fontSize = fontSize_md + 'px'
@@ -163,9 +168,9 @@ export default class Action{
         for(let i=0; i < statusToggle.length; i++){
             statusToggle[i].style.fontSize = fontSize_md + 'px'
             statusToggle[i].children[0].style.margin = `0 ${fontSize_sm}px`
-            statusToggle[i].children[0].style.padding = `${fontSize_sm / 2}px`
+            statusToggle[i].children[0].style.padding = `0 ${fontSize_sm / 2}px`
             statusToggle[i].children[1].style.margin = `0 ${fontSize_sm}px`
-            statusToggle[i].children[1].style.padding = `${fontSize_sm / 2}px`
+            statusToggle[i].children[1].style.padding = `0 ${fontSize_sm / 2}px`
         }
     }
 
@@ -174,37 +179,60 @@ export default class Action{
         statusToggle.forEach(t => t.classList.add('invisible'))
     }
 
+    /**
+     * Lock all of the + button
+     * @param {HTMLCollection} statusToggle - A collection of HTMLElement contains both minus and plus button
+     */
     lockPlusToggle(statusToggle){
         statusToggle.forEach(t => t.children[1].classList.add('no-event'))
     }
 
+    /**
+     * Unlock all of thr + button
+     * @param {HTMLCollection} statusToggle - A collection of HTMLElement contains both minus and plus button
+     */
     unLockPlusToggle(statusToggle){
         statusToggle.forEach(t => t.children[1].classList.remove('no-event'))
     }
 
+    /**
+     * Lock all of the - button
+     * @param {HTMLCollection} statusToggle - A collection of HTMLElement contains both minus and plus button
+     */
+    lockMinusToggle(statusToggle){
+        statusToggle.forEach(t => t.children[0].classList.add('no-event'))
+    }
+
+    /**
+     * Get status value from player and display on the screen
+     * @param {object} inspectingCharacter - An object represend current acting player 
+     * @param {number} fontSize_md - A number for middle tier font
+     */
     setStatusList(inspectingCharacter, fontSize_md){
-        const tableNode = document.getElementById('status').children[3].querySelectorAll('.status-node')
+        const statusTable = document.getElementById('status').children[3]
+        const tableNode = statusTable.querySelectorAll('.status-node')
+        // const { height } = setting.general.camera
+
+        statusTable.style.fontSize = fontSize_md + 'px'
+        // statusTable.style.maxHeight = (statusTable.clientHeight - (height - statusTable.clientHeight)) + 'px'
 
         for(let i=0; i < tableNode.length; i++){
-            tableNode[i].style.fontSize = fontSize_md + 'px'
-            if(tableNode[i].dataset.attribute !== undefined){
-                switch(tableNode[i].dataset.attribute){
-                    case 'hp':
-                        tableNode[i].innerText = `${inspectingCharacter.attributes.hp} / ${inspectingCharacter.attributes.maxHp}`
-                    break;
-                    case 'mp':
-                        tableNode[i].innerText = `${inspectingCharacter.attributes.mp} / ${inspectingCharacter.attributes.maxMp}`
-                    break;
-                    case 'ap':
-                        tableNode[i].innerText = `${inspectingCharacter.attributes.ap} / ${inspectingCharacter.attributes.maxAp}`
-                    break;
-                    case 'exp':
-                        tableNode[i].innerText = `${inspectingCharacter.exp? inspectingCharacter.exp : 0 } / ${inspectingCharacter.requiredExp? inspectingCharacter.requiredExp : 0}`
-                    break;
-                    default:
-                        tableNode[i].innerText = `${inspectingCharacter.attributes[`${tableNode[i].dataset.attribute}`]}`
-                    break;
-                }
+            switch(tableNode[i].dataset.attribute){
+                case 'hp':
+                    tableNode[i].innerText = `${inspectingCharacter.attributes.hp} / ${inspectingCharacter.attributes.maxHp}`
+                break;
+                case 'mp':
+                    tableNode[i].innerText = `${inspectingCharacter.attributes.mp} / ${inspectingCharacter.attributes.maxMp}`
+                break;
+                case 'ap':
+                    tableNode[i].innerText = `${inspectingCharacter.attributes.ap} / ${inspectingCharacter.attributes.maxAp}`
+                break;
+                case 'exp':
+                    tableNode[i].innerText = `${inspectingCharacter.exp? inspectingCharacter.exp : 0 } / ${inspectingCharacter.requiredExp? inspectingCharacter.requiredExp : 0}`
+                break;
+                default:
+                    tableNode[i].innerText = `${inspectingCharacter.attributes[`${tableNode[i].dataset.attribute}`]}`
+                break;
             }
         }
     }
@@ -258,13 +286,17 @@ export default class Action{
                         // Change the number on the screen
                         this.setStatusList(inspectingCharacter, fontSize_md)
 
-                        if(inspectingCharacter.pt > 0){
+                        if(inspectingCharacter.pt === 5){
+                            this.lockMinusToggle(statusToggle)
+                        }
+
+                        if(inspectingCharacter.pt === 1){
                             this.unLockPlusToggle(statusToggle)
                         }
                     })
 
                     minusBtn.style.margin = `0 ${fontSize_sm}px`
-                    minusBtn.style.padding = `${fontSize_sm / 2}px`
+                    minusBtn.style.padding = `0 ${fontSize_sm / 2}px`
 
                     // plus
                     const plusBtn = statusToggle[i].children[1]
@@ -284,7 +316,7 @@ export default class Action{
                     })
 
                     plusBtn.style.margin = `0 ${fontSize_sm}px`
-                    plusBtn.style.padding = `${fontSize_sm / 2}px`
+                    plusBtn.style.padding = `0 ${fontSize_sm / 2}px`
                 }
             }
         }
@@ -358,6 +390,7 @@ export default class Action{
                         const { attribute, value } = this.selectedSkill
                         player.attributes[attribute] -= value
                         player.attributes.ap -= 2
+                        player.attributes.mp -= this.selectedSkill.cost.value
 
                         this.messageConfig.message = await skillAttack(this.selectedSkill, player, enemy, tileMap, row, col)
                     break;
