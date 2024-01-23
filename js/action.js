@@ -14,7 +14,7 @@ export default class Action{
         this.animationInit = animationInit.Action
         this.messageConfig = {
             message: '',
-            style: 'yellow',
+            style: '',
             size: 0,
         },
         this.selectedSkill = {}
@@ -391,24 +391,32 @@ export default class Action{
                 console.log('clear selectable :>>>', this.selectableSpace)
 
                 switch(this.mode){
-                    case 'attack':
+                    case 'attack':{
                         player.attributes.ap -= 1
-                        this.messageConfig.message = await weaponAttack(player, enemy)
+                        const { message, style } = await weaponAttack(player, enemy)
+                        this.messageConfig.message = message
+                        this.messageConfig.style = style
+                    }
                     break;
-                    case 'skill':
+                    case 'skill':{
                         const { attribute, value } = this.selectedSkill
                         player.attributes[attribute] -= value
                         player.attributes.ap -= 2
                         player.attributes.mp -= this.selectedSkill.cost.value
 
-                        this.messageConfig.message = await skillAttack(this.selectedSkill, player, enemy)
+                        const { message, style } = await skillAttack(this.selectedSkill, player, enemy)
+
+                        this.messageConfig.message = message
+                        this,this.messageConfig.style = style
+                    }
                     break;
-                    case 'item':
+                    case 'item':{
                         player.attributes.ap -= 1
                         player.animation = 'item'
                         const { message, type } = useItem(player)
                         this.messageConfig.message = message
                         this.messageConfig.style = (type === 0)? 'rgb(0, 255, 0)' : 'yellow'
+                    }
                     break;
                 }
 
