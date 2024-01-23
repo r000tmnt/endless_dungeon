@@ -30,6 +30,8 @@ export default class Character {
         this.destination = null
         this.walkableSpace = []
         this.wait = false
+        this.animation = ''
+        this.animationFrame = 0
     }
 
     /**
@@ -60,7 +62,31 @@ export default class Character {
         }else
         // If the image of the character is loaded
         if(!this.characterIsMoving && this.characterImage?.src?.length){
-            ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
+            
+            //TODO: Need to know if the item is used on the character somehow...
+            if(this.animation === 'item'){
+                const frame = ['rgb(144, 255, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)']
+                ctx.save()
+                // draw color
+                ctx.fillStyle = frame[this.animationFrame]
+                // ctx.globalAlpha = frame[this.animationFrame]
+                ctx.fillRect(this.x, this.y, this.tileSize, this.tileSize)
+
+                // set composite mode
+                ctx.globalCompositeOperation = "destination-in";
+
+                ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize) 
+
+                ctx.restore()
+
+                if(this.animationFrame + 1 > (frame.length - 1)){
+                    this.animationFrame = 0
+                }else{
+                    this.animationFrame += 1
+                }
+            }else{
+                ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)                
+            }
         }
     }
 
