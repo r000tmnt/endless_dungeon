@@ -204,17 +204,49 @@ export default class Action{
     }
 
     /**
-     * Get status value from player and display on the screen
-     * @param {object} inspectingCharacter - An object represend current acting player 
-     * @param {number} fontSize_md - A number for middle tier font
+     * Alter status number on the screen
+     * @param {object} inspectingCharacter - An object represend current acting player
+     * @param {number} attribute - A number of the stat to change 
+     * @param {HTMLCollection} tableNode - A collection of HTMLElement contains a list of character status
      */
-    setStatusList(inspectingCharacter, fontSize_md){
-        const statusTable = document.getElementById('status').children[3]
-        const tableNode = statusTable.querySelectorAll('.status-node')
-        // const { height } = setting.general.camera
+    alterStatusList(inspectingCharacter, attribute, tableNode){
+        const index = tableNode.findIndex(t => attribute.toLowerCase().includes(t.dataset.attribute))
 
+        switch(attribute){
+            case 'maxHp':
+                tableNode[index].innerText = `${inspectingCharacter.attributes.hp} / ${inspectingCharacter.attributes.maxHp}`
+            break;
+            case 'maxMp':
+                tableNode[index].innerText = `${inspectingCharacter.attributes.mp} / ${inspectingCharacter.attributes.maxMp}`
+            break;
+            default:
+                tableNode[index].innerText = `${inspectingCharacter.attributes[attribute]}`
+            break;
+        }
+    }
+
+    /**
+     * Set text information for status dialog
+     * @param {object} inspectingCharacter - A set of data about the inspecting character 
+     */
+    setStatusWindow(inspectingCharacter){
+        const statusWindow = document.getElementById('status')
+        const statusInfo = document.getElementById('info')
+        const statusLv = statusWindow.children[2].children[0]
+        const statusPt = statusWindow.children[2].children[1]
+        const statusTable = statusWindow.children[3]
+        const tableNode = statusTable.querySelectorAll('.status-node')
+        
+        const { fontSize_md, fontSize_sm } = setting.general
+
+        this.mode = 'status'
+
+        statusInfo.style.fontSize = fontSize_md + 'px' 
+        statusInfo.children[0].innerText = inspectingCharacter.name
+        statusInfo.children[1].innerText = inspectingCharacter.class
+        statusLv.innerText = `Lv ${inspectingCharacter.lv}`
+        statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
         statusTable.style.fontSize = fontSize_md + 'px'
-        // statusTable.style.maxHeight = (statusTable.clientHeight - (height - statusTable.clientHeight)) + 'px'
 
         for(let i=0; i < tableNode.length; i++){
             switch(tableNode[i].dataset.attribute){
@@ -235,31 +267,6 @@ export default class Action{
                 break;
             }
         }
-    }
-
-    /**
-     * Set text information for status dialog
-     * @param {object} inspectingCharacter - A set of data about the inspecting character 
-     */
-    setStatusWindow(inspectingCharacter){
-        const statusWindow = document.getElementById('status')
-        const statusInfo = document.getElementById('info')
-        const statusLv = statusWindow.children[2].children[0]
-        const statusPt = statusWindow.children[2].children[1]
-        
-        const { fontSize_md, fontSize_sm } = setting.general
-
-        this.mode = 'status'
-
-        statusInfo.style.fontSize = fontSize_md + 'px' 
-
-        // Insert status information
-        statusInfo.children[0].innerText = inspectingCharacter.name
-        statusInfo.children[1].innerText = inspectingCharacter.class
-        statusLv.innerText = `LV ${inspectingCharacter.lv}`
-        statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
-
-        this.setStatusList(inspectingCharacter, fontSize_md)
 
         // If there're points to spend
         if(inspectingCharacter.pt > 0){
@@ -284,7 +291,7 @@ export default class Action{
                         statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
 
                         // Change the number on the screen
-                        this.setStatusList(inspectingCharacter, fontSize_md)
+                        this.alterStatusList(inspectingCharacter, attr, Array.from(tableNode))
 
                         if(inspectingCharacter.pt === 5){
                             this.lockMinusToggle(statusToggle)
@@ -308,7 +315,7 @@ export default class Action{
                         minusBtn.classList.remove('no-event')
 
                         // Change the number on the screen
-                        this.setStatusList(inspectingCharacter, fontSize_md)
+                        this.alterStatusList(inspectingCharacter, attr, Array.from(tableNode))
 
                         if(inspectingCharacter.pt === 0){
                             this.lockPlusToggle(statusToggle)
