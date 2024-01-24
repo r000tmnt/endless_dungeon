@@ -150,7 +150,8 @@ li{
     opacity: 0;
     color: white;
     background: black;
-    transition: all .1s ease-in-out;
+    transition: all .3s ease-in-out;
+    transform: translateY(10%);
 }
 
 #characterCaption{
@@ -411,8 +412,9 @@ li{
     overflow-y: scroll;
   }
 
-  .learned-skills > li {
+  .skill{
     background: unset;
+    /* justify-content: space-between; */
   }
 
   .attribute-toggle{
