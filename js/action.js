@@ -417,6 +417,8 @@ export default class Action{
                             skillName.innerText = this.selectedSkill.name;
                             skillName.style.fontSize = size + 'px'
                             skillName.style.padding = size / 2 + 'px'
+                            skillName.classList.remove('invisible')
+                            skillName.style.opacity = 1
     
                             this.messageConfig.message = message
                             this.messageConfig.style = style
@@ -431,12 +433,12 @@ export default class Action{
     
                         message.forEach(msg => {
                             setTimeout(() => {
-                                this.#displayMessage(canvas, msg, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize,) 
+                                this.#displayMessage(canvas, msg, size, style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize,) 
                             }, 300)
                         })
                     }else{
                         setTimeout(() => {  
-                            this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize)  
+                            this.#displayMessage(canvas, message, size, style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize)  
                         }, 300)
                     }
                 }
@@ -540,11 +542,6 @@ export default class Action{
     #displayMessage(canvas, message, size, style, x, y) {
         const appWrapper = document.getElementById('wrapper')
         const skillName = document.getElementById('skillName').children[0]
-
-        if(this.mode === 'skill'){
-            skillName.classList.remove('invisible')
-            skillName.style.opacity = 1
-        }
 
         const messageHolder = document.createElement('span')
         messageHolder.setAttribute('data-message', message) 
