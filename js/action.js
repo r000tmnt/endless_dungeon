@@ -3,7 +3,7 @@ import { skillAttack, weaponAttack, gainExp } from './utils/battle.js';
 import skills from './dataBase/skills.js';
 import setting from './utils/setting.js';
 import { useItem } from './utils/inventory.js'
-import { setEvent } from "./game.js"
+import { setEvent, characterAnimationPhaseEnded } from "./game.js"
 
 export default class Action{
     constructor(mode, selectableSpace, reachableDirections, steps, animationInit){
@@ -347,11 +347,10 @@ export default class Action{
      * @param {number} row - A number indicates which row ( y axis ) is user pointed
      * @param {number} col - A number indicates which col ( x axis ) is user pointed
      * @param {object} playerPosition - An object contains the row and col position of the current acting player 
-     * @param {object} currentActingPlayer - An onbject contains the information about the current acting character 
-     * @param {function} characterAnimationPhaseEnded - A callBack function to init after animation finished 
+     * @param {object} currentActingPlayer - An onbject contains the information about the current acting character
      * @returns {boolean} A value represend the state of pointed block is ib the range or not
      */
-    async move(tileMap, row, col, playerPosition, currentActingPlayer, characterAnimationPhaseEnded){
+    async move(tileMap, row, col, playerPosition, currentActingPlayer){
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
@@ -363,7 +362,7 @@ export default class Action{
 
             // Start moving
             // Maybe I need a global variable to track the steps...
-            this.#beginAnimationPhase(currentActingPlayer, characterAnimationPhaseEnded)
+            this.beginAnimationPhase(currentActingPlayer)
         }else{
             this.selectableSpace.splice(0)
         }
@@ -371,11 +370,13 @@ export default class Action{
         return inRange
     }
     
-    async command(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded){
+    async command(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap){
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
             this.selectableSpace.splice(0)
+            this.animationInit = true
+            
             if(this.mode === 'item'){
                 player.attributes.ap -= 1
                 player.animation = 'item'
@@ -384,8 +385,6 @@ export default class Action{
                 this.#displayMessage(canvas, message, Math.floor(this.messageConfig.size * 1.5), (type === 0)? 'rgb(0, 255, 0)' : 'yellow', player.x, player.y - tileSize)   
             }else{
                 if(enemyPosition.row === row && enemyPosition.col === col){
-                    this.animationInit = true
-
                     const horizontalLine = Math.floor(9 / 2)
                     const verticalLine = 16 / 2
     
@@ -405,15 +404,22 @@ export default class Action{
                         }
                         break;
                         case 'skill':{
+                            const skillName = document.getElementById('skillName').children[0]
                             const { attribute, value } = this.selectedSkill
                             player.attributes[attribute] -= value
                             player.attributes.ap -= 2
                             player.attributes.mp -= this.selectedSkill.cost.value
     
                             const { message, style } = await skillAttack(this.selectedSkill, player, enemy)
+
+                            const { size } = this.messageConfig
+
+                            skillName.innerText = this.selectedSkill.name;
+                            skillName.style.fontSize = size + 'px'
+                            skillName.style.padding = size / 2 + 'px'
     
                             this.messageConfig.message = message
-                            this,this.messageConfig.style = style
+                            this.messageConfig.style = style
                         }
                         break;
                     }
@@ -444,7 +450,7 @@ export default class Action{
 
                     // Calculate item drop rate
                     if(player.characterType === 2){
-                        gainExp(player, enemy, characterAnimationPhaseEnded)
+                        gainExp(player, enemy)
                     
                         const totalDropRate = enemy.drop.reduce((accu, current) => accu + current.rate, 0)
 
@@ -475,11 +481,6 @@ export default class Action{
         return inRange
     }
 
-    stay(currentActingPlayer, characterAnimationPhaseEnded){
-        this.mode = 'stay'
-        this.#beginAnimationPhase(currentActingPlayer, characterAnimationPhaseEnded)
-    }
-
     async #checkIfInRange(row, col,) {
         let inRange = false
         // Loop through the array and find if the position matches
@@ -501,49 +502,38 @@ export default class Action{
 
     /**
      * Start moving
-     * @param {object} currentActingPlayer - An object represent current acting player 
-     * @param {function} characterAnimationPhaseEnded - A callBack function to init after animation finished 
+     * @param {object} currentActingPlayer - An object represent current acting player
      */
-    #beginAnimationPhase(currentActingPlayer, characterAnimationPhaseEnded) {
+    beginAnimationPhase(currentActingPlayer) {
         console.log('step :>>>', this.steps)
 
-        if(this.mode !== 'stay'){
-            // First step
-            currentActingPlayer.setDestination({row: this.reachableDirections[this.steps][0], col: this.reachableDirections[this.steps][1]})            
-        }
-
-
         // Waiting for the animation to end 
-        let animationWatcher = setInterval(async() => {
-            // If animation ended
-            if(!this.animationInit) {
-                // If steps is not the same as the length of the array
-                if(this.steps < (this.reachableDirections.length - 1)){
-                    console.log('step :>>>', this.steps)
-                    // Begin next step
-                    this.steps += 1
-                    currentActingPlayer.setDestination({row: this.reachableDirections[this.steps][0], col: this.reachableDirections[this.steps][1]})
-                }else{
-                    // Finish the phase
-                    // Reset steps
-                    this.steps = 0
+        // If animation ended
+        if(!this.animationInit) {
+            if(this.steps > (this.reachableDirections.length - 1)){
+                console.log('Step finished')
+                // Finish the phase
+                // Reset steps
+                this.steps = 0
 
-                    // Clear the array
-                    this.selectableSpace.splice(0)
+                // Clear the array
+                this.selectableSpace.splice(0)
 
-                    this.reachableDirections.splice(0)
+                this.reachableDirections.splice(0)
 
-                    // Spend an action point
-                    // currentActingPlayer.attributes.ap -= 1
-
-                    clearInterval(animationWatcher)
-
-                    characterAnimationPhaseEnded()
-                }  
+                characterAnimationPhaseEnded()
             }else{
-                console.log('watching animation')
+    ``            // Take step
+                this.animationInit = true
+                currentActingPlayer.setDestination({row: this.reachableDirections[this.steps][0], col: this.reachableDirections[this.steps][1]})  
+
+                // Point to the next step
+                this.steps += 1      
             }
-        }, 100) 
+
+        }else{
+            console.log('watching animation')
+        }
     }
 
     // Text information about damage, heal, poisoned... etc
@@ -552,9 +542,6 @@ export default class Action{
         const skillName = document.getElementById('skillName').children[0]
 
         if(this.mode === 'skill'){
-            skillName.innerText = this.selectedSkill.name;
-            skillName.style.fontSize = size + 'px'
-            skillName.style.padding = size / 2 + 'px'
             skillName.classList.remove('invisible')
             skillName.style.opacity = 1
         }
@@ -595,7 +582,7 @@ export default class Action{
         }, 1000)
     }
 
-    async enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded){
+    async enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition){
         this.mode = 'move'
         enemy.attributes.ap -= 1 
         // get walkable space
@@ -624,7 +611,7 @@ export default class Action{
             if(this.reachableDirections.length){
                 // Start moving
                 enemy.setWalkableSpace(this.selectableSpace)
-                this.#beginAnimationPhase(enemy, characterAnimationPhaseEnded)  
+                this.beginAnimationPhase(enemy)  
             }else{
                 // Spend an action point
                 characterAnimationPhaseEnded()  
@@ -632,7 +619,7 @@ export default class Action{
         }else{
             console.log('Player out of reach')
 
-            await this.#randomSteps(tileMap, enemy, enemyPosition, characterAnimationPhaseEnded)
+            await this.#randomSteps(tileMap, enemy, enemyPosition)
         }  
     }
 
@@ -674,7 +661,7 @@ export default class Action{
         return !Object.entries(actionToTake).length? possibleActions[0] : actionToTake
     }
 
-    async enemyMakeDecision(canvas, tileMap, enemyPosition, moveSpeed, sight, playerPosition, enemy, player, characterAnimationPhaseEnded) {
+    async enemyMakeDecision(canvas, tileMap, enemyPosition, moveSpeed, sight, playerPosition, enemy, player) {
         this.mode = 'search'
 
         const { row, col } = playerPosition
@@ -697,11 +684,11 @@ export default class Action{
                 case 'attack': {
                     this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, 1)
 
-                    const actable = await this.command(canvas, row, col, enemy, player, playerPosition, enemy.tileSize, tileMap, characterAnimationPhaseEnded)
+                    const actable = await this.command(canvas, row, col, enemy, player, playerPosition, enemy.tileSize, tileMap)
 
                     if(!actable){
                         // Move
-                        await this.enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded)
+                        await this.enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition)
                     }
                 }
                 break;
@@ -747,30 +734,31 @@ export default class Action{
                     // Get skill effect range
                     this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, this.selectedSkill.effect.range)
 
-                    const actable = await this.command(canvas, row, col, enemy, player, playerPosition, enemy.tileSize, tileMap, characterAnimationPhaseEnded)
+                    const actable = await this.command(canvas, row, col, enemy, player, playerPosition, enemy.tileSize, tileMap)
 
                     if(!actable){
                         // Move
-                        await this.enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded)
+                        await this.enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition)
                     }
                 }
                 break;
                 case 'stay':
                     // Spend an action point
+                    enemy.attributes.ap -= 1
                     characterAnimationPhaseEnded()  
                 break;
             }
         }else{
             console.log('enemyAI can not find the player')
             // Move
-            await this.enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition, characterAnimationPhaseEnded)
+            await this.enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition)
         }
     }
 
     /**
      * Randomly decide x and y
      */
-    async #randomSteps(tileMap, enemy, enemyPosition, characterAnimationPhaseEnded){
+    async #randomSteps(tileMap, enemy, enemyPosition){
 
         const row =  Math.floor( Math.random() * this.selectableSpace.length)
         console.log("row :>>>", row)
@@ -788,7 +776,7 @@ export default class Action{
             if(this.reachableDirections.length){
                 // Start moving
                 enemy.setWalkableSpace(this.selectableSpace)
-                this.#beginAnimationPhase(enemy, characterAnimationPhaseEnded)  
+                this.beginAnimationPhase(enemy)  
             }else{
                 // Spend an action point
                 characterAnimationPhaseEnded()
