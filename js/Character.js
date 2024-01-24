@@ -32,13 +32,14 @@ export default class Character {
         this.wait = false
         this.animation = ''
         this.animationFrame = 0
+        // this.worker = new Worker('../js/worker/spriteAnimation.js')
     }
 
     /**
      * Draw the character on the canvas
      * @param {function} ctx - canvas.getContext("2d")
      */
-    draw(ctx){
+    async draw(ctx){
         if(this.destination !== null){
             this.#move(ctx, this.destination)
         }
@@ -66,19 +67,34 @@ export default class Character {
             //TODO: Need to know if the item is used on the character somehow...
             if(this.animation === 'item'){
                 const frame = ['rgb(144, 255, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)']
-                ctx.save()
+
+                const tempCanvas = document.createElement('canvas')
+                const tempContext = tempCanvas.getContext('2d')
+                tempCanvas.width = this.tileSize
+                tempCanvas.height = this.tileSize
                 // draw color
-                ctx.fillStyle = frame[this.animationFrame]
-                // ctx.globalAlpha = frame[this.animationFrame]
-                ctx.fillRect(this.x, this.y, this.tileSize, this.tileSize)
+                tempContext.fillStyle = frame[this.animationFrame]
+                tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
+
+                console.log('current rendering frame :>>>', tempContext.fillStyle)
 
                 // set composite mode
-                ctx.globalCompositeOperation = "destination-in";
+                tempContext.globalCompositeOperation = "destination-in";
 
-                ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize) 
+                tempContext.drawImage(this.characterImage, 0, 0, this.tileSize, this.tileSize)
+                // const imgBitMap = await createImageBitmap(this.characterImage)
+                // this.worker.postMessage({mode: this.animation, image: imgBitMap, tileSize: this.tileSize})
 
-                ctx.restore()
-
+                // this.worker.onmessage = (msg) => {
+                //     console.log('sprite altered :>>>', msg)
+                //     if(msg.data.buffer){
+                //         ctx.clearRect(this.x, this.y, this.tileSize, this.tileSize)
+                //         ctx.save()
+                        ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
+                //         ctx.restore()
+                //     }
+                // }
+                tempCanvas.remove()
                 if(this.animationFrame + 1 > (frame.length - 1)){
                     this.animationFrame = 0
                 }else{
