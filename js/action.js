@@ -18,6 +18,7 @@ export default class Action{
             size: 0,
         },
         this.selectedSkill = {}
+        this.target = {}
     }
 
     /**
@@ -374,104 +375,99 @@ export default class Action{
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
-            if(enemyPosition.row === row && enemyPosition.col === col)
-                this.animationInit = true
+            this.selectableSpace.splice(0)
+            if(this.mode === 'item'){
+                player.attributes.ap -= 1
+                player.animation = 'item'
+                const { message, type } = useItem(player)
 
-                const horizontalLine = Math.floor(9 / 2)
-                const verticalLine = 16 / 2
+                this.#displayMessage(canvas, message, Math.floor(this.messageConfig.size * 1.5), (type === 0)? 'rgb(0, 255, 0)' : 'yellow', player.x, player.y - tileSize)   
+            }else{
+                if(enemyPosition.row === row && enemyPosition.col === col){
+                    this.animationInit = true
 
-                const offsetX = (horizontalLine - col) * tileSize
-                const offsetY = (verticalLine - row) * tileSize  
-
-                if(this.mode !== 'item'){
+                    const horizontalLine = Math.floor(9 / 2)
+                    const verticalLine = 16 / 2
+    
+                    const offsetX = (horizontalLine - col) * tileSize
+                    const offsetY = (verticalLine - row) * tileSize  
+    
                     canvas.style.transform = `scale(1.5) translate(${offsetX}px, ${offsetY}px)`
-                }
-
-                this.selectableSpace.splice(0)
-                console.log('clear selectable :>>>', this.selectableSpace)
-
-                switch(this.mode){
-                    case 'attack':{
-                        player.attributes.ap -= 1
-                        const { message, style } = await weaponAttack(player, enemy)
-                        this.messageConfig.message = message
-                        this.messageConfig.style = style
-                    }
-                    break;
-                    case 'skill':{
-                        const { attribute, value } = this.selectedSkill
-                        player.attributes[attribute] -= value
-                        player.attributes.ap -= 2
-                        player.attributes.mp -= this.selectedSkill.cost.value
-
-                        const { message, style } = await skillAttack(this.selectedSkill, player, enemy)
-
-                        this.messageConfig.message = message
-                        this,this.messageConfig.style = style
-                    }
-                    break;
-                    case 'item':{
-                        player.attributes.ap -= 1
-                        player.animation = 'item'
-                        const { message, type } = useItem(player)
-                        this.messageConfig.message = message
-                        this.messageConfig.style = (type === 0)? 'rgb(0, 255, 0)' : 'yellow'
-                    }
-                    break;
-                }
-
-                const { message, style, size} = this.messageConfig 
-
-                if(message.includes(',')){
-                    message = message.split(',')
-
-                    message.forEach(msg => {
-                        setTimeout(() => {
-                            this.#displayMessage(canvas, msg, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize,) 
-                        }, 300)
-                    })
-                }else{
-                    setTimeout(() => {  
-                        if(this.mode === 'item'){
-                            this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, player.x, player.y - tileSize)    
-                        }else{
-                            this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize)                                
+    
+                    console.log('clear selectable :>>>', this.selectableSpace)
+    
+                    switch(this.mode){
+                        case 'attack':{
+                            player.attributes.ap -= 1
+                            const { message, style } = await weaponAttack(player, enemy)
+                            this.messageConfig.message = message
+                            this.messageConfig.style = style
                         }
-                    }, 300)
-                }
-
-                // Wait for damage animation to finish
-                setTimeout(() => {
-                    // Check if the enemy is defeated
-                    if(enemy.attributes.hp <= 0){
-                        tileMap.removeCharacter(row, col)
-
-                        // Calculate item drop rate
-                        if(player.characterType === 2){
-                            gainExp(player, enemy, characterAnimationPhaseEnded)
-                        
-                            const totalDropRate = enemy.drop.reduce((accu, current) => accu + current.rate, 0)
-
-                            enemy.drop.forEach(item => {
-                                item.rate = item.rate / totalDropRate
-                            });
-
-                            const randomDrop = Math.random()
-
-                            const dropItems = enemy.drop.filter(item => randomDrop <= item.rate)
-
-                            console.log('random item drop :>>>', dropItems)
-                            
-                            // Leave the item on the ground
-                            if(dropItems.length) setEvent({x: enemy.x, y: enemy.y}, dropItems)
-                        }else if(enemy.bag.length){
-                            // Leave the player's item on the ground
-                            setEvent({x: enemy.x, y: enemy.y}, enemy.bag)            
+                        break;
+                        case 'skill':{
+                            const { attribute, value } = this.selectedSkill
+                            player.attributes[attribute] -= value
+                            player.attributes.ap -= 2
+                            player.attributes.mp -= this.selectedSkill.cost.value
+    
+                            const { message, style } = await skillAttack(this.selectedSkill, player, enemy)
+    
+                            this.messageConfig.message = message
+                            this,this.messageConfig.style = style
                         }
+                        break;
+                    }
+    
+                    const { message, style, size} = this.messageConfig 
+    
+                    if(message.includes(',')){
+                        message = message.split(',')
+    
+                        message.forEach(msg => {
+                            setTimeout(() => {
+                                this.#displayMessage(canvas, msg, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize,) 
+                            }, 300)
+                        })
                     }else{
-                        characterAnimationPhaseEnded()
+                        setTimeout(() => {  
+                            this.#displayMessage(canvas, message, Math.floor(size * 1.5), style, Math.floor((tileSize * 9) / 2) - tileSize, Math.floor((tileSize * 16) / 2) - tileSize)  
+                        }, 300)
                     }
-                }, 1500)
+                }
+            }
+
+            // Wait for damage animation to finish
+            setTimeout(() => {
+                // Check if the enemy is defeated
+                if(enemy.attributes.hp <= 0){
+                    tileMap.removeCharacter(row, col)
+
+                    // Calculate item drop rate
+                    if(player.characterType === 2){
+                        gainExp(player, enemy, characterAnimationPhaseEnded)
+                    
+                        const totalDropRate = enemy.drop.reduce((accu, current) => accu + current.rate, 0)
+
+                        enemy.drop.forEach(item => {
+                            item.rate = item.rate / totalDropRate
+                        });
+
+                        const randomDrop = Math.random()
+
+                        const dropItems = enemy.drop.filter(item => randomDrop <= item.rate)
+
+                        console.log('random item drop :>>>', dropItems)
+                        
+                        // Leave the item on the ground
+                        if(dropItems.length) setEvent({x: enemy.x, y: enemy.y}, dropItems)
+                    }else if(enemy.bag.length){
+                        // Leave the player's item on the ground
+                        setEvent({x: enemy.x, y: enemy.y}, enemy.bag)            
+                    }
+                }else{
+                    characterAnimationPhaseEnded()
+                }
+            }, 1500)
         }else{
             this.selectableSpace.splice(0)
         }
