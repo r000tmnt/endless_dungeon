@@ -52,8 +52,8 @@ export default class Action{
         }
     }
 
-    resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, width){
-        const skillList = document.querySelector('.learned-skill')
+    resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, width, tileSize){
+        const skillList = document.querySelector('.learned-skills')
         const skills = document.querySelectorAll('.skill')
         const title = document.getElementById('skill').children[0]
 
@@ -63,10 +63,11 @@ export default class Action{
         skillList.style.maxHeight = (skillItemHeight * 3) + 'px'
 
         skills.forEach(skill => {
-            skill.style.fontSize = fontSize + 'px'
-            skill.style.height = skillItemHeight + 'px'
+            skill.style.fontSize = fontSize_md + 'px'
             skill.style.padding = `${fontSize_sm}px` 
-            skill.children[1].children[1].style.fontSize = fontSize_md + 'px'
+            skill.children[0].style.width = tileSize + 'px'
+            skill.children[0].style.height = tileSize + 'px'
+            skill.children[0].style.marginRight = `${fontSize_sm}px`
         })
     }
 
@@ -81,6 +82,7 @@ export default class Action{
         const { width } = setting.general.camera
         const skillItemHeight = Math.floor(width * (30/100))
 
+        skillList.style.maxHeight = (skillItemHeight * 3) + 'px'
         title.style.fontSize = fontSize + 'px'
 
         for(let i=0; i < currentActingPlayer.skill.length; i++){
@@ -94,19 +96,18 @@ export default class Action{
             const skillDesc = document.createElement('span')
             skill.classList.add('flex')
             skill.classList.add('skill')
-            skill.style.fontSize = fontSize + 'px'
-            skill.style.height = skillItemHeight + 'px'
+            skill.style.fontSize = fontSize_md + 'px'
             skill.style.boxSizing = 'border-box'
             skill.style.padding = `${fontSize_sm}px`  
 
             skillIcon.style.width = tileMap.tileSize + 'px'
             skillIcon.style.height = tileMap.tileSize + 'px'
-            skillIcon.style.margin = `0 ${fontSize_sm}px`
+            skillIcon.style.marginRight = `${fontSize_sm}px`
+            skillIcon.classList.add('icon')
 
             skillName.innerText = skillData.name
             skillCost.innerText = `${skillData.cost.attribute}: ${skillData.cost.value}`
             skillDesc.innerText = skillData.effect.desc
-            skillDesc.style.fontSize = fontSize_md + 'px'
 
             skillLabel.classList.add('flex')
             skillLabel.style.justifyContent = 'space-between'
@@ -142,7 +143,7 @@ export default class Action{
             skill.append(skillInfo)
             skillList.append(skill)
         }
-        skillList.style.maxHeight = (skillItemHeight * 3) + 'px'
+
         skillWindow.classList.remove('invisible')
         skillWindow.classList.add('open_window')
     }
@@ -385,6 +386,8 @@ export default class Action{
                 this.#displayMessage(canvas, message, Math.floor(this.messageConfig.size * 1.5), (type === 0)? 'rgb(0, 255, 0)' : 'yellow', player.x, player.y - tileSize)   
             }else{
                 if(enemyPosition.row === row && enemyPosition.col === col){
+                    const { message, style, size} = this.messageConfig 
+
                     const horizontalLine = Math.floor(9 / 2)
                     const verticalLine = 16 / 2
     
@@ -398,9 +401,9 @@ export default class Action{
                     switch(this.mode){
                         case 'attack':{
                             player.attributes.ap -= 1
-                            const { message, style } = await weaponAttack(player, enemy)
-                            this.messageConfig.message = message
-                            this.messageConfig.style = style
+                            const { resultMessage, resultStyle } = await weaponAttack(player, enemy)
+                            message = resultMessage
+                            style = resultStyle
                         }
                         break;
                         case 'skill':{
@@ -410,23 +413,19 @@ export default class Action{
                             player.attributes.ap -= 2
                             player.attributes.mp -= this.selectedSkill.cost.value
     
-                            const { message, style } = await skillAttack(this.selectedSkill, player, enemy)
-
-                            const { size } = this.messageConfig
+                            const { resultMessage, resultStyle  } = await skillAttack(this.selectedSkill, player, enemy)
 
                             skillName.innerText = this.selectedSkill.name;
                             skillName.style.fontSize = size + 'px'
-                            skillName.style.padding = size / 2 + 'px'
+                            skillName.style.padding = Math.floor(size / 2) + 'px'
                             skillName.classList.remove('invisible')
                             skillName.style.opacity = 1
     
-                            this.messageConfig.message = message
-                            this.messageConfig.style = style
+                            message = resultMessage
+                            style = resultStyle
                         }
                         break;
                     }
-    
-                    const { message, style, size} = this.messageConfig 
     
                     if(message.includes(',')){
                         message = message.split(',')
