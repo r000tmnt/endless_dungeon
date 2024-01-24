@@ -78,6 +78,8 @@ turnCounter.innerText = 'Turn 1'
 
 const actionMenu = document.getElementById('action_menu');
 const actionMenuOptions = actionMenu.getElementsByTagName('li')
+const option_menu = document.getElementById('option_menu')
+const options = option_menu.getElementsByTagName('li')
 const characterCaption = document.getElementById('characterCaption')
 const characterName = document.getElementById('name')
 const characterLv = document.getElementById('lv')
@@ -483,6 +485,19 @@ canvas.addEventListener('mousedown', async(event) =>{
             // Open UI element
             displayUIElement()
         }else{
+            if(option_menu.classList.contains('action_menu_open')){
+                option_menu.classList.remove('action_menu_open')
+            }else{
+                // Shift UI position based on the character position
+                if(playerPosition.row < 7 && playerPosition.col < Math.floor(9/2)){
+                    option_menu.style.left = (tileSize * 6) + 'px'
+                }else{
+                    option_menu.style.left = 'unset'
+                }  
+
+                option_menu.classList.add('action_menu_open')
+            }
+
             if(!characterCaption.classList.contains('invisible')){
                 characterCaption.classList.add('invisible') 
             }
