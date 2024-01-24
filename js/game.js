@@ -93,6 +93,24 @@ const Inventory = document.getElementById('item')
 const pickUpWindow = document.getElementById('pickUp')
 const skillWindow = document.getElementById('skill')
 
+// option menu child click event
+for(let i=0; i < options.length; i++){
+    switch(options[i].dataset.option){
+        case 'party':
+        break;
+        case 'config':
+        break;
+        case 'end':
+            options[i].addEventListener('click', () => {
+                player.attributes.ap = 0
+                characterAnimationPhaseEnded()
+                option_menu.classList.remove('action_menu_open')
+            })
+        break;
+    }
+}
+
+
 // Back button click event
 for(let i=0; i < backBtn.length; i++){
     switch(backBtn[i].dataset.action){
@@ -193,7 +211,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 hideUIElement()
                 setTimeout(() => {
                     player.attributes.ap -= 1
-                    action.stay(player, characterAnimationPhaseEnded)
+                    characterAnimationPhaseEnded()
                 }, 500)
             })
     }
@@ -412,8 +430,8 @@ canvas.addEventListener('mousedown', async(event) =>{
         if(action.mode === 'move' || action.mode === 'attack' || action.mode === 'skill' || action.mode === 'item'){
 
             const movable = (action.mode === 'move')? 
-                await action.move(tileMap, row, col, playerPosition, player, characterAnimationPhaseEnded) : 
-                await action.command(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap, characterAnimationPhaseEnded)
+                await action.move(tileMap, row, col, playerPosition, player) : 
+                await action.command(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap)
 
             if(!movable){
 
@@ -535,7 +553,7 @@ const enemyAI = async() => {
 
     const { moveSpeed, sight } = enemy.attributes
 
-    await action.enemyMakeDecision(canvas, tileMap, enemyPosition, moveSpeed, sight, playerPosition, enemy, player, characterAnimationPhaseEnded )
+    await action.enemyMakeDecision(canvas, tileMap, enemyPosition, moveSpeed, sight, playerPosition, enemy, player)
 }
 
 // Check if the tile has an event
@@ -554,54 +572,6 @@ const checkAp = () => {
     }
 }
 
-// Thing to do after animation ended
-const characterAnimationPhaseEnded = async() => {
-    // If it is the player's turn
-    if(turnType === 0){
-
-        playerPosition.row = player.y / tileSize
-        playerPosition.col = player.x / tileSize  
-
-        // Check if the tile has an event
-        await checkIfStepOnTheEvent(player.x, player.y)
-
-        player.animation = ''
-        prepareCharacterCaption(player)
-
-        // If the player is ran out of action point, move to the enemy phase
-        if(player.attributes.ap === 0) {
-            grid.setPointedBlock({})
-            player.wait = true
-            nextTurn()
-        }else{
-            grid.setPointedBlock({ ...playerPosition })
-            checkAp()
-            // Display Action options
-            actionMenu.classList.add('action_menu_open')
-            characterCaption.classList.remove('invisible')
-        }
-    }else{
-        enemyPosition.row = enemy.y / tileSize
-        enemyPosition.col = enemy.x / tileSize  
-        // characterAp.innerText = `AP: ${player.attributes.ap}`
-            
-        // Move to the next phase
-        if(enemy.attributes.ap === 0){
-            grid.setPointedBlock({})
-            enemy.wait = true
-            nextTurn()
-        }else{
-            grid.setPointedBlock({ ...enemyPosition })
-            // keep looking
-            await enemyAI()
-            console.log('enemyAI keep looking')
-        }         
-    }  
-
-    action.mode = ''
-    console.log('reset action mode :>>>', action.mode)
-}
-
 //  Initialize the game
 const gameLoop = () => {
     console.log('rendering')
@@ -609,6 +579,10 @@ const gameLoop = () => {
 
     if(action.selectableSpace.length){
         range.draw(ctx, action.selectableSpace, action.mode, action.selectedSkill.type)
+    }
+
+    if(action.mode === 'move' && action.reachableDirections.length && !action.animationInit){
+        action.beginAnimationPhase(inspectingCharacter)
     }
 
     if(player !== null) {
@@ -681,6 +655,63 @@ window.addEventListener('resize', resize, false);
 
 // Game running based on browser refresh rate
 window.requestAnimationFrame(gameLoop)
+
+// Thing to do after animation ended
+export const characterAnimationPhaseEnded = async() => {
+    // if(enemy === null){
+    //     // Level clear
+    //     // Play secene
+    // }else{
+ 
+    // }
+
+    // If it is the player's turn
+    if(turnType === 0){
+
+        playerPosition.row = player.y / tileSize
+        playerPosition.col = player.x / tileSize  
+
+        // Check if the tile has an event
+        await checkIfStepOnTheEvent(player.x, player.y)
+
+        player.animation = ''
+        prepareCharacterCaption(player)
+
+        // If the player is ran out of action point, move to the enemy phase
+        if(player.attributes.ap === 0) {
+            grid.setPointedBlock({})
+            player.wait = true
+            nextTurn()
+        }else{
+            grid.setPointedBlock({ ...playerPosition })
+            checkAp()
+            // Display Action options
+            actionMenu.classList.add('action_menu_open')
+            characterCaption.classList.remove('invisible')
+        }
+
+        action.mode = ''
+        console.log('reset action mode :>>>', action.mode)
+    }else{
+        enemyPosition.row = enemy.y / tileSize
+        enemyPosition.col = enemy.x / tileSize  
+        // characterAp.innerText = `AP: ${player.attributes.ap}`
+            
+        // Move to the next phase
+        if(enemy.attributes.ap === 0){
+            action.mode = ''
+            console.log('reset action mode :>>>', action.mode)
+            grid.setPointedBlock({})
+            enemy.wait = true
+            nextTurn()
+        }else{
+            grid.setPointedBlock({ ...enemyPosition })
+            // keep looking
+            await enemyAI()
+            console.log('enemyAI keep looking')
+        }         
+    } 
+}
 
 // A exported function for other object to talk to the game engine
 export const animationSignal = (signal) => {
