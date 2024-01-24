@@ -324,7 +324,7 @@ const resize = () => {
 
     const fontsize_sm = setting.general.fontSize_sm = Math.floor(fontSize * 0.5)
 
-    action.setFontSize(fontSize)
+    action.setFontSize(Math.floor(fontSize * 1.25))
 
     // calculation the percentage of the attribute
     for(let i=0; i < gauges.length; i++){
@@ -335,6 +335,11 @@ const resize = () => {
     // action menu child font size
     for(let i=0; i < actionMenuOptions.length; i++){
         actionMenuOptions[i].style['font-size'] = fontSize + 'px';
+    }
+
+    // option menu child font size
+    for(let i=0; i < options.length; i++){
+        options[i].style['font-size'] = fontSize + 'px';
     }
 
     appWrapper.style.width = cameraWidth  + 'px';
@@ -397,7 +402,7 @@ const resize = () => {
             resizePickUp(fontSize, cameraWidth)
         break;
         case 'skill':
-            action.resizeSkillWindow(fontSize, fontSize_md, fontsize_sm, cameraWidth)
+            action.resizeSkillWindow(fontSize, fontSize_md, fontsize_sm, cameraWidth, tileSize)
         break;
     }
 }
@@ -430,7 +435,7 @@ canvas.addEventListener('mousedown', async(event) =>{
         if(action.mode === 'move' || action.mode === 'attack' || action.mode === 'skill' || action.mode === 'item'){
 
             const movable = (action.mode === 'move')? 
-                await action.move(tileMap, row, col, playerPosition, player) : 
+                 action.move(tileMap, row, col, playerPosition, player) : 
                 await action.command(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap)
 
             if(!movable){
@@ -484,6 +489,7 @@ canvas.addEventListener('mousedown', async(event) =>{
             prepareCharacterCaption(inspectingCharacter)
 
             displayUIElement()
+            option_menu.classList.remove('action_menu_open')
         }else
         // if this tile is enemy
         if((row * tileSize) === enemy?.y && (col * tileSize) === enemy?.x){
@@ -502,6 +508,7 @@ canvas.addEventListener('mousedown', async(event) =>{
 
             // Open UI element
             displayUIElement()
+            option_menu.classList.remove('action_menu_open')
         }else{
             if(option_menu.classList.contains('action_menu_open')){
                 option_menu.classList.remove('action_menu_open')
