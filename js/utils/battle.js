@@ -2,8 +2,10 @@ import weapon from "../dataBase/item/item_weapon"
 import armor from "../dataBase/item/item_armor"
 import setting from "./setting"
 
+import { characterAnimationPhaseEnded } from "../game"
+
 // Player level up if the exp reached the required amount
-const levelUp = (player, characterAnimationPhaseEnded) => {
+const levelUp = (player) => {
     // Player level up
     // Extend the required exp for the next level
     player.requiredExp += player.requiredExp * 1.5
@@ -45,7 +47,7 @@ const calculateHitRate = (player, enemy, damage) => {
     let critRate =  player.attributes.lck * player.attributes.int
 
     let LvDistance = 0, totalRate = 0
-    let message = '', style = 'yellow'
+    let resultMessage = '', resultStyle = 'yellow'
 
     if(player.lv >= enemy.lv){
         LvDistance = player.lv - enemy.lv
@@ -94,22 +96,22 @@ const calculateHitRate = (player, enemy, damage) => {
         if(secondDiceRoll.name === 'critRate'){
             console.log('crit!')
             const criticalHit = Math.round(damage * 1.5)
-            message = String(criticalHit)
-            style = 'orange'
+            resultMessage = String(criticalHit)
+            resultStyle = 'orange'
             enemy.attributes.hp -= criticalHit
             console.log('enmey hp:>>>', enemy.attributes.hp)
         }else{
             console.log('hit!')
-            message = String(damage)
+            resultMessage = String(damage)
             enemy.attributes.hp -= damage
             console.log('enmey hp:>>>', enemy.attributes.hp)
         }
     }else{
         console.log('miss!')
-        message = 'MISS!'
+        resultMessage = 'MISS!'
     }
 
-    return { message, style }
+    return { resultMessage, resultStyle }
 }
 
 const calculateEnemyMagicDefense = (enemy) => {
@@ -269,7 +271,7 @@ export const skillAttack = async(skill, player, enemy) => {
 }
 
 // Player gain expirence upon enemy defeated
-export const gainExp = (player, enemy, characterAnimationPhaseEnded) => {
+export const gainExp = (player, enemy) => {
     // Remove the enemy on the screen
     if(player.exp !== undefined){
         player.exp += enemy.givenExp
@@ -301,7 +303,7 @@ export const gainExp = (player, enemy, characterAnimationPhaseEnded) => {
                 setTimeout(() => {
                     message.style.opacity = 0
                     message.style.top = (player.y - (fontSize * 2)) + 'px'
-                    levelUp(player, characterAnimationPhaseEnded)
+                    levelUp(player)
 
                     setTimeout(() => message.remove(), 500)
                 }, 500)                
