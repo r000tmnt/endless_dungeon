@@ -52,6 +52,29 @@ export default class TileMap {
         // }
     ]
 
+    // In what condition does player clear the level
+    objective_v = ['Clear all'] // Clear all, pass X turns, Defeat XXX...etc
+
+    // In what condition does player lose the level
+    objective_f = ['Defeat all'] // Defeat all, XXX down...etc
+
+    // In what condition does player get bonus
+    objective_o = ['Within 6 turns', 'Survive all']
+
+    // Prize for clear the level
+    bonus = [
+        {
+            id: 'currency_1',
+            condition: 0,
+            amount: 100
+        },
+        {
+            id: 'exp',
+            condition: 1,
+            based_attribute: 'hp'
+        }
+    ]
+
     //負責渲染於畫面的函式
     draw(canvas, ctx){
         // console.log(walkableSpace)
