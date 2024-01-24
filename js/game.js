@@ -76,22 +76,37 @@ const appWrapper = document.getElementById('wrapper')
 const turnCounter = document.getElementById('turn')
 turnCounter.innerText = 'Turn 1'
 
+// Actiom menu UI
 const actionMenu = document.getElementById('action_menu');
 const actionMenuOptions = actionMenu.getElementsByTagName('li')
+
+// Option menu UI
 const option_menu = document.getElementById('option_menu')
 const options = option_menu.getElementsByTagName('li')
+
+// Character caption UI
 const characterCaption = document.getElementById('characterCaption')
 const characterName = document.getElementById('name')
 const characterLv = document.getElementById('lv')
 const characterAp = document.getElementById('ap')
 const characterCaptionAttributes = ['hp', 'mp']
 const gauges = document.querySelectorAll('.gauge')
+
+// Status UI
 const statusWindow = document.getElementById('status')
 const avatar = document.getElementById('avatar')
+
 const backBtn = document.getElementsByClassName('back')
+
+// Inventory UI
 const Inventory = document.getElementById('item')
 const pickUpWindow = document.getElementById('pickUp')
+
+// Skill UI
 const skillWindow = document.getElementById('skill')
+
+// Party UI
+const partyWindow = document.getElementById('party')
 
 // option menu child click event
 for(let i=0; i < options.length; i++){
@@ -296,23 +311,13 @@ const resize = () => {
     // Get the player position relative to the canvas size
     if(player !== null){
         player.setCharacterTileSize(tileSize)
-        player.setCharacterPosition(playerPosition.col * tileSize, playerPosition.row * tileSize)
-
-        playerPosition = {
-            row: parseInt(player.y / tileSize),
-            col: parseInt(player.x / tileSize)
-        }    
+        player.setCharacterPosition(playerPosition.col * tileSize, playerPosition.row * tileSize)  
     }
     console.log('player :>>>', player)
 
     if(enemy !== null){
         enemy.setCharacterTileSize(tileSize)
-        enemy.setCharacterPosition(enemyPosition.col * tileSize, enemyPosition.row * tileSize)  
-        
-        enemyPosition = {
-            row: parseInt(enemy.y / tileSize),
-            col: parseInt(enemy.x / tileSize)
-        }
+        enemy.setCharacterPosition(enemyPosition.col * tileSize, enemyPosition.row * tileSize)
     }
 
     console.log('enemy :>>>', enemy)
@@ -334,26 +339,26 @@ const resize = () => {
 
     // action menu child font size
     for(let i=0; i < actionMenuOptions.length; i++){
-        actionMenuOptions[i].style['font-size'] = fontSize + 'px';
+        actionMenuOptions[i].style.fontSize = fontSize + 'px';
     }
 
     // option menu child font size
     for(let i=0; i < options.length; i++){
-        options[i].style['font-size'] = fontSize + 'px';
+        options[i].style.fontSize = fontSize + 'px';
     }
 
     appWrapper.style.width = cameraWidth  + 'px';
     appWrapper.style.height = cameraHeight + 'px';
     
     characterCaption.style.width = Math.floor(50 * (cameraWidth / 100)) + 'px'
-    characterName.style['font-size'] = fontSize + 'px';
-    characterLv.style['font-size'] = fontsize_sm + 'px';
-    characterAp.style['font-size'] = fontsize_sm + 'px';
+    characterName.style.fontSize = fontSize + 'px';
+    characterLv.style.fontSize = fontsize_sm + 'px';
+    characterAp.style.fontSize = fontsize_sm + 'px';
 
     // Set phase transition style
     phaseWrapper.style.width = cameraWidth + 'px'
     phaseWrapper.style.height = cameraHeight + 'px' 
-    phaseElement.style['font-size'] = fontSize + 'px';
+    phaseElement.style.fontSize = fontSize + 'px';
 
     statusWindow.style.width = cameraWidth + 'px'
     statusWindow.style.height = cameraHeight + 'px' ;

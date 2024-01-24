@@ -5,7 +5,7 @@ export default {
             "name": "Fighter",
             "prefer_attributes": [ "str", "def" ],
             "base_attribute": {
-                "hp": 15, 
+                "hp": 5, 
                 "mp": 10, 
                 "maxHp": 15, 
                 "maxMp": 10, 
