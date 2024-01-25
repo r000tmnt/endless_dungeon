@@ -193,7 +193,7 @@ export default class Character {
 
     #stopMoving(){
         console.log('Stop walking animation')
-        this.walkableSpace.splice(0)
+        // this.walkableSpace.splice(0)
         this.destination = null 
         // Tell the game engine to unfreeze other objects
         animationSignal(false)
@@ -235,7 +235,7 @@ export default class Character {
                 
                 // Assign the attributes to the object
                 if(job){
-                    this.id = Math.floor(Math.random() * 100)
+                    this.id = `${String(Date.now())}P${String(performance.now())}`
                     this.name = attributes.name
                     this.lv = 1
                     this.class = job.name
@@ -286,7 +286,7 @@ export default class Character {
                 
                 // Assign the attributes to the object
                 if(job){
-                    this.id = Math.floor(Math.random() * 100)
+                    this.id = `${String(Date.now())}E${String(performance.now())}`
                     this.name = attributes.name
                     this.lv = 1
                     this.class = job.name

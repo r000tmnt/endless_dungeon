@@ -11,6 +11,7 @@ import {
     resizePickUp, 
     clearPickUpWindow 
 } from './utils/inventory.js'
+import { resizeHiddenElement } from './utils/ui.js'
 import setting from './utils/setting.js';
 
 // aspect ratio
@@ -54,20 +55,53 @@ var turnType = 0
 let velocity = 1;
 
 // Create player object
-let player = tileMap.getPlayer(velocity)
-var playerPosition = {
-    row: parseInt(player.y / tileSize),
-    col: parseInt(player.x / tileSize)
-}
+let player = []
+let playerPosition = []
+
+setting.player.forEach(p => {
+    const newPlayer = tileMap.getCharacter(velocity, 2, p.name, p.job)
+    player.push(newPlayer)
+
+})
+
+// Sort from fastest to slowest, define acting order
+player.sort((a, b) => b.attributes.spd - a.attributes.spd)
+
+player.forEach(p => {
+    playerPosition.push(
+        {
+            row: parseInt(p.y / tileSize),
+            col: parseInt(p.x / tileSize)
+        }
+    )
+})
+
 // Create enemy object
-let enemy = tileMap.getEnemy(velocity)
+let enemy = []
+let enemyPosition = []
+let enemyActingCount = 0
 
-var enemyPosition = {
-    row: parseInt(enemy.y / tileSize),
-    col: parseInt(enemy.x / tileSize)
-}
+tileMap.enemy.forEach(e => {
+    const newPlayer = tileMap.getCharacter(velocity, 3, e.name, e.job)
+    enemy.push(newPlayer)
+})
 
+// Sort from fastest to slowest, define acting order
+enemy.sort((a,b) => b.attributes.spd - a.attributes.apd)
+
+enemy.forEach(e => {
+    enemyPosition.push(
+        {
+            row: parseInt(e.y / tileSize),
+            col: parseInt(e.x / tileSize)
+        }
+    )
+})
+
+// The character you clicked
 var inspectingCharacter = null
+// The position of the character you clicked
+var inspectingPosition = null
 // #endregion
 
 // #region UI element variables and functions
@@ -112,13 +146,30 @@ const partyWindow = document.getElementById('party')
 for(let i=0; i < options.length; i++){
     switch(options[i].dataset.option){
         case 'party':
+            options[i].addEventListener('click', () => {
+                const memberList = document.getElementById('member_list')
+                const member = document.createElement('li')
+                const memberIcon = document.createElement('img')
+                const memberInfo = document.createElement('div')
+                const memberName = document.createElement('span')
+                const memberLv = document.createElement('span')
+                member.classList.add('member')
+                member.classList.add('flex')
+                // member.style
+
+                partyWindow.classList.remove('invisible')
+            })
         break;
         case 'config':
         break;
         case 'end':
             options[i].addEventListener('click', () => {
-                player.attributes.ap = 0
-                characterAnimationPhaseEnded()
+                player.forEach(p => {
+                    p.attributes.ap = 0
+                    p.wait = true
+                })
+                grid.setPointedBlock({})
+                nextTurn()
                 option_menu.classList.remove('action_menu_open')
             })
         break;
@@ -184,35 +235,39 @@ for(let i=0; i < actionMenuOptions.length; i++){
         case 'move':
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement() 
-                await action.setMove(tileMap, playerPosition, player.attributes.moveSpeed, enemyPosition)           
+                const position = playerPosition.find(p => p.row === parseInt(inspectingCharacter.y / tileSize) && p.col === parseInt(inspectingCharacter.x / tileSize))
+                const possibleEncounterEnemyPosition = limitPositonToCheck(inspectingCharacter.attributes.moveSpeed, position, enemyPosition)
+                await action.setMove(tileMap, inspectingCharacter, position, inspectingCharacter.attributes.moveSpeed, possibleEncounterEnemyPosition)           
             })
         break;
         case 'attack':
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement() 
-                await action.setAttack(tileMap, playerPosition, 1)
+                const position = playerPosition.find(p => p.row === parseInt(inspectingCharacter.y / tileSize) && p.col === parseInt(inspectingCharacter.x / tileSize))
+                await action.setAttack(tileMap, inspectingCharacter, position, 1)
             })
         break;   
         case "skill":
             actionMenuOptions[i].addEventListener('click', () => {
                 hideUIElement()
-                action.setSKillWindow(player, tileMap, playerPosition)
+                const position = playerPosition.find(p => p.row === parseInt(inspectingCharacter.y / tileSize) && p.col === parseInt(inspectingCharacter.x / tileSize))
+                action.setSKillWindow(inspectingCharacter, tileMap, position)
             })
         break;
         case 'item':
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement()
                 action.mode = 'item'
-                constructInventoryWindow(player, enemyPosition, tileMap)
+                constructInventoryWindow(inspectingCharacter, enemyPosition, tileMap)
             })
         break; 
         case 'pick':
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement()
-                const event = tileMap.getEventOnTile({x: player.x, y: player.y})
+                const event = tileMap.getEventOnTile({x: inspectingCharacter.x, y: inspectingCharacter.y})
                 action.mode = 'pick'
                 const { width, height } = setting.general.camera
-                constructPickUpWindow(player, width, height, event.item, tileMap)
+                constructPickUpWindow(inspectingCharacter, width, height, event.item, tileMap)
             })
         break;
         case 'status':
@@ -225,8 +280,8 @@ for(let i=0; i < actionMenuOptions.length; i++){
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement()
                 setTimeout(() => {
-                    player.attributes.ap -= 1
-                    characterAnimationPhaseEnded()
+                    inspectingCharacter.attributes.ap -= 1
+                    characterAnimationPhaseEnded(inspectingCharacter)
                 }, 500)
             })
     }
@@ -309,16 +364,17 @@ const resize = () => {
     const cameraHeight = setting.general.camera.height = tileSize * 16 
 
     // Get the player position relative to the canvas size
-    if(player !== null){
-        player.setCharacterTileSize(tileSize)
-        player.setCharacterPosition(playerPosition.col * tileSize, playerPosition.row * tileSize)  
-    }
+    player.forEach((p, index) => {
+        p.setCharacterTileSize(tileSize)
+        p.setCharacterPosition(playerPosition[index].col * tileSize, playerPosition[index].row * tileSize) 
+    })
+ 
     console.log('player :>>>', player)
 
-    if(enemy !== null){
-        enemy.setCharacterTileSize(tileSize)
-        enemy.setCharacterPosition(enemyPosition.col * tileSize, enemyPosition.row * tileSize)
-    }
+    enemy.forEach((e, index) => {
+        e.setCharacterTileSize(tileSize)
+        e.setCharacterPosition(enemyPosition[index].col * tileSize, enemyPosition[index].row * tileSize)
+    })
 
     console.log('enemy :>>>', enemy)
 
@@ -360,35 +416,29 @@ const resize = () => {
     phaseWrapper.style.height = cameraHeight + 'px' 
     phaseElement.style.fontSize = fontSize + 'px';
 
-    statusWindow.style.width = cameraWidth + 'px'
-    statusWindow.style.height = cameraHeight + 'px' ;
-    statusWindow.style.padding = fontsize_sm + 'px';
-
-    avatar.style.width = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
-    avatar.style.height = Math.floor( 50 * Math.floor(cameraWidth / 100)) + 'px';
+    // Set status window style
+    resizeHiddenElement(statusWindow.style, cameraWidth, cameraHeight, fontsize_sm)
+    avatar.style.width = Math.floor(cameraWidth * 0.3) + 'px';
+    avatar.style.height = Math.floor(cameraWidth * 0.3) + 'px';
 
     // Set skill window style
-    skillWindow.style.width = cameraWidth + 'px'
-    skillWindow.style.height = cameraHeight + 'px' 
-    skillWindow.style.padding = fontsize_sm + 'px';
+    resizeHiddenElement(skillWindow.style, cameraWidth, cameraHeight, fontsize_sm)
 
     // Set inventory style
-    Inventory.style.width = cameraWidth + 'px'
-    Inventory.style.height = cameraHeight + 'px' 
-    Inventory.style.padding = fontsize_sm + 'px';
+    resizeHiddenElement(Inventory.style, cameraWidth, cameraHeight, fontsize_sm)
+
+    // Set pick up window style
+    resizeHiddenElement(pickUpWindow.style, cameraWidth, cameraHeight, fontsize_sm)
+
+    // Set party window style
+    resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontsize_sm)
 
     for(let i=0; i < backBtn.length; i++){
         backBtn[i].style.transform = `translateX(-${fontsize_sm}px)`
         backBtn[i].style.top = fontsize_sm + 'px'        
     }
 
-    // Set pick up window style
-    pickUpWindow.style.width = cameraWidth + 'px' 
-    pickUpWindow.style.height = cameraHeight + 'px' 
-    pickUpWindow.style.padding = fontsize_sm + 'px';
-
     // Get canvas position after resize
-    ctx = canvas.getContext("2d");
     canvasPosition = canvas.getBoundingClientRect();
 
     console.log('canvas element :>>>', canvas)
@@ -436,22 +486,26 @@ canvas.addEventListener('mousedown', async(event) =>{
     
     // If not playing animation
     if(!action.animationInit){
-        // If there are selectable blocks in the array
-        if(action.mode === 'move' || action.mode === 'attack' || action.mode === 'skill' || action.mode === 'item'){
+        
+        // Define who is on the tile you clicked
+        inspectingCharacter = player.find(p => p.y === (row * tileSize) && p.x === (col * tileSize))
 
-            const movable = (action.mode === 'move')? 
-                 action.move(tileMap, row, col, playerPosition, player) : 
-                await action.command(canvas, row, col, player, enemy, enemyPosition, tileSize, tileMap)
+        // If is not a player, checking enmey instead
+        if(inspectingCharacter === undefined){
+            inspectingCharacter = enemy.find(e => e.y === (row * tileSize) && e.x === (col * tileSize))
+        }
 
-            if(!movable){
+        let movable = false
 
-                if(action.mode === 'skill'){
-                    // Back to skill window
-                    action.setSKillWindow(player, tileMap, playerPosition)
-                }else if(action.mode === 'item'){
-                    // Back to inventory
-                    constructInventoryWindow(player)
-                }else{
+        switch(action.mode){
+            case 'move':{
+                const currentActingPlayer = player.find(p => p.walkableSpace.length)
+               
+                const position = playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
+
+                movable = action.move(tileMap, row, col, position, currentActingPlayer)      
+                
+                if(!movable){
                     // Cancel action
                     if(!characterCaption.classList.contains('invisible')){
                         characterCaption.classList.add('invisible') 
@@ -465,77 +519,94 @@ canvas.addEventListener('mousedown', async(event) =>{
                         actionMenu.classList.add('action_menu_open') 
                     }
 
-                    action.mode = ''                    
-                }
-            }else{
-                characterCaption.classList.add('invisible') 
-            }
-
-        }else
-        // if this tile is player
-        if((row * tileSize) === player?.y && (col * tileSize) === player?.x){
-            console.log('I am player')
-
-            inspectingCharacter = player
-
-            //Reset action menu option style
-            for(let i=0; i < actionMenuOptions.length; i++){
-                actionMenuOptions[i].style.display = 'block'
-            }
-
-            checkAp()
-
-            // Check if the tile has an event
-            await checkIfStepOnTheEvent(player.x, player.y)
-
-            // Keep tracking player position
-            playerPosition = { row, col }
-
-            prepareCharacterCaption(inspectingCharacter)
-
-            displayUIElement()
-            option_menu.classList.remove('action_menu_open')
-        }else
-        // if this tile is enemy
-        if((row * tileSize) === enemy?.y && (col * tileSize) === enemy?.x){
-            // Fill the element with a portion of the character info
-            console.log('I am the enemy')
-            inspectingCharacter = enemy
-
-            // Hide parts of action menu
-            for(let i=0; i < actionMenuOptions.length; i++){
-               if (actionMenuOptions[i].dataset.action !== 'status'){
-                actionMenuOptions[i].style.display = 'none'
-               }
-            }
-
-            prepareCharacterCaption(inspectingCharacter)
-
-            // Open UI element
-            displayUIElement()
-            option_menu.classList.remove('action_menu_open')
-        }else{
-            if(option_menu.classList.contains('action_menu_open')){
-                option_menu.classList.remove('action_menu_open')
-            }else{
-                // Shift UI position based on the character position
-                if(playerPosition.row < 7 && playerPosition.col < Math.floor(9/2)){
-                    option_menu.style.left = (tileSize * 6) + 'px'
+                    action.mode = ''  
                 }else{
-                    option_menu.style.left = 'unset'
+                    characterCaption.classList.add('invisible') 
+                }
+            }
+            break;
+            case 'attack': case 'skill': case 'item':{
+                const currentActingPlayer = player.find(p => p.walkableSpace.length)
+               
+                const position = playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
+                
+                const possibleEncounterEnemyPosition = limitPositonToCheck(currentActingPlayer.attributes.moveSpeed, position, enemyPosition)
+                movable = await action.command(canvas, row, col, currentActingPlayer, inspectingCharacter, possibleEncounterEnemyPosition, tileSize, tileMap)
+
+                if(!movable){
+                    if(action.mode === 'skill'){
+                        // Back to skill window
+                        action.setSKillWindow(currentActingPlayer, tileMap, position)
+                    }else if(action.mode === 'item'){
+                        // Back to inventory
+                        constructInventoryWindow(currentActingPlayer)
+                    }
+                }else{
+                    characterCaption.classList.add('invisible') 
+                }
+            }
+            break;
+            default:
+                // if this tile is player
+                if(inspectingCharacter?.characterType === 2){
+                    console.log('I am player')
+
+                    //Reset action menu option style
+                    for(let i=0; i < actionMenuOptions.length; i++){
+                        actionMenuOptions[i].style.display = 'block'
+                    }
+
+                    checkAp(inspectingCharacter)
+
+                    // Check if the tile has an event
+                    await checkIfStepOnTheEvent(inspectingCharacter.x, inspectingCharacter.y)
+
+                    prepareCharacterCaption(inspectingCharacter)
+
+                    displayUIElement()
+                    option_menu.classList.remove('action_menu_open')
+                }else
+                // if this tile is enemy
+                if(inspectingCharacter?.characterType === 3){
+                    // Fill the element with a portion of the character info
+                    console.log('I am the enemy')
+
+                    // Hide parts of action menu
+                    for(let i=0; i < actionMenuOptions.length; i++){
+                        if (actionMenuOptions[i].dataset.action !== 'status'){
+                            actionMenuOptions[i].style.display = 'none'
+                        }
+                    }
+
+                    prepareCharacterCaption(inspectingCharacter)
+
+                    // Open UI element
+                    displayUIElement()
+                    option_menu.classList.remove('action_menu_open')
+                }else{
+                    if(option_menu.classList.contains('action_menu_open')){
+                        option_menu.classList.remove('action_menu_open')
+                    }else{
+                        // Shift UI position based on the character position
+                        if(playerPosition.row < 7 && playerPosition.col < Math.floor(9/2)){
+                            option_menu.style.left = (tileSize * 6) + 'px'
+                        }else{
+                            option_menu.style.left = 'unset'
+                        }  
+
+                        option_menu.classList.add('action_menu_open')
+                    }
+
+                    if(!characterCaption.classList.contains('invisible')){
+                        characterCaption.classList.add('invisible') 
+                    }
+
+                    if(actionMenu.classList.contains('action_menu_open')){
+                        actionMenu.classList.remove('action_menu_open') 
+                    }
                 }  
-
-                option_menu.classList.add('action_menu_open')
-            }
-
-            if(!characterCaption.classList.contains('invisible')){
-                characterCaption.classList.add('invisible') 
-            }
-
-            if(actionMenu.classList.contains('action_menu_open')){
-                actionMenu.classList.remove('action_menu_open') 
-            }
-        }        
+            break;
+        }
     }
 })
 
@@ -557,15 +628,22 @@ const getPercentage = (type, character) => {
 
 // Enemy movement decision
 const enemyAI = async() => {
-    // Get enemy position
-    enemyPosition.row = parseInt( enemy.y / tileSize)
-    enemyPosition.col = parseInt( enemy.x / tileSize)
+    grid.setPointedBlock({ ...enemyPosition[enemyActingCount] })
 
-    grid.setPointedBlock({ ...enemyPosition })
+    const { moveSpeed, sight } = enemy[enemyActingCount].attributes
 
-    const { moveSpeed, sight } = enemy.attributes
+    const possibleEncounterPlayerPosition = limitPositonToCheck(moveSpeed, enemyPosition[enemyActingCount], playerPosition)
 
-    await action.enemyMakeDecision(canvas, tileMap, enemyPosition, moveSpeed, sight, playerPosition, enemy, player)
+    await action.enemyMakeDecision(
+        canvas, 
+        tileMap, 
+        enemyPosition[enemyActingCount], 
+        moveSpeed, 
+        sight, 
+        possibleEncounterPlayerPosition.length? possibleEncounterPlayerPosition : playerPosition, 
+        enemy[enemyActingCount], 
+        player
+    )
 }
 
 // Check if the tile has an event
@@ -575,9 +653,9 @@ const checkIfStepOnTheEvent = async(x, y) => {
     actionMenuOptions[4].style.display = (event === undefined)? 'none' : 'block'
 }
 
-const checkAp = () => {
+const checkAp = (inspectingCharacter) => {
     // If player's ap is not enough to use skill
-    if(player.attributes.ap < 2){
+    if(inspectingCharacter.attributes.ap < 2){
         actionMenuOptions[2].classList.add('no-event')
     }else{
         actionMenuOptions[2].classList.remove('no-event')
@@ -594,15 +672,16 @@ const gameLoop = () => {
     }
 
     if(action.mode === 'move' && action.reachableDirections.length && !action.animationInit){
-        action.beginAnimationPhase(inspectingCharacter)
+        const currentActingPlayer = (turnType === 0)? player.find(p => p.walkableSpace.length) : enemy.find(e => e.walkableSpace.length)
+        action.beginAnimationPhase(currentActingPlayer)
     }
 
-    if(player !== null) {
-        player.draw(ctx)
+    if(player.length) {
+        player.forEach(p => p.draw(ctx))
     }
 
-    if(enemy !== null){
-        enemy.draw(ctx)
+    if(enemy.length){
+        enemy.forEach(e => e.draw(ctx))
     }
 
     if(setting.general.showGrid){
@@ -628,11 +707,11 @@ const nextTurn = () => {
         phaseWrapper.classList.remove('fade_in')
         phaseWrapper.classList.remove('fade_out')
         if(turnType === 0){
-            if(enemy?.attributes?.hp > 0){
+            if(enemy.length){
                 console.log('enemy phase')
-                enemy.wait = false
+                enemy[0].wait = false
                 turnType = 1
-                enemy.attributes.ap = enemy.attributes.maxAp
+                enemy[0].attributes.ap = enemy[0].attributes.maxAp
                 enemyAI()                 
             }else{
                 turnType = 1
@@ -640,11 +719,12 @@ const nextTurn = () => {
                 // TODO: Display result screen
             }
         }else{
-            if(player?.attributes?.hp > 0){
+            if(player.length){
                 console.log('player phase')
-                player.wait = false
+                player[0].wait = false
                 turnType = 0
-                player.attributes.ap = player.attributes.maxAp
+                player[0].attributes.ap = player[0].attributes.maxAp
+                grid.setPointedBlock({ ...playerPosition[0] })
                 turn += 1 
                 turnCounter.innerText = `Turn ${turn}`                
             }else{
@@ -667,9 +747,29 @@ window.addEventListener('resize', resize, false);
 
 // Game running based on browser refresh rate
 window.requestAnimationFrame(gameLoop)
+    
+/**
+ * Limit enemy position to check in a range based on player selectable space
+ * @param {number} range - A number of tiles a character can reach per direction 
+ * @param {object} position - An object contains character current position
+ * @param {object} targets - An Array of object contains character / enemy position
+ * @returns  An Array of filtered enemyPosition
+ */
+export const limitPositonToCheck = (range, position, targets) => {
+    const top = position.row - range
+    const down = position.row + range
+    const left = position.col - range
+    const right = position.col + range
+
+    const possibleEncounterEnemyPosition = targets.filter(e => {
+        return e.row >= top && e.row <= down && e.col >= left && e.col <= right
+    })
+
+    return possibleEncounterEnemyPosition
+}
 
 // Thing to do after animation ended
-export const characterAnimationPhaseEnded = async() => {
+export const characterAnimationPhaseEnded = async(currentActingPlayer) => {
     // if(enemy === null){
     //     // Level clear
     //     // Play secene
@@ -679,24 +779,26 @@ export const characterAnimationPhaseEnded = async() => {
 
     // If it is the player's turn
     if(turnType === 0){
-
-        playerPosition.row = player.y / tileSize
-        playerPosition.col = player.x / tileSize  
+        const index = player.findIndex(p => p.animation === currentActingPlayer.animation)
+        playerPosition[index].row = currentActingPlayer.y / tileSize
+        playerPosition[index].col = currentActingPlayer.x / tileSize  
 
         // Check if the tile has an event
-        await checkIfStepOnTheEvent(player.x, player.y)
+        await checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
 
-        player.animation = ''
-        prepareCharacterCaption(player)
+        currentActingPlayer.animation = ''
+        prepareCharacterCaption(currentActingPlayer)
 
         // If the player is ran out of action point, move to the enemy phase
-        if(player.attributes.ap === 0) {
+        if(currentActingPlayer.attributes.ap === 0) {
             grid.setPointedBlock({})
-            player.wait = true
+            currentActingPlayer.wait = true
+            currentActingPlayer.setWalkableSpace([])
             nextTurn()
         }else{
-            grid.setPointedBlock({ ...playerPosition })
-            checkAp()
+            grid.setPointedBlock({ ...playerPosition[index] })
+            inspectingCharacter = currentActingPlayer
+            checkAp(currentActingPlayer)
             // Display Action options
             actionMenu.classList.add('action_menu_open')
             characterCaption.classList.remove('invisible')
@@ -705,19 +807,28 @@ export const characterAnimationPhaseEnded = async() => {
         action.mode = ''
         console.log('reset action mode :>>>', action.mode)
     }else{
-        enemyPosition.row = enemy.y / tileSize
-        enemyPosition.col = enemy.x / tileSize  
+        const index = enemy.findIndex(e => e.animation === currentActingPlayer.animation)
+        enemyPosition[index].row = currentActingPlayer.y / tileSize
+        enemyPosition[index].col = currentActingPlayer.x / tileSize  
         // characterAp.innerText = `AP: ${player.attributes.ap}`
             
         // Move to the next phase
-        if(enemy.attributes.ap === 0){
+        if(currentActingPlayer.attributes.ap === 0){
             action.mode = ''
             console.log('reset action mode :>>>', action.mode)
             grid.setPointedBlock({})
-            enemy.wait = true
-            nextTurn()
+            currentActingPlayer.wait = true
+            currentActingPlayer.setWalkableSpace([])
+            // Check if the others run out of ap also
+            if(enemyActingCount !== (enemy.length - 1)){
+                enemyActingCount += 1
+                await enemyAI()
+                console.log('next enemy start moving')
+            }else{
+                nextTurn()                
+            }            
         }else{
-            grid.setPointedBlock({ ...enemyPosition })
+            grid.setPointedBlock({ ...enemyPosition[index] })
             // keep looking
             await enemyAI()
             console.log('enemyAI keep looking')
@@ -732,12 +843,17 @@ export const animationSignal = (signal) => {
 
 export const removeCharacter = (type) => {
     switch(type){
-        case 2:
-            player = null
+        case 2:{
+            const index = player.findIndex(p => inspectingCharacter.x === p.x && inspectingCharacter.y === p.y)
+            player.splice(index, 1)
+            playerPosition.splice(index, 1)
+        }
         break;
-        case 3:
-            enemy = null
-            enemyPosition = null
+        case 3:{
+            const index = enemy.findIndex(e => inspectingCharacter.x === e.x && inspectingCharacter.y === e.y)
+            enemy.splice(index, 1)
+            enemyPosition.splice(index, 1)
+        }
         break
     }
 }

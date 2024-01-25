@@ -20,15 +20,19 @@
                 <!-- <li class="action" data-option="save">Save</li> -->
                 <li class="action" data-option="end">End Turn</li>
             </ul>
-
-            <!-- Party -->
-            <div id="party" class="absolute invisible">
-                <ul id="member"></ul>
-            </div>
-
-            <!-- Config -->
-            <div id="config" class="absolute invisible"></div>
         </div>
+
+        <!-- Party -->
+        <div id="party" class="menu absolute invisible">
+            <div>Party</div>
+
+            <button class="back absolute" data-action="party" type="button">BACK</button>
+
+            <ul id="member_list"></ul>
+        </div>
+
+        <!-- Config -->
+        <div id="config" class="menu absolute invisible"></div>        
 
         <!-- Action Menu -->
         <div id="action_menu" class="absolute action_menu_close">

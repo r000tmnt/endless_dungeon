@@ -36,7 +36,7 @@ const levelUp = (player) => {
         }
     }
 
-    characterAnimationPhaseEnded()
+    characterAnimationPhaseEnded(player)
     console.log('player status after level up :>>>', player.attributes)
 }
 
@@ -310,7 +310,7 @@ export const gainExp = (player, enemy) => {
             }, 500)
 
         }else{
-            characterAnimationPhaseEnded()
+            characterAnimationPhaseEnded(player)
         }   
     }
 }

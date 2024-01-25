@@ -144,6 +144,7 @@ const setItemSpace = async(currentActingPlayer, enemyPosition, tileMap) => {
         selectedItem.effect.range, selectedItem.effect?.dmg? null: enemyPosition
     )
 
+    currentActingPlayer.setWalkableSpace(itemUseRange)
     setRange(itemUseRange)
 
     // Hide inventory
