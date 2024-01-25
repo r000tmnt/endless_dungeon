@@ -84,15 +84,8 @@ export default class TileMap {
 
     //負責渲染於畫面的函式
     draw(canvas, ctx){
-        // console.log(walkableSpace)
-        this.#setCanvasSize(canvas);
         this.#clearCanvas(canvas, ctx)
         this.#drawMap(ctx, 0);
-    }
-
-    #setCanvasSize(canvas){
-        canvas.height = this.map.length * this.tileSize;
-        canvas.width = this.map[0].length * this.tileSize;
     }
 
     #clearCanvas(canvas, ctx){

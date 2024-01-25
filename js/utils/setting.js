@@ -4,6 +4,7 @@ export default {
         fontSize: 0,
         fontSize_md: 0,
         fontSize_sm: 0,
+        tileSize: 0,
         camera: {
             width: 0,
             height: 0
