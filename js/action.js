@@ -3,7 +3,7 @@ import { skillAttack, weaponAttack, gainExp } from './utils/battle.js';
 import skills from './dataBase/skills.js';
 import setting from './utils/setting.js';
 import { useItem } from './utils/inventory.js'
-import { setEvent, characterAnimationPhaseEnded } from "./game.js"
+import { setEvent, setTile, characterAnimationPhaseEnded, checkDroppedItem } from "./game.js"
 
 export default class Action{
     constructor(mode, selectableSpace, reachableDirections, steps, animationInit){
@@ -131,6 +131,8 @@ export default class Action{
                     this.selectedSkill = skillData
                     // Get skill effect range
                     this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, skillData.effect.range)
+                    // Keep the array for refernce
+                    currentActingPlayer.setWalkableSpace(this.selectableSpace)
                     // Close skill window
                     skillWindow.classList.add('invisible')
                     
@@ -382,7 +384,7 @@ export default class Action{
                 player.animation = 'item'
                 const { message, type } = useItem(player)
 
-                this.#displayMessage(canvas, message, Math.floor(this.messageConfig.size * 1.5), (type === 0)? 'rgb(0, 255, 0)' : 'yellow', player.x, player.y - tileSize)   
+                this.#displayMessage(canvas, message, this.messageConfig.size, (type === 0)? 'rgb(0, 255, 0)' : 'yellow', player.x, player.y - tileSize)   
             }else{
                 if(enemyPosition.findIndex(e => e.row === row && e.col === col) >= 0){
                     let { message, style, size} = this.messageConfig 
@@ -444,7 +446,7 @@ export default class Action{
             }
 
             // Wait for damage animation to finish
-            setTimeout(() => {
+            setTimeout(async() => {
                 // Check if the enemy is defeated
                 if(enemy.attributes.hp <= 0){
                     tileMap.removeCharacter(row, col)
@@ -455,21 +457,49 @@ export default class Action{
                     
                         const totalDropRate = enemy.drop.reduce((accu, current) => accu + current.rate, 0)
 
+                        console.log('totol drop rate :>>>', totalDropRate)
+        
                         enemy.drop.forEach(item => {
                             item.rate = item.rate / totalDropRate
                         });
-
+        
+                        console.log('Each drop rate :>>>', enemy.drop)
+        
+                        // Multiply with luck
                         const randomDrop = Math.random()
+                        const bonus = randomDrop * (player.attributes.lck / 100)
+        
+                        console.log('init random drop :>>>', randomDrop)
+                        console.log('drop bonus :>>>', bonus)
 
-                        const dropItems = enemy.drop.filter(item => randomDrop <= item.rate)
+                        const finalDrop = randomDrop + bonus
 
+                        console.log('final drop :>>>', finalDrop)
+        
+                        let dropItems = enemy.drop.filter(item => item.rate <= finalDrop)
+        
                         console.log('random item drop :>>>', dropItems)
-                        
+        
                         // Leave the item on the ground
-                        if(dropItems.length) setEvent({x: enemy.x, y: enemy.y}, dropItems)
-                    }else if(enemy.bag.length){
-                        // Leave the player's item on the ground
-                        setEvent({x: enemy.x, y: enemy.y}, enemy.bag)            
+                        if(dropItems.length){
+                            dropItems = await checkDroppedItem(dropItems)
+        
+                            setEvent({x: enemy.x, y: enemy.y}, dropItems)
+                            setTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
+                        }else{
+                            // At least drop a key to continue the game
+                            setEvent({x: enemy.x, y: enemy.y}, [
+                                {
+                                    amount: 1,
+                                    id: "key_dark_1",
+                                    rate: 0.45454545454545453,
+                                    type: 6
+                                }
+                            ])
+                            setTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
+                        }
+                    }else{
+                
                     }
                 }else{
                     characterAnimationPhaseEnded(player)

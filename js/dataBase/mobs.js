@@ -42,7 +42,7 @@ export default{
                     "id": "key_dark_1",
                     "amount": 1,
                     "type": 6,
-                    "rate": 100
+                    "rate": 220
                 }
             ]
         }

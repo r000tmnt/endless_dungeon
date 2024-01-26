@@ -308,6 +308,7 @@ const filterItem = (type) => {
  * @param {object} tileMap - An object contains information about the tileMap
  */
 const pickUpItem = (currentActingPlayer, tileMap) => {
+    const { itemBlockMargin } = setting.inventory
     const pickUpWindow = document.getElementById('pickUp')
     const droppedItems = document.getElementById('dropped-items')
     // 1. Check if there's the same item in the bag

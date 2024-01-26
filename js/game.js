@@ -14,8 +14,12 @@ import {
     hideOptionMenu,
     toggleActionMenuAndCharacterCaption,
     toggleActionMenuOption,
+    togglePhaseTranistion,
     prepareCharacterCaption,
-    displayUIElement
+    displayUIElement,
+    hideUIElement,
+    cancelAction,
+    countTurn
 } from './utils/ui.js'
 import setting from './utils/setting.js';
 
@@ -125,22 +129,9 @@ canvas.addEventListener('mousedown', async(event) =>{
                 movable = action.move(tileMap, row, col, position, currentActingPlayer)      
                 
                 if(!movable){
-                    // Cancel action
-                    if(!characterCaption.classList.contains('invisible')){
-                        characterCaption.classList.add('invisible') 
-                    }else{
-                        characterCaption.classList.remove('invisible') 
-                    }
-
-                    if(actionMenu.classList.contains('action_menu_open')){
-                        actionMenu.classList.remove('action_menu_open') 
-                    }else{
-                        actionMenu.classList.add('action_menu_open') 
-                    }
-
-                    action.mode = ''  
+                    cancelAction()
                 }else{
-                    characterCaption.classList.add('invisible') 
+                    hideUIElement()
                 }
             }
             break;
@@ -159,9 +150,11 @@ canvas.addEventListener('mousedown', async(event) =>{
                     }else if(action.mode === 'item'){
                         // Back to inventory
                         constructInventoryWindow(currentActingPlayer)
+                    }else{
+                        cancelAction()
                     }
                 }else{
-                    characterCaption.classList.add('invisible') 
+                    hideUIElement()
                 }
             }
             break;
@@ -175,10 +168,7 @@ canvas.addEventListener('mousedown', async(event) =>{
 
                     checkAp(inspectingCharacter)
 
-                    // Check if the tile has an event
-                    await checkIfStepOnTheEvent(inspectingCharacter.x, inspectingCharacter.y)
-
-                    prepareCharacterCaption(inspectingCharacter)
+                    prepareCharacterCaption(inspectingCharacter, tileSize)
 
                     displayUIElement()
                     hideOptionMenu()
@@ -266,18 +256,9 @@ const gameLoop = () => {
 
 // Move to the next phase
 const nextTurn = () => {
-    phaseElement.innerText = (turnType === 0)? 'Enemy Phase' : 'Player Phase'
-    // Phase transition fade in
-    phaseWrapper.classList.add('fade_in')
-    // Phase transition fade out
-    setTimeout(() => {
-        phaseWrapper.classList.add('fade_out')
-    }, 1000)
+    togglePhaseTranistion(turnType)
 
-    //
     setTimeout(() => {
-        phaseWrapper.classList.remove('fade_in')
-        phaseWrapper.classList.remove('fade_out')
         if(turnType === 0){
             if(enemy.length){
                 console.log('enemy phase')
@@ -298,7 +279,7 @@ const nextTurn = () => {
                 player[0].attributes.ap = player[0].attributes.maxAp
                 grid.setPointedBlock({ ...playerPosition[0] })
                 turn += 1 
-                turnCounter.innerText = `Turn ${turn}`                
+                countTurn(turn)               
             }else{
                 turnType = 0
                 nextTurn()
@@ -318,10 +299,39 @@ window.addEventListener('resize', resize, false);
 
 // Game running based on browser refresh rate
 window.requestAnimationFrame(gameLoop)
+
+export const checkDroppedItem = async(dropItems) => {
+    const playerHasKey = false
+    const dropKey = dropItems.findIndex(i => i.id.includes('key')) >= 0
+
+    for(let i=0; i < player.length; i++){
+        if(player[i].bag.findIndex(i => i.id.includes('key')) >= 0){
+            playerHasKey = true
+            return
+        }
+    }
+
+    // If player doesn't get any key and the enemy didn't drop any key
+    if(!playerHasKey && !dropKey){
+        // Add a key to the arrat
+        dropItems.push(
+            {
+                amount: 1,
+                id: "key_dark_1",
+                rate: 0.45454545454545453,
+                type: 6
+            }
+        )
+    }
+
+    return dropItems
+}
     
 // Check if the tile has an event
 export const checkIfStepOnTheEvent = async(x, y) => {
-    return tileMap.event.find(e => e.position.x === x && e.position.y === y && e.trigger === 'stepOn')
+    const event = tileMap.event.find(e => e.position.x === x && e.position.y === y && e.trigger === 'stepOn')
+
+    if(event !== undefined) toggleActionMenuOption('pick', false, 'event')
 }
 
 /**
@@ -356,8 +366,8 @@ export const characterAnimationPhaseEnded = async(currentActingPlayer) => {
     // If it is the player's turn
     if(turnType === 0){
         const index = player.findIndex(p => p.animation === currentActingPlayer.animation)
-        playerPosition[index].row = currentActingPlayer.y / tileSize
-        playerPosition[index].col = currentActingPlayer.x / tileSize  
+        playerPosition[index].row = parseInt(currentActingPlayer.y / tileSize)
+        playerPosition[index].col = parseInt(currentActingPlayer.x / tileSize)  
 
         // Check if the tile has an event
         await checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
@@ -383,8 +393,8 @@ export const characterAnimationPhaseEnded = async(currentActingPlayer) => {
         console.log('reset action mode :>>>', action.mode)
     }else{
         const index = enemy.findIndex(e => e.animation === currentActingPlayer.animation)
-        enemyPosition[index].row = currentActingPlayer.y / tileSize
-        enemyPosition[index].col = currentActingPlayer.x / tileSize  
+        enemyPosition[index].row = parseInt(currentActingPlayer.y / tileSize)
+        enemyPosition[index].col = parseInt(currentActingPlayer.x / tileSize) 
         // characterAp.innerText = `AP: ${player.attributes.ap}`
             
         // Move to the next phase

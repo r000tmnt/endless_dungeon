@@ -1,4 +1,4 @@
-import { animationSignal, removeCharacter, setTile } from './game.js'
+import { animationSignal, removeCharacter, setTile, setEvent } from './game.js'
 import classes from './dataBase/class.js'
 import mob from './dataBase/mobs.js'
 import weapon from './dataBase/item/item_weapon.js'
@@ -199,7 +199,7 @@ export default class Character {
         animationSignal(false)
     }
 
-    #fadeOutTimer = (ctx, characterType) => {
+    async #fadeOutTimer(ctx, characterType){
         if(this.alpha > 0){
             console.log('blinking')
             ctx.save()
@@ -212,9 +212,10 @@ export default class Character {
             this.characterIsMoving = false
             removeCharacter(characterType)
 
-            // Display item image
-            if(this?.bag?.length || this?.drop?.length){
-                setTile(Math.floor(this.y / this.tileSize), Math.floor(this.x / this.tileSize), 4)
+            // If player lose, drop all items
+            if(this?.bag?.length){
+                setEvent({x: enemy.x, y: enemy.y}, this.bag)
+                setTile(parseInt(this.y / this.tileSize), parseInt(this.x / this.tileSize), 4)
             }
         }
     }

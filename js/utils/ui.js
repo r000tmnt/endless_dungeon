@@ -17,6 +17,7 @@ import {
     inspectingCharacter,
     checkIfStepOnTheEvent,
     limitPositonToCheck,
+    characterAnimationPhaseEnded,
     tileMap,
     grid,
     range,
@@ -98,8 +99,7 @@ for(let i=0; i < options.length; i++){
                     p.attributes.ap = 0
                     p.wait = true
                 })
-                grid.setPointedBlock({})
-                nextTurn()
+                characterAnimationPhaseEnded(player[0])
                 option_menu.classList.remove('action_menu_open')
             })
         break;
@@ -246,9 +246,44 @@ const resizeHiddenElement = (target, width, height, size) => {
     target.height = height + 'px'
 }
 
-const hideUIElement = () => {
+export const countTurn = (turn) => {
+    turnCounter.innerText = `Turn ${turn}` 
+}
+
+export const togglePhaseTranistion = (turnType) => {
+    phaseElement.innerText = (turnType === 0)? 'Enemy Phase' : 'Player Phase'
+    // Phase transition fade in
+    phaseWrapper.classList.add('fade_in')
+    // Phase transition fade out
+    setTimeout(() => {
+        phaseWrapper.classList.add('fade_out')
+    }, 1000)
+
+    setTimeout(() => {
+        phaseWrapper.classList.remove('fade_in')
+        phaseWrapper.classList.remove('fade_out') 
+    }, 1500);
+}
+
+export const hideUIElement = () => {
     actionMenu.classList.remove('action_menu_open')
     characterCaption.classList.add('invisible') 
+}
+
+export const cancelAction = () => {
+    if(!characterCaption.classList.contains('invisible')){
+        characterCaption.classList.add('invisible') 
+    }else{
+        characterCaption.classList.remove('invisible') 
+    }
+
+    if(actionMenu.classList.contains('action_menu_open')){
+        actionMenu.classList.remove('action_menu_open') 
+    }else{
+        actionMenu.classList.add('action_menu_open') 
+    }
+
+    action.mode = ''  
 }
 
 export const displayUIElement = () => {
@@ -256,7 +291,7 @@ export const displayUIElement = () => {
     characterCaption.classList.remove('invisible') 
 }
 
-export const prepareCharacterCaption = (inspectingCharacter) => {
+export const prepareCharacterCaption = (inspectingCharacter, tileSize) => {
     // Fill the element with a portion of the character info
     characterName.innerText = inspectingCharacter.name
     characterLv.innerText = `LV ${inspectingCharacter.lv}`
@@ -279,7 +314,7 @@ export const prepareCharacterCaption = (inspectingCharacter) => {
         gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], inspectingCharacter) + '%';
     }
 
-    const position = (inspectingCharacter.characterType === 2)? playerPosition : enemyPosition
+    const position = (inspectingCharacter.characterType === 2)? playerPosition[player.findIndex(p => p.id === inspectingCharacter.id)] : enemyPosition[enemy.findIndex(e => e.id === inspectingCharacter.id)]
 
     // Shift UI position based on the character position
     if(position.row > 7 && position.col < Math.floor(9/2)){
@@ -296,13 +331,19 @@ export const prepareCharacterCaption = (inspectingCharacter) => {
     }  
 }
 
-export const toggleActionMenuOption = (action, disable, mode = 'event') => {
+export const toggleActionMenuOption = (action, disable, mode = '') => {
     for(let i=0; i < actionMenuOptions.length; i++){
-        if(actionMenuOptions[i].dataset.action === action && disable){
-            actionMenuOptions[i].classList.add('no-event')
-            return
-        }else{
-            actionMenuOptions[i].classList.remove('no-event')
+        if(actionMenuOptions[i].dataset.action === action){
+            if(mode.length){
+                if(mode === 'event'){
+                    actionMenuOptions[i].style.display = (disable)? 'none' : 'block'
+                }
+            }else
+            if(disable){
+                actionMenuOptions[i].classList.add('no-event')
+            }else{
+                actionMenuOptions[i].classList.remove('no-event')
+            }
             return
         }
     }
@@ -336,17 +377,17 @@ export const alterActionMenu = () => {
     }
 }
 
-export const toggleOptionMenu = (tileSize) => {option_menu.classList.add('action_menu_open')
+export const toggleOptionMenu = (tileSize) => {
     if(option_menu.classList.contains('action_menu_open')){
         option_menu.classList.remove('action_menu_open')
     }else{
-    // Shift UI position based on the character position
-    if(playerPosition.row < 7 && playerPosition.col < Math.floor(9/2)){
-        option_menu.style.left = (tileSize * 6) + 'px'
-    }else{
-        option_menu.style.left = 'unset'
-    }  
-        
+        // Shift UI position based on the character position
+        if(playerPosition.row < 7 && playerPosition.col < Math.floor(9/2)){
+            option_menu.style.left = (tileSize * 6) + 'px'
+        }else{
+            option_menu.style.left = 'unset'
+        }  
+            
         option_menu.classList.add('action_menu_open')
     }
 }
@@ -414,7 +455,7 @@ export const resize = () => {
 
     const fontsize_sm = setting.general.fontSize_sm = Math.floor(fontSize * 0.5)
 
-    action.setFontSize(Math.floor(fontSize * 1.25))
+    action.setFontSize(Math.floor(fontSize * 2))
 
     // calculation the percentage of the attribute
     for(let i=0; i < gauges.length; i++){
