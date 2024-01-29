@@ -61,10 +61,10 @@ export default class Action{
         const skills = document.querySelectorAll('.skill')
         const title = document.getElementById('skill').children[0]
 
-        const skillItemHeight = Math.floor(width * (30/100))
+        const { itemBlockSize } = setting.inventory
         title.style.fontSize = fontSize + 'px'
 
-        skillList.style.maxHeight = (skillItemHeight * 3) + 'px'
+        skillList.style.maxHeight = (itemBlockSize * 3) + 'px'
 
         skills.forEach(skill => {
             skill.style.fontSize = fontSize_md + 'px'
@@ -83,10 +83,9 @@ export default class Action{
         const title = skillWindow.children[0]
         const skillList = document.querySelector('.learned-skills')
         const { fontSize, fontSize_md, fontSize_sm } = setting.general
-        const { width } = setting.general.camera
-        const skillItemHeight = Math.floor(width * (30/100))
+        const { itemBlockSize } = setting.inventory
 
-        skillList.style.maxHeight = (skillItemHeight * 3) + 'px'
+        skillList.style.maxHeight = (itemBlockSize * 3) + 'px'
         title.style.fontSize = fontSize + 'px'
 
         for(let i=0; i < currentActingPlayer.skill.length; i++){
