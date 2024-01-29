@@ -408,8 +408,14 @@ li{
     height: 0.5rem;
   }
   
-  .learned-skills{
+  .learned-skills, #member_list{
     overflow-y: scroll;
+  }
+
+  #member_list > li{
+    background: black;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .skill{
