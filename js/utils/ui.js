@@ -21,7 +21,8 @@ import {
     tileMap,
     grid,
     range,
-    action
+    action,
+    option
  } from '../game.js';
 
 // Get UI element and bind a click event
@@ -78,16 +79,8 @@ for(let i=0; i < options.length; i++){
     switch(options[i].dataset.option){
         case 'party':
             options[i].addEventListener('click', () => {
-                const memberList = document.getElementById('member_list')
-                const member = document.createElement('li')
-                const memberIcon = document.createElement('img')
-                const memberInfo = document.createElement('div')
-                const memberName = document.createElement('span')
-                const memberLv = document.createElement('span')
-                member.classList.add('member')
-                member.classList.add('flex')
-                // member.style
-
+                option.mode = 'party'
+                option.setPartyWindow(player, setting, action)
                 partyWindow.classList.remove('invisible')
             })
         break;
@@ -116,7 +109,9 @@ for(let i=0; i < backBtn.length; i++){
                 skillWindow.classList.add('invisible')
                 skillWindow.classList.remove('open_window')
                 action.clearSkillWindow()
-                prepareCharacterCaption(inspectingCharacter)
+                if(inspectingCharacter){
+                    prepareCharacterCaption(inspectingCharacter) 
+                 }
                 displayUIElement()
             })
         break;
@@ -127,7 +122,9 @@ for(let i=0; i < backBtn.length; i++){
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
                 action.resetStatusWindow()
-                prepareCharacterCaption(inspectingCharacter)
+                if(inspectingCharacter){
+                   prepareCharacterCaption(inspectingCharacter) 
+                }
                 displayUIElement()
             })
         break;
@@ -139,7 +136,9 @@ for(let i=0; i < backBtn.length; i++){
                 Inventory.classList.add('invisible')
                 Inventory.classList.remove('open_window')
                 clearInventory()
-                prepareCharacterCaption(inspectingCharacter)
+                if(inspectingCharacter){
+                   prepareCharacterCaption(inspectingCharacter) 
+                }
                 displayUIElement()
             })
         break;
@@ -153,6 +152,13 @@ for(let i=0; i < backBtn.length; i++){
                 clearPickUpWindow()
                 prepareCharacterCaption(inspectingCharacter)
                 displayUIElement()
+            })
+        break;
+        case 'party':
+            backBtn[i].addEventListener('click', () => {
+                partyWindow.classList.add('invisible')
+                option.mode = ''
+                option.cleatPartyWindow()
             })
         break;
     }
@@ -530,6 +536,12 @@ export const resize = () => {
         break;
         case 'skill':
             action.resizeSkillWindow(fontSize, fontSize_md, fontsize_sm, cameraWidth, tileSize)
+        break;
+    }
+
+    switch(option.mode){
+        case 'party':
+            option.resizePartyWindow(setting)
         break;
     }
 }
