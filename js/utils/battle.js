@@ -7,6 +7,7 @@ import { characterAnimationPhaseEnded } from "../game"
 // Player level up if the exp reached the required amount
 const levelUp = (player) => {
     // Player level up
+    player.lv += 1
     // Extend the required exp for the next level
     player.requiredExp += player.requiredExp * 1.5
 
