@@ -454,6 +454,12 @@ export default class Action{
                     // Calculate item drop rate
                     if(player.characterType === 2){
                         gainExp(player, enemy)
+
+                        // Sort in ascending order for accuracy
+                        enemy.drop.sort((a, b) => a.rate - b.rate)
+
+                        // Apply luck bonus to the lowest drop rate
+                        enemy.drop[0].rate += Math.floor(enemy.drop[0].rate * (player.attributes.lck / 100) )
                     
                         const totalDropRate = enemy.drop.reduce((accu, current) => accu + current.rate, 0)
 
@@ -467,16 +473,10 @@ export default class Action{
         
                         // Multiply with luck
                         const randomDrop = Math.random()
-                        const bonus = randomDrop * (player.attributes.lck / 100)
         
                         console.log('init random drop :>>>', randomDrop)
-                        console.log('drop bonus :>>>', bonus)
-
-                        const finalDrop = randomDrop + bonus
-
-                        console.log('final drop :>>>', finalDrop)
         
-                        let dropItems = enemy.drop.filter(item => item.rate <= finalDrop)
+                        let dropItems = enemy.drop.filter(item => randomDrop <= item.rate)
         
                         console.log('random item drop :>>>', dropItems)
         
@@ -705,6 +705,7 @@ export default class Action{
 
             playerInRange.sort((a, b) => b.attributes.def - a.attributes.def)
 
+            // Chose the player with the lowest def
             const targetPlayerPosition = {
                 row: parseInt(playerInRange[0].y / tileMap.tileSize),
                 col: parseInt(playerInRange[0].x / tileMap.tileSize)
@@ -771,7 +772,7 @@ export default class Action{
                     // Get skill effect range
                     this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, this.selectedSkill.effect.range)
 
-                    const actable = await this.command(canvas, row, col, enemy, playerInRange[0], targetPlayerPosition, enemy.tileSize, tileMap)
+                    const actable = await this.command(canvas, targetPlayerPosition.row, targetPlayerPosition.col, enemy, playerInRange[0], targetPlayerPosition, enemy.tileSize, tileMap)
 
                     if(!actable){
                         // Move
