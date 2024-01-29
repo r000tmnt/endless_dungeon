@@ -74,6 +74,9 @@ const skillWindow = document.getElementById('skill')
 // Party UI
 const partyWindow = document.getElementById('party')
 
+// Config UI
+const configWindow = document.getElementById('config')
+
 // option menu child click event
 for(let i=0; i < options.length; i++){
     switch(options[i].dataset.option){
@@ -85,6 +88,10 @@ for(let i=0; i < options.length; i++){
             })
         break;
         case 'config':
+            options[i].addEventListener('click', () => {
+                option.mode = 'config'
+                configWindow.classList.remove('invisible')
+            })
         break;
         case 'end':
             options[i].addEventListener('click', () => {
@@ -159,6 +166,12 @@ for(let i=0; i < backBtn.length; i++){
                 partyWindow.classList.add('invisible')
                 option.mode = ''
                 option.cleatPartyWindow()
+            })
+        break;
+        case 'config':
+            backBtn[i].addEventListener('click', () => {
+                option.mode = ''
+                configWindow.classList.add('invisible')
             })
         break;
     }
@@ -509,9 +522,14 @@ export const resize = () => {
     // Set party window style
     resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontsize_sm)
 
+    // Set config window style
+    resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontsize_sm)
+
+    // Set back button style
     for(let i=0; i < backBtn.length; i++){
         backBtn[i].style.transform = `translateX(-${fontsize_sm}px)`
-        backBtn[i].style.top = fontsize_sm + 'px'        
+        backBtn[i].style.top = fontsize_sm + 'px'      
+        backBtn[i].style.fontSize = fontSize_md + 'px'  
     }
 
     canvas.height = tileMap.map.length * tileSize;
@@ -535,7 +553,7 @@ export const resize = () => {
             resizePickUp(fontSize, cameraWidth)
         break;
         case 'skill':
-            action.resizeSkillWindow(fontSize, fontSize_md, fontsize_sm, cameraWidth, tileSize)
+            action.resizeSkillWindow(fontSize, fontSize_md, fontsize_sm, tileSize)
         break;
     }
 
