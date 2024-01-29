@@ -2,6 +2,7 @@ import TileMap from './TileMap.js';
 import Grid from './grid.js';
 import Action from './action.js';
 import Range from './range.js';
+import Option from './option.js';
 
 import { constructInventoryWindow } from './utils/inventory.js'
 import { 
@@ -28,13 +29,15 @@ let ctx = canvas.getContext("2d");
 // #region Tile map setup
 let tileSize = setting.general.tileSize = Math.floor(canvas.width / 9);
 
-export let tileMap = new TileMap(tileSize);
+export const tileMap = new TileMap(tileSize);
 
-export let grid = new Grid(tileMap.map, tileSize, {});
+export const grid = new Grid(tileMap.map, tileSize, {});
 
-export let range = new Range(tileMap.map, tileSize)
+export const range = new Range(tileMap.map, tileSize)
 
-export let action = new Action('', [], [], 0, false);
+export const action = new Action('', [], [], 0, false);
+
+export const option = new Option('')
 // console.log(tileMap)
 // #endregion
 
