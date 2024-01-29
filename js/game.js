@@ -38,7 +38,7 @@ export const range = new Range(tileMap.map, tileSize)
 export const action = new Action('', [], [], 0, false);
 
 export const option = new Option('')
-// console.log(tileMap)
+option.setConfigOptions(setting)
 // #endregion
 
 // #region Game logic variables

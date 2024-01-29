@@ -64,4 +64,23 @@ export default class Option{
             memberList.removeChild(memberList.firstChild)
         }
     }
+
+    setConfigOptions(setting){
+        const options = document.getElementById('config_option').querySelectorAll('input')
+
+        for(let i=0; i< options.length; i++){
+            switch(options[i].dataset.config){
+                case 'grid':
+                    options[i].checked = setting.general.showGrid
+
+                    options[i].addEventListener('click', (event) => {
+                        event.preventDefault()
+                        console.log('gridToggle :>>>', event)
+                        event.target.checked = !setting.general.showGrid
+                        setting.general.showGrid = !setting.general.showGrid
+                    })
+                break;
+            }
+        }
+    }
 }
