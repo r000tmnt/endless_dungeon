@@ -1,6 +1,9 @@
 export default {
     general: {
         showGrid: true,
+        bgm: 0,
+        se: 0,
+        filter: 'default',
         fontSize: 0,
         fontSize_md: 0,
         fontSize_sm: 0,
