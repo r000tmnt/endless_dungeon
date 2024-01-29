@@ -56,7 +56,7 @@ export default class Action{
         }
     }
 
-    resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, width, tileSize){
+    resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, tileSize){
         const skillList = document.querySelector('.learned-skills')
         const skills = document.querySelectorAll('.skill')
         const title = document.getElementById('skill').children[0]
