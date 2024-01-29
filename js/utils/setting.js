@@ -23,5 +23,7 @@ export default {
             job: 'class_fighter_1'
         }
     ],
+    saveData: [],
+    levels: [],
     clearedLevel: []
 }
