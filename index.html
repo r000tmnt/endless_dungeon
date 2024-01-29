@@ -32,7 +32,41 @@
         </div>
 
         <!-- Config -->
-        <div id="config" class="menu absolute invisible"></div>        
+        <div id="config" class="menu absolute invisible">
+            <div>Config</div>
+
+            <button class="back absolute" data-action="config" type="button">BACK</button>
+
+            <ul id="config_option" class="disable-scrollbars">
+                <!-- BGM -->
+                <label for="bgm">
+                    BGM Volumn
+                    <input type="range" data-config="bgm" name="bgm" disabled>                    
+                </label>
+                <!-- SE -->
+                <label for="se">
+                    SE Volumn
+                    <input type="range" data-config="se" name="se" disabled>
+                </label>
+                <!-- Grid -->
+                <label for="grid">
+                    Display grid
+                    <input type="radio" data-config="grid" name='grid'>
+                </label>
+                <!-- Character image filter -->
+                <div>
+                    Filter
+                    <label for="default">
+                        Default
+                        <input type="radio" data-config="filter" name=default value="defult" disabled>                        
+                    </label>
+                    <label for="retro">
+                        Retro
+                        <input type="radio" data-config="filter" name="retro" value='retro' disabled>
+                    </label>
+                </div>
+            </ul>
+        </div>        
 
         <!-- Action Menu -->
         <div id="action_menu" class="absolute action_menu_close">
