@@ -23,13 +23,22 @@ import {
     countTurn
 } from './utils/ui.js'
 import setting from './utils/setting.js';
+import level from './dataBase/level.js';
+
+const levels = level.getAll()
+let levelCount = 0
+
+// 1. Display title screen
+// 1-1. New game ---> Create character screen
+// 1-2. Load game ---> Display save slots
+// 1-3. Quit ---> Close the game
 
 let ctx = canvas.getContext("2d");
 
 // #region Tile map setup
-let tileSize = setting.general.tileSize = Math.floor(canvas.width / 9);
+let tileSize = setting.general.tileSize = Math.floor(32);
 
-export const tileMap = new TileMap(tileSize);
+export let tileMap = new TileMap(tileSize, levels[levelCount].map, levels[levelCount].event, levels[levelCount].enemy, levels[levelCount].assets);
 
 export const grid = new Grid(tileMap.map, tileSize, {});
 
@@ -53,17 +62,21 @@ var turnType = 0
 // Character movement speed
 let velocity = 1;
 
-// Create player object
-export const player = []
+// Create player object ( from character creation... )
+export const player = [
+    {
+        name: 'Player',
+        job: 'class_fighter_1'
+    }
+]
 export const playerPosition = []
 
-setting.player.forEach(p => {
+// Sort from fastest to slowest, define acting order
+player.forEach(p => {
     const newPlayer = tileMap.getCharacter(velocity, 2, p.name, p.job)
-    player.push(newPlayer)
+    p = JSON.parse(JSON.stringify(newPlayer))
 
 })
-
-// Sort from fastest to slowest, define acting order
 player.sort((a, b) => b.attributes.spd - a.attributes.spd)
 
 player.forEach(p => {
@@ -100,6 +113,13 @@ enemy.forEach(e => {
 // The character you clicked
 export var inspectingCharacter = null
 // #endregion
+
+// If there's a scene to play first
+if(tileMap.event.length){
+    const scene = tileMap.event.find(e => e.trigger === 'auto')
+
+    // Start conversation phase
+}
 
 // get mouse position and divide by tile size to see where the row and the column it clicked
 canvas.addEventListener('mousedown', async(event) =>{

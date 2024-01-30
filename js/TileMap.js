@@ -2,10 +2,12 @@ import Character from "./Character.js";
 import { getItemType } from './utils/inventory.js'
 
 // class - 物件創建的模板
-export default class TileMap {
+export default class TileMa {
     //付值給實體的物件
-    constructor(tileSize){
+    constructor(tileSize, map, event, enemy, assets){
         this.tileSize = tileSize;
+        this.map = map;
+        this.event = event;
         this.wall = this.#image("wall.png")
         this.item = this.#image("item.png")
         // this.enemy = this.#image("zombie.png")
@@ -41,22 +43,6 @@ export default class TileMap {
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ]
-
-    event = [
-        // {
-        //     position: [], // [y, x],
-        //     item: [], // { id: xxxx, type: 0, amount: 1 }
-        //     dialogue: [], // String for the scene
-        //     trigger: "stepOn" // "stepOn", "beside", "inRange"
-        // }
-    ]
-
-    enemy = [
-        {
-            name: 'Zombie',
-            job: 'mob_zombie_1'
-        }
     ]
 
     // In what condition does player clear the level
@@ -155,18 +141,18 @@ export default class TileMap {
     }
 
     // Set an event on the tile
-    setEventOnTile = (position, item = [], dialogue = [], trigger = 'stepOn') => {
-        this.event.push({position, item, dialogue, trigger})
+    setEventOnTile = (position, item = [], scene = [], trigger = 'stepOn') => {
+        this.event.push({position, item, scene, trigger})
     }
 
     // Modify the event on the tile
-    modifyEventOnTile = (mode, position, item = [], dialogue = [], trigger = 'stepOn') => {
+    modifyEventOnTile = (mode, position, item = [], scene = [], trigger = 'stepOn') => {
         const eventIndex = this.event.findIndex(e => e.position.x === position.x && e.position.y === position.y)
 
         switch(mode){
             case 'replace':
                 this.event[eventIndex].item = item
-                if(dialogue.length) this.event[eventIndex].dialogue = dialogue
+                if(scene.length) this.event[eventIndex].scene = scene
                 if(trigger.length) this.event[eventIndex].trigger = trigger
             break;
             case 'modify':
@@ -191,7 +177,7 @@ export default class TileMap {
                         this.event[eventIndex].item.push(i)
                     }
                 }) 
-                if(dialogue.length) this.event[eventIndex].dialogue = dialogue
+                if(scene.length) this.event[eventIndex].scene = scene
                 if(trigger.length) this.event[eventIndex].trigger = trigger
             break;
             case 'remove':
@@ -208,7 +194,7 @@ export default class TileMap {
         }
     }
 
-    copyEventToTile(oldPosition, newPosition, item = [], dialogue = []){
+    copyEventToTile(oldPosition, newPosition, item = [], scene = []){
         // TODO: Alter event position if needed
     }
 
