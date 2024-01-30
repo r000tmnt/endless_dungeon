@@ -21,6 +21,13 @@ export default{
                 [1, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 1, 1, 1, 1, 1, 1, 1, 1],
             ],
+            "assets": [ // define in numeric order
+                "",
+                "wall.png",
+                "",
+                "",
+                "item.png"
+            ],
             "event": [
                 {
                     "position": [],
@@ -31,16 +38,14 @@ export default{
                             "dialogue": [
                                 {
                                     "person": "none",
-                                    "message": "......"
+                                    "message": [
+                                        "......",
+                                        "You feel quite a headache, like you've been hit by a boulder or somthing."
+                                    ]
                                 },
                                 {
                                     "person": "none",
-                                    "message": "You feel quite a headache, like you've been hit by a boulder or somthing.",
-                                    "option": []
-                                },
-                                {
-                                    "person": "none",
-                                    "message": "As you gradually regain your conscious. You first...",
+                                    "message": ["As you gradually regain your conscious. You first..."],
                                     "option": [
                                         {
                                             "value": "Take a look around",
@@ -52,8 +57,9 @@ export default{
                                             "respond": "You slowly bend down your body against the ground. Then you realize that your cloth is in a poor condition, not enough to protect you from the low temperature",
                                             "effect": [
                                                 {
-                                                    "target": "hp",
-                                                    "value": -1
+                                                    "target": "player",
+                                                    "attribute": "hp",
+                                                    "value": -1,
                                                 }
                                             ]
                                         }
@@ -61,18 +67,94 @@ export default{
                                 },
                                 {
                                     "person": "none",
-                                    "message": "You heard a voice whispering beyond the entrence. It is not clear enough for anyone to understand. But it gives you a direction to follow."
+                                    "message": [
+                                        "You heard a voice whispering beyond the entrence. It is not clear enough for anyone to understand. But it gives you a direction to follow.",
+                                        "As you walk your way out of the cave. You start to get used to the lack of brightness of your surrounding.",
+                                        "That voice draws you further, until you reach a widther space",
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "background": "",
+                            "dialogue": [
+                                {
+                                    "person": "unknow",
+                                    "message": [ "Oh...you finially awake." ]
                                 },
                                 {
                                     "person": "none",
-                                    "message": "As you walk your way out of the cave. You start to get used to the lack of brightness of your surrounding"
+                                    "message": [ "Due to the darkness, you bearly saw a silhouette of a person standing on the other side of the space." ]
+                                },
+                                {
+                                    "person": "unknow",
+                                    "message": [
+                                        "You should not come any closer, they will smell you."
+                                    ]
+                                },
+                                {
+                                    "person": "none",
+                                    "message": [
+                                        "Just as the mysterious person finish the words. You have take a step already."
+                                    ]
+                                },
+                                {
+                                    "person": "unknow",
+                                    "message": [
+                                        "Shit...! What did I told you.",
+                                        "You're lucky there's only one of them.",
+                                        "Here, catch."
+                                    ]
+                                },
+                                {
+                                    "person": "none",
+                                    "message": [
+                                        "The mysterious person throws a knife on the ground near where you are standing.",
+                                        "Would you..."
+                                    ],
+                                    "option": [
+                                        {
+                                            "value": "Take the knife",
+                                            "respond": [
+                                                "Soon as you pick up the kneif on the ground. You heard another voice, and a rotten smell came after.",
+                                                "A sound of deadman approch towoards you"
+                                            ],
+                                            "effect": [] // player equipt with the knife
+                                        },
+                                        {
+                                            "value": "I trust on my own fist",
+                                            "respond": [
+                                                "You kicked the knife out of your reach. Yet it stops in the middle like it hit something solid, and it is not the sound of the ground or stone either."
+                                            ],
+                                            "effect": [
+                                                {
+                                                    "target": "enemy",
+                                                    "attribute": "hp",
+                                                    "value": -1
+                                                }   
+                                            ]
+                                        }
+                                    ]
+                                },
+                                {
+                                    "person": "unknow",
+                                    "messsage": [
+                                        "Suit yourself, I'm out of here"
+                                    ]
+                                    // proceed to battle phase
                                 }
                             ]
                         }
-                    ]
+                    ],
+                    "trigger": "auto"
                 }
             ], // Pre-defined events
-            "enemy": [],
+            "enemy": [
+                {
+                    "name": 'Zombie',
+                    "job": 'mob_zombie_1'
+                }
+            ],
             "difficulty": 1
         },
     ],
