@@ -36,13 +36,12 @@ let levelCount = 0
 let ctx = canvas.getContext("2d");
 
 // #region Tile map setup
-let tileSize = setting.general.tileSize = Math.floor(32);
 
-export let tileMap = new TileMap(tileSize, levels[levelCount].map, levels[levelCount].event, levels[levelCount].enemy, levels[levelCount].assets);
+export let tileMap = new TileMap(32, levels[levelCount].map, levels[levelCount].event, levels[levelCount].enemy, levels[levelCount].assets);
 
-export const grid = new Grid(tileMap.map, tileSize, {});
+export const grid = new Grid(tileMap.map, 32, {});
 
-export const range = new Range(tileMap.map, tileSize)
+export const range = new Range(tileMap.map, 32)
 
 export const action = new Action('', [], [], 0, false);
 
@@ -63,18 +62,13 @@ var turnType = 0
 let velocity = 1;
 
 // Create player object ( from character creation... )
-export const player = [
-    {
-        name: 'Player',
-        job: 'class_fighter_1'
-    }
-]
+export const player = []
 export const playerPosition = []
 
 // Sort from fastest to slowest, define acting order
-player.forEach(p => {
+setting.player.forEach(p => {
     const newPlayer = tileMap.getCharacter(velocity, 2, p.name, p.job)
-    p = JSON.parse(JSON.stringify(newPlayer))
+    player.push(newPlayer)
 
 })
 player.sort((a, b) => b.attributes.spd - a.attributes.spd)
@@ -82,8 +76,8 @@ player.sort((a, b) => b.attributes.spd - a.attributes.spd)
 player.forEach(p => {
     playerPosition.push(
         {
-            row: parseInt(p.y / tileSize),
-            col: parseInt(p.x / tileSize)
+            row: parseInt(p.y / 32),
+            col: parseInt(p.x / 32)
         }
     )
 })
@@ -104,8 +98,8 @@ enemy.sort((a,b) => b.attributes.spd - a.attributes.apd)
 enemy.forEach(e => {
     enemyPosition.push(
         {
-            row: parseInt(e.y / tileSize),
-            col: parseInt(e.x / tileSize)
+            row: parseInt(e.y / 32),
+            col: parseInt(e.x / 32)
         }
     )
 })
@@ -153,6 +147,7 @@ canvas.addEventListener('mousedown', async(event) =>{
                 
                 if(!movable){
                     cancelAction()
+                    inspectingCharacter = currentActingPlayer
                 }else{
                     hideUIElement()
                 }
@@ -175,6 +170,7 @@ canvas.addEventListener('mousedown', async(event) =>{
                         constructInventoryWindow(currentActingPlayer)
                     }else{
                         cancelAction()
+                        inspectingCharacter = currentActingPlayer
                     }
                 }else{
                     hideUIElement()
@@ -379,6 +375,7 @@ export const limitPositonToCheck = (range, position, targets) => {
 
 // Thing to do after animation ended
 export const characterAnimationPhaseEnded = async(currentActingPlayer) => {
+    const { tileSize } = setting.general
     // if(enemy === null){
     //     // Level clear
     //     // Play secene
