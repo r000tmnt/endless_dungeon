@@ -39,31 +39,34 @@
 
             <ul id="config_option" class="disable-scrollbars">
                 <!-- BGM -->
-                <label for="bgm">
-                    BGM Volumn
-                    <input type="range" data-config="bgm" name="bgm" disabled>                    
-                </label>
+                <p class="flex config_item">
+                    <label for="bgm">BGM</label>
+                    <input type="range" data-config="bgm" name="bgm" disabled>  
+                </p>
                 <!-- SE -->
-                <label for="se">
-                    SE Volumn
-                    <input type="range" data-config="se" name="se" disabled>
-                </label>
+                <p class="flex config_item">
+                    <label for="se">SE</label> 
+                    <input type="range" data-config="se" name="se" disabled>               
+                </p>
                 <!-- Grid -->
-                <label for="grid">
-                    Display grid
-                    <input type="radio" data-config="grid" name='grid'>
-                </label>
+                <p class="flex config_item">
+                    <label for="grid">Grid</label>
+                    <input type="radio" data-config="grid" name='grid'>             
+                </p>
                 <!-- Character image filter -->
                 <div>
                     Filter
-                    <label for="default">
-                        Default
-                        <input type="radio" data-config="filter" name=default value="defult" disabled>                        
-                    </label>
-                    <label for="retro">
-                        Retro
+
+                    <p class="flex config_item">
+                        <label for="default">Default</label>
+                        <input type="radio" data-config="filter" name=default value="defult" disabled>                   
+                    </p>
+                    
+                    <p class="flex config_item">
+                        <label for="retro">Retro</label>
                         <input type="radio" data-config="filter" name="retro" value='retro' disabled>
-                    </label>
+                    </p>
+                    
                 </div>
             </ul>
         </div>        
@@ -295,6 +298,18 @@
                 <!-- Phase -->
                 TEST
             </h3>
+        </div>
+
+        <!-- Conversation scene -->
+        <div id="conversation" class="menu absolute invisible">
+            <ul class="control">
+                <li>SKIP</li>
+                <li>HIDE</li>
+                <li>AUTO</li>
+                <li>LOG</li>
+            </ul>
+            <div id="dialogue" class="absolute invisible"></div>
+            <div id="dialogue-options" class="invisible"></div>
         </div>
     </div>
 
