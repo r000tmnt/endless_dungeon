@@ -1,12 +1,18 @@
+import { resizeHiddenElement } from './utils/ui.js'
+
 export default class Option{
     constructor(mode){
         this.mode = mode
     }
 
     setPartyWindow(player, setting, action){
+        const partyWindow = document.getElementById('party')
         const memberList = document.getElementById('member_list')
-        const { fontSize_md } = setting.general
+        const { fontSize_md, camera } = setting.general
+        const { width, height } = camera
         const { itemBlockSize, itemBlockMargin } = setting.inventory
+
+        resizeHiddenElement(partyWindow.style, width, height, fontSize_md)
 
         memberList.style.fontSize = fontSize_md + 'px'
         memberList.style.maxHeight = (itemBlockSize * 3) + 'px'
@@ -58,26 +64,48 @@ export default class Option{
         memberList.style.maxHeight = setting.general.itemBlockSize + 'px'
     }
 
-    cleatPartyWindow(){
+    cleatPartyWindow(target){
         const memberList = document.getElementById('member_list')
         while(memberList.firstChild){
             memberList.removeChild(memberList.firstChild)
         }
+
+        resizeHiddenElement(target, 0, 0, 0)
     }
 
-    setConfigOptions(setting){
-        const options = document.getElementById('config_option').querySelectorAll('input')
+    setConfigWindow(setting){
+        const configWindow = document.getElementById('config')
+        const title = configWindow.children[0]
+        const { fontSize, fontSize_md, camera } = setting.general
+        const { width, height } = camera
 
+        title.style.fontSize = fontSize + 'px'
+        configWindow.style.fontSize = fontSize_md + 'px'
+
+        resizeHiddenElement(configWindow.style, width, height, fontSize_md)
+
+
+    }
+
+    setConfigOption(setting){
+        const options = document.getElementById('config_option').querySelectorAll('input')
         for(let i=0; i< options.length; i++){
             switch(options[i].dataset.config){
                 case 'grid':
-                    options[i].checked = setting.general.showGrid
+                    if(setting.general.showGrid && options[i].value === 'true'){
+                        options[i].setAttribute('checked', 'checked')
+                    }
 
                     options[i].addEventListener('click', (event) => {
                         event.preventDefault()
-                        console.log('gridToggle :>>>', event)
-                        event.target.checked = !setting.general.showGrid
-                        setting.general.showGrid = !setting.general.showGrid
+
+                        if(options[i].value === 'true'){
+                            options[i+1].removeAttribute('checked')
+                        }else{
+                            options[i-1].setAttribute('checked', 'checked')
+                        }
+
+                        setting.general.showGrid = options[i].value === 'true'? true : false
                     })
                 break;
             }

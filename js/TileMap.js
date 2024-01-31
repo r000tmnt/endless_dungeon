@@ -8,42 +8,24 @@ export default class TileMa {
         this.tileSize = tileSize;
         this.map = map;
         this.event = event;
-        this.wall = this.#image("wall.png")
-        this.item = this.#image("item.png")
-        // this.enemy = this.#image("zombie.png")
+        this.enemy = enemy;
+        this.assets = this.#loadAssetImage(assets)
     }
 
-    #image(fileName){
-        const img = new Image();
-        img.src = `/assets/images/env/${fileName}`;
-        return img
+    #loadAssetImage(assets){
+        let tempAssets = []
+        assets.forEach(a => {
+            const img = new Image();
+            if(a.length){
+                img.src = `/assets/images/env/${a}`;
+                tempAssets.push(img)
+            }else{
+                tempAssets.push('')
+            }
+        })
+        return tempAssets
     }
 
-    // 地圖樣式的參考列表
-    // [{ type: 0; walkable: false }]
-    // 0 - ground
-    // 1 - wall
-    // 2 - player
-    // 3 - zombie
-    // 4 - item
-    map = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 3, 2, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1],
-    ]
 
     // In what condition does player clear the level
     objective_v = ['Clear all'] // Clear all, pass X turns, Defeat XXX...etc
@@ -86,14 +68,11 @@ export default class TileMa {
             let img = null
 
             switch(tile){
-                case 1:
-                    img = this.wall;
+                case 1: case 4:
+                    img = this.assets[tile];
                 break;
-                case 3:
+                case 2: case 3:
                     this.map[currentRow][column] = 0
-                break;
-                case 4:
-                    img = this.item;
                 break;
                 default:
                 break;

@@ -2,6 +2,7 @@ import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathF
 import { skillAttack, weaponAttack, gainExp } from './utils/battle.js';
 import skills from './dataBase/skills.js';
 import setting from './utils/setting.js';
+import { resizeHiddenElement } from './utils/ui.js'
 import { useItem } from './utils/inventory.js'
 import { setEvent, setTile, characterAnimationPhaseEnded, checkDroppedItem } from "./game.js"
 
@@ -49,11 +50,13 @@ export default class Action{
         player.setWalkableSpace(this.selectableSpace)
     }
 
-    clearSkillWindow(){
+    clearSkillWindow(target){
         const skillList = document.querySelector('.learned-skills')
         while(skillList.firstChild){
             skillList.removeChild(skillList.firstChild)
         }
+
+        resizeHiddenElement(target, 0, 0, 0)
     }
 
     resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, tileSize){
@@ -76,13 +79,12 @@ export default class Action{
     }
 
     // TODO: Skill menu
-    setSKillWindow(currentActingPlayer, tileMap, playerPosition){
+    setSKillWindow(currentActingPlayer, tileMap, playerPosition, fontSize, fontSize_md, fontSize_sm){
         this.mode = 'skill'
         
         const skillWindow = document.getElementById('skill')
         const title = skillWindow.children[0]
         const skillList = document.querySelector('.learned-skills')
-        const { fontSize, fontSize_md, fontSize_sm } = setting.general
         const { itemBlockSize } = setting.inventory
 
         skillList.style.maxHeight = (itemBlockSize * 3) + 'px'
@@ -173,9 +175,11 @@ export default class Action{
         }
     }
 
-    resetStatusWindow(){
+    resetStatusWindow(target){
         const statusToggle = document.querySelectorAll('.attribute-toggle')
         statusToggle.forEach(t => t.classList.add('invisible'))
+
+        resizeHiddenElement(target, 0, 0, 0)
     }
 
     /**
@@ -228,16 +232,15 @@ export default class Action{
      * Set text information for status dialog
      * @param {object} inspectingCharacter - A set of data about the inspecting character 
      */
-    setStatusWindow(inspectingCharacter){
+    setStatusWindow(inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width){
         const statusWindow = document.getElementById('status')
         const statusInfo = document.getElementById('info')
         const statusLv = statusWindow.children[2].children[0]
         const statusPt = statusWindow.children[2].children[1]
         const statusTable = statusWindow.children[3]
         const tableNode = statusTable.querySelectorAll('.status-node')
+        const avatar = document.getElementById('avatar')
         
-        const { fontSize, fontSize_md, fontSize_sm } = setting.general
-
         this.mode = 'status'
 
         statusWindow.style.fontSize = fontSize + 'px'
@@ -247,6 +250,8 @@ export default class Action{
         statusLv.innerText = `Lv ${inspectingCharacter.lv}`
         statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
         statusTable.style.fontSize = fontSize_md + 'px'
+        avatar.style.width = Math.floor(width * 0.3) + 'px';
+        avatar.style.height = Math.floor(width * 0.3) + 'px';
 
         for(let i=0; i < tableNode.length; i++){
             switch(tableNode[i].dataset.attribute){
@@ -771,7 +776,7 @@ export default class Action{
                     // Get skill effect range
                     this.selectableSpace = await getAvailableSpace(tileMap, enemyPosition, this.selectedSkill.effect.range)
 
-                    const actable = await this.command(canvas, targetPlayerPosition.row, targetPlayerPosition.col, enemy, playerInRange[0], targetPlayerPosition, enemy.tileSize, tileMap)
+                    const actable = await this.command(canvas, targetPlayerPosition.row, targetPlayerPosition.col, enemy, playerInRange[0], playerPosition, enemy.tileSize, tileMap)
 
                     if(!actable){
                         // Move

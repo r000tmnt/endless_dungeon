@@ -17,6 +17,12 @@ export default {
         itemBlockSize: 0,   
         itemBlockMargin: 0     
     },
+    player: [
+        {
+            name: 'Player',
+            job: 'class_fighter_1'
+        }
+    ],
     saveData: [],
     levels: [],
     clearedLevel: []

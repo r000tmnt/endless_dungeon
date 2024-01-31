@@ -49,24 +49,28 @@
                     <input type="range" data-config="se" name="se" disabled>               
                 </p>
                 <!-- Grid -->
-                <p class="flex config_item">
-                    <label for="grid">Grid</label>
-                    <input type="radio" data-config="grid" name='grid'>             
-                </p>
+                <div>
+                    Grid
+                    <p class="flex config_item">
+                        <label for="grid">Display</label>
+                        <input type="radio" data-config="grid" name='grid' value="true"> 
+
+                        <label for="grid">Hide</label>
+                        <input type="radio" data-config="grid" name='grid' value="false">             
+                    </p>                
+                </div>
+
                 <!-- Character image filter -->
                 <div>
                     Filter
 
                     <p class="flex config_item">
                         <label for="default">Default</label>
-                        <input type="radio" data-config="filter" name=default value="defult" disabled>                   
-                    </p>
-                    
-                    <p class="flex config_item">
+                        <input type="radio" data-config="filter" name=default value="defult" disabled>  
+
                         <label for="retro">Retro</label>
                         <input type="radio" data-config="filter" name="retro" value='retro' disabled>
                     </p>
-                    
                 </div>
             </ul>
         </div>        

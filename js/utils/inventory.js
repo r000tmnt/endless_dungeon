@@ -6,7 +6,8 @@ import material from '../dataBase/item/item_material.js'
 import other from '../dataBase/item/item_other.js'
 
 import { setEvent, setRange } from '../game.js'
-import { getAvailableSpace } from '../utils/pathFinding.js'
+import { getAvailableSpace } from './pathFinding.js'
+import { resizeHiddenElement } from './ui.js'
 import setting from './setting.js'
 // and more ...
 
@@ -570,7 +571,7 @@ export const resizePickUp = (fontSize, cameraWidth) => {
 /**
  * Clear the inventory elements on the page
  */
-export const clearInventory = () => {
+export const clearInventory = (target) => {
     const subMenu = document.getElementById('itemAction')
 
     // Close sub menu
@@ -586,17 +587,21 @@ export const clearInventory = () => {
     }
 
     itemsToTake.splice(0)
+
+    resizeHiddenElement(target, 0, 0, 0)
 }
 
 /**
  * Clear the pick up window elements on the page
  */
-export const clearPickUpWindow = () => {
+export const clearPickUpWindow = (target) => {
     const droppedItems = document.getElementById('dropped-items')
 
     while(droppedItems.firstChild){
         droppedItems.removeChild(droppedItems.firstChild)
     }
+
+    resizeHiddenElement(target, 0, 0, 0)
 }
 
 export const useItem = (currentActingPlayer) => {
@@ -654,7 +659,7 @@ export const useItem = (currentActingPlayer) => {
  * Append the all the items in to the inventory window 
  * @param {object} currentActingPlayer - An object represent current acting player 
  */
-export const constructInventoryWindow = (currentActingPlayer, enemyPosition, tileMap) => {
+export const constructInventoryWindow = (currentActingPlayer, enemyPosition, tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin, width) => {
     // Get UI elements
     const Inventory = document.getElementById('item')
     const title = Inventory.children[0]
@@ -663,10 +668,6 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
     const itemActions = subMenu.querySelectorAll('li')
     const filterButton = document.querySelectorAll('.filter')
     const desc = document.getElementById('item-desc')
-
-    const { fontSize, fontSize_sm } = setting.general
-    const { width } = setting.general.camera
-    const { itemBlockSize, itemBlockMargin } = setting.inventory
 
     desc.children[0].style.width = currentActingPlayer.tileSize + 'px'
     desc.children[0].style.height = currentActingPlayer.tileSize + 'px'
@@ -840,21 +841,18 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
  * @param {number} cameraHeight - The heigth of camera
  * @param {object} eventItem -An object represents dropped items on the tile
  */
-export const constructPickUpWindow = (currentActingPlayer, cameraWidth, cameraHeight, eventItem, tileMap) => {
+export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventItem, tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin) => {
     const pickUpWindow = document.getElementById('pickUp')
     const title = pickUpWindow.children[0]
     const droppedItems = document.getElementById('dropped-items')
     const btn = document.querySelector('.btn-group')
 
-    const { fontSize } = setting.general
-    const { itemBlockSize, itemBlockMargin } = setting.inventory
-
     title.style.fontSize = fontSize + 'px'
-    title.style.paddingBottom = (fontSize / 2) + 'px'
+    title.style.paddingBottom = fontSize_sm + 'px'
 
     // Set confirm botton style
-    btn.style.width = (cameraWidth - (Math.floor(fontSize / 2) * 2)) + 'px'
-    btn.style.padding = `${Math.floor(fontSize / 2)}px 0`
+    btn.style.width = (cameraWidth - fontSize) + 'px'
+    btn.style.padding = `${Math.floorfontSize_sm}px 0`
     btn.children[0].style.fontSize = fontSize + 'px'
     btn.children[0].style.margin = "0 auto"
     btn.children[0].setAttribute('disabled', 'true')
@@ -901,13 +899,13 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, cameraHe
         console.log(item)
 
         itemCount.style.width = 'fit-content'
-        itemCount.style.fontSize = (fontSize / 2) + 'px'
-        itemCount.style.padding = `0 ${fontSize / 4}px ${fontSize / 4}px 0`
+        itemCount.style.fontSize = fontSize_sm + 'px'
+        itemCount.style.padding = `0 ${fontSize_sm / 2}px ${fontSize_sm / 2}px 0`
         itemCount.classList.add('item-count')
 
         item.style.width = itemBlockSize + 'px'
         item.style.height = itemBlockSize + 'px'
-        item.style.fontSize = (fontSize / 2) + 'px'
+        item.style.fontSize = fontSize_sm + 'px'
 
         // If the index is the middle column
         if(((i + (i+1)) % 3) === 0){

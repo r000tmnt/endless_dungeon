@@ -249,6 +249,7 @@ li{
     background-color: black;
     color: white;
     transition: all .3s ease-in-out;
+    opacity: 0;
     z-index: 15;
 }
 
@@ -262,10 +263,19 @@ li{
 }
 
 .open_window{
-    top: 0
+    top: 0;
+    opacity: 1;
 }
 
 .open_subWindow{
+    bottom: 0;
+}
+
+.config_item{
+    align-items: center;
+}
+
+#dialogue{
     bottom: 0;
 }
 

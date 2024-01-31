@@ -27,7 +27,7 @@ import {
 
 // Get UI element and bind a click event
 const aspectRatio = 9 / 16
-
+let dialogueCounter = 0
 // #region Canvas element
 export let canvas = document.getElementById('game');
 
@@ -77,6 +77,10 @@ const partyWindow = document.getElementById('party')
 // Config UI
 const configWindow = document.getElementById('config')
 
+// Conversation UI
+const conversationWindow = document.getElementById('conversation')
+const dialogue = document.getElementById('dialogue')
+
 // option menu child click event
 for(let i=0; i < options.length; i++){
     switch(options[i].dataset.option){
@@ -85,12 +89,14 @@ for(let i=0; i < options.length; i++){
                 option.mode = 'party'
                 option.setPartyWindow(player, setting, action)
                 partyWindow.classList.remove('invisible')
+                partyWindow.classList.add('open_window')
             })
         break;
         case 'config':
             options[i].addEventListener('click', () => {
                 option.mode = 'config'
                 configWindow.classList.remove('invisible')
+                configWindow.classList.add('open_window')
             })
         break;
         case 'end':
@@ -115,7 +121,7 @@ for(let i=0; i < backBtn.length; i++){
                 await checkIfStepOnTheEvent(player.x, player.y)
                 skillWindow.classList.add('invisible')
                 skillWindow.classList.remove('open_window')
-                action.clearSkillWindow()
+                action.clearSkillWindow(skillWindow.style)
                 if(inspectingCharacter){
                     prepareCharacterCaption(inspectingCharacter) 
                  }
@@ -128,7 +134,7 @@ for(let i=0; i < backBtn.length; i++){
                 await checkIfStepOnTheEvent(player.x, player.y)
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
-                action.resetStatusWindow()
+                action.resetStatusWindow(statusWindow.style)
                 if(inspectingCharacter){
                    prepareCharacterCaption(inspectingCharacter) 
                 }
@@ -142,7 +148,7 @@ for(let i=0; i < backBtn.length; i++){
                 await checkIfStepOnTheEvent(player.x, player.y)
                 Inventory.classList.add('invisible')
                 Inventory.classList.remove('open_window')
-                clearInventory()
+                clearInventory(Inventory.style)
                 if(inspectingCharacter){
                    prepareCharacterCaption(inspectingCharacter) 
                 }
@@ -156,7 +162,7 @@ for(let i=0; i < backBtn.length; i++){
                 await checkIfStepOnTheEvent(player.x, player.y)
                 pickUpWindow.classList.add('invisible')
                 pickUpWindow.classList.remove('open_window')
-                clearPickUpWindow()
+                clearPickUpWindow(pickUpWindow.style)
                 prepareCharacterCaption(inspectingCharacter)
                 displayUIElement()
             })
@@ -164,14 +170,16 @@ for(let i=0; i < backBtn.length; i++){
         case 'party':
             backBtn[i].addEventListener('click', () => {
                 partyWindow.classList.add('invisible')
+                partyWindow.classList.remove('open_window')
                 option.mode = ''
-                option.cleatPartyWindow()
+                option.cleatPartyWindow(partyWindow.style)
             })
         break;
         case 'config':
             backBtn[i].addEventListener('click', () => {
                 option.mode = ''
                 configWindow.classList.add('invisible')
+                configWindow.classList.remove('open_window')
             })
         break;
     }
@@ -205,16 +213,22 @@ for(let i=0; i < actionMenuOptions.length; i++){
         case "skill":
             actionMenuOptions[i].addEventListener('click', () => {
                 hideUIElement()
-                const { tileSize } = setting.general
+                const { tileSize, fontSize, fontSize_md, fontSize_sm, camera } = setting.general
+                const { width, height } = camera
+                resizeHiddenElement(skillWindow.style, width, height, fontSize_sm)
                 const position = playerPosition.find(p => p.row === parseInt(inspectingCharacter.y / tileSize) && p.col === parseInt(inspectingCharacter.x / tileSize))
-                action.setSKillWindow(inspectingCharacter, tileMap, position)
+                action.setSKillWindow(inspectingCharacter, tileMap, position, fontSize, fontSize_md, fontSize_sm)
             })
         break;
         case 'item':
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement()
                 action.mode = 'item'
-                constructInventoryWindow(inspectingCharacter, enemyPosition, tileMap)
+                const { fontSize, fontSize_sm, camera } = setting.general
+                const { width, height } = camera
+                const { itemBlockSize, itemBlockMargin } = setting.inventory
+                resizeHiddenElement(Inventory.style, width, height, fontSize_sm)
+                constructInventoryWindow(inspectingCharacter, enemyPosition, tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin, width)
             })
         break; 
         case 'pick':
@@ -222,14 +236,20 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 hideUIElement()
                 const event = tileMap.getEventOnTile({x: inspectingCharacter.x, y: inspectingCharacter.y})
                 action.mode = 'pick'
-                const { width, height } = setting.general.camera
-                constructPickUpWindow(inspectingCharacter, width, height, event.item, tileMap)
+                const { fontSize, fontSize_sm, camera } = setting.general
+                const { width, height } = camera
+                const { itemBlockSize, itemBlockMargin } = setting.inventory
+                resizeHiddenElement(pickUpWindow.style, width, height, fontSize_sm)
+                constructPickUpWindow(inspectingCharacter, width, event.item, tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin)
             })
         break;
         case 'status':
             actionMenuOptions[i].addEventListener('click', () => {
                 hideUIElement()
-                action.setStatusWindow(inspectingCharacter)
+                const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
+                const { width, height } = camera
+                resizeHiddenElement(statusWindow.style, width, height, fontSize_sm)
+                action.setStatusWindow(inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
             })
         break;
         case 'stay':
@@ -259,7 +279,21 @@ const getPercentage = (type, character) => {
     return percentage
 }
 
-const resizeHiddenElement = (target, width, height, size) => {
+const displayConversation = (width, height, fontSize_md) => {
+    dialogue.style.width = (width - fontSize_md) + 'px'
+    dialogue.style.height = Math.floor(height * 0.3) + 'px'
+}
+
+const loadConversation = (message) => {
+    dialogue.innerText = ''
+
+    for(let i=0; i < message.length; i++){
+    }
+
+    dialogueCounter += 1
+}
+
+export const resizeHiddenElement = (target, width, height, size) => {
     target.padding = size + 'px'
     target.width = width + 'px'
     target.height = height + 'px'
@@ -414,6 +448,23 @@ export const toggleOptionMenu = (tileSize) => {
 export const hideOptionMenu = () => {
     option_menu.classList.remove('action_menu_open')
 }
+
+export const setConversationWindow = (event, width, height, fontSize_md) => {
+    resizeHiddenElement(conversationWindow.style, width, height, fontSize_md)
+
+    conversationWindow.classList.remove('invisible')
+    conversationWindow.classList.add('open-window')
+
+    dialogue.addEventLinster('click', () => {
+        if(dialogueCounter <= (event.dialogue.length - 1)){
+            loadConversation(event.dialogue[dialogueCounter].message)
+        }else{
+            // Reset dialogue counter
+            // Proceed to next phase
+            dialogueCounter = 0
+        }
+    })
+}
   
 // Get the position on the tileMap
 export const getPosition = (event, tileSize) => {
@@ -505,26 +556,6 @@ export const resize = () => {
     phaseWrapper.style.height = cameraHeight + 'px' 
     phaseElement.style.fontSize = fontSize + 'px';
 
-    // Set status window style
-    resizeHiddenElement(statusWindow.style, cameraWidth, cameraHeight, fontsize_sm)
-    avatar.style.width = Math.floor(cameraWidth * 0.3) + 'px';
-    avatar.style.height = Math.floor(cameraWidth * 0.3) + 'px';
-
-    // Set skill window style
-    resizeHiddenElement(skillWindow.style, cameraWidth, cameraHeight, fontsize_sm)
-
-    // Set inventory style
-    resizeHiddenElement(Inventory.style, cameraWidth, cameraHeight, fontsize_sm)
-
-    // Set pick up window style
-    resizeHiddenElement(pickUpWindow.style, cameraWidth, cameraHeight, fontsize_sm)
-
-    // Set party window style
-    resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontsize_sm)
-
-    // Set config window style
-    resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontsize_sm)
-
     // Set back button style
     for(let i=0; i < backBtn.length; i++){
         backBtn[i].style.transform = `translateX(-${fontsize_sm}px)`
@@ -540,26 +571,45 @@ export const resize = () => {
     console.log('canvas element :>>>', canvas)
     console.log('canvas position :>>>', canvasPosition)
 
+    option.setConfigWindow(setting)
+
     if(!characterCaption.classList.contains('invisible')) prepareCharacterCaption(inspectingCharacter)
 
     switch(action.mode){
         case 'item':
+            // Set inventory style
+            resizeHiddenElement(Inventory.style, cameraWidth, cameraHeight, fontsize_sm)
             resizeInventory(cameraWidth, fontSize, fontsize_sm)
         break;
         case 'status':
+            // Set status window style
+            resizeHiddenElement(statusWindow.style, cameraWidth, cameraHeight, fontsize_sm)
+            avatar.style.width = Math.floor(cameraWidth * 0.3) + 'px';
+            avatar.style.height = Math.floor(cameraWidth * 0.3) + 'px';
             action.resizeStatusWindow()
         break;
         case 'pick':
+            // Set pick up window style
+            resizeHiddenElement(pickUpWindow.style, cameraWidth, cameraHeight, fontsize_sm)
             resizePickUp(fontSize, cameraWidth)
         break;
         case 'skill':
+            // Set skill window style
+            resizeHiddenElement(skillWindow.style, cameraWidth, cameraHeight, fontsize_sm)
             action.resizeSkillWindow(fontSize, fontSize_md, fontsize_sm, tileSize)
         break;
     }
 
     switch(option.mode){
         case 'party':
+            // Set party window style
+            resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontsize_sm)
             option.resizePartyWindow(setting)
+        break;
+        case 'config':
+            // Set config window style
+            configWindow.style.fontSize = fontSize_md + 'px'
+            resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontsize_sm)
         break;
     }
 }

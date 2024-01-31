@@ -46,7 +46,7 @@ export const range = new Range(tileMap.map, 32)
 export const action = new Action('', [], [], 0, false);
 
 export const option = new Option('')
-option.setConfigOptions(setting)
+option.setConfigOption(setting)
 // #endregion
 
 // #region Game logic variables

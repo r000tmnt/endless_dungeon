@@ -1,7 +1,7 @@
 export default{
     data: [
         {
-            "id": "p_1",
+            "id": "p-1-1",
             "name": "Echo from the above",
             "map": [
                 [1, 1, 1, 1, 1, 1, 1, 1, 1],
