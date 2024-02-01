@@ -16,6 +16,7 @@
         <div id="option_menu" class="absolute action_menu_close">
             <ul id="option_list">
                 <li class="action" data-option="party">Party</li>
+                <li class="action" data-option="objective">Objective</li>
                 <li class="action" data-option="config">Config</li>
                 <!-- <li class="action" data-option="save">Save</li> -->
                 <li class="action" data-option="end">End Turn</li>
@@ -73,7 +74,29 @@
                     </p>
                 </div>
             </ul>
-        </div>        
+        </div>
+        
+        <!-- Objective -->
+        <div id="objective" class="menu absolute invisible">
+            <div>Objective</div>
+
+            <button class="back absolute" data-action="objective" type="button">BACK</button>
+
+            <ul>
+                <li>
+                   <div>Victory</div> 
+                   <div class="desc" data-objective="victory"></div>
+                </li>
+                <li>
+                    <div>Fail</div>
+                    <div class="desc" data-objective="fail"></div>
+                </li>
+                <li>
+                    <div>Optional</div> 
+                    <div class="desc" data-objective="optional"></div>
+                </li>
+            </ul>
+        </div>
 
         <!-- Action Menu -->
         <div id="action_menu" class="absolute action_menu_close">
