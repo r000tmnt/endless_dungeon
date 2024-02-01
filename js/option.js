@@ -83,8 +83,6 @@ export default class Option{
         configWindow.style.fontSize = fontSize_md + 'px'
 
         resizeHiddenElement(configWindow.style, width, height, fontSize_md)
-
-
     }
 
     setConfigOption(setting){
@@ -92,16 +90,22 @@ export default class Option{
         for(let i=0; i< options.length; i++){
             switch(options[i].dataset.config){
                 case 'grid':
-                    if(setting.general.showGrid && options[i].value === 'true'){
-                        options[i].checked = true
-                    }
+                    options[i].checked = options[i].value === String(setting.general.showGrid)
 
-                    options[i].addEventListener('click', (event) => {
+                    options[i].addEventListener('click', () => {
                         // event.preventDefault()
 
                         console.log(options[i].checked)
 
                         setting.general.showGrid = options[i].value === 'true'? true : false
+                    })
+                break;
+                case 'filter':
+                    options[i].checked = options[i].value === setting.general.filter
+
+                    options[i].addEventListener('click', () => {
+
+                        setting.general.filter = options[i].value
                     })
                 break;
             }
