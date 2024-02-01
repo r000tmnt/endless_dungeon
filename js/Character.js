@@ -39,7 +39,7 @@ export default class Character {
      * Draw the character on the canvas
      * @param {function} ctx - canvas.getContext("2d")
      */
-    async draw(ctx){
+    async draw(ctx, filter){
         if(this.destination !== null){
             this.#move(ctx, this.destination)
         }
@@ -64,6 +64,27 @@ export default class Character {
         // If the image of the character is loaded
         if(!this.characterIsMoving && this.characterImage?.src?.length){
             
+            if(filter === 'retro'){
+                const color = (this.characterType === 2)? '#33BBFF' : '#FF3333'
+
+                const tempCanvas = document.createElement('canvas')
+                const tempContext = tempCanvas.getContext('2d')
+                tempCanvas.width = this.tileSize
+                tempCanvas.height = this.tileSize
+                
+                tempContext.fillStyle = color
+                tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
+
+                // set composite mode
+                tempContext.globalCompositeOperation = "destination-in";
+
+                tempContext.drawImage(this.characterImage, 0, 0, this.tileSize, this.tileSize)
+
+                ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
+
+                tempCanvas.remove()
+            }else
+
             //TODO: Need to know if the item is used on the character somehow...
             if(this.animation === 'item'){
                 const frame = ['rgb(144, 255, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)']
