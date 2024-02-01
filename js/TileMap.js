@@ -4,12 +4,13 @@ import { getItemType } from './utils/inventory.js'
 // class - 物件創建的模板
 export default class TileMa {
     //付值給實體的物件
-    constructor(tileSize, map, event, enemy, assets){
+    constructor(tileSize, map, event, enemy, assets, objective){
         this.tileSize = tileSize;
         this.map = map;
         this.event = event;
         this.enemy = enemy;
         this.assets = this.#loadAssetImage(assets)
+        this.objective = objective
     }
 
     #loadAssetImage(assets){
@@ -25,30 +26,6 @@ export default class TileMa {
         })
         return tempAssets
     }
-
-
-    // In what condition does player clear the level
-    objective_v = ['Clear all'] // Clear all, pass X turns, Defeat XXX...etc
-
-    // In what condition does player lose the level
-    objective_f = ['Defeat all'] // Defeat all, XXX down...etc
-
-    // In what condition does player get bonus
-    objective_o = ['Within 6 turns', 'Survive all']
-
-    // Prize for clear the level
-    bonus = [
-        {
-            id: 'currency_1',
-            condition: 0,
-            amount: 100
-        },
-        {
-            id: 'exp',
-            condition: 1,
-            based_attribute: 'hp'
-        }
-    ]
 
     //負責渲染於畫面的函式
     draw(canvas, ctx){
