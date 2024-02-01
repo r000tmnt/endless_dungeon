@@ -443,3 +443,8 @@ li{
     padding: 1%; */
     border: 1px solid white;
   }
+
+  #objective > ul > li{
+    background: black;
+    border: 1px dotted white;
+  }
