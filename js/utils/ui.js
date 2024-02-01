@@ -77,6 +77,9 @@ const partyWindow = document.getElementById('party')
 // Config UI
 const configWindow = document.getElementById('config')
 
+// Objective UI
+const objectiveWindow = document.getElementById('objective')
+
 // Conversation UI
 const conversationWindow = document.getElementById('conversation')
 const dialogue = document.getElementById('dialogue')
@@ -90,6 +93,12 @@ for(let i=0; i < options.length; i++){
                 option.setPartyWindow(player, setting, action)
                 partyWindow.classList.remove('invisible')
                 partyWindow.classList.add('open_window')
+            })
+        break;
+        case 'objective':
+            options[i].addEventListener('click', () => {
+                option.mode = 'objective'
+                option.setObjectiveWindow(objectiveWindow, setting, tileMap.objective)
             })
         break;
         case 'config':
@@ -173,6 +182,13 @@ for(let i=0; i < backBtn.length; i++){
                 partyWindow.classList.remove('open_window')
                 option.mode = ''
                 option.cleatPartyWindow(partyWindow.style)
+            })
+        break;
+        case 'objective':
+            backBtn[i].addEventListener('click', () => {
+                option.mode = ''
+                objectiveWindow.classList.add('invisible')
+                objectiveWindow.classList.remove('open_window')
             })
         break;
         case 'config':
