@@ -73,6 +73,57 @@ export default class Option{
         resizeHiddenElement(target, 0, 0, 0)
     }
 
+    setObjectiveWindow(target, setting, objective){
+        const list = target.querySelectorAll('li')
+        const desc = target.querySelectorAll('.desc')
+        const { fontSize, fontSize_md, camera } = setting.general
+        const { width, height } = camera
+
+        target.children[0].style.fontSize = fontSize + 'px'
+        target.style.fontSize = fontSize_md + 'px'
+        target.style.width = width + 'px'
+        target.style.height = height + 'px'
+        target.style.padding = fontSize_md + 'px'
+
+        for(let i=0; i < desc.length; i++){
+            list[i].style.height = ((height - (fontSize_md * 6)) * 0.3) + 'px'
+            switch(desc[i].dataset.objective){
+                case 'victory':
+                    if(objective.victory.target === 'enemy'){
+                        if(objective.victory.value === 0){
+                            desc[i].innerText = 'Defeat All enemies'
+                        }else{
+                            desc[i].innerText = `Defeat ${objective.victory.value} enemies`
+                        }
+                    }
+                break;
+                case 'fail':
+                    if(objective.fail.target === 'player'){
+                        if(typeof objective.fail.value === "number"){
+                            if(objective.fail.value === 0){
+                                desc[i].innerText = 'Party member All down'
+                            }else{
+                                desc[i].innerText = `Lose ${objective.fail.value} party member`
+                            }                            
+                        }else{
+                            // TODO: If the targeted player lose
+                        }
+                    }
+                break;
+                case 'optional':
+                    for(let j=0; j < objective.optional.length; j++){
+                        if(objective.optional[j].target === 'turn'){
+                            desc[i].innerText = `Finish the level in ${objective.optional[j].value}\n`
+                        }                        
+                    }
+                break;
+            }
+        }
+
+        target.classList.remove('invisible')
+        target.classList.add('open_window')
+    }
+
     setConfigWindow(setting){
         const configWindow = document.getElementById('config')
         const title = configWindow.children[0]
