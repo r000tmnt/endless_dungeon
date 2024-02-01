@@ -155,6 +155,34 @@ export default{
                     "job": 'mob_zombie_1'
                 }
             ],
+            "objective": {
+                // In what condition does player clear the level
+                // Clear all, pass X turns, Defeat XXX...etc
+                "victory": {
+                    "target": "enemy",
+                    "value": 0
+                },
+                // In what condition does player lose the level
+                // Defeat all, XXX down...etc
+                "fail": {
+                    "target": "player",
+                    "value": 0
+                },
+                // In what condition does player get bonus
+                "optional": [
+                    {
+                        "target": "turn",
+                        "value": 6,
+                        "prize": [
+                            { // Prize for clear the level
+                                "id": 'currency_1',
+                                "condition": 0,
+                                "amount": 100
+                            }
+                        ]
+                    }
+                ]
+            },
             "difficulty": 1
         },
     ],
