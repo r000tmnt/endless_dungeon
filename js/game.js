@@ -37,7 +37,7 @@ let ctx = canvas.getContext("2d");
 
 // #region Tile map setup
 
-export let tileMap = new TileMap(32, levels[levelCount].map, levels[levelCount].event, levels[levelCount].enemy, levels[levelCount].assets);
+export let tileMap = new TileMap(32, levels[levelCount].map, levels[levelCount].event, levels[levelCount].enemy, levels[levelCount].assets, levels[levelCount].objective);
 
 export const grid = new Grid(tileMap.map, 32, {});
 
