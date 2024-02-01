@@ -93,17 +93,13 @@ export default class Option{
             switch(options[i].dataset.config){
                 case 'grid':
                     if(setting.general.showGrid && options[i].value === 'true'){
-                        options[i].setAttribute('checked', 'checked')
+                        options[i].checked = true
                     }
 
                     options[i].addEventListener('click', (event) => {
-                        event.preventDefault()
+                        // event.preventDefault()
 
-                        if(options[i].value === 'true'){
-                            options[i+1].removeAttribute('checked')
-                        }else{
-                            options[i-1].setAttribute('checked', 'checked')
-                        }
+                        console.log(options[i].checked)
 
                         setting.general.showGrid = options[i].value === 'true'? true : false
                     })
