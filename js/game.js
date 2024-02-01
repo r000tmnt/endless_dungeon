@@ -258,11 +258,11 @@ const gameLoop = () => {
     }
 
     if(player.length) {
-        player.forEach(p => p.draw(ctx))
+        player.forEach(p => p.draw(ctx, setting.general.filter))
     }
 
     if(enemy.length){
-        enemy.forEach(e => e.draw(ctx))
+        enemy.forEach(e => e.draw(ctx, setting.general.filter))
     }
 
     if(setting.general.showGrid){

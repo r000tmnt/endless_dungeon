@@ -71,15 +71,17 @@ export default class Character {
                 const tempContext = tempCanvas.getContext('2d')
                 tempCanvas.width = this.tileSize
                 tempCanvas.height = this.tileSize
-                
+
+                // set composite mode
+                // tempContext.globalCompositeOperation = "multiply";
                 tempContext.fillStyle = color
                 tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
 
                 // set composite mode
                 tempContext.globalCompositeOperation = "destination-in";
-
                 tempContext.drawImage(this.characterImage, 0, 0, this.tileSize, this.tileSize)
 
+                // tempContext.globalCompositeOperation = "source-over";
                 ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
 
                 tempCanvas.remove()
