@@ -5,7 +5,7 @@ import potion from '../dataBase/item/item_potion.js'
 import material from '../dataBase/item/item_material.js'
 import other from '../dataBase/item/item_other.js'
 
-import { setEvent, setRange } from '../game.js'
+import game from '../game.js'
 import { getAvailableSpace } from './pathFinding.js'
 import { resizeHiddenElement } from './ui.js'
 import setting from './setting.js'
@@ -146,7 +146,7 @@ const setItemSpace = async(currentActingPlayer, enemyPosition, tileMap) => {
     )
 
     currentActingPlayer.setWalkableSpace(itemUseRange)
-    setRange(itemUseRange)
+    game.action.setSelectableSpace(itemUseRange)
 
     // Hide inventory
     Inventory.classList.add('invisible')
@@ -214,7 +214,7 @@ const dropItem = (currentActingPlayer, itemActions) => {
         const value = Number(document.getElementById('range').getAttribute('value')) 
 
         // Leave an item on the ground, need an sprite to draw on the tile    
-        setEvent({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, type: currentActingPlayer.bag[selectedItem.index].type, amount: value}])
+        game.tileMap.setEventOnTile({x: currentActingPlayer.x, y: currentActingPlayer.y}, [{id: currentActingPlayer.bag[selectedItem.index].id, type: currentActingPlayer.bag[selectedItem.index].type, amount: value}])
 
         // If the item is equipped
         if(Object.values(currentActingPlayer.equip).findIndex(e => e.id === selectedItem.id) >= 0){

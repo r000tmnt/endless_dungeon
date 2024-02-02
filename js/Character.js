@@ -1,4 +1,4 @@
-import { animationSignal, removeCharacter, setTile, setEvent } from './game.js'
+import game from './game.js'
 import classes from './dataBase/class.js'
 import mob from './dataBase/mobs.js'
 import weapon from './dataBase/item/item_weapon.js'
@@ -190,7 +190,7 @@ export default class Character {
                 this.movingDirection = (col < currentCol)? 'left' : 'right'           
             }
 
-            animationSignal(true) 
+            game.action.animationInit = true
             this.#movementInterval(ctx)           
         }else{
             this.#movementInterval(ctx)
@@ -233,13 +233,7 @@ export default class Character {
         }else{
             console.log('blinking finished')
             this.characterIsMoving = false
-            removeCharacter(characterType)
-
-            // If player lose, drop all items
-            if(this?.bag?.length){
-                setEvent({x: enemy.x, y: enemy.y}, this.bag)
-                setTile(parseInt(this.y / this.tileSize), parseInt(this.x / this.tileSize), 4)
-            }
+            game.removeCharacter(characterType, this.id)
         }
     }
 

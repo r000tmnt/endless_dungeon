@@ -8,22 +8,7 @@ import {
 } from './inventory.js'
 
 import setting from './setting.js';
-
-import { 
-    player, 
-    playerPosition, 
-    enemy, 
-    enemyPosition, 
-    inspectingCharacter,
-    checkIfStepOnTheEvent,
-    limitPositonToCheck,
-    characterAnimationPhaseEnded,
-    tileMap,
-    grid,
-    range,
-    action,
-    option
- } from '../game.js';
+import game from '../game.js';
 
 // Get UI element and bind a click event
 const aspectRatio = 9 / 16
@@ -89,32 +74,32 @@ for(let i=0; i < options.length; i++){
     switch(options[i].dataset.option){
         case 'party':
             options[i].addEventListener('click', () => {
-                option.mode = 'party'
-                option.setPartyWindow(player, setting, action)
+                game.option.mode = 'party'
+                game.option.setPartyWindow(game.player, setting, game.action)
                 partyWindow.classList.remove('invisible')
                 partyWindow.classList.add('open_window')
             })
         break;
         case 'objective':
             options[i].addEventListener('click', () => {
-                option.mode = 'objective'
-                option.setObjectiveWindow(objectiveWindow, setting, tileMap.objective)
+                game.option.mode = 'objective'
+                game.option.setObjectiveWindow(objectiveWindow, setting, tileMap.objective)
             })
         break;
         case 'config':
             options[i].addEventListener('click', () => {
-                option.mode = 'config'
+                game.option.mode = 'config'
                 configWindow.classList.remove('invisible')
                 configWindow.classList.add('open_window')
             })
         break;
         case 'end':
             options[i].addEventListener('click', () => {
-                player.forEach(p => {
+                game.player.forEach(p => {
                     p.attributes.ap = 0
                     p.wait = true
                 })
-                characterAnimationPhaseEnded(player[0])
+                game.characterAnimationPhaseEnded(game.player[0])
                 option_menu.classList.remove('action_menu_open')
             })
         break;
@@ -127,26 +112,24 @@ for(let i=0; i < backBtn.length; i++){
         case 'skill':
             backBtn[i].addEventListener('click', async() => {
                 action.mode = ''
-                await checkIfStepOnTheEvent(player.x, player.y)
+                // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
                 skillWindow.classList.add('invisible')
                 skillWindow.classList.remove('open_window')
-                action.clearSkillWindow(skillWindow.style)
-                if(inspectingCharacter){
-                    prepareCharacterCaption(inspectingCharacter) 
-                 }
+                game.action.clearSkillWindow(skillWindow.style)
+                // if(game.inspectingCharacter){
+                //     prepareCharacterCaption(game.inspectingCharacter) 
+                //  }
                 displayUIElement()
             })
         break;
         case 'status':
             backBtn[i].addEventListener('click', async() => {
-                action.mode = ''
-                await checkIfStepOnTheEvent(player.x, player.y)
+                game.action.mode = ''
+                // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
-                action.resetStatusWindow(statusWindow.style)
-                if(inspectingCharacter){
-                   prepareCharacterCaption(inspectingCharacter) 
-                }
+                game.action.resetStatusWindow(statusWindow.style)
+                prepareCharacterCaption(game.inspectingCharacter) 
                 displayUIElement()
             })
         break;
@@ -154,25 +137,23 @@ for(let i=0; i < backBtn.length; i++){
             backBtn[i].addEventListener('click', async() => {
                 action.mode = ''
                 // Check if the tile has an event
-                await checkIfStepOnTheEvent(player.x, player.y)
+                await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
                 Inventory.classList.add('invisible')
                 Inventory.classList.remove('open_window')
                 clearInventory(Inventory.style)
-                if(inspectingCharacter){
-                   prepareCharacterCaption(inspectingCharacter) 
-                }
+                prepareCharacterCaption(game.inspectingCharacter)
                 displayUIElement()
             })
         break;
         case 'pick':
             backBtn[i].addEventListener('click', async() => {
-                action.mode = ''
+                game.action.mode = ''
                 // Check if the tile has an event
-                await checkIfStepOnTheEvent(player.x, player.y)
+                await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
                 pickUpWindow.classList.add('invisible')
                 pickUpWindow.classList.remove('open_window')
                 clearPickUpWindow(pickUpWindow.style)
-                prepareCharacterCaption(inspectingCharacter)
+                prepareCharacterCaption(game.inspectingCharacter)
                 displayUIElement()
             })
         break;
@@ -180,20 +161,20 @@ for(let i=0; i < backBtn.length; i++){
             backBtn[i].addEventListener('click', () => {
                 partyWindow.classList.add('invisible')
                 partyWindow.classList.remove('open_window')
-                option.mode = ''
-                option.cleatPartyWindow(partyWindow.style)
+                game.option.mode = ''
+                game.option.cleatPartyWindow(partyWindow.style)
             })
         break;
         case 'objective':
             backBtn[i].addEventListener('click', () => {
-                option.mode = ''
+                game.option.mode = ''
                 objectiveWindow.classList.add('invisible')
                 objectiveWindow.classList.remove('open_window')
             })
         break;
         case 'config':
             backBtn[i].addEventListener('click', () => {
-                option.mode = ''
+                game.option.mode = ''
                 configWindow.classList.add('invisible')
                 configWindow.classList.remove('open_window')
             })
@@ -208,13 +189,13 @@ for(let i=0; i < actionMenuOptions.length; i++){
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement() 
                 const { tileSize } = setting.general
-                const position = playerPosition.find(p => p.row === parseInt(inspectingCharacter.y / tileSize) && p.col === parseInt(inspectingCharacter.x / tileSize))
-                const possibleEncounterEnemyPosition = limitPositonToCheck(inspectingCharacter.attributes.moveSpeed, position, enemyPosition)
-                await action.setMove(
-                    tileMap, 
-                    inspectingCharacter, 
+                const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
+                const possibleEncounterEnemyPosition = limitPositonToCheck(game.inspectingCharacter.attributes.moveSpeed, position, game.enemyPosition)
+                await game.action.setMove(
+                    game.tileMap, 
+                    game.inspectingCharacter, 
                     position, 
-                    inspectingCharacter.attributes.moveSpeed, possibleEncounterEnemyPosition.length? possibleEncounterEnemyPosition : enemyPosition
+                    inspectingCharacter.attributes.moveSpeed, possibleEncounterEnemyPosition.length? possibleEncounterEnemyPosition : game.enemyPosition
                 )           
             })
         break;
@@ -222,8 +203,8 @@ for(let i=0; i < actionMenuOptions.length; i++){
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement() 
                 const { tileSize } = setting.general
-                const position = playerPosition.find(p => p.row === parseInt(inspectingCharacter.y / tileSize) && p.col === parseInt(inspectingCharacter.x / tileSize))
-                await action.setAttack(tileMap, inspectingCharacter, position, 1)
+                const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
+                await game.action.setAttack(game.tileMap, game.inspectingCharacter, position, 1)
             })
         break;   
         case "skill":
@@ -232,8 +213,8 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 const { tileSize, fontSize, fontSize_md, fontSize_sm, camera } = setting.general
                 const { width, height } = camera
                 resizeHiddenElement(skillWindow.style, width, height, fontSize_sm)
-                const position = playerPosition.find(p => p.row === parseInt(inspectingCharacter.y / tileSize) && p.col === parseInt(inspectingCharacter.x / tileSize))
-                action.setSKillWindow(inspectingCharacter, tileMap, position, fontSize, fontSize_md, fontSize_sm)
+                const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
+                action.setSKillWindow(game.inspectingCharacter, game.tileMap, position, fontSize, fontSize_md, fontSize_sm)
             })
         break;
         case 'item':
@@ -244,19 +225,19 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 const { width, height } = camera
                 const { itemBlockSize, itemBlockMargin } = setting.inventory
                 resizeHiddenElement(Inventory.style, width, height, fontSize_sm)
-                constructInventoryWindow(inspectingCharacter, enemyPosition, tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin, width)
+                constructInventoryWindow(game.inspectingCharacter, game.enemyPosition, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin, width)
             })
         break; 
         case 'pick':
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement()
-                const event = tileMap.getEventOnTile({x: inspectingCharacter.x, y: inspectingCharacter.y})
-                action.mode = 'pick'
+                const event = tileMap.getEventOnTile({x: game.inspectingCharacter.x, y: game.inspectingCharacter.y})
+                game.action.mode = 'pick'
                 const { fontSize, fontSize_sm, camera } = setting.general
                 const { width, height } = camera
                 const { itemBlockSize, itemBlockMargin } = setting.inventory
                 resizeHiddenElement(pickUpWindow.style, width, height, fontSize_sm)
-                constructPickUpWindow(inspectingCharacter, width, event.item, tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin)
+                constructPickUpWindow(game.inspectingCharacter, width, event.item, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin)
             })
         break;
         case 'status':
@@ -265,15 +246,15 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
                 const { width, height } = camera
                 resizeHiddenElement(statusWindow.style, width, height, fontSize_sm)
-                action.setStatusWindow(inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
+                action.setStatusWindow(game.inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
             })
         break;
         case 'stay':
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement()
                 setTimeout(() => {
-                    inspectingCharacter.attributes.ap -= 1
-                    characterAnimationPhaseEnded(inspectingCharacter)
+                    game.inspectingCharacter.attributes.ap -= 1
+                    characterAnimationPhaseEnded(game.inspectingCharacter)
                 }, 500)
             })
     }
@@ -383,7 +364,7 @@ export const prepareCharacterCaption = (inspectingCharacter, tileSize) => {
         gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], inspectingCharacter) + '%';
     }
 
-    const position = (inspectingCharacter.characterType === 2)? playerPosition[player.findIndex(p => p.id === inspectingCharacter.id)] : enemyPosition[enemy.findIndex(e => e.id === inspectingCharacter.id)]
+    const position = (inspectingCharacter.characterType === 2)? game.playerPosition[game.player.findIndex(p => p.id === game.inspectingCharacter.id)] : game.enemyPosition[game.enemy.findIndex(e => e.id === game.inspectingCharacter.id)]
 
     // Shift UI position based on the character position
     if(position.row > 7 && position.col < Math.floor(9/2)){
@@ -446,21 +427,6 @@ export const alterActionMenu = () => {
     }
 }
 
-export const toggleOptionMenu = (tileSize) => {
-    if(option_menu.classList.contains('action_menu_open')){
-        option_menu.classList.remove('action_menu_open')
-    }else{
-        // Shift UI position based on the character position
-        if(playerPosition.row < 7 && playerPosition.col < Math.floor(9/2)){
-            option_menu.style.left = (tileSize * 6) + 'px'
-        }else{
-            option_menu.style.left = 'unset'
-        }  
-            
-        option_menu.classList.add('action_menu_open')
-    }
-}
-
 export const hideOptionMenu = () => {
     option_menu.classList.remove('action_menu_open')
 }
@@ -512,27 +478,27 @@ export const resize = () => {
 
     // Set up tile size according to the canvas width
     const tileSize = setting.general.tileSize = Math.floor(deviceWidth / 9);
-    tileMap.changeTileSize(tileSize)
-    grid.setTileSize(tileSize)
-    range.setTileSize(tileSize)
+    game?.tileMap?.changeTileSize(tileSize)
+    game?.grid?.setTileSize(tileSize)
+    game?.range?.setTileSize(tileSize)
 
     const cameraWidth = setting.general.camera.width = tileSize * 9 
     const cameraHeight = setting.general.camera.height = tileSize * 16 
 
     // Get the player position relative to the canvas size
-    player.forEach((p, index) => {
+    game.player.forEach((p, index) => {
         p.setCharacterTileSize(tileSize)
-        p.setCharacterPosition(playerPosition[index].col * tileSize, playerPosition[index].row * tileSize) 
+        p.setCharacterPosition(game.playerPosition[index].col * tileSize, game.playerPosition[index].row * tileSize) 
     })
  
-    console.log('player :>>>', player)
+    console.log('player :>>>', game.player)
 
-    enemy.forEach((e, index) => {
+    game.enemy.forEach((e, index) => {
         e.setCharacterTileSize(tileSize)
-        e.setCharacterPosition(enemyPosition[index].col * tileSize, enemyPosition[index].row * tileSize)
+        e.setCharacterPosition(game.enemyPosition[index].col * tileSize, game.enemyPosition[index].row * tileSize)
     })
 
-    console.log('enemy :>>>', enemy)
+    console.log('enemy :>>>', game.enemy)
 
     const fontSize = setting.general.fontSize = Math.floor( 8 * Math.floor(cameraWidth / 100))
     const fontSize_md = setting.general.fontSize_md = Math.floor(fontSize * 0.75)
@@ -541,7 +507,7 @@ export const resize = () => {
 
     const fontsize_sm = setting.general.fontSize_sm = Math.floor(fontSize * 0.5)
 
-    action.setFontSize(Math.floor(fontSize * 2))
+    game?.action?.setFontSize(Math.floor(fontSize * 2))
 
     // calculation the percentage of the attribute
     for(let i=0; i < gauges.length; i++){
@@ -579,19 +545,17 @@ export const resize = () => {
         backBtn[i].style.fontSize = fontSize_md + 'px'  
     }
 
-    canvas.height = tileMap.map.length * tileSize;
-    canvas.width = tileMap.map[0].length * tileSize;
+    canvas.height = game?.tileMap?.map.length * tileSize;
+    canvas.width = game?.tileMap?.map[0].length * tileSize;
     // Get canvas position after resize
     canvasPosition = canvas.getBoundingClientRect();
 
     console.log('canvas element :>>>', canvas)
     console.log('canvas position :>>>', canvasPosition)
 
-    option.setConfigWindow(setting)
+    if(!characterCaption.classList.contains('invisible')) prepareCharacterCaption(game.inspectingCharacter)
 
-    if(!characterCaption.classList.contains('invisible')) prepareCharacterCaption(inspectingCharacter)
-
-    switch(action.mode){
+    switch(game.action.mode){
         case 'item':
             // Set inventory style
             resizeHiddenElement(Inventory.style, cameraWidth, cameraHeight, fontsize_sm)
@@ -616,14 +580,14 @@ export const resize = () => {
         break;
     }
 
-    switch(option.mode){
+    switch(game.option.mode){
         case 'party':
             // Set party window style
             resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontsize_sm)
-            option.resizePartyWindow(setting)
+            game.option.resizePartyWindow(setting)
         break;
         case 'objective':
-            option.resizeObjectiveWindow(objectiveWindow, setting)
+            game.option.resizeObjectiveWindow(objectiveWindow, setting)
         break;
         case 'config':
             // Set config window style

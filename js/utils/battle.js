@@ -1,8 +1,7 @@
 import weapon from "../dataBase/item/item_weapon"
 import armor from "../dataBase/item/item_armor"
 import setting from "./setting"
-
-import { characterAnimationPhaseEnded } from "../game"
+import game from "../game"
 
 // Player level up if the exp reached the required amount
 const levelUp = (player) => {
@@ -37,7 +36,7 @@ const levelUp = (player) => {
         }
     }
 
-    characterAnimationPhaseEnded(player)
+    game.characterAnimationPhaseEnded(player)
     console.log('player status after level up :>>>', player.attributes)
 }
 
@@ -350,7 +349,7 @@ export const gainExp = (player, enemy) => {
             }, 500)
 
         }else{
-            characterAnimationPhaseEnded(player)
+            game.characterAnimationPhaseEnded(player)
         }   
     }
 }

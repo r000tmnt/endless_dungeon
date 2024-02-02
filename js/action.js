@@ -4,7 +4,7 @@ import skills from './dataBase/skills.js';
 import setting from './utils/setting.js';
 import { resizeHiddenElement } from './utils/ui.js'
 import { useItem } from './utils/inventory.js'
-import { setEvent, setTile, characterAnimationPhaseEnded, checkDroppedItem } from "./game.js"
+import game from './game.js';
 
 export default class Action{
     constructor(mode, selectableSpace, reachableDirections, steps, animationInit){
@@ -12,7 +12,7 @@ export default class Action{
         this.selectableSpace = selectableSpace
         this.reachableDirections = reachableDirections
         this.steps = steps
-        this.animationInit = animationInit.Action
+        this.animationInit = animationInit
         this.messageConfig = {
             message: '',
             style: '',
@@ -486,27 +486,30 @@ export default class Action{
         
                         // Leave the item on the ground
                         if(dropItems.length){
-                            dropItems = await checkDroppedItem(dropItems)
+                            dropItems = await game.checkDroppedItem(dropItems)
         
-                            setEvent({x: enemy.x, y: enemy.y}, dropItems)
-                            setTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
+                            game.tileMap.setEventOnTile({x: enemy.x, y: enemy.y}, dropItems)
+                            (parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
                         }else{
                             // At least drop a key to continue the game
-                            setEvent({x: enemy.x, y: enemy.y}, [
+                            game.tileMap.setEventOnTile({x: enemy.x, y: enemy.y}, [
                                 {
                                     amount: 1,
                                     id: "key_dark_1",
-                                    rate: 0.45454545454545453,
                                     type: 6
                                 }
                             ])
-                            setTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
+                            game.tileMap.changeTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
                         }
                     }else{
-                
+                        // If player lose, drop all items
+                        if(player.bag.length){
+                            game.tileMap.setEventOnTile({x: player.x, y: player.y}, player.bag)
+                            game.tileMap.changeTile(parseInt(player.y / tileSize), parseInt(player.x / tileSize), 4)
+                        }
                     }
                 }else{
-                    characterAnimationPhaseEnded(player)
+                    game.characterAnimationPhaseEnded(player)
                 }
             }, 1500)
         }else{
@@ -557,7 +560,7 @@ export default class Action{
 
                 this.reachableDirections.splice(0)
 
-                characterAnimationPhaseEnded(currentActingPlayer)
+                game.characterAnimationPhaseEnded(currentActingPlayer)
             }else{
     ``            // Take step
                 this.animationInit = true
@@ -645,7 +648,7 @@ export default class Action{
                 this.beginAnimationPhase(enemy)  
             }else{
                 // Spend an action point
-                characterAnimationPhaseEnded()  
+                game.characterAnimationPhaseEnded()  
             }                   
         }else{
             console.log('Player out of reach')
@@ -787,7 +790,7 @@ export default class Action{
                 case 'stay':
                     // Spend an action point
                     enemy.attributes.ap -= 1
-                    characterAnimationPhaseEnded(enemy)  
+                    game.characterAnimationPhaseEnded(enemy)  
                 break;
             }
         }else{
@@ -809,7 +812,7 @@ export default class Action{
 
         if(this.selectableSpace[row][col][0] === enemyPosition.row && this.selectableSpace[row][col][1] === enemyPosition.col){
             // Spend an action point
-            characterAnimationPhaseEnded()                       
+            game.characterAnimationPhaseEnded()                       
         }else{
             // Go to the random selected position
             this.reachableDirections = await prepareDirections(tileMap, enemyPosition, { row: this.selectableSpace[row][col][0], col: this.selectableSpace[row][col][1] }, this.reachableDirections)
@@ -821,7 +824,7 @@ export default class Action{
                 this.beginAnimationPhase(enemy)  
             }else{
                 // Spend an action point
-                characterAnimationPhaseEnded(enemy)
+                game.characterAnimationPhaseEnded(enemy)
             }
         } 
     }
