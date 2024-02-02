@@ -12,6 +12,7 @@ import {
     resetActionMenu, 
     alterActionMenu,
     hideOptionMenu,
+    toggleOptionMenu,
     toggleActionMenuAndCharacterCaption,
     toggleActionMenuOption,
     togglePhaseTranistion,
@@ -30,7 +31,7 @@ class Game{
         this.levelCount = 0
         this.turn = 1;
         this.turnType = 0;
-        this.velocity = 0;
+        this.velocity = 1;
         this.tileMap = null;
         this.grid = null;
         this.range = null;
@@ -52,57 +53,63 @@ class Game{
         this.option.setConfigOption(setting);
 
         // If there is scene to play first
-        if(this.levels[this.levelCount].event[0].trigger === 'auto'){
+        // if(this.levels[this.levelCount].event[0].trigger === 'auto'){
 
-        }else{
-            // Proceed to battle phase
-            this.tileMap = new TileMap(32, JSON.parse(JSON.stringify(levels[levelCount])));
-            
-            this.grid = new Grid(tileMap.map, 32, {});
+        // }else{
+            this.#initBattlePhase()
+        // }     
+    }
 
-            this.range = new Range(tileMap.map, 32);
+    #initConversationPhase = () => {}
 
-            // Temporary solution, define player from setting
-            setting.player.forEach(p => {
-                const newPlayer = tileMap.getCharacter(velocity, 2, p.name, p.job)
-                this.player.push(newPlayer)
+    #initBattlePhase = () => {
+        // Proceed to battle phase
+        this.tileMap = new TileMap(32, JSON.parse(JSON.stringify(this.levels[this.levelCount])));
 
-            })
-            
-            // Sort from fastest to slowest, define acting order
-            this.player.sort((a, b) => b.attributes.spd - a.attributes.spd)
+        this.grid = new Grid(this.tileMap.map, 32, {});
 
-            // Keep the memerizing the position for each player
-            player.forEach(p => {
-                playerPosition.push(
-                    {
-                        row: parseInt(p.y / 32),
-                        col: parseInt(p.x / 32)
-                    }
-                )
-            })
+        this.range = new Range(this.tileMap.map, 32);
 
-            // Define enemy from the level data
-            this.tileMap.enemy.forEach(e => {
-                const newPlayer = tileMap.getCharacter(velocity, 3, e.name, e.job)
-                this.enemy.push(newPlayer)
-            })
-            
-            // Sort from fastest to slowest, define acting order
-            this.enemy.sort((a,b) => b.attributes.spd - a.attributes.apd)
-            
-            this.enemy.forEach(e => {
-                this.enemyPosition.push(
-                    {
-                        row: parseInt(e.y / 32),
-                        col: parseInt(e.x / 32)
-                    }
-                )
-            })
+        // Temporary solution, define player from setting
+        setting.player.forEach(p => {
+            const newPlayer = this.tileMap.getCharacter(this.velocity, 2, p.name, p.job)
+            this.player.push(newPlayer)
 
-            this.#setUpCanvasEvent()
-            this.#gameLoop()
-        }     
+        })
+        
+        // Sort from fastest to slowest, define acting order
+        this.player.sort((a, b) => b.attributes.spd - a.attributes.spd)
+
+        // Keep the memerizing the position for each player
+        this.player.forEach(p => {
+            this.playerPosition.push(
+                {
+                    row: parseInt(p.y / 32),
+                    col: parseInt(p.x / 32)
+                }
+            )
+        })
+
+        // Define enemy from the level data
+        this.tileMap.enemy.forEach(e => {
+            const newPlayer = this.tileMap.getCharacter(this.velocity, 3, e.name, e.job)
+            this.enemy.push(newPlayer)
+        })
+        
+        // Sort from fastest to slowest, define acting order
+        this.enemy.sort((a,b) => b.attributes.spd - a.attributes.apd)
+        
+        this.enemy.forEach(e => {
+            this.enemyPosition.push(
+                {
+                    row: parseInt(e.y / 32),
+                    col: parseInt(e.x / 32)
+                }
+            )
+        })
+
+        this.#setUpCanvasEvent()
+        this.#gameLoop()
     }
 
     #setUpCanvasEvent = () => {
@@ -134,7 +141,7 @@ class Game{
                     
                         const position = this.playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
 
-                        movable = action.move(this.tileMap, row, col, position, currentActingPlayer)      
+                        movable = this.action.move(this.tileMap, row, col, position, currentActingPlayer)      
                         
                         if(!movable){
                             cancelAction()
@@ -149,13 +156,13 @@ class Game{
                     
                         const position = this.playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
                         
-                        const possibleEncounterEnemyPosition = limitPositonToCheck(currentActingPlayer.attributes.moveSpeed, position, this.enemyPosition)
-                        movable = await action.command(canvas, row, col, currentActingPlayer, this.inspectingCharacter, possibleEncounterEnemyPosition, tileSize, this.tileMap)
+                        const possibleEncounterEnemyPosition = this.limitPositonToCheck(currentActingPlayer.attributes.moveSpeed, position, this.enemyPosition)
+                        movable = await this.action.command(canvas, row, col, currentActingPlayer, this.inspectingCharacter, possibleEncounterEnemyPosition, tileSize, this.tileMap)
 
                         if(!movable){
                             if(this.action.mode === 'skill'){
                                 // Back to skill window
-                                this.action.setSKillWindow(currentActingPlayer, tileMap, position)
+                                this.action.setSKillWindow(currentActingPlayer, this.tileMap, position)
                             }else if(this.action.mode === 'item'){
                                 // Back to inventory
                                 constructInventoryWindow(currentActingPlayer)
@@ -176,7 +183,7 @@ class Game{
                             //Reset action menu option style
                             resetActionMenu(this.inspectingCharacter.x, this.inspectingCharacter.y)
 
-                            this.checkAp(this.inspectingCharacter)
+                            this.#checkAp(this.inspectingCharacter)
 
                             prepareCharacterCaption(this.inspectingCharacter, tileSize)
 
@@ -197,6 +204,7 @@ class Game{
                             displayUIElement()
                             hideOptionMenu()
                         }else{
+                            toggleOptionMenu()
                             toggleActionMenuAndCharacterCaption()
                         }  
                     break;
@@ -261,7 +269,7 @@ class Game{
         }
 
         // Form a loop for rendering
-        window.requestAnimationFrame(this.gameLoop)
+        window.requestAnimationFrame(this.#gameLoop)
     }
 
     // Move to the next phase

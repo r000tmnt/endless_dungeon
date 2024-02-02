@@ -219,7 +219,7 @@ export default class Character {
         // this.walkableSpace.splice(0)
         this.destination = null 
         // Tell the game engine to unfreeze other objects
-        animationSignal(false)
+        game.action.animationInit = false
     }
 
     async #fadeOutTimer(ctx, characterType){

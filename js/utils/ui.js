@@ -83,12 +83,13 @@ for(let i=0; i < options.length; i++){
         case 'objective':
             options[i].addEventListener('click', () => {
                 game.option.mode = 'objective'
-                game.option.setObjectiveWindow(objectiveWindow, setting, tileMap.objective)
+                game.option.setObjectiveWindow(objectiveWindow, setting, game.tileMap.objective)
             })
         break;
         case 'config':
             options[i].addEventListener('click', () => {
                 game.option.mode = 'config'
+                game.option.setConfigWindow(setting)
                 configWindow.classList.remove('invisible')
                 configWindow.classList.add('open_window')
             })
@@ -111,7 +112,7 @@ for(let i=0; i < backBtn.length; i++){
     switch(backBtn[i].dataset.action){
         case 'skill':
             backBtn[i].addEventListener('click', async() => {
-                action.mode = ''
+                game.action.mode = ''
                 // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
                 skillWindow.classList.add('invisible')
                 skillWindow.classList.remove('open_window')
@@ -135,9 +136,9 @@ for(let i=0; i < backBtn.length; i++){
         break;
         case 'item':
             backBtn[i].addEventListener('click', async() => {
-                action.mode = ''
+                game.action.mode = ''
                 // Check if the tile has an event
-                await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
+                await game.checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
                 Inventory.classList.add('invisible')
                 Inventory.classList.remove('open_window')
                 clearInventory(Inventory.style)
@@ -190,12 +191,12 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 hideUIElement() 
                 const { tileSize } = setting.general
                 const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
-                const possibleEncounterEnemyPosition = limitPositonToCheck(game.inspectingCharacter.attributes.moveSpeed, position, game.enemyPosition)
+                const possibleEncounterEnemyPosition = game.limitPositonToCheck(game.inspectingCharacter.attributes.moveSpeed, position, game.enemyPosition)
                 await game.action.setMove(
                     game.tileMap, 
                     game.inspectingCharacter, 
                     position, 
-                    inspectingCharacter.attributes.moveSpeed, possibleEncounterEnemyPosition.length? possibleEncounterEnemyPosition : game.enemyPosition
+                    game.inspectingCharacter.attributes.moveSpeed, possibleEncounterEnemyPosition.length? possibleEncounterEnemyPosition : game.enemyPosition
                 )           
             })
         break;
@@ -214,13 +215,13 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 const { width, height } = camera
                 resizeHiddenElement(skillWindow.style, width, height, fontSize_sm)
                 const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
-                action.setSKillWindow(game.inspectingCharacter, game.tileMap, position, fontSize, fontSize_md, fontSize_sm)
+                game.action.setSKillWindow(game.inspectingCharacter, game.tileMap, position, fontSize, fontSize_md, fontSize_sm)
             })
         break;
         case 'item':
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement()
-                action.mode = 'item'
+                game.action.mode = 'item'
                 const { fontSize, fontSize_sm, camera } = setting.general
                 const { width, height } = camera
                 const { itemBlockSize, itemBlockMargin } = setting.inventory
@@ -246,7 +247,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
                 const { width, height } = camera
                 resizeHiddenElement(statusWindow.style, width, height, fontSize_sm)
-                action.setStatusWindow(game.inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
+                game.action.setStatusWindow(game.inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
             })
         break;
         case 'stay':
@@ -364,7 +365,7 @@ export const prepareCharacterCaption = (inspectingCharacter, tileSize) => {
         gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], inspectingCharacter) + '%';
     }
 
-    const position = (inspectingCharacter.characterType === 2)? game.playerPosition[game.player.findIndex(p => p.id === game.inspectingCharacter.id)] : game.enemyPosition[game.enemy.findIndex(e => e.id === game.inspectingCharacter.id)]
+    const position = (inspectingCharacter.characterType === 2)? game.playerPosition[game.player.findIndex(p => p.id === inspectingCharacter.id)] : game.enemyPosition[game.enemy.findIndex(e => e.id === inspectingCharacter.id)]
 
     // Shift UI position based on the character position
     if(position.row > 7 && position.col < Math.floor(9/2)){
@@ -414,7 +415,7 @@ export const resetActionMenu = async(x, y) => {
         actionMenuOptions[i].style.display = 'block'
     }
 
-    const event = await checkIfStepOnTheEvent(x, y)
+    const event = await game.checkIfStepOnTheEvent(x, y)
 
     if(event === undefined) actionMenuOptions[4].style.display = 'none'
 }
@@ -424,6 +425,14 @@ export const alterActionMenu = () => {
         if (actionMenuOptions[i].dataset.action !== 'status'){
             actionMenuOptions[i].style.display = 'none'
         }
+    }
+}
+
+export const toggleOptionMenu = () => {
+    if(option_menu.classList.contains('action_menu_open')){
+        option_menu.classList.remove('action_menu_open')
+    }else{
+        option_menu.classList.add('action_menu_open')
     }
 }
 
