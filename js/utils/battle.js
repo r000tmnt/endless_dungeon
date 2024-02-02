@@ -41,11 +41,33 @@ const levelUp = (player) => {
     console.log('player status after level up :>>>', player.attributes)
 }
 
+const diceRoll = async(hitRates, totalRate) => {
+    for(let i=0; i < hitRates.length; i++){
+        hitRates[i].value = hitRates[i].value / totalRate
+    }
+
+    // Sort in ascending order for accuracy
+    hitRates.sort((a, b) => a.value - b.value)
+
+    const diceRoll = Math.random()
+    let result = {name: '', value: ''}
+
+    for(let i=0; i < hitRates.length; i++){
+        if(diceRoll <= hitRates[i].value){
+            result = hitRates[i]
+            break
+        }
+    }
+
+    return result
+} 
+
 // Calculate Hit rate and Crit rate
-const calculateHitRate = (player, enemy, damage) => {
+const calculateHitRate = async(player, enemy, damage, status = null) => {
     let hitRate = player.attributes.spd + player.attributes.lck + damage
     let evadeRate = enemy.attributes.spd + enemy.attributes.def
     let critRate =  player.attributes.lck * player.attributes.int
+    let statusRate = (status !== null)? player.attributes.lck + (player.attributes.lck * Math.floor(player.attributes.lck / 100)) : 0
 
     let LvDistance = 0, totalRate = 0
     let resultMessage = '', resultStyle = 'yellow'
@@ -62,14 +84,7 @@ const calculateHitRate = (player, enemy, damage) => {
 
     const hitRates = [ { name: 'hitRate', value: hitRate }, { name: 'evadeRate', value: evadeRate } ]
 
-    for(let i=0; i < hitRates.length; i++){
-        hitRates[i].value = hitRates[i].value / totalRate
-    }
-
-    // Sort in ascending order for accuracy
-    hitRates.sort((a, b) => a.value - b.value)
-
-    const firstDiceRoll = hitRates[Math.floor(Math.random() * hitRates.length)]
+    const firstDiceRoll = await diceRoll(hitRates, totalRate)
 
     console.log('Hit rates :>>>', hitRates)
     console.log('totalRate :>>>', totalRate)
@@ -81,14 +96,7 @@ const calculateHitRate = (player, enemy, damage) => {
 
         const critRates = [ { name: 'hitRate', value: hitRate }, { name: 'critRate', value: critRate} ]
     
-        for(let i=0; i < critRates.length; i++){
-            critRates[i].value = critRates[i].value / totalRate
-        }
-    
-        // Sort in ascending order for accuracy
-        critRates.sort((a, b) => a.value - b.value)
-    
-        const secondDiceRoll = critRates[Math.floor(Math.random() * hitRates.length)]
+        const secondDiceRoll = await diceRoll(critRates, totalRate)
     
         console.log('Crit rates :>>>', critRates)
         console.log('totalRate :>>>', totalRate)
@@ -106,6 +114,19 @@ const calculateHitRate = (player, enemy, damage) => {
             resultMessage = String(damage)
             enemy.attributes.hp -= damage
             console.log('enmey hp:>>>', enemy.attributes.hp)
+        }
+
+        if(statusRate > 0){
+            totalRate = statusRate + evadeRate
+            const statusRates = [ { name: 'statusRate', value: statusRate}, { name: 'evadeRate', value: evadeRate } ]
+
+            const thirdDiceRoll = await diceRoll(statusRates, totalRate)
+
+            if(thirdDiceRoll.name !== 'evadeRate'){
+                console.log('Change status')
+                enemy.attributes.status = effect.status
+                resultMessage += `,${effect.status}`
+            }
         }
     }else{
         console.log('miss!')
@@ -160,6 +181,48 @@ const calculateEnemyDefense = (enemy) => {
     return defense
 }
 
+const calculatePossibleDamage = (player, enemyDefense, base_on_attribute, base_number, multiply_as) => {
+    const dmgRange = []
+    let damage = 1 // Min dmg
+    // Calculare weapon and attribute bonus
+    if(player.equip?.hand?.id !== undefined){
+        const itemData = weapon.getOne(player.equip.hand.id)      
+
+        // Need something to know if the attck is enhanced by skill or not
+        let minDmg = ((player.attributes[base_on_attribute] + Math.floor(player.attributes[base_on_attribute] * ( itemData.effect.base_attribute[base_on_attribute]/100 ))) - enemyDefense ) + itemData.effect.base_damage.min
+
+        if(multiply_as === 'solid'){
+            minDmg += base_number
+        }else{
+            minDmg += Math.floor(minDmg * (base_number / 100))
+        }
+
+        const maxDmg = minDmg + (itemData.effect.base_damage.max - itemData.effect.base_damage.min)
+
+        for(let i = minDmg; i <= maxDmg; i++){
+            dmgRange.push(i)
+        }
+
+        damage = dmgRange[Math.floor(Math.random() * dmgRange.length)]         
+    }else{
+        // Without weapon
+        // Need something to know if the attck is enhanced by skill or not
+        let minDmg = (player.attributes[base_on_attribute] - enemyDefense) + 1
+
+        if(minDmg <= 0) minDmg = 1
+
+        const maxDmg = minDmg + 2
+
+        for(let i = minDmg; i <= maxDmg; i++){
+            dmgRange.push(i)
+        }
+
+        damage = dmgRange[Math.floor(Math.random() * dmgRange.length)]    
+    }
+    console.log('dmgRange :>>>', dmgRange)
+    return damage
+}
+
 /**
  * 
  * @param {object} player - An object contains player attributes 
@@ -212,49 +275,25 @@ export const weaponAttack = async(player, enemy) => {
 }
 
 export const skillAttack = async(skill, player, enemy) => {
-    const dmgRange = []
     let damage = 1 // Min dmg
 
-    const { base_on_attribute, multiply_as, base_number } = skill.effect
+    const { base_on_attribute, multiply_as, base_number, type } = skill.effect
 
-    if(skill.type === 'dmg' || skill.type === 'magic'){
-        const enemyDefense = (skill.type === 'dmg')? calculateEnemyDefense(enemy) : calculateEnemyMagicDefense(enemy)
+    if(skill.type === 'offence'){
+        switch(type){
+            case 'dmg': case 'magic':{
+                const enemyDefense = (skill.type === 'dmg')? calculateEnemyDefense(enemy) : calculateEnemyMagicDefense(enemy)
 
-        // Calculare weapon and attribute bonus
-        if(player.equip?.hand?.id !== undefined){
-            const itemData = weapon.getOne(player.equip.hand.id)      
-
-            // Need something to know if the attck is enhanced by skill or not
-            let minDmg = ((player.attributes[base_on_attribute] + Math.floor(player.attributes[base_on_attribute] * ( itemData.effect.base_attribute[base_on_attribute]/100 ))) - enemyDefense ) + itemData.effect.base_damage.min
-
-            if(multiply_as === 'solid'){
-                minDmg += base_number
-            }else{
-                minDmg += Math.floor(minDmg * (base_number / 100))
+                damage = calculatePossibleDamage(player, enemyDefense, base_on_attribute, base_number, multiply_as)
             }
+            break;
+            case 'status':{
+                const enemyDefense = calculateEnemyDefense(enemy)
 
-            const maxDmg = minDmg + (itemData.effect.base_damage.max - itemData.effect.base_damage.min)
-
-            for(let i = minDmg; i <= maxDmg; i++){
-                dmgRange.push(i)
+                damage = calculatePossibleDamage(player, enemyDefense, base_on_attribute, base_number, multiply_as)
             }
-
-            damage = dmgRange[Math.floor(Math.random() * dmgRange.length)]         
-        }else{
-            // Without weapon
-            // Need something to know if the attck is enhanced by skill or not
-            let minDmg = (player.attributes[base_on_attribute] - enemyDefense) + 1
-
-            if(minDmg <= 0) minDmg = 1
-    
-            const maxDmg = minDmg + 2
-    
-            for(let i = minDmg; i <= maxDmg; i++){
-                dmgRange.push(i)
-            }
-    
-            damage = dmgRange[Math.floor(Math.random() * dmgRange.length)]    
-        }
+            break;
+        }        
     }else{
         // Support skill
         if(multiply_as === 'solid'){
@@ -265,10 +304,10 @@ export const skillAttack = async(skill, player, enemy) => {
             damage += Math.floor(enemy.attributes[base_on_attribute] * (base_number / 100))
         }
     }
-    console.log('dmgRange :>>>', dmgRange)
+
     console.log('possible damage :>>>', damage)
 
-    return calculateHitRate(player, enemy, damage)
+    return await calculateHitRate(player, enemy, damage)
 }
 
 // Player gain expirence upon enemy defeated
