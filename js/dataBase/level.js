@@ -197,5 +197,11 @@ export default{
 
     search(keyWord){
         return this.data.filter(k => k.name.includes(keyWord))
+    },
+
+    getTile(id, row, col){
+        const map = this.data.find(l => l.id === id).map
+
+        return map[row][col]
     }
 }
