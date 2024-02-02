@@ -852,7 +852,8 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventIte
 
     // Set confirm botton style
     btn.style.width = (cameraWidth - fontSize) + 'px'
-    btn.style.padding = `${Math.floorfontSize_sm}px 0`
+    // btn.style.padding = `${Math.floorfontSize_sm}px 0`
+    btn.style.bottom = fontSize_sm + 'px'
     btn.children[0].style.fontSize = fontSize + 'px'
     btn.children[0].style.margin = "0 auto"
     btn.children[0].setAttribute('disabled', 'true')
