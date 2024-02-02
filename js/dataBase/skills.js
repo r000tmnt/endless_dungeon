@@ -34,6 +34,7 @@ export default{
                 "base_on_attribute": "luk",
                 "multiply_as": "solid",
                 "base_number": 3,
+                "status": "Poison",
                 "desc": "Bite the enemy. Cause the foe to get poisoned"
             }
         }
