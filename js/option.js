@@ -86,7 +86,8 @@ export default class Option{
         target.style.padding = fontSize_md + 'px'
 
         for(let i=0; i < desc.length; i++){
-            list[i].style.height = ((height - (fontSize_md * 6)) * 0.3) + 'px'
+            // list[i].style.height = ((height - (fontSize_md * 6)) * 0.3) + 'px'
+            list[i].style.margin = `${fontSize_md}px 0`
             switch(desc[i].dataset.objective){
                 case 'victory':
                     if(objective.victory.target === 'enemy'){
@@ -113,7 +114,7 @@ export default class Option{
                 case 'optional':
                     for(let j=0; j < objective.optional.length; j++){
                         if(objective.optional[j].target === 'turn'){
-                            desc[i].innerText = `Finish the level in ${objective.optional[j].value}\n`
+                            desc[i].innerText = `Finish the level in ${objective.optional[j].value} turns\n`
                         }                        
                     }
                 break;
