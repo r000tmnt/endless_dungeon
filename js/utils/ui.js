@@ -622,6 +622,9 @@ export const resize = () => {
             resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontsize_sm)
             option.resizePartyWindow(setting)
         break;
+        case 'objective':
+            option.resizeObjectiveWindow(objectiveWindow, setting)
+        break;
         case 'config':
             // Set config window style
             configWindow.style.fontSize = fontSize_md + 'px'
