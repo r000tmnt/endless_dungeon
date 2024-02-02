@@ -448,3 +448,11 @@ li{
     background: black;
     border: 1px dotted white;
   }
+
+  .label{
+    /* margin-top: -14px; */
+    position: relative;
+    width: fit-content;
+    background-color: black;
+    /* padding: 1%; */
+  }
