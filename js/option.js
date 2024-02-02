@@ -76,7 +76,7 @@ export default class Option{
     setObjectiveWindow(target, setting, objective){
         const list = target.querySelectorAll('li')
         const desc = target.querySelectorAll('.desc')
-        const { fontSize, fontSize_md, camera } = setting.general
+        const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
         const { width, height } = camera
 
         target.children[0].style.fontSize = fontSize + 'px'
@@ -88,6 +88,8 @@ export default class Option{
         for(let i=0; i < desc.length; i++){
             // list[i].style.height = ((height - (fontSize_md * 6)) * 0.3) + 'px'
             list[i].style.margin = `${fontSize_md}px 0`
+            list[i].children[0].style.marginTop = (0 - fontSize) + 'px'
+            list[i].children[0].style.padding = fontSize_sm + 'px'
             switch(desc[i].dataset.objective){
                 case 'victory':
                     if(objective.victory.target === 'enemy'){
@@ -125,6 +127,26 @@ export default class Option{
         target.classList.add('open_window')
     }
 
+    resizeObjectiveWindow(target, setting){
+        const list = target.querySelectorAll('li')
+        const desc = target.querySelectorAll('.desc')
+        const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
+        const { width, height } = camera
+
+        target.children[0].style.fontSize = fontSize + 'px'
+        target.style.fontSize = fontSize_md + 'px'
+        target.style.width = width + 'px'
+        target.style.height = height + 'px'
+        target.style.padding = fontSize_md + 'px'
+
+        for(let i=0; i < desc.length; i++){
+            // list[i].style.height = ((height - (fontSize_md * 6)) * 0.3) + 'px'
+            list[i].style.margin = `${fontSize_md}px 0`
+            list[i].children[0].style.marginTop = (0 - fontSize) + 'px'
+            list[i].children[0].style.padding = fontSize_sm + 'px'
+        }
+    }
+
     setConfigWindow(setting){
         const configWindow = document.getElementById('config')
         const title = configWindow.children[0]
@@ -156,7 +178,6 @@ export default class Option{
                     options[i].checked = options[i].value === setting.general.filter
 
                     options[i].addEventListener('click', () => {
-
                         setting.general.filter = options[i].value
                     })
                 break;
