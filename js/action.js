@@ -138,7 +138,7 @@ export default class Action{
                     skillWindow.classList.add('invisible')
                     
                     setTimeout(() => {
-                        this.clearSkillWindow()
+                        this.clearSkillWindow(skillWindow.style)
                     }, 300)
                 })                
             }else{
