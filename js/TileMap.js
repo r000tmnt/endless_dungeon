@@ -1,16 +1,19 @@
 import Character from "./Character.js";
 import { getItemType } from './utils/inventory.js'
+// import level from "./dataBase/level.js";
 
 // class - 物件創建的模板
 export default class TileMa {
     //付值給實體的物件
-    constructor(tileSize, map, event, enemy, assets, objective){
+    constructor(tileSize, levelData){
+        this.id = levelData.id;
+        this.name = levelData.name;
         this.tileSize = tileSize;
-        this.map = map;
-        this.event = event;
-        this.enemy = enemy;
-        this.assets = this.#loadAssetImage(assets)
-        this.objective = objective
+        this.map = levelData.map;
+        this.event = levelData.event;
+        this.enemy = levelData.enemy;
+        this.assets = this.#loadAssetImage(levelData.assets)
+        this.objective = levelData.objective
     }
 
     #loadAssetImage(assets){
@@ -140,12 +143,12 @@ export default class TileMa {
                 this.event.splice(eventIndex, 1)
                 
                 // Remove image
-                let ctx = document.getElementById('game').getContext("2d");
-                ctx.save()
-                ctx.globalAlpha = 0
-                ctx.drawImage(this.item, position.x, position.y, this.tileSize, this.tileSize)
-                ctx.restore()
-                this.map[parseInt(position.y / this.tileSize)][parseInt(position.x / this.tileSize)] = 0
+                // let ctx = document.getElementById('game').getContext("2d");
+                const row = parseInt(position.y / this.tileSize)
+                const col = parseInt(position.x / this.tileSize)
+                // const originalTile = level.getTile(this.id, row, col)
+                this.map[row][col] = 0
+                // ctx.drawImage(this.assets[4], position.x, position.y, this.tileSize, this.tileSize)
             break;
         }
     }
