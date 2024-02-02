@@ -183,7 +183,7 @@ canvas.addEventListener('mousedown', async(event) =>{
                     console.log('I am player')
 
                     //Reset action menu option style
-                    resetActionMenu()
+                    resetActionMenu(inspectingCharacter.x, inspectingCharacter.y)
 
                     checkAp(inspectingCharacter)
 
@@ -350,7 +350,11 @@ export const checkDroppedItem = async(dropItems) => {
 export const checkIfStepOnTheEvent = async(x, y) => {
     const event = tileMap.event.find(e => e.position.x === x && e.position.y === y && e.trigger === 'stepOn')
 
-    if(event !== undefined) toggleActionMenuOption('pick', false, 'event')
+    if(event !== undefined){
+        toggleActionMenuOption('pick', false, 'event')
+    }
+
+    return event
 }
 
 /**
