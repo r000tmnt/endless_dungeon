@@ -3,6 +3,7 @@ import Grid from './grid.js';
 import Action from './action.js';
 import Range from './range.js';
 import Option from './option.js';
+import TextBox from './textBox.js';
 
 import { constructInventoryWindow } from './utils/inventory.js'
 import { 
@@ -21,7 +22,6 @@ import {
     hideUIElement,
     cancelAction,
     countTurn,
-    setConversationWindow,
     redefineDeviceWidth,
     redefineFontSize
 } from './utils/ui.js'
@@ -30,8 +30,8 @@ import level from './dataBase/level.js';
 class Game{
     constructor(){
         this.ctx = canvas.getContext("2d");
-        this.levels = level.getAll();
-        this.levelCount = 0
+        this.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
+        this.phaseCount = 0;
         this.turn = 1;
         this.turnType = 0;
         this.velocity = 1;
@@ -39,7 +39,8 @@ class Game{
         this.grid = null;
         this.range = null;
         this.action = new Action('', [], [], 0, false); 
-        this.option = new Option('');;
+        this.option = new Option('');
+        this.textBox = null;
         this.player = [];
         this.playerPosition = [];
         this.enemy = [];
@@ -54,26 +55,36 @@ class Game{
     // 1-3. Quit ---> Close the game
     init = async() => {
         this.option.setConfigOption(setting);
-
-        // If there is scene to play first
-        if(this.levels[this.levelCount].event[0].trigger === 'auto'){
-            const { cameraWidth, cameraHeight } = redefineDeviceWidth()
-
-            const { fontSize_md } = redefineFontSize(cameraWidth)
-
-            this.#initConversationPhase(this.levels[this.levelCount].event[0],cameraWidth, cameraHeight, fontSize_md)
-        }else{
-            this.#initBattlePhase()
-        }  
+        
+        this.beginNextPhase()
     }
 
-    #initConversationPhase = (event, width, height, fontSize_md) => {
-        setConversationWindow(event.scene, width, height, fontSize_md)
+    beginNextPhase(){
+        if(this.phaseCount > (this.level.phase[this.phaseCount].length - 1)){
+            this.phaseCount = 0
+            // Load the next level
+        }else{
+            switch(this.level.phase[this.phaseCount]){
+                case 'conversation':
+                    this.textBox = new TextBox(this.level.event[0].scene)
+                    const { cameraWidth, cameraHeight } = redefineDeviceWidth()
+
+                    const { fontSize, fontSize_md, fontSize_sm } = redefineFontSize(cameraWidth)
+        
+                    this.textBox.setConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
+                break;
+                case 'battle':
+                    this.#initBattlePhase()
+                break;
+                case 'intermission':
+                break;
+            }
+        }
     }
 
     #initBattlePhase = () => {
         // Proceed to battle phase
-        this.tileMap = new TileMap(32, JSON.parse(JSON.stringify(this.levels[this.levelCount])));
+        this.tileMap = new TileMap(32, this.level);
 
         this.grid = new Grid(this.tileMap.map, 32, {});
 
