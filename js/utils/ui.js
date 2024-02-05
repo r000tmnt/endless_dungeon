@@ -130,8 +130,11 @@ for(let i=0; i < backBtn.length; i++){
                 statusWindow.classList.add('invisible')
                 statusWindow.classList.remove('open_window')
                 game.action.resetStatusWindow(statusWindow.style)
-                prepareCharacterCaption(game.inspectingCharacter) 
-                displayUIElement()
+
+                if(game?.inspectingCharacter?.id){
+                    prepareCharacterCaption(game.inspectingCharacter) 
+                    displayUIElement()                    
+                }
             })
         break;
         case 'item':

@@ -8,7 +8,7 @@ export default class Option{
     setPartyWindow(player, setting, action){
         const partyWindow = document.getElementById('party')
         const memberList = document.getElementById('member_list')
-        const { fontSize_md, camera } = setting.general
+        const {fontSize, fontSize_md, fontSize_sm, camera } = setting.general
         const { width, height } = camera
         const { itemBlockSize, itemBlockMargin } = setting.inventory
 
@@ -29,7 +29,8 @@ export default class Option{
             // member click event
             member.addEventListener('click', () => {
                 action.mode = 'status'
-                action.setStatusWindow(player[i])
+                resizeHiddenElement(document.getElementById('status').style, width, height, fontSize_sm)
+                action.setStatusWindow(player[i], fontSize, fontSize_md, fontSize_sm, width)
             })   
             
             memberIcon.setAttribute('alt', 'icon')
