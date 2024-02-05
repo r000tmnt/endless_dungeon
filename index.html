@@ -329,14 +329,16 @@
 
         <!-- Conversation scene -->
         <div id="conversation" class="menu absolute invisible">
-            <ul class="absolute control">
-                <li>SKIP</li>
-                <li>HIDE</li>
-                <li>AUTO</li>
-                <li>LOG</li>
+            <ul id="dialogue_control" class="absolute">
+                <li class="action">SKIP</li>
+                <li class="action">HIDE</li>
+                <li class="action">AUTO</li>
+                <li class="action">LOG</li>
             </ul>
             <ul id="dialogue-options" class="absolute invisible"></ul>
-            <div id="dialogue" class="absolute invisible"></div>
+            <div id="dialogue" class="absolute invisible disable-scrollbars">
+                <div id="textContent"></div>
+            </div>
         </div>
     </div>
 
