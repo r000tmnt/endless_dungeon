@@ -13,15 +13,6 @@ import game from '../game.js';
 // Get UI element and bind a click event
 const aspectRatio = 9 / 16
 
-// Count the scence to display in conversation phase
-let sceneCounter = 0
-
-// Count the order of dialogues
-let dialogueCounter = 0
-
-// dialogue animation indicator
-let dialogAnimationInit = false
-
 // #region Canvas element
 export let canvas = document.getElementById('game');
 
@@ -30,6 +21,7 @@ let canvasPosition
 const appWrapper = document.getElementById('wrapper')
 const turnCounter = document.getElementById('turn')
 turnCounter.innerText = 'Turn 1'
+turnCounter.classList.add('invisible')
 
 const phaseWrapper = document.getElementById('Phase_Transition');
 const phaseElement = document.getElementById('phase');
@@ -71,10 +63,6 @@ const configWindow = document.getElementById('config')
 
 // Objective UI
 const objectiveWindow = document.getElementById('objective')
-
-// Conversation UI
-const conversationWindow = document.getElementById('conversation')
-const dialogue = document.getElementById('dialogue')
 
 // option menu child click event
 for(let i=0; i < options.length; i++){
@@ -287,40 +275,6 @@ const getPercentage = (type, character) => {
     return percentage
 }
 
-const loadConversation = (event, message, speed = 100) => {
-    let counter = 0
-    const messageLength = message.length - 1
-
-    dialogAnimationInit = true
-
-    const messageCounter = setInterval(() => {
-        if(counter === messageLength){
-            // Load the next scence if reached the end of the current playing scene
-            if(dialogueCounter === event[sceneCounter].dialogue.length){
-                dialogueCounter = 0
-                sceneCounter += 1
-                clearInterval(messageCounter)
-                loadConversation(event, event[sceneCounter].dialogue[dialogueCounter].message)
-            }else{
-                // Stop the animation
-                dialogueCounter += 1
-                dialogAnimationInit = false
-                clearInterval(messageCounter)                
-            }
-        }else{
-            // If the user wants to skip the dialogue
-            if(!dialogAnimationInit){
-                dialogue.innerText = message 
-                dialogueCounter += 1
-                clearInterval(messageCounter)
-            }else{
-                dialogue.innerText += message[counter]
-                counter += 1                
-            }
-        }
-    }, speed)
-}
-
 export const resizeHiddenElement = (target, width, height, size) => {
     target.padding = size + 'px'
     target.width = width + 'px'
@@ -468,31 +422,6 @@ export const toggleOptionMenu = () => {
 
 export const hideOptionMenu = () => {
     option_menu.classList.remove('action_menu_open')
-}
-
-export const setConversationWindow = (event, width, height, fontSize_md) => {
-    turnCounter.classList.add('invisible')
-
-    resizeHiddenElement(conversationWindow.style, width, height, fontSize_md)
-
-    dialogue.style.width = (width - (fontSize_md * 2)) + 'px'
-    dialogue.style.height = Math.floor(height * 0.3) + 'px'
-
-    conversationWindow.classList.remove('invisible')
-    conversationWindow.classList.add('open-window')
-
-    dialogue.addEventListener('click', () => {
-        if(dialogAnimationInit){
-            // Skip animation / show the whole dialogue
-            dialogAnimationInit = false
-            return
-        }else{
-            // Load dialogue
-            loadConversation(event, event[sceneCounter].dialogue[dialogueCounter].message)
-        }
-    })
-
-    loadConversation(event, event[sceneCounter].dialogue[dialogueCounter].message)
 }
   
 // Get the position on the tileMap
