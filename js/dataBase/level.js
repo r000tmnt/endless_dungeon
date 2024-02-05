@@ -1,3 +1,7 @@
+/**
+ * Plase the conversation event at the beginning of the event array and state the trigger value as "auto"
+ * Other event like drop item or character interation are place after conversation event
+ */
 export default{
     data: [
         {
@@ -28,6 +32,7 @@ export default{
                 "",
                 "item.png"
             ],
+            "phase": [ 'conversation', 'battle', 'conversation', 'intermission' ],
             "event": [
                 {
                     "position": [],
