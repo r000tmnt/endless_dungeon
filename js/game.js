@@ -20,7 +20,10 @@ import {
     displayUIElement,
     hideUIElement,
     cancelAction,
-    countTurn
+    countTurn,
+    setConversationWindow,
+    redefineDeviceWidth,
+    redefineFontSize
 } from './utils/ui.js'
 import setting from './utils/setting.js';
 import level from './dataBase/level.js';
@@ -53,14 +56,20 @@ class Game{
         this.option.setConfigOption(setting);
 
         // If there is scene to play first
-        // if(this.levels[this.levelCount].event[0].trigger === 'auto'){
+        if(this.levels[this.levelCount].event[0].trigger === 'auto'){
+            const { cameraWidth, cameraHeight } = redefineDeviceWidth()
 
-        // }else{
+            const { fontSize_md } = redefineFontSize(cameraWidth)
+
+            this.#initConversationPhase(this.levels[this.levelCount].event[0],cameraWidth, cameraHeight, fontSize_md)
+        }else{
             this.#initBattlePhase()
-        // }     
+        }  
     }
 
-    #initConversationPhase = () => {}
+    #initConversationPhase = (event, width, height, fontSize_md) => {
+        setConversationWindow(event.scene, width, height, fontSize_md)
+    }
 
     #initBattlePhase = () => {
         // Proceed to battle phase
@@ -71,42 +80,46 @@ class Game{
         this.range = new Range(this.tileMap.map, 32);
 
         // Temporary solution, define player from setting
-        setting.player.forEach(p => {
-            const newPlayer = this.tileMap.getCharacter(this.velocity, 2, p.name, p.job)
-            this.player.push(newPlayer)
+        if(!this.player.length){
+            setting.player.forEach((p) => {
+                const newPlayer = this.tileMap.getCharacter(this.velocity, 2, p.name, p.job)
+                this.player.push(newPlayer)
 
-        })
-        
-        // Sort from fastest to slowest, define acting order
-        this.player.sort((a, b) => b.attributes.spd - a.attributes.spd)
+            })
+            
+            // Sort from fastest to slowest, define acting order
+            this.player.sort((a, b) => b.attributes.spd - a.attributes.spd)
 
-        // Keep the memerizing the position for each player
-        this.player.forEach(p => {
-            this.playerPosition.push(
-                {
-                    row: parseInt(p.y / 32),
-                    col: parseInt(p.x / 32)
-                }
-            )
-        })
+            // Keep the memerizing the position for each player
+            this.player.forEach(p => {
+                this.playerPosition.push(
+                    {
+                        row: parseInt(p.y / 32),
+                        col: parseInt(p.x / 32)
+                    }
+                )
+            })            
+        }
 
-        // Define enemy from the level data
-        this.tileMap.enemy.forEach(e => {
-            const newPlayer = this.tileMap.getCharacter(this.velocity, 3, e.name, e.job)
-            this.enemy.push(newPlayer)
-        })
-        
-        // Sort from fastest to slowest, define acting order
-        this.enemy.sort((a,b) => b.attributes.spd - a.attributes.apd)
-        
-        this.enemy.forEach(e => {
-            this.enemyPosition.push(
-                {
-                    row: parseInt(e.y / 32),
-                    col: parseInt(e.x / 32)
-                }
-            )
-        })
+        if(!this.enemy.length){
+            // Define enemy from the level data
+            this.tileMap.enemy.forEach(e => {
+                const newPlayer = this.tileMap.getCharacter(this.velocity, 3, e.name, e.job)
+                this.enemy.push(newPlayer)
+            })
+            
+            // Sort from fastest to slowest, define acting order
+            this.enemy.sort((a,b) => b.attributes.spd - a.attributes.apd)
+            
+            this.enemy.forEach(e => {
+                this.enemyPosition.push(
+                    {
+                        row: parseInt(e.y / 32),
+                        col: parseInt(e.x / 32)
+                    }
+                )
+            })            
+        }
 
         this.#setUpCanvasEvent()
         this.#gameLoop()
@@ -217,9 +230,9 @@ class Game{
     #enemyAI = async(currentActingEnemy, index) => {
         this.grid.setPointedBlock({ ...this.enemyPosition[index] })
 
-        const { moveSpeed, sight } = currentActingEnemy
+        const { moveSpeed, sight } = currentActingEnemy.attributes
 
-        const possibleEncounterPlayerPosition = limitPositonToCheck(moveSpeed, this.enemyPosition[index], this.playerPosition)
+        const possibleEncounterPlayerPosition = this.limitPositonToCheck(moveSpeed, this.enemyPosition[index], this.playerPosition)
 
         await this.action.enemyMakeDecision(
             canvas, 
@@ -282,7 +295,7 @@ class Game{
                     console.log('enemy phase')
                     this.turnType = 1
                     this.enemy[index].attributes.ap = this.enemy[index].attributes.maxAp
-                    this.#enemyAI(this.enemy[index])                 
+                    this.#enemyAI(this.enemy[index], index)                 
                 }else{
                     this.turnType = 1
                     this.#nextTurn()
@@ -391,7 +404,7 @@ class Game{
                 this.grid.setPointedBlock({})
                 currentActingPlayer.wait = true
                 currentActingPlayer.setWalkableSpace([])
-                nextTurn(0)
+                this.#nextTurn(0)
             }else{
                 this.grid.setPointedBlock({ ...this.playerPosition[index] })
                 this.inspectingCharacter = currentActingPlayer
@@ -417,7 +430,7 @@ class Game{
                 currentActingPlayer.setWalkableSpace([])
                 // Check if the others run out of ap also
                 if(this.enemy[index + 1] !== undefined){
-                    await this.#enemyAI(this.enemy[index + 1])
+                    await this.#enemyAI(this.enemy[index + 1], index + 1)
                     console.log('next enemy start moving')
                 }else{
                     this.#nextTurn(0)                
@@ -425,7 +438,7 @@ class Game{
             }else{
                 this.grid.setPointedBlock({ ...this.enemyPosition[index] })
                 // keep looking
-                await this.#enemyAI(index)
+                await this.#enemyAI(this.enemy[index], index)
                 console.log('enemyAI keep looking')
             }         
         } 
@@ -440,7 +453,7 @@ class Game{
             }
             break;
             case 3:{
-                const index = enemy.findIndex(e => e.id === id)
+                const index = this.enemy.findIndex(e => e.id === id)
                 this.enemy.splice(index, 1)
                 this.enemyPosition.splice(index, 1)
             }

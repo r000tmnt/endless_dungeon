@@ -12,13 +12,20 @@ import game from '../game.js';
 
 // Get UI element and bind a click event
 const aspectRatio = 9 / 16
+
+// Count the scence to display in conversation phase
+let sceneCounter = 0
+
+// Count the order of dialogues
 let dialogueCounter = 0
+
+// dialogue animation indicator
+let dialogAnimationInit = false
+
 // #region Canvas element
 export let canvas = document.getElementById('game');
 
 let canvasPosition
-let deviceWidth = window.innerWidth
-let deviceHeight = window.innerHeight
 
 const appWrapper = document.getElementById('wrapper')
 const turnCounter = document.getElementById('turn')
@@ -258,7 +265,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 hideUIElement()
                 setTimeout(() => {
                     game.inspectingCharacter.attributes.ap -= 1
-                    characterAnimationPhaseEnded(game.inspectingCharacter)
+                    game.characterAnimationPhaseEnded(game.inspectingCharacter)
                 }, 500)
             })
     }
@@ -280,18 +287,38 @@ const getPercentage = (type, character) => {
     return percentage
 }
 
-const displayConversation = (width, height, fontSize_md) => {
-    dialogue.style.width = (width - fontSize_md) + 'px'
-    dialogue.style.height = Math.floor(height * 0.3) + 'px'
-}
+const loadConversation = (event, message, speed = 100) => {
+    let counter = 0
+    const messageLength = message.length - 1
 
-const loadConversation = (message) => {
-    dialogue.innerText = ''
+    dialogAnimationInit = true
 
-    for(let i=0; i < message.length; i++){
-    }
-
-    dialogueCounter += 1
+    const messageCounter = setInterval(() => {
+        if(counter === messageLength){
+            // Load the next scence if reached the end of the current playing scene
+            if(dialogueCounter === event[sceneCounter].dialogue.length){
+                dialogueCounter = 0
+                sceneCounter += 1
+                clearInterval(messageCounter)
+                loadConversation(event, event[sceneCounter].dialogue[dialogueCounter].message)
+            }else{
+                // Stop the animation
+                dialogueCounter += 1
+                dialogAnimationInit = false
+                clearInterval(messageCounter)                
+            }
+        }else{
+            // If the user wants to skip the dialogue
+            if(!dialogAnimationInit){
+                dialogue.innerText = message 
+                dialogueCounter += 1
+                clearInterval(messageCounter)
+            }else{
+                dialogue.innerText += message[counter]
+                counter += 1                
+            }
+        }
+    }, speed)
 }
 
 export const resizeHiddenElement = (target, width, height, size) => {
@@ -444,20 +471,28 @@ export const hideOptionMenu = () => {
 }
 
 export const setConversationWindow = (event, width, height, fontSize_md) => {
+    turnCounter.classList.add('invisible')
+
     resizeHiddenElement(conversationWindow.style, width, height, fontSize_md)
+
+    dialogue.style.width = (width - (fontSize_md * 2)) + 'px'
+    dialogue.style.height = Math.floor(height * 0.3) + 'px'
 
     conversationWindow.classList.remove('invisible')
     conversationWindow.classList.add('open-window')
 
-    dialogue.addEventLinster('click', () => {
-        if(dialogueCounter <= (event.dialogue.length - 1)){
-            loadConversation(event.dialogue[dialogueCounter].message)
+    dialogue.addEventListener('click', () => {
+        if(dialogAnimationInit){
+            // Skip animation / show the whole dialogue
+            dialogAnimationInit = false
+            return
         }else{
-            // Reset dialogue counter
-            // Proceed to next phase
-            dialogueCounter = 0
+            // Load dialogue
+            loadConversation(event, event[sceneCounter].dialogue[dialogueCounter].message)
         }
     })
+
+    loadConversation(event, event[sceneCounter].dialogue[dialogueCounter].message)
 }
   
 // Get the position on the tileMap
@@ -472,11 +507,9 @@ export const getPosition = (event, tileSize) => {
     return { row, col }
 }
 
-export const resize = () => {
-    console.log('resize')
-
-    deviceWidth = window.innerWidth
-    deviceHeight = window.innerHeight
+export const redefineDeviceWidth = () => {
+    let deviceWidth = window.innerWidth
+    let deviceHeight = window.innerHeight
 
     if(deviceHeight <= 768){
         deviceWidth = Math.floor(deviceHeight * aspectRatio)       
@@ -490,12 +523,33 @@ export const resize = () => {
 
     // Set up tile size according to the canvas width
     const tileSize = setting.general.tileSize = Math.floor(deviceWidth / 9);
+    const cameraWidth = setting.general.camera.width = tileSize * 9 
+    const cameraHeight = setting.general.camera.height = tileSize * 16 
+
+    return { tileSize, cameraWidth, cameraHeight }
+}
+
+export const redefineFontSize = (cameraWidth) => {
+    const fontSize = setting.general.fontSize = Math.floor( 8 * Math.floor(cameraWidth / 100))
+    const fontSize_md = setting.general.fontSize_md = Math.floor(fontSize * 0.75)
+    setting.inventory.itemBlockSize = Math.floor(cameraWidth / 100) * 30
+    setting.inventory.itemBlockMargin = Math.floor((setting.inventory.itemBlockSize  / 100) * 10)
+
+    const fontSize_sm = setting.general.fontSize_sm = Math.floor(fontSize * 0.5)
+
+    return { fontSize, fontSize_md, fontSize_sm }
+}
+
+export const resize = () => {
+    console.log('resize')
+
+    const { tileSize, cameraWidth, cameraHeight } = redefineDeviceWidth()
+
+    const { fontSize, fontSize_md, fontSize_sm } = redefineFontSize(cameraWidth)
+
     game?.tileMap?.changeTileSize(tileSize)
     game?.grid?.setTileSize(tileSize)
     game?.range?.setTileSize(tileSize)
-
-    const cameraWidth = setting.general.camera.width = tileSize * 9 
-    const cameraHeight = setting.general.camera.height = tileSize * 16 
 
     // Get the player position relative to the canvas size
     game.player.forEach((p, index) => {
@@ -512,19 +566,12 @@ export const resize = () => {
 
     console.log('enemy :>>>', game.enemy)
 
-    const fontSize = setting.general.fontSize = Math.floor( 8 * Math.floor(cameraWidth / 100))
-    const fontSize_md = setting.general.fontSize_md = Math.floor(fontSize * 0.75)
-    setting.inventory.itemBlockSize = Math.floor(cameraWidth / 100) * 30
-    setting.inventory.itemBlockMargin = Math.floor((setting.inventory.itemBlockSize  / 100) * 10)
-
-    const fontsize_sm = setting.general.fontSize_sm = Math.floor(fontSize * 0.5)
-
     game?.action?.setFontSize(Math.floor(fontSize * 2))
 
     // calculation the percentage of the attribute
     for(let i=0; i < gauges.length; i++){
         // console.log(gauges[i].firstElementChild)
-        gauges[i].firstElementChild.style.height = fontsize_sm + 'px';
+        gauges[i].firstElementChild.style.height = fontSize_sm + 'px';
     }
 
     // action menu child font size
@@ -542,8 +589,8 @@ export const resize = () => {
     
     characterCaption.style.width = Math.floor(50 * (cameraWidth / 100)) + 'px'
     characterName.style.fontSize = fontSize + 'px';
-    characterLv.style.fontSize = fontsize_sm + 'px';
-    characterAp.style.fontSize = fontsize_sm + 'px';
+    characterLv.style.fontSize = fontSize_sm + 'px';
+    characterAp.style.fontSize = fontSize_sm + 'px';
 
     // Set phase transition style
     phaseWrapper.style.width = cameraWidth + 'px'
@@ -552,8 +599,8 @@ export const resize = () => {
 
     // Set back button style
     for(let i=0; i < backBtn.length; i++){
-        backBtn[i].style.transform = `translateX(-${fontsize_sm}px)`
-        backBtn[i].style.top = fontsize_sm + 'px'      
+        backBtn[i].style.transform = `translateX(-${fontSize_sm}px)`
+        backBtn[i].style.top = fontSize_sm + 'px'      
         backBtn[i].style.fontSize = fontSize_md + 'px'  
     }
 
@@ -570,32 +617,32 @@ export const resize = () => {
     switch(game.action.mode){
         case 'item':
             // Set inventory style
-            resizeHiddenElement(Inventory.style, cameraWidth, cameraHeight, fontsize_sm)
-            resizeInventory(cameraWidth, fontSize, fontsize_sm)
+            resizeHiddenElement(Inventory.style, cameraWidth, cameraHeight, fontSize_sm)
+            resizeInventory(cameraWidth, fontSize, fontSize_sm)
         break;
         case 'status':
             // Set status window style
-            resizeHiddenElement(statusWindow.style, cameraWidth, cameraHeight, fontsize_sm)
+            resizeHiddenElement(statusWindow.style, cameraWidth, cameraHeight, fontSize_sm)
             avatar.style.width = Math.floor(cameraWidth * 0.3) + 'px';
             avatar.style.height = Math.floor(cameraWidth * 0.3) + 'px';
             action.resizeStatusWindow()
         break;
         case 'pick':
             // Set pick up window style
-            resizeHiddenElement(pickUpWindow.style, cameraWidth, cameraHeight, fontsize_sm)
+            resizeHiddenElement(pickUpWindow.style, cameraWidth, cameraHeight, fontSize_sm)
             resizePickUp(fontSize, cameraWidth)
         break;
         case 'skill':
             // Set skill window style
-            resizeHiddenElement(skillWindow.style, cameraWidth, cameraHeight, fontsize_sm)
-            action.resizeSkillWindow(fontSize, fontSize_md, fontsize_sm, tileSize)
+            resizeHiddenElement(skillWindow.style, cameraWidth, cameraHeight, fontSize_sm)
+            action.resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, tileSize)
         break;
     }
 
     switch(game.option.mode){
         case 'party':
             // Set party window style
-            resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontsize_sm)
+            resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontSize_sm)
             game.option.resizePartyWindow(setting)
         break;
         case 'objective':
@@ -604,7 +651,7 @@ export const resize = () => {
         case 'config':
             // Set config window style
             configWindow.style.fontSize = fontSize_md + 'px'
-            resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontsize_sm)
+            resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontSize_sm)
         break;
     }
 }
