@@ -16,6 +16,7 @@ export default class TextBox{
     constructor(event){
         this.event = event;
         this.log = [];
+        this.action = '';
         this.optionOnScreen = false;
         // Count the scence to display in conversation phase
         this.sceneCounter = 0;
@@ -58,10 +59,80 @@ export default class TextBox{
                 // Skip animation / show the whole dialogue
                 this.animationInit = false
             }else{
+                switch(this.action){
+                    case 'skip':
+                        if(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message[this.messageCounter + 1] !== undefined ){
+                            this.messageCounter += 1
+                            dialogueOptions.children[0].click()                            
+                        }else 
+                        if(this.event[this.sceneCounter].dialogue[this.dialogueCounter + 1] !== undefined ){
+
+                        }else
+                        if(this.event[this.sceneCounter + 1] !== undefined){
+
+                        }
+                        
+                    break;
+                    case 'hide':
+                    break;
+                    case 'auto':
+                    break;
+                    case 'log':
+                    break;
+                }
                 // Load dialogue
                 this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message)
             }
         })
+
+        // Get dialog options
+        const controlOptions = dialogueControl.querySelectorAll('li')
+
+        // Bind click event to the options
+        for(let i=0; i < controlOptions.length; i++){
+            switch(controlOptions[i].dataset.action){
+                case 'skip':
+                    this.action = 'skip'
+                    // Jump to the step where options are presents or to go the battle phase
+                    controlOptions[i].addEventListener('click', (event) => {
+                        event.stopPropagation()
+
+                        let optionExist = false
+
+                        for(let i=this.dialogueCounter; i < this.event[this.sceneCounter].dialogue.length; i++){
+                            if(optionExist) return
+                            for(let j=this.messageCounter; j < this.event[this.sceneCounter].dialogue[i].message.length; j++){
+                                optionExist = this.#checkIfOptionExist(this.event[this.sceneCounter].dialogue[i].message[j])
+
+                                if(optionExist){
+                                    this.dialogueCounter = i
+                                    this.messageCounter = j
+                                    
+                                    this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1
+                                    const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
+                                    this.messageLength = message.length -1
+                                    this.textLength = message[this.messageCounter].content.length -1
+
+                                    this.#displayConversation(message)
+                                    return
+                                }
+                            }
+                        }
+                        
+                        if(!optionExist){
+                            this.#endConversationPhase()
+                        }
+                    })
+                break;
+                case 'hide':
+                break;
+                case 'auto':
+                    // Increse the dialogue play speed and auto click, stop at options
+                break;
+                case 'log':
+                break;
+            }
+        }
     
         // First time load conversation
         setTimeout(() => {
@@ -92,14 +163,7 @@ export default class TextBox{
                     // Stop the conversation phase if reached the end of the event
                     if(this.sceneCounter === (this.event.length - 1)){
                         this.sceneCounter = 0
-                        conversationWindow.style.opacity = 0
-                        conversationWindow.classList.add('invisible')
-                        conversationWindow.classList.remove('open_window')
-    
-                        // Remove the predefined event
-                        game.level.event.splice(0, 1)
-                        game.phaseCount += 1
-                        game.beginNextPhase()
+                        this.#endConversationPhase()
                     }else{
                         this.sceneCounter += 1  
                         this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1      
@@ -112,7 +176,7 @@ export default class TextBox{
                 const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
                 this.messageLength = message.length - 1
                 
-                const optionExist = this.#cheeckIfOptionExist(message)
+                const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
 
                 if(!optionExist){
                     this.textLength = message[this.messageCounter].content.length - 1
@@ -121,7 +185,7 @@ export default class TextBox{
             }else{
                 // Increate the message counter by one
                 this.messageCounter += 1
-                const optionExist = this.#cheeckIfOptionExist(message)
+                const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
 
                 if(!optionExist){
                     this.textLength = message[this.messageCounter].content.length - 1
@@ -129,10 +193,21 @@ export default class TextBox{
                 }
             }
         }else{
-            const optionExist = this.#cheeckIfOptionExist(message)
+            const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
 
             if(!optionExist) this.#displayConversation(message[this.messageCounter])
         }
+    }
+
+    #endConversationPhase(){
+        conversationWindow.style.opacity = 0
+        conversationWindow.classList.add('invisible')
+        conversationWindow.classList.remove('open_window')
+
+        // Remove the predefined event
+        game.level.event.splice(0, 1)
+        game.phaseCount += 1
+        game.beginNextPhase()
     }
     
     #displayConversation = (message, speed = 100) => {
@@ -173,19 +248,19 @@ export default class TextBox{
         }, speed)
     }
 
-    #cheeckIfOptionExist = (message) => {
+    #checkIfOptionExist = (message) => {
         // Display option if any
-        const optionExist = message[this.messageCounter].option !== undefined
+        const optionExist = message.option !== undefined
         if(optionExist){
             this.optionOnScreen = true
             // Display option if any
-            for(let i=0 ; i < message[this.messageCounter].option.length; i++){
+            for(let i=0 ; i < message.option.length; i++){
                 const option = document.createElement('li')
-                option.innerHTML = message[this.messageCounter].option[i].value
+                option.innerHTML = message.option[i].value
                 option.style.background = 'none'
                 option.style.margin = `${setting.general.fontSize_sm}px 0`
 
-                const { style, size } = message[this.messageCounter].option[i]
+                const { style, size } = message.option[i]
 
                 if(style.length){
                     option.style.color = style
@@ -208,11 +283,11 @@ export default class TextBox{
                     dialogue.classList.remove('invisible')
                     dialogue.style.opacity = 1
                     
-                    this.textLength = message[this.messageCounter].option[i].content.length - 1
-                    this.#displayConversation(message[this.messageCounter].option[i])
+                    this.textLength = message.option[i].content.length - 1
+                    this.#displayConversation(message.option[i])
 
-                    for(let j=0; j < message[this.messageCounter].option[i].effect.length; j++){
-                        game.eventEffect.push(message[this.messageCounter].option[i].effect[j])
+                    for(let j=0; j < message.option[i].effect.length; j++){
+                        game.eventEffect.push(message.option[i].effect[j])
                     }
 
                     while(dialogueOptions.firstChild){
