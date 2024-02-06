@@ -120,6 +120,12 @@ body{
     color: black;
 }
 
+#dialogue-options{
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 #dialogue{
     box-sizing: border-box;
     line-break: auto;
