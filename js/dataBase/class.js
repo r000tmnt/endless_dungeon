@@ -21,11 +21,11 @@ export default {
                 "sight": 5
             },
             "bag": [
-                {
-                    "id": "sword_1",
-                    "type": 3,
-                    "amount": 1
-                },
+                // {
+                //     "id": "sword_1",
+                //     "type": 3,
+                //     "amount": 1
+                // },
                 {
                     "id": "armor_light_1",
                     "type": 4,
