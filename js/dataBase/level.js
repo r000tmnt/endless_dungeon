@@ -84,7 +84,7 @@ export default{
                                                     "content": "You slowly bend down your body against the ground.\nThen you realize that your cloth is in a poor condition,\nnot enough to protect you from the low temperature",
                                                     "effect": [
                                                         {
-                                                            "target": "player", // Default to the first player created
+                                                            "target": "player_1", // Default to the first player created
                                                             "attribute": "hp",
                                                             "value": -1,
                                                         }
@@ -201,7 +201,7 @@ export default{
                                                     "content": "Soon as you pick up the kneif on the ground.\nYou heard another voice, and a rotten smell came after.",
                                                     "effect": [ // player equipt with the knife
                                                         {
-                                                            "target": "player",
+                                                            "target": "player_1",
                                                             "attribute": "equip",
                                                             "type": 3,
                                                             "value": "knife_1"
@@ -215,7 +215,7 @@ export default{
                                                     "content": "You kicked the knife out of your reach.\nYet it stops in the middle like it hit something solid, and it is not the sound of the ground or stone either.",
                                                     "effect": [
                                                         {
-                                                            "target": "enemy",
+                                                            "target": "enemy_1",
                                                             "attribute": "hp",
                                                             "value": -1
                                                         }   
