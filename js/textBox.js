@@ -2,9 +2,6 @@ import game from './game'
 import setting from './utils/setting';
 import { resizeHiddenElement } from "./utils/ui";
 
-import weapon from './dataBase/item/item_weapon';
-import armor from './dataBase/item/item_armor';
-
 // Conversation UI
 const conversationWindow = document.getElementById('conversation')
 const dialogueControl = document.getElementById('dialogue_control')
@@ -213,7 +210,10 @@ export default class TextBox{
                     
                     this.textLength = message[this.messageCounter].option[i].content.length - 1
                     this.#displayConversation(message[this.messageCounter].option[i])
-                    this.#applyOptionEffect(message[this.messageCounter].option[i].effect)
+
+                    for(let j=0; j < message[this.messageCounter].option[i].effect.length; j++){
+                        game.eventEffect.push(message[this.messageCounter].option[i].effect[j])
+                    }
 
                     while(dialogueOptions.firstChild){
                         dialogueOptions.removeChild(dialogueOptions.firstChild)
@@ -230,91 +230,5 @@ export default class TextBox{
         }
 
         return optionExist
-    }
-
-    #applyOptionEffect = (effect) => {
-        // Apply effects to the target if any
-        for(let j=0; j < effect.length; j++){
-            switch(effect[j].target){
-                case 'player':
-                    if(!game.player.length){
-                        game.createCharacter(setting.player, game.player, game.playerPosition, 2)
-                    }
-
-                    switch(effect[j].attribute){
-                        case 'equip':
-                            switch(effect[j].type){
-                                case 3:{
-                                    const itemData = weapon.getOne(effect[j].value)
-                                    game.player[0].equip[itemData.position] = {
-                                        id: itemData.id,
-                                        name: itemData.name
-                                    }
-                                }     
-                                break;
-                                case 4:{
-                                    const itemData = armor.getOne(effect[j].value)
-                                    game.player[0].equip[itemData.position] = {
-                                        id: itemData.id,
-                                        name: itemData.name
-                                    }
-                                }
-                                break;
-                            } 
-
-                            // Change attribute value
-                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                                this.attributes[key] += itemData.effect.base_attribute[key]
-                            }
-                        break;
-                        case 'status':
-                            game.player[0].attributes[effect[j].attribute] = effect[j].value     
-                        break;
-                        default:
-                            game.player[0].attributes[effect[j].attribute] += effect[j].value                                                
-                        break;
-                    }
-                break;
-                case 'enemy':
-                    if(!game.enemy.length){
-                        game.createCharacter(game.level.enemy, game.enemy, game.enemyPosition, 3)
-                    }
-
-                                        switch(effect[j].attribute){
-                        case 'equip':
-                            switch(effect[j].type){
-                                case 3:{
-                                    const itemData = weapon.getOne(effect[j].value)
-                                    game.enemy[0].equip[itemData.position] = {
-                                        id: itemData.id,
-                                        name: itemData.name
-                                    }
-                                }     
-                                break;
-                                case 4:{
-                                    const itemData = armor.getOne(effect[j].value)
-                                    game.enemy[0].equip[itemData.position] = {
-                                        id: itemData.id,
-                                        name: itemData.name
-                                    }
-                                }
-                                break;
-                            } 
-
-                            // Change attribute value
-                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                                this.attributes[key] += itemData.effect.base_attribute[key]
-                            }
-                        break;
-                        case 'status':
-                            game.enemy[0].attributes[effect[j].attribute] = effect[j].value     
-                        break;
-                        default:
-                            game.enemy[0].attributes[effect[j].attribute] += effect[j].value                                                
-                        break;
-                    }
-                break;
-            }
-        }
     }
 }
