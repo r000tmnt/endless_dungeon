@@ -376,7 +376,7 @@ class Game{
                     }
                 break;
                 case 'enemy':
-                    const targetedEnemy = this.enemy.find(p => p.name === tileMap.enemy[Number(target[1]) - 1].name)
+                    const targetedEnemy = this.enemy.find(p => p.name === this.tileMap.enemy[Number(target[1]) - 1].name)
                     switch(effect[j].attribute){
                         case 'equip':{
                             let itemData = {}
