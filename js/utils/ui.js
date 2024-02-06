@@ -230,7 +230,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
         case 'pick':
             actionMenuOptions[i].addEventListener('click', async() => {
                 hideUIElement()
-                const event = tileMap.getEventOnTile({x: game.inspectingCharacter.x, y: game.inspectingCharacter.y})
+                const event = game.tileMap.getEventOnTile({x: game.inspectingCharacter.x, y: game.inspectingCharacter.y})
                 game.action.mode = 'pick'
                 const { fontSize, fontSize_sm, camera } = setting.general
                 const { width, height } = camera
