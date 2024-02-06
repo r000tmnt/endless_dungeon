@@ -489,7 +489,6 @@ export default class Action{
                             dropItems = await game.checkDroppedItem(dropItems)
         
                             game.tileMap.setEventOnTile({x: enemy.x, y: enemy.y}, dropItems)
-                            (parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
                         }else{
                             // At least drop a key to continue the game
                             game.tileMap.setEventOnTile({x: enemy.x, y: enemy.y}, [
@@ -499,8 +498,9 @@ export default class Action{
                                     type: 6
                                 }
                             ])
-                            game.tileMap.changeTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
                         }
+
+                        game.tileMap.changeTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
                     }else{
                         // If player lose, drop all items
                         if(player.bag.length){
