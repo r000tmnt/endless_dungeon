@@ -82,6 +82,26 @@ class Game{
         }
     }
 
+    createCharacter = (source, property, position, type) => {
+        source.forEach((p) => {
+            const newPlayer = this.tileMap.getCharacter(this.velocity, type, p.name, p.job)
+            property.push(newPlayer)
+        })
+        
+        // Sort from fastest to slowest, define acting order
+        property.sort((a, b) => b.attributes.spd - a.attributes.spd)
+
+        // Keep the memerizing the position for each player
+        property.forEach(p => {
+            position.push(
+                {
+                    row: parseInt(p.y / 32),
+                    col: parseInt(p.x / 32)
+                }
+            )
+        })  
+    }
+
     #initBattlePhase = () => {
         // Proceed to battle phase
         this.tileMap = new TileMap(32, this.level);
@@ -92,48 +112,21 @@ class Game{
 
         // Temporary solution, define player from setting
         if(!this.player.length){
-            setting.player.forEach((p) => {
-                const newPlayer = this.tileMap.getCharacter(this.velocity, 2, p.name, p.job)
-                this.player.push(newPlayer)
-
-            })
-            
-            // Sort from fastest to slowest, define acting order
-            this.player.sort((a, b) => b.attributes.spd - a.attributes.spd)
-
-            // Keep the memerizing the position for each player
-            this.player.forEach(p => {
-                this.playerPosition.push(
-                    {
-                        row: parseInt(p.y / 32),
-                        col: parseInt(p.x / 32)
-                    }
-                )
-            })            
+            this.createCharacter(setting.player, this.player, this.playerPosition, 2)
+          
         }
 
         if(!this.enemy.length){
-            // Define enemy from the level data
-            this.tileMap.enemy.forEach(e => {
-                const newPlayer = this.tileMap.getCharacter(this.velocity, 3, e.name, e.job)
-                this.enemy.push(newPlayer)
-            })
-            
-            // Sort from fastest to slowest, define acting order
-            this.enemy.sort((a,b) => b.attributes.spd - a.attributes.apd)
-            
-            this.enemy.forEach(e => {
-                this.enemyPosition.push(
-                    {
-                        row: parseInt(e.y / 32),
-                        col: parseInt(e.x / 32)
-                    }
-                )
-            })            
+            this.createCharacter(this.tileMap.enemy, this.enemy, this.enemyPosition, 3)       
         }
 
         this.#setUpCanvasEvent()
         this.#gameLoop()
+
+        // Display canvas
+        setTimeout(() => {
+            resize()
+        }, 500)
     }
 
     #setUpCanvasEvent = () => {
