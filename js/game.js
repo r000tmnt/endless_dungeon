@@ -25,8 +25,12 @@ import {
     redefineDeviceWidth,
     redefineFontSize
 } from './utils/ui.js'
+
 import setting from './utils/setting.js';
 import level from './dataBase/level.js';
+import weapon from './dataBase/item/item_weapon';
+import armor from './dataBase/item/item_armor';
+
 class Game{
     constructor(){
         this.ctx = canvas.getContext("2d");
@@ -46,6 +50,7 @@ class Game{
         this.enemy = [];
         this.enemyPosition = [];
         this.inspectingCharacter = null;
+        this.eventEffect = []; // What effect will take when move into battle phase
     }
 
     // Initialize the game
@@ -82,7 +87,7 @@ class Game{
         }
     }
 
-    createCharacter = (source, property, position, type) => {
+    #createCharacter = (source, property, position, type) => {
         source.forEach((p) => {
             const newPlayer = this.tileMap.getCharacter(this.velocity, type, p.name, p.job)
             property.push(newPlayer)
@@ -112,12 +117,16 @@ class Game{
 
         // Temporary solution, define player from setting
         if(!this.player.length){
-            this.createCharacter(setting.player, this.player, this.playerPosition, 2)
+            this.#createCharacter(setting.player, this.player, this.playerPosition, 2)
           
         }
 
         if(!this.enemy.length){
-            this.createCharacter(this.tileMap.enemy, this.enemy, this.enemyPosition, 3)       
+            this.#createCharacter(this.tileMap.enemy, this.enemy, this.enemyPosition, 3)       
+        }
+
+        if(this.eventEffect.length){
+            this.#applyOptionEffect(this.eventEffect)
         }
 
         this.#setUpCanvasEvent()
@@ -320,6 +329,96 @@ class Game{
                 }
             }            
         }, 1500)
+    }
+
+    // Apply effects to the target if any
+    #applyOptionEffect = (effect) => {       
+        for(let j=0; j < effect.length; j++){
+            const target = effect[j].target.split('_')
+            switch(target[0]){
+                case 'player':
+                    const targetedPlayer = this.player.find(p => p.name === setting.player[Number(target[1]) - 1].name)
+                    switch(effect[j].attribute){
+                        case 'equip':{
+                            let itemData = {}
+                            switch(effect[j].type){
+                                case 3:
+                                    itemData = weapon.getOne(effect[j].value)
+                                break;
+                                case 4:
+                                    itemData = armor.getOne(effect[j].value)
+                                break;
+                            } 
+
+                            targetedPlayer.equip[itemData.position] = {
+                                id: itemData.id,
+                                name: itemData.name
+                            }
+                            
+                            targetedPlayer.bag.push({
+                                id: itemData.id,
+                                type: effect[j].type,
+                                amount: 1
+                            })
+
+                            // Change attribute value
+                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
+                                targetedPlayer.attributes[key] += itemData.effect.base_attribute[key]
+                            }
+                        }
+                        break;
+                        case 'status':
+                            targetedPlayer.attributes[effect[j].attribute] = effect[j].value     
+                        break;
+                        default:
+                            targetedPlayer.attributes[effect[j].attribute] += effect[j].value                                                
+                        break;
+                    }
+                break;
+                case 'enemy':
+                    const targetedEnemy = this.enemy.find(p => p.name === tileMap.enemy[Number(target[1]) - 1].name)
+                    switch(effect[j].attribute){
+                        case 'equip':{
+                            let itemData = {}
+
+                            switch(effect[j].type){
+                                case 3:
+                                    itemData = weapon.getOne(effect[j].value)  
+                                break;
+                                case 4:
+                                    itemData = armor.getOne(effect[j].value)
+                                break;
+                            } 
+
+                            targetedEnemy.equip[itemData.position] = {
+                                id: itemData.id,
+                                name: itemData.name
+                            } 
+
+                            targetedEnemy.drop.push({
+                                id: itemData.id,
+                                type: effect[j].type,
+                                amount: 1
+                            })
+
+                            // Change attribute value
+                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
+                                targetedEnemy.attributes[key] += itemData.effect.base_attribute[key]
+                            }
+                        }
+                        break;
+                        case 'status':
+                            targetedEnemy.attributes[effect[j].attribute] = effect[j].value     
+                        break;
+                        default:
+                            targetedEnemy.attributes[effect[j].attribute] += effect[j].value                                                
+                        break;
+                    }
+                break;
+            }
+        }
+
+        this.eventEffect.splice(0)
     }
 
     // Check the content of dropped items
