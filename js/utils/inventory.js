@@ -57,6 +57,7 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
 
     if(clickedItem.type === 0){
         const { attributes } = currentActingPlayer
+        itemActions[0].style.display = 'block'
 
         // Disable the element if the condition is not match
         switch(clickedItem.useCondition.compare){
@@ -152,7 +153,7 @@ const setItemSpace = async(currentActingPlayer, enemyPosition, tileMap) => {
     Inventory.classList.add('invisible')
     Inventory.classList.remove('open_window')
 
-    clearInventory()
+    clearInventory(Inventory.style)
 }
 
 /**
@@ -771,15 +772,16 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
             case 'drop':
                 itemActions[i].addEventListener('click', () => {
                     // Open slider
+
                     const slider = document.getElementById('slider')
                     const range = document.getElementById('range')
                     const btns = slider.children[2].getElementsByTagName('button')
 
-                    range.style.width = ((cameraWidth - fontSize) - itemBlockMargin) + 'px'
+                    range.style.width = ((width - fontSize) - itemBlockMargin) + 'px'
                     range.setAttribute('max', selectedItem.amount)
 
                     // Set the size of each block
-                    slider.style.width = (cameraWidth - fontSize) + 'px'
+                    slider.style.width = (width - fontSize) + 'px'
                     slider.style.fontSize = fontSize + 'px'
 
                     // Blind input event
