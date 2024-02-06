@@ -1,11 +1,17 @@
 import game from './game'
+import setting from './utils/setting';
 import { resizeHiddenElement } from "./utils/ui";
+
+import weapon from './dataBase/item/item_weapon';
+import armor from './dataBase/item/item_armor';
 
 // Conversation UI
 const conversationWindow = document.getElementById('conversation')
 const dialogueControl = document.getElementById('dialogue_control')
 // textBox parent wrapper
 const dialogue = document.getElementById('dialogue')
+// Dialogue options
+const dialogueOptions = document.getElementById('dialogue-options')
 // textBox content
 const content = dialogue.querySelector('#textContent')
 
@@ -13,6 +19,7 @@ export default class TextBox{
     constructor(event){
         this.event = event;
         this.log = [];
+        this.optionOnScreen = false;
         // Count the scence to display in conversation phase
         this.sceneCounter = 0;
         this.dialogueCounter = 0;
@@ -45,7 +52,11 @@ export default class TextBox{
         conversationWindow.style.opacity = 1
     
         // Conversation text box click event
-        dialogue.addEventListener('click', () => {
+        conversationWindow.addEventListener('click', () => {
+            if(this.optionOnScreen){
+                return
+            }
+
             if(this.animationInit){
                 // Skip animation / show the whole dialogue
                 this.animationInit = false
@@ -57,10 +68,11 @@ export default class TextBox{
     
         // First time load conversation
         setTimeout(() => {
-            this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1
-            this.messageLength = this.event[this.sceneCounter].dialogue[this.dialogueCounter].message.length - 1
-            this.textLength = this.event[this.sceneCounter].dialogue[this.dialogueCounter].message[this.messageCounter].length - 1
-            this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message)
+            const { dialogue } = this.event[this.sceneCounter]
+            this.dialogueLength = dialogue.length - 1
+            this.messageLength = dialogue[this.dialogueCounter].message.length - 1
+            this.textLength = dialogue[this.dialogueCounter].message[this.messageCounter].content.length - 1
+            this.#loadConversation(dialogue[this.dialogueCounter].message)
         }, 500)
     }
 
@@ -70,8 +82,7 @@ export default class TextBox{
             // Reset text counter
             this.textCounter = 0
             // Clear the message on the screen
-            content.innerHTML = ''
-    
+            content.innerHTML = ''    
             // Load thg next dialogue if reached the end of current playing dialougue           
             if(this.messageCounter === this.messageLength){
                 // Reset the message counter
@@ -82,7 +93,7 @@ export default class TextBox{
                     this.dialogueCounter = 0
     
                     // Stop the conversation phase if reached the end of the event
-                    if(this.sceneCounter === this.event.length){
+                    if(this.sceneCounter === (this.event.length - 1)){
                         this.sceneCounter = 0
                         conversationWindow.style.opacity = 0
                         conversationWindow.classList.add('invisible')
@@ -93,37 +104,59 @@ export default class TextBox{
                         game.phaseCount += 1
                         game.beginNextPhase()
                     }else{
-                        this.sceneCounter += 1
-                        this.textLength = this.event[this.sceneCounter].dialogue[this.dialogueCounter].message[this.messageCounter].length - 1    
-                        this.#displayConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message[this.messageCounter])            
+                        this.sceneCounter += 1  
+                        this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1      
                     }
                 }else{
                     // Increase the dialogue counter by one
-                    this.dialogueCounter += 1   
-                    this.messageLength = this.event[this.sceneCounter].dialogue[this.dialogueCounter].message.length - 1
-                    this.textLength = this.event[this.sceneCounter].dialogue[this.dialogueCounter].message[this.messageCounter].length - 1
-                    this.#displayConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message[this.messageCounter])
+                    this.dialogueCounter += 1 
                 }
+
+                const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
+                this.messageLength = message.length - 1
+                
+                const optionExist = this.#cheeckIfOptionExist(message)
+
+                if(!optionExist){
+                    this.textLength = message[this.messageCounter].content.length - 1
+                    this.#displayConversation(message[this.messageCounter])                     
+                } 
             }else{
                 // Increate the message counter by one
-                this.messageCounter += 1                   
-                this.textLength = message[this.messageCounter].length - 1
-                this.#displayConversation(message[this.messageCounter])
+                this.messageCounter += 1
+                const optionExist = this.#cheeckIfOptionExist(message)
+
+                if(!optionExist){
+                    this.textLength = message[this.messageCounter].content.length - 1
+                    this.#displayConversation(message[this.messageCounter])                     
+                }
             }
         }else{
-            this.#displayConversation(message[this.messageCounter])
+            const optionExist = this.#cheeckIfOptionExist(message)
+
+            if(!optionExist) this.#displayConversation(message[this.messageCounter])
         }
     }
     
     #displayConversation = (message, speed = 100) => {
         this.animationInit = true
+
+        const { style, size } = message
+
+        if(style.length){
+            content.style.color = style
+        }
+
+        if(size.length){
+            content.style.fontSize = setting.general[size] + 'px'
+        }
     
         const dialogueAnimation = setInterval(() => {
             // If the user wants to skip the dialogue or the messag is fully displayed
             if(!this.animationInit){
                 // Skipping animation
                 // Display all the text in the message
-                content.innerHTML = message
+                content.innerHTML = message.content
                 // Counter add up to the number of text in the message 
                 this.textCounter = this.textLength
                 // Stop animation
@@ -136,10 +169,152 @@ export default class TextBox{
                     this.log.push(message)
                     clearInterval(dialogueAnimation)
                 }else{
-                    content.innerHTML += message[this.textCounter] 
+                    content.innerHTML += message.content[this.textCounter]
                     this.textCounter += 1
                 }  
             }
         }, speed)
+    }
+
+    #cheeckIfOptionExist = (message) => {
+        // Display option if any
+        const optionExist = message[this.messageCounter].option !== undefined
+        if(optionExist){
+            this.optionOnScreen = true
+            // Display option if any
+            for(let i=0 ; i < message[this.messageCounter].option.length; i++){
+                const option = document.createElement('li')
+                option.innerHTML = message[this.messageCounter].option[i].value
+                option.style.background = 'none'
+                option.style.margin = `${setting.general.fontSize_sm}px 0`
+
+                const { style, size } = message[this.messageCounter].option[i]
+
+                if(style.length){
+                    option.style.color = style
+                }else{
+                    option.style.color = 'white'
+                }
+
+                if(size.length){
+                    option.style.fontSize = setting.general[size] + 'px'
+                }else{
+                    option.style.fontSize = setting.general.fontSize + 'px'
+                }
+
+                // Bind click event
+                option.addEventListener('click', (event) => {
+                    event.stopPropagation()
+                    this.optionOnScreen = false
+                    // Hide & clear option
+                    dialogueOptions.classList.add('invisible')
+                    dialogue.classList.remove('invisible')
+                    dialogue.style.opacity = 1
+                    
+                    this.textLength = message[this.messageCounter].option[i].content.length - 1
+                    this.#displayConversation(message[this.messageCounter].option[i])
+                    this.#applyOptionEffect(message[this.messageCounter].option[i].effect)
+
+                    while(dialogueOptions.firstChild){
+                        dialogueOptions.removeChild(dialogueOptions.firstChild)
+                    }
+                })
+
+                dialogueOptions.append(option)
+            }
+
+            dialogue.style.opacity = 0
+            dialogue.classList.add('invisible')
+
+            dialogueOptions.classList.remove('invisible')
+        }
+
+        return optionExist
+    }
+
+    #applyOptionEffect = (effect) => {
+        // Apply effects to the target if any
+        for(let j=0; j < effect.length; j++){
+            switch(effect[j].target){
+                case 'player':
+                    if(!game.player.length){
+                        game.createCharacter(setting.player, game.player, game.playerPosition, 2)
+                    }
+
+                    switch(effect[j].attribute){
+                        case 'equip':
+                            switch(effect[j].type){
+                                case 3:{
+                                    const itemData = weapon.getOne(effect[j].value)
+                                    game.player[0].equip[itemData.position] = {
+                                        id: itemData.id,
+                                        name: itemData.name
+                                    }
+                                }     
+                                break;
+                                case 4:{
+                                    const itemData = armor.getOne(effect[j].value)
+                                    game.player[0].equip[itemData.position] = {
+                                        id: itemData.id,
+                                        name: itemData.name
+                                    }
+                                }
+                                break;
+                            } 
+
+                            // Change attribute value
+                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
+                                this.attributes[key] += itemData.effect.base_attribute[key]
+                            }
+                        break;
+                        case 'status':
+                            game.player[0].attributes[effect[j].attribute] = effect[j].value     
+                        break;
+                        default:
+                            game.player[0].attributes[effect[j].attribute] += effect[j].value                                                
+                        break;
+                    }
+                break;
+                case 'enemy':
+                    if(!game.enemy.length){
+                        game.createCharacter(game.level.enemy, game.enemy, game.enemyPosition, 3)
+                    }
+
+                                        switch(effect[j].attribute){
+                        case 'equip':
+                            switch(effect[j].type){
+                                case 3:{
+                                    const itemData = weapon.getOne(effect[j].value)
+                                    game.enemy[0].equip[itemData.position] = {
+                                        id: itemData.id,
+                                        name: itemData.name
+                                    }
+                                }     
+                                break;
+                                case 4:{
+                                    const itemData = armor.getOne(effect[j].value)
+                                    game.enemy[0].equip[itemData.position] = {
+                                        id: itemData.id,
+                                        name: itemData.name
+                                    }
+                                }
+                                break;
+                            } 
+
+                            // Change attribute value
+                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
+                                this.attributes[key] += itemData.effect.base_attribute[key]
+                            }
+                        break;
+                        case 'status':
+                            game.enemy[0].attributes[effect[j].attribute] = effect[j].value     
+                        break;
+                        default:
+                            game.enemy[0].attributes[effect[j].attribute] += effect[j].value                                                
+                        break;
+                    }
+                break;
+            }
+        }
     }
 }
