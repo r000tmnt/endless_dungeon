@@ -44,38 +44,74 @@ export default{
                                 {
                                     "person": "none",
                                     "message": [
-                                        "......",
-                                        "You feel quite a headache, like you've been hit by a boulder or somthing."
-                                    ]
-                                },
-                                {
-                                    "person": "none",
-                                    "message": ["As you gradually regain your conscious. You first..."],
-                                    "option": [
                                         {
-                                            "value": "Take a look around",
-                                            "respond": "Although there not much light in here, you've notice that you're in a cave",
-                                            "effect": []
+                                            "style": "", // color, default as white
+                                            "size": "", // Default to setting fontSize, accept fontSize_md, fontSize_sm property
+                                            "content": "......" // text content
                                         },
                                         {
-                                            "value": "Lay down on the ground",
-                                            "respond": "You slowly bend down your body against the ground. Then you realize that your cloth is in a poor condition, not enough to protect you from the low temperature",
-                                            "effect": [
-                                                {
-                                                    "target": "player",
-                                                    "attribute": "hp",
-                                                    "value": -1,
-                                                }
-                                            ]
+                                            "style": "",
+                                            "size": "",
+                                            "content": "You feel quite a headache, like you've been hit by a boulder or somthing."
                                         }
                                     ]
                                 },
                                 {
                                     "person": "none",
                                     "message": [
-                                        "You heard a voice whispering beyond the entrence. It is not clear enough for anyone to understand. But it gives you a direction to follow.",
-                                        "As you walk your way out of the cave. You start to get used to the lack of brightness of your surrounding.",
-                                        "That voice draws you further, until you reach a widther space",
+                                        { 
+                                            "style": "", 
+                                            "size": "", 
+                                            "content": "As you gradually regain your conscious.\nYou first...",
+                                        }
+                                    ],
+                                },
+                                {
+                                    "person": "none",
+                                    "message": [
+                                        {
+                                            "option": [
+                                                {
+                                                    "value": "Take a look around",                                            "style": "",
+                                                    "size": "",
+                                                    "content": "Although there not much light in here, you've notice that you're in a cave.",
+                                                    "effect": []
+                                                },
+                                                {
+                                                    "value": "Lay down on the ground",
+                                                    "style": "",
+                                                    "size": "",
+                                                    "content": "You slowly bend down your body against the ground.\nThen you realize that your cloth is in a poor condition,\nnot enough to protect you from the low temperature",
+                                                    "effect": [
+                                                        {
+                                                            "target": "player", // Default to the first player created
+                                                            "attribute": "hp",
+                                                            "value": -1,
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                        },
+                                    ]
+                                },
+                                {
+                                    "person": "none",
+                                    "message": [
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "You heard a voice whispering beyond the entrence.\nIt is not clear enough for anyone to understand. But it gives you a direction to follow."
+                                        },
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "As you walk your way out of the cave. You start to get used to the lack of brightness of your surrounding."
+                                        },
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "That voice draws you further, until you reach a widther space."
+                                        },
                                     ]
                                 }
                             ]
@@ -85,66 +121,123 @@ export default{
                             "dialogue": [
                                 {
                                     "person": "unknow",
-                                    "message": [ "Oh...you finially awake." ]
-                                },
-                                {
-                                    "person": "none",
-                                    "message": [ "Due to the darkness, you bearly saw a silhouette of a person standing on the other side of the space." ]
-                                },
-                                {
-                                    "person": "unknow",
                                     "message": [
-                                        "You should not come any closer, they will smell you."
-                                    ]
-                                },
-                                {
-                                    "person": "none",
-                                    "message": [
-                                        "Just as the mysterious person finish the words. You have take a step already."
-                                    ]
-                                },
-                                {
-                                    "person": "unknow",
-                                    "message": [
-                                        "Shit...! What did I told you.",
-                                        "You're lucky there's only one of them.",
-                                        "Here, catch."
-                                    ]
-                                },
-                                {
-                                    "person": "none",
-                                    "message": [
-                                        "The mysterious person throws a knife on the ground near where you are standing.",
-                                        "Would you..."
-                                    ],
-                                    "option": [
                                         {
-                                            "value": "Take the knife",
-                                            "respond": [
-                                                "Soon as you pick up the kneif on the ground. You heard another voice, and a rotten smell came after.",
-                                                "A sound of deadman approch towoards you"
-                                            ],
-                                            "effect": [] // player equipt with the knife
-                                        },
+                                            "style": "",
+                                            "size": "",
+                                            "content": "Oh...you finially awake."
+                                        }
+                                    ]
+                                },
+                                {
+                                    "person": "none",
+                                    "message": [
                                         {
-                                            "value": "I trust on my own fist",
-                                            "respond": [
-                                                "You kicked the knife out of your reach. Yet it stops in the middle like it hit something solid, and it is not the sound of the ground or stone either."
-                                            ],
-                                            "effect": [
-                                                {
-                                                    "target": "enemy",
-                                                    "attribute": "hp",
-                                                    "value": -1
-                                                }   
-                                            ]
+                                            "style": "",
+                                            "size": "",
+                                            "content": "Due to the darkness, you bearly saw a silhouette of a person standing on the other side of the space."
                                         }
                                     ]
                                 },
                                 {
                                     "person": "unknow",
-                                    "messsage": [
-                                        "Suit yourself, I'm out of here"
+                                    "message": [
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "You should not come any closer, they will smell you."
+                                        }
+                                    ]
+                                },
+                                {
+                                    "person": "none",
+                                    "message": [
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "Just as the mysterious person finish the words. You have take a step already."
+                                        }
+                                    ]
+                                },
+                                {
+                                    "person": "unknow",
+                                    "message": [
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "Shit...! What did I told you."
+                                        },
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "You're lucky there's only one of them."
+                                        },
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "Here, catch."
+                                        }
+                                    ]
+                                },
+                                {
+                                    "person": "none",
+                                    "message": [
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "The mysterious person throws a knife on the ground near where you are standing.\nWould you...",
+                                        }
+                                    ],
+                                },
+                                {
+                                    "person": "none",
+                                    "message": [
+                                        {
+                                            "option": [
+                                                {
+                                                    "value": "Take the knife",
+                                                    "style": "",
+                                                    "size": "",
+                                                    "content": "Soon as you pick up the kneif on the ground.\nYou heard another voice, and a rotten smell came after.",
+                                                    "effect": [ // player equipt with the knife
+                                                        {
+                                                            "target": "player",
+                                                            "attribute": "equip",
+                                                            "type": 3,
+                                                            "value": "knife_1"
+                                                        }
+                                                    ] 
+                                                },
+                                                {
+                                                    "value": "I trust on my own fist",
+                                                    "style": "",
+                                                    "size": "",
+                                                    "content": "You kicked the knife out of your reach.\nYet it stops in the middle like it hit something solid, and it is not the sound of the ground or stone either.",
+                                                    "effect": [
+                                                        {
+                                                            "target": "enemy",
+                                                            "attribute": "hp",
+                                                            "value": -1
+                                                        }   
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "A sound of deadman approch towoards you."
+                                        },
+                                    ]
+                                },
+                                {
+                                    "person": "unknow",
+                                    "message": [
+                                        {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "Suit yourself, I'm out of here"
+                                        }
                                     ]
                                     // proceed to battle phase
                                 }
