@@ -59,27 +59,27 @@ export default class TextBox{
                 // Skip animation / show the whole dialogue
                 this.animationInit = false
             }else{
-                switch(this.action){
-                    case 'skip':
-                        if(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message[this.messageCounter + 1] !== undefined ){
-                            this.messageCounter += 1
-                            dialogueOptions.children[0].click()                            
-                        }else 
-                        if(this.event[this.sceneCounter].dialogue[this.dialogueCounter + 1] !== undefined ){
+                // switch(this.action){
+                //     case 'skip':
+                //         if(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message[this.messageCounter + 1] !== undefined ){
+                //             this.messageCounter += 1
+                //             dialogueOptions.children[0].click()                            
+                //         }else 
+                //         if(this.event[this.sceneCounter].dialogue[this.dialogueCounter + 1] !== undefined ){
 
-                        }else
-                        if(this.event[this.sceneCounter + 1] !== undefined){
+                //         }else
+                //         if(this.event[this.sceneCounter + 1] !== undefined){
 
-                        }
+                //         }
                         
-                    break;
-                    case 'hide':
-                    break;
-                    case 'auto':
-                    break;
-                    case 'log':
-                    break;
-                }
+                //     break;
+                //     case 'hide':
+                //     break;
+                //     case 'auto':
+                //     break;
+                //     case 'log':
+                //     break;
+                // }
                 // Load dialogue
                 this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message)
             }
@@ -92,33 +92,36 @@ export default class TextBox{
         for(let i=0; i < controlOptions.length; i++){
             switch(controlOptions[i].dataset.action){
                 case 'skip':
-                    this.action = 'skip'
                     // Jump to the step where options are presents or to go the battle phase
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
-
+                        this.action = 'skip'
                         let optionExist = false
 
-                        for(let i=this.dialogueCounter; i < this.event[this.sceneCounter].dialogue.length; i++){
-                            if(optionExist) return
-                            for(let j=this.messageCounter; j < this.event[this.sceneCounter].dialogue[i].message.length; j++){
-                                optionExist = this.#checkIfOptionExist(this.event[this.sceneCounter].dialogue[i].message[j])
+                        for(let i=this.sceneCounter; i < this.event.length; i++){
+                            if(optionExist) break
+                            for(let j=this.dialogueCounter; j < this.event[i].dialogue.length; j++){
+                                if(optionExist) break
+                                for(let k=this.messageCounter; k < this.event[i].dialogue[j].message.length; k++){
+                                    optionExist = this.#checkIfOptionExist(this.event[i].dialogue[j].message[k])
 
-                                if(optionExist){
-                                    this.dialogueCounter = i
-                                    this.messageCounter = j
-                                    
-                                    this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1
-                                    const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
-                                    this.messageLength = message.length -1
-                                    this.textLength = message[this.messageCounter].content.length -1
-
-                                    this.#displayConversation(message)
-                                    return
+                                    if(optionExist){
+                                        content.innerHTML = ''
+                                        this.textCounter = 0
+                                        this.sceneCounter = i
+                                        this.dialogueCounter = j
+                                        this.messageCounter = k
+                                        
+                                        this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1
+                                        const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
+                                        this.messageLength = message.length -1
+                                        break
+                                    }
                                 }
                             }
                         }
                         
+                        // Skip the whole conversation if there are no options found
                         if(!optionExist){
                             this.#endConversationPhase()
                         }
@@ -163,6 +166,7 @@ export default class TextBox{
                     // Stop the conversation phase if reached the end of the event
                     if(this.sceneCounter === (this.event.length - 1)){
                         this.sceneCounter = 0
+                        this.action = ''
                         this.#endConversationPhase()
                     }else{
                         this.sceneCounter += 1  
@@ -176,26 +180,43 @@ export default class TextBox{
                 const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
                 this.messageLength = message.length - 1
                 
-                const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
+                if(this.action === 'skip'){
+                    console.log('skipping conversation')
+                    dialogueControl.children[0].click()
+                }else{
+                    const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
 
-                if(!optionExist){
-                    this.textLength = message[this.messageCounter].content.length - 1
-                    this.#displayConversation(message[this.messageCounter])                     
-                } 
+                    if(!optionExist){
+                        this.textLength = message[this.messageCounter].content.length - 1
+                        this.#displayConversation(message[this.messageCounter])                     
+                    }                     
+                }
+
             }else{
                 // Increate the message counter by one
                 this.messageCounter += 1
-                const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
 
-                if(!optionExist){
-                    this.textLength = message[this.messageCounter].content.length - 1
-                    this.#displayConversation(message[this.messageCounter])                     
+                if(this.action === 'skip'){
+                    console.log('skipping conversation')
+                    dialogueControl.children[0].click()
+                }else{
+                    const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
+
+                    if(!optionExist){
+                        this.textLength = message[this.messageCounter].content.length - 1
+                        this.#displayConversation(message[this.messageCounter])                     
+                    }                    
                 }
             }
         }else{
-            const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
+            if(this.action === 'skip'){
+                console.log('skipping conversation')
+                dialogueControl.children[0].click()
+            }else{
+                const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
 
-            if(!optionExist) this.#displayConversation(message[this.messageCounter])
+                if(!optionExist) this.#displayConversation(message[this.messageCounter])                
+            }
         }
     }
 
@@ -253,6 +274,12 @@ export default class TextBox{
         const optionExist = message.option !== undefined
         if(optionExist){
             this.optionOnScreen = true
+
+            // Remove old options
+            while(dialogueOptions.firstChild){
+                dialogueOptions.removeChild(dialogueOptions.firstChild)
+            }
+            
             // Display option if any
             for(let i=0 ; i < message.option.length; i++){
                 const option = document.createElement('li')
@@ -279,25 +306,31 @@ export default class TextBox{
                     event.stopPropagation()
                     this.optionOnScreen = false
                     // Hide & clear option
+                    dialogueControl.classList.remove('invisible')
+                    dialogueControl.style.opacity = 1
                     dialogueOptions.classList.add('invisible')
                     dialogue.classList.remove('invisible')
                     dialogue.style.opacity = 1
-                    
-                    this.textLength = message.option[i].content.length - 1
-                    this.#displayConversation(message.option[i])
 
+                    this.textLength = message.option[i].content.length - 1
+                    
                     for(let j=0; j < message.option[i].effect.length; j++){
                         game.eventEffect.push(message.option[i].effect[j])
-                    }
+                    }  
 
-                    while(dialogueOptions.firstChild){
-                        dialogueOptions.removeChild(dialogueOptions.firstChild)
+                    if(this.action === 'skip'){
+                        this.textCounter = this.textLength
+                        this.#loadConversation(message)
+                    }else{
+                        this.#displayConversation(message.option[i])                      
                     }
                 })
 
                 dialogueOptions.append(option)
             }
 
+            dialogueControl.style.opacity = 0
+            dialogueControl.classList.add('invisible')
             dialogue.style.opacity = 0
             dialogue.classList.add('invisible')
 
