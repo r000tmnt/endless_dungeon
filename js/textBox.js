@@ -29,6 +29,7 @@ export default class TextBox{
         this.messageLength = 0;
         this.dialogueLength = 0;
         this.animationInit = false;
+        this.speed = 100;
     }
 
     setConversationWindow = (width, height, fontSize, fontSize_md, fontSize_sm) => {
@@ -51,7 +52,7 @@ export default class TextBox{
     
         // Conversation text box click event
         conversationWindow.addEventListener('click', () => {
-            if(this.optionOnScreen){
+            if(this.optionOnScreen || this.action === 'auto'){
                 return
             }
 
@@ -66,8 +67,6 @@ export default class TextBox{
                         dialogue.classList.remove('invisible')
                         dialogueControl.style.opacity = 1
                         dialogueControl.classList.remove('invisible')
-                    break;
-                    case 'auto':
                     break;
                     case 'log':
                     break;
@@ -127,6 +126,7 @@ export default class TextBox{
                     })
                 break;
                 case 'hide':
+                    // Hide both text box and control options on the screen
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
 
@@ -143,6 +143,17 @@ export default class TextBox{
                 break;
                 case 'auto':
                     // Increse the dialogue play speed and auto click, stop at options
+                    controlOptions[i].addEventListener('click', (event) => {
+                        event.stopPropagation()
+
+                        if(this.action.length){
+                            this.speed = this.speed * 2
+                            this.action = ''
+                        }else{
+                            this.speed = this.speed * 0.5
+                            this.action = 'auto'
+                        }
+                    })
                 break;
                 case 'log':
                 break;
@@ -243,7 +254,7 @@ export default class TextBox{
         game.beginNextPhase()
     }
     
-    #displayConversation = (message, speed = 100) => {
+    #displayConversation = (message) => {
         this.animationInit = true
 
         const { style, size } = message
@@ -268,17 +279,23 @@ export default class TextBox{
                 clearInterval(dialogueAnimation)     
             }else{
                 if(this.textCounter === this.textLength){
-                    // Stop animation
-                    this.animationInit = false
+
                     // Store the displayed message to the log
                     this.log.push(message)
-                    clearInterval(dialogueAnimation)
+
+                    if(this.action === 'auto'){
+                        this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message)
+                    }else{
+                        // Stop animation
+                        this.animationInit = false
+                        clearInterval(dialogueAnimation)
+                    }
                 }else{
                     content.innerHTML += message.content[this.textCounter]
                     this.textCounter += 1
                 }  
             }
-        }, speed)
+        }, this.speed)
     }
 
     #checkIfOptionExist = (message) => {
