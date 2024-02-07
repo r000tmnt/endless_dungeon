@@ -59,29 +59,23 @@ export default class TextBox{
                 // Skip animation / show the whole dialogue
                 this.animationInit = false
             }else{
-                // switch(this.action){
-                //     case 'skip':
-                //         if(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message[this.messageCounter + 1] !== undefined ){
-                //             this.messageCounter += 1
-                //             dialogueOptions.children[0].click()                            
-                //         }else 
-                //         if(this.event[this.sceneCounter].dialogue[this.dialogueCounter + 1] !== undefined ){
-
-                //         }else
-                //         if(this.event[this.sceneCounter + 1] !== undefined){
-
-                //         }
-                        
-                //     break;
-                //     case 'hide':
-                //     break;
-                //     case 'auto':
-                //     break;
-                //     case 'log':
-                //     break;
-                // }
-                // Load dialogue
-                this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message)
+                switch(this.action){
+                    case 'hide':
+                        this.action = ''
+                        dialogue.style.opacity = 1
+                        dialogue.classList.remove('invisible')
+                        dialogueControl.style.opacity = 1
+                        dialogueControl.classList.remove('invisible')
+                    break;
+                    case 'auto':
+                    break;
+                    case 'log':
+                    break;
+                    default:
+                        // Load dialogue
+                        this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message)                        
+                    break;
+                }
             }
         })
 
@@ -105,13 +99,18 @@ export default class TextBox{
                                 for(let k=this.messageCounter; k < this.event[i].dialogue[j].message.length; k++){
                                     optionExist = this.#checkIfOptionExist(this.event[i].dialogue[j].message[k])
 
+                                    // If option found
                                     if(optionExist){
+                                        // Clear text in the box
                                         content.innerHTML = ''
+                                        
+                                        // Update counters
                                         this.textCounter = 0
                                         this.sceneCounter = i
                                         this.dialogueCounter = j
                                         this.messageCounter = k
-                                        
+
+                                        // Update length
                                         this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1
                                         const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
                                         this.messageLength = message.length -1
@@ -128,6 +127,19 @@ export default class TextBox{
                     })
                 break;
                 case 'hide':
+                    controlOptions[i].addEventListener('click', (event) => {
+                        event.stopPropagation()
+
+                        if(this.animationInit){
+                            conversationWindow.click()
+                        }
+                        
+                        this.action = 'hide'
+                        dialogue.style.opacity = 0
+                        dialogue.classList.add('invisible')
+                        dialogueControl.style.opacity = 0
+                        dialogueControl.classList.add('invisible')
+                    })
                 break;
                 case 'auto':
                     // Increse the dialogue play speed and auto click, stop at options
