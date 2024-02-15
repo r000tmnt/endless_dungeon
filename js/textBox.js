@@ -11,6 +11,9 @@ const dialogue = document.getElementById('dialogue')
 const dialogueOptions = document.getElementById('dialogue-options')
 // textBox content
 const content = dialogue.querySelector('#textContent')
+// Dialogue log
+const dialogueLog = document.getElementById('dialogue-log')
+const logWrapper = dialogueLog.querySelector('#log')
 
 export default class TextBox{
     constructor(event){
@@ -68,7 +71,24 @@ export default class TextBox{
                         dialogueControl.style.opacity = 1
                         dialogueControl.classList.remove('invisible')
                     break;
+                    case 'auto':
+                        // Cancel auto play
+                        if(this.action === 'auto'){
+                            this.action = '' 
+                            this.speed = this.speed * 0.5
+                        }
+                    break;
                     case 'log':
+                        // Close dialogue log
+                        if(this.action === 'log'){
+                            this.action = ''
+
+                            dialogueLog.classList.add('invisible')
+
+                            while(logWrapper.firstChild){
+                                logWrapper.removeChild(logWrapper.firstChild)
+                            }
+                        }
                     break;
                     default:
                         // Load dialogue
@@ -146,16 +166,40 @@ export default class TextBox{
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
 
-                        if(this.action.length){
+                        // Cancel auto play
+                        if(this.action === 'auto'){
                             this.speed = this.speed * 2
-                            this.action = ''
+                            this.action = ''             
                         }else{
+                            // Start auto play
                             this.speed = this.speed * 0.5
                             this.action = 'auto'
+
+                            if(this.textCounter === this.textLength){
+                               this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message) 
+                            }
+                            
                         }
                     })
                 break;
                 case 'log':
+                    case 'auto':
+                        // Display dialogue log
+                        controlOptions[i].addEventListener('click', (event) => {
+                            event.stopPropagation()
+    
+                            this.action = 'log'
+                            
+                            resizeHiddenElement(dialogueLog.style, width, height, fontSize_md)
+
+                            this.log.map(l => {
+                                const log = document.createElement('li')
+                                log.innerHTML = l
+                                logWrapper.append(log)
+                            })
+
+                            dialogueLog.classList.remove('invisible')
+                        })
                 break;
             }
         }
@@ -284,6 +328,9 @@ export default class TextBox{
                     this.log.push(message)
 
                     if(this.action === 'auto'){
+                        // Stop current timer
+                        clearInterval(dialogueAnimation)
+                        // Start a new timer
                         this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message)
                     }else{
                         // Stop animation
