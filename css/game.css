@@ -470,6 +470,17 @@ li{
     border: 1px dotted white;
   }
 
+  #log {
+    overflow-y: scroll;
+  }
+
+  #log > li{
+    background: black;
+    display: flex;
+    flex-direction: column;
+    border: none;
+  }
+
   .label{
     /* margin-top: -14px; */
     position: relative;
