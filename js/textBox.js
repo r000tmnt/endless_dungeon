@@ -50,8 +50,7 @@ export default class TextBox{
         dialogue.classList.remove('invisible')
     
         conversationWindow.classList.remove('invisible')
-        conversationWindow.classList.add('open-window')
-        conversationWindow.style.opacity = 1
+        conversationWindow.classList.add('open_window')
     
         // Conversation text box click event
         conversationWindow.addEventListener('click', () => {
@@ -76,18 +75,6 @@ export default class TextBox{
                         if(this.action === 'auto'){
                             this.action = '' 
                             this.speed = this.speed * 0.5
-                        }
-                    break;
-                    case 'log':
-                        // Close dialogue log
-                        if(this.action === 'log'){
-                            this.action = ''
-
-                            dialogueLog.classList.add('invisible')
-
-                            while(logWrapper.firstChild){
-                                logWrapper.removeChild(logWrapper.firstChild)
-                            }
                         }
                     break;
                     default:
@@ -183,23 +170,45 @@ export default class TextBox{
                     })
                 break;
                 case 'log':
-                    case 'auto':
-                        // Display dialogue log
-                        controlOptions[i].addEventListener('click', (event) => {
-                            event.stopPropagation()
-    
-                            this.action = 'log'
-                            
-                            resizeHiddenElement(dialogueLog.style, width, height, fontSize_md)
+                    // Display dialogue log
+                    controlOptions[i].addEventListener('click', (event) => {
+                        event.stopPropagation()
 
-                            this.log.map(l => {
-                                const log = document.createElement('li')
-                                log.innerHTML = l
-                                logWrapper.append(log)
-                            })
+                        this.action = 'log'
+                        
+                        resizeHiddenElement(dialogueLog.style, width, height, fontSize_md)
 
-                            dialogueLog.classList.remove('invisible')
+                        this.log.map(l => {
+                            const log = document.createElement('li')
+                            const content = document.createElement('span')
+
+                            if(l.person !== 'none'){
+                                const person = document.createElement('span')
+                                person.innerHTML = l.person
+                                log.append(person)
+                            }
+
+                            content.innerHTML = l.content
+                            log.append(content)
+                            logWrapper.append(log)
                         })
+
+                        // Bind clcik event to close log
+                        dialogueLog.addEventListener('click', () => {
+                            this.action = ''
+
+                            dialogueLog.classList.remove('open_window')
+                            dialogueLog.classList.add('invisible')
+
+                            while(logWrapper.firstChild){
+                                logWrapper.removeChild(logWrapper.firstChild)
+                            }
+                        })
+                        
+                        logWrapper.style.maxHeight = height + 'px'
+                        dialogueLog.classList.remove('invisible')
+                        dialogueLog.classList.add('open_window')
+                    })
                 break;
             }
         }
@@ -288,9 +297,8 @@ export default class TextBox{
     }
 
     #endConversationPhase(){
-        conversationWindow.style.opacity = 0
-        conversationWindow.classList.add('invisible')
         conversationWindow.classList.remove('open_window')
+        conversationWindow.classList.add('invisible')
 
         // Remove the predefined event
         game.level.event.splice(0, 1)
@@ -319,13 +327,21 @@ export default class TextBox{
                 content.innerHTML = message.content
                 // Counter add up to the number of text in the message 
                 this.textCounter = this.textLength
+                // Store the displayed message to the log
+                this.log.push({
+                    person: this.event[this.sceneCounter].dialogue[this.dialogueCounter].person,
+                    content: message.content
+                })
                 // Stop animation
                 clearInterval(dialogueAnimation)     
             }else{
                 if(this.textCounter === this.textLength){
 
                     // Store the displayed message to the log
-                    this.log.push(message)
+                    this.log.push({
+                        person: this.event[this.sceneCounter].dialogue[this.dialogueCounter].person,
+                        content: message.content
+                    })
 
                     if(this.action === 'auto'){
                         // Stop current timer
