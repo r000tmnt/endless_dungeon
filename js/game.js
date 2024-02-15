@@ -51,6 +51,7 @@ class Game{
         this.enemyPosition = [];
         this.inspectingCharacter = null;
         this.eventEffect = []; // What effect will take when move into battle phase
+        this.pickUps = []; // All of dropped items on the ground collected after the battle phase finished
     }
 
     // Initialize the game
@@ -71,7 +72,8 @@ class Game{
         }else{
             switch(this.level.phase[this.phaseCount]){
                 case 'conversation':
-                    this.textBox = new TextBox(this.level.event[0].scene)
+                    const pointer = this.phaseCount > 0? 1 : 0
+                    this.textBox = new TextBox(this.level.event[pointer].scene)
                     const { cameraWidth, cameraHeight } = redefineDeviceWidth()
 
                     const { fontSize, fontSize_md, fontSize_sm } = redefineFontSize(cameraWidth)
@@ -421,6 +423,31 @@ class Game{
         this.eventEffect.splice(0)
     }
 
+    // Win or lose
+    #winOrLose = () => {
+        let result = ''
+
+        // Check if victory
+        switch(this.tileMap.objective.victory.target){
+            case 'enemy':
+                if(this.enemy.length === this.tileMap.objective.velocity.value){
+                    result = 'win'
+                }
+            break;
+        }
+
+        // Check if fail
+        switch(this.tileMap.objective.fail.target){
+            case 'player':
+                if(this.player.length === this.tileMap.objective.fail.value){
+                    result = 'fail'
+                }
+            break;
+        }
+
+        return result
+    }
+
     // Check the content of dropped items
     checkDroppedItem = async(dropItems) => {
         const playerHasKey = false
@@ -483,68 +510,79 @@ class Game{
     // Thing to do after animation ended
     characterAnimationPhaseEnded = async(currentActingPlayer) => {
         const { tileSize } = setting.general
-        // if(enemy === null){
-        //     // Level clear
-        //     // Play secene
-        // }else{
-     
-        // }
-    
-        // If it is the player's turn
-        if(this.turnType === 0){
-            const index = this.player.findIndex(p => p.animation === currentActingPlayer.animation)
-            this.playerPosition[index].row = parseInt(currentActingPlayer.y / tileSize)
-            this.playerPosition[index].col = parseInt(currentActingPlayer.x / tileSize)  
-    
-            // Check if the tile has an event
-            await this.checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
-    
-            currentActingPlayer.animation = ''
-            prepareCharacterCaption(currentActingPlayer)
-    
-            // If the player is ran out of action point, move to the enemy phase
-            if(currentActingPlayer.attributes.ap === 0) {
-                this.grid.setPointedBlock({})
-                currentActingPlayer.wait = true
-                currentActingPlayer.setWalkableSpace([])
-                this.#nextTurn(0)
-            }else{
-                this.grid.setPointedBlock({ ...this.playerPosition[index] })
-                this.inspectingCharacter = currentActingPlayer
-                this.#checkAp(currentActingPlayer)
-                // Display Action options
-                displayUIElement()
+
+        // Check if player win or lose
+        const situation = this.#winOrLose()
+        if(situation.length){
+            if(situation === 'win'){
+                // Collect all the remain items on the ground
+                if(this.tileMap.event.length){
+                    
+                }
+
+                // Proceed to the next phase
+                this.phaseCount += 1
+                this.beginNextPhase()
             }
-    
-            this.action.mode = ''
-            console.log('reset action mode :>>>', this.action.mode)
         }else{
-            const index = this.enemy.findIndex(e => e.animation === currentActingPlayer.animation)
-            this.enemyPosition[index].row = parseInt(currentActingPlayer.y / tileSize)
-            this.enemyPosition[index].col = parseInt(currentActingPlayer.x / tileSize) 
-            // characterAp.innerText = `AP: ${player.attributes.ap}`
-                
-            // Move to the next phase
-            if(currentActingPlayer.attributes.ap === 0){
+            // If it is the player's turn
+            if(this.turnType === 0){
+                const index = this.player.findIndex(p => p.animation === currentActingPlayer.animation)
+                this.playerPosition[index].row = parseInt(currentActingPlayer.y / tileSize)
+                this.playerPosition[index].col = parseInt(currentActingPlayer.x / tileSize)  
+        
+                // Check if the tile has an event
+                await this.checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
+        
+                currentActingPlayer.animation = ''
+                prepareCharacterCaption(currentActingPlayer)
+        
+                // If the player is ran out of action point, move to the enemy phase
+                if(currentActingPlayer.attributes.ap === 0) {
+                    this.grid.setPointedBlock({})
+                    currentActingPlayer.wait = true
+                    currentActingPlayer.setWalkableSpace([])
+                    this.#nextTurn(0)
+                }else{
+                    this.grid.setPointedBlock({ ...this.playerPosition[index] })
+                    this.inspectingCharacter = currentActingPlayer
+                    this.#checkAp(currentActingPlayer)
+                    // Display Action options
+                    displayUIElement()
+                }
+        
                 this.action.mode = ''
                 console.log('reset action mode :>>>', this.action.mode)
-                this.grid.setPointedBlock({})
-                currentActingPlayer.wait = true
-                currentActingPlayer.setWalkableSpace([])
-                // Check if the others run out of ap also
-                if(this.enemy[index + 1] !== undefined){
-                    await this.#enemyAI(this.enemy[index + 1], index + 1)
-                    console.log('next enemy start moving')
-                }else{
-                    this.#nextTurn(0)                
-                }            
             }else{
-                this.grid.setPointedBlock({ ...this.enemyPosition[index] })
-                // keep looking
-                await this.#enemyAI(this.enemy[index], index)
-                console.log('enemyAI keep looking')
-            }         
-        } 
+                const index = this.enemy.findIndex(e => e.animation === currentActingPlayer.animation)
+                this.enemyPosition[index].row = parseInt(currentActingPlayer.y / tileSize)
+                this.enemyPosition[index].col = parseInt(currentActingPlayer.x / tileSize) 
+                // characterAp.innerText = `AP: ${player.attributes.ap}`
+                    
+                // Move to the next phase
+                if(currentActingPlayer.attributes.ap === 0){
+                    this.action.mode = ''
+                    console.log('reset action mode :>>>', this.action.mode)
+                    this.grid.setPointedBlock({})
+                    currentActingPlayer.wait = true
+                    currentActingPlayer.setWalkableSpace([])
+                    // Check if the others run out of ap also
+                    if(this.enemy[index + 1] !== undefined){
+                        await this.#enemyAI(this.enemy[index + 1], index + 1)
+                        console.log('next enemy start moving')
+                    }else{
+                        this.#nextTurn(0)                
+                    }            
+                }else{
+                    this.grid.setPointedBlock({ ...this.enemyPosition[index] })
+                    // keep looking
+                    await this.#enemyAI(this.enemy[index], index)
+                    console.log('enemyAI keep looking')
+                }         
+            }      
+        }
+    
+
     }
 
     removeCharacter = (type, id) => {

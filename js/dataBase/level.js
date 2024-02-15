@@ -32,8 +32,12 @@ export default{
                 "",
                 "item.png"
             ],
+            // conversation - 對話階段, 
+            // battle - 戰鬥階段
+            // intermission - 整備階段
             "phase": [ 'conversation', 'battle', 'conversation', 'intermission' ],
             "event": [
+                // Before battle phase
                 {
                     "position": [],
                     "item": [],
@@ -244,6 +248,13 @@ export default{
                             ]
                         }
                     ],
+                    "trigger": "auto"
+                },
+                // After battle phase
+                {
+                    "position": [],
+                    "item": [],
+                    "scene": [],
                     "trigger": "auto"
                 }
             ], // Pre-defined events
