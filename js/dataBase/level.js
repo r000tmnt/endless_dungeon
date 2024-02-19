@@ -285,7 +285,7 @@ export default{
                         "prize": [
                             { // Prize for clear the level
                                 "id": 'currency_1',
-                                "condition": 0,
+                                "type": 1,
                                 "amount": 100
                             }
                         ]

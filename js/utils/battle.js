@@ -3,43 +3,6 @@ import armor from "../dataBase/item/item_armor"
 import setting from "./setting"
 import game from "../game"
 
-// Player level up if the exp reached the required amount
-const levelUp = (player) => {
-    // Player level up
-    player.lv += 1
-    // Extend the required exp for the next level
-    player.requiredExp += player.requiredExp * 1.5
-
-    // Give player a few points to spend
-    player.pt = 5
-
-    const grows = [0, 1, 3]
-
-    // A list of attributes that are allow to growth on level up
-    const attributeList = ['maxHp', 'maxMp', 'str', 'def', 'spd', 'int', 'lck', 'spi']
-
-    console.log('player status before level up :>>>', player.attributes)
-
-    // Randomly apply attributes growth
-    for(let attr of attributeList){
-        console.log('key :>>>', attr)
-        const allowIndex = attributeList.findIndex(a => a === attr)
-        const preferIndex = player.prefer_attributes.findIndex(a => attr.includes(a))
-        if(allowIndex >= 0){
-            const randomGrowth = Math.floor(Math.random() * (grows.length -1))
-            player.attributes[attr] += grows[randomGrowth]
-        }
-
-        // Guarantee attribute growth
-        if(preferIndex >= 0){
-            player.attributes[attr] += 1
-        }
-    }
-
-    game.characterAnimationPhaseEnded(player)
-    console.log('player status after level up :>>>', player.attributes)
-}
-
 const diceRoll = async(hitRates, totalRate) => {
     for(let i=0; i < hitRates.length; i++){
         hitRates[i].value = hitRates[i].value / totalRate
@@ -307,6 +270,48 @@ export const skillAttack = async(skill, player, enemy) => {
     console.log('possible damage :>>>', damage)
 
     return await calculateHitRate(player, enemy, damage)
+}
+
+// Player level up if the exp reached the required amount
+export const levelUp = (player) => {
+    // Player level up
+    player.lv += 1
+    // Extend the required exp for the next level
+    player.requiredExp += player.requiredExp * 1.5
+
+    // Give player a few points to spend
+    player.pt = 5
+
+    const grows = [0, 1, 3]
+
+    // A list of attributes that are allow to growth on level up
+    const attributeList = ['maxHp', 'maxMp', 'str', 'def', 'spd', 'int', 'lck', 'spi']
+
+    console.log('player status before level up :>>>', player.attributes)
+
+    // Randomly apply attributes growth
+    for(let attr of attributeList){
+        console.log('key :>>>', attr)
+        const allowIndex = attributeList.findIndex(a => a === attr)
+        const preferIndex = player.prefer_attributes.findIndex(a => attr.includes(a))
+        if(allowIndex >= 0){
+            const randomGrowth = Math.floor(Math.random() * (grows.length -1))
+            player.attributes[attr] += grows[randomGrowth]
+        }
+
+        // Guarantee attribute growth
+        if(preferIndex >= 0){
+            player.attributes[attr] += 1
+        }
+    }
+
+    // Check if exp is enough to level up the character again
+    if(player.exp >= player.requiredExp){
+        levelUp(player)
+    }else{
+        game.characterAnimationPhaseEnded(player)
+        console.log('player status after level up :>>>', player.attributes)        
+    }
 }
 
 // Player gain expirence upon enemy defeated

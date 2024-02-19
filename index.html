@@ -327,6 +327,32 @@
             </h3>
         </div>
 
+        <!-- Level clear -->
+        <div id="levelClear" class="abosoulte invisible">
+            <div><!-- WIN or LOSE --></div>
+
+            <!-- If optional objective exist -->
+            <ul id="optional" class="invisible"></ul>
+
+            <!-- Actions you can take at the moment -->
+            <ul class="action invisible">
+                <!-- You can do item management later  -->
+                <li data-action="stash">Push items to the stash</li>
+                <!-- Or you want to do it right now -->
+                <li data-action="pickAfterBattle">Pick up items</li>
+                <!-- You can choose to ignore all of it also -->
+                <li data-action="finish">Finish</li>
+            </ul>
+
+            <!-- <div id="party" class="absolute invisible flex">
+
+            </div> -->
+
+            <div class="tap invisible">
+                TAP TO CONTINUE
+            </div>
+        </div>
+
         <!-- Conversation scene -->
         <div id="conversation" class="menu absolute invisible">
             <ul id="dialogue_control" class="absolute">

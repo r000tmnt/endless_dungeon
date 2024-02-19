@@ -25,6 +25,8 @@ import {
     redefineDeviceWidth,
     redefineFontSize
 } from './utils/ui.js'
+// import { getItemType } from './utils/inventory.js'
+import { levelUp } from './utils/battle.js'
 
 import setting from './utils/setting.js';
 import level from './dataBase/level.js';
@@ -51,7 +53,7 @@ class Game{
         this.enemyPosition = [];
         this.inspectingCharacter = null;
         this.eventEffect = []; // What effect will take when move into battle phase
-        this.pickUps = []; // All of dropped items on the ground collected after the battle phase finished
+        this.stepOnEvent = {}; // The event waiting to be trigger
     }
 
     // Initialize the game
@@ -487,9 +489,10 @@ class Game{
 
     // Check if the tile has an event
     checkIfStepOnTheEvent = async(x, y) => {
-        const event = this.tileMap.event.find(e => e.position.x === x && e.position.y === y && e.trigger === 'stepOn')
+        const event = this.tileMap.getEventOnTile({x, y})
     
         if(event !== undefined){
+            this.stepOnEvent = event
             toggleActionMenuOption('pick', false, 'event')
         }
     
@@ -524,14 +527,52 @@ class Game{
         const situation = this.#winOrLose()
         if(situation.length){
             if(situation === 'win'){
-                // Collect all the remain items on the ground
-                if(this.tileMap.event.length){
-                    
+                // Get stage clear bonus
+                const { optional } = this.level.objective
+                
+                if(!Object.entries(this.stepOnEvent).length){
+                    this.stepOnEvent['item'] = []
                 }
 
+                for(let i=0; i < optional.length; i++){
+                    const { target, value, prize } = optional[i]
+                    switch(target){
+                        case 'turn':
+                            if(this.turn <= value){
+                                for(let j=0; j <= prize.length; j++){
+                                    if(prize.id.includes('exp')){
+                                        this.player.map(p => {
+                                            p.exp += prize[j].amount
+
+                                            if(p.exp >= p.requiredExp){
+                                                levelUp(p)
+                                            }
+                                        })
+                                    }else{
+                                        this.stepOnEvent.item.push({...prize[j]})
+                                    }
+                                }
+                            }
+                        break;
+                    }
+                }
+
+                // Display all the remaining items on the ground
+                const { event } = this.tileMap
+                
+                for(let i=0; i < event.length; i++){
+                    if(event[i].trigger !== 'auto'){
+                        for(let j=0; j < event[i].item.length; j++){
+                            this.stepOnEvent.item.push({...event[i].item[j]})
+                        }
+                    }
+                }
+                
+                // Display options
+
                 // Proceed to the next phase
-                this.phaseCount += 1
-                this.beginNextPhase()
+                // this.phaseCount += 1
+                // this.beginNextPhase()
             }
         }else{
             // If it is the player's turn

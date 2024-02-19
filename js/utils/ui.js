@@ -64,6 +64,9 @@ const configWindow = document.getElementById('config')
 // Objective UI
 const objectiveWindow = document.getElementById('objective')
 
+// UI after Battle finished
+const levelClear = document.getElementById('levelClear')
+
 // option menu child click event
 for(let i=0; i < options.length; i++){
     switch(options[i].dataset.option){
@@ -228,16 +231,15 @@ for(let i=0; i < actionMenuOptions.length; i++){
             })
         break; 
         case 'pick':
-            actionMenuOptions[i].addEventListener('click', async() => {
-                hideUIElement()
-                const event = game.tileMap.getEventOnTile({x: game.inspectingCharacter.x, y: game.inspectingCharacter.y})
-                game.action.mode = 'pick'
-                const { fontSize, fontSize_sm, camera } = setting.general
-                const { width, height } = camera
-                const { itemBlockSize, itemBlockMargin } = setting.inventory
-                resizeHiddenElement(pickUpWindow.style, width, height, fontSize_sm)
-                constructPickUpWindow(game.inspectingCharacter, width, event.item, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin)
+            actionMenuOptions[i].addEventListener('click', () => {
+                preparePickUpWindow()
             })
+        break;
+        case 'pickAfterBattle':
+            // Choose which character to take items if there's more then one in the party
+
+            // const partySubWindow = 
+
         break;
         case 'status':
             actionMenuOptions[i].addEventListener('click', () => {
@@ -273,6 +275,63 @@ const getPercentage = (type, character) => {
     }
 
     return percentage
+}
+
+export const displayResult = (win) => {
+
+    const title = levelClear.firstChild
+
+    if(win){
+        title.innerText = "Victory"
+
+        const optional = levelClear.querySelector('#optional')
+
+        if(game.tileMap.objective.optional.length){
+            game.tileMap.objective.optional.map(o => {
+                const condition = document.createElement('li')
+                if(o.target === 'turn'){
+                    condition.innerText = `Finish the level in ${o.value} turns\n`
+
+                    if(game.turn <= o.value){
+                        setTimeout(() => {
+                            const clear = document.createElement('span')
+                            clear.innerHTML = '&#10003;'
+                            clear.style.color = 'yellow'
+
+                            condition.append(clear)
+                        }, 500)
+                    }
+
+                    optional.append(condition)
+                } 
+            })            
+        }else{
+            optional.innerHTML = 'No more objective'
+        }
+
+        setTimeout(() => {
+            optional.style.transformX = -100 + '%'
+            levelClear.querySelector('.action').classList.remove('invisible')
+        }, 1000)
+    }else{
+        title.innerText = 'Game Over'
+
+        setTimeout(() => {
+            levelClear.querySelector('.tap').classList.remove('invisible')
+        }, 1000)        
+    }
+
+    levelClear.classList.remove('invisible')
+}
+
+export const preparePickUpWindow = () => {
+    hideUIElement()
+    game.action.mode = 'pick'
+    const { fontSize, fontSize_sm, camera } = setting.general
+    const { width, height } = camera
+    const { itemBlockSize, itemBlockMargin } = setting.inventory
+    resizeHiddenElement(pickUpWindow.style, width, height, fontSize_sm)
+    constructPickUpWindow(game.inspectingCharacter, width, game.stepOnEvent.item, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin)
 }
 
 export const resizeHiddenElement = (target, width, height, size) => {
