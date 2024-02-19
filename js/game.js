@@ -16,7 +16,7 @@ import {
     toggleOptionMenu,
     toggleActionMenuAndCharacterCaption,
     toggleActionMenuOption,
-    togglePhaseTranistion,
+    togglePhaseTransition,
     prepareCharacterCaption,
     displayUIElement,
     hideUIElement,
@@ -79,6 +79,15 @@ class Game{
                     const { fontSize, fontSize_md, fontSize_sm } = redefineFontSize(cameraWidth)
         
                     this.textBox.setConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
+                break;
+                case 'titleCard':
+                    // Display the title of the level
+                    togglePhaseTransition(`${this.level.id}\n${this.level.name}`, 1500)
+                    
+                    setTimeout(() => {
+                        this.phaseCount += 1
+                        this.beginNextPhase()
+                    }, 2000)
                 break;
                 case 'battle':
                     this.#initBattlePhase()
@@ -302,7 +311,7 @@ class Game{
 
     // Move to the next phase
     #nextTurn = (index) => {
-        togglePhaseTranistion(this.turnType)
+        togglePhaseTransition((this.turnType === 0)? 'Enemy Phase' : 'Player Phase', 1000)
 
         setTimeout(() => {
             if(this.turnType === 0){

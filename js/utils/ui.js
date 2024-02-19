@@ -285,19 +285,19 @@ export const countTurn = (turn) => {
     turnCounter.innerText = `Turn ${turn}` 
 }
 
-export const togglePhaseTranistion = (turnType) => {
-    phaseElement.innerText = (turnType === 0)? 'Enemy Phase' : 'Player Phase'
+export const togglePhaseTransition = (text, time) => {
+    phaseElement.innerText = text
     // Phase transition fade in
     phaseWrapper.classList.add('fade_in')
     // Phase transition fade out
     setTimeout(() => {
         phaseWrapper.classList.add('fade_out')
-    }, 1000)
+    }, time)
 
     setTimeout(() => {
         phaseWrapper.classList.remove('fade_in')
         phaseWrapper.classList.remove('fade_out') 
-    }, 1500);
+    }, time + 500);
 }
 
 export const hideUIElement = () => {

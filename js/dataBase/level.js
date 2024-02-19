@@ -35,7 +35,7 @@ export default{
             // conversation - 對話階段, 
             // battle - 戰鬥階段
             // intermission - 整備階段
-            "phase": [ 'conversation', 'battle', 'conversation', 'intermission' ],
+            "phase": [ 'conversation', 'titleCard', 'battle', 'conversation', 'intermission' ],
             "event": [
                 // Before battle phase
                 {
