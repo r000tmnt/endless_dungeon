@@ -23,7 +23,9 @@ import {
     cancelAction,
     countTurn,
     redefineDeviceWidth,
-    redefineFontSize
+    redefineFontSize,
+    displayResult,
+    displayTurn
 } from './utils/ui.js'
 // import { getItemType } from './utils/inventory.js'
 import { levelUp } from './utils/battle.js'
@@ -53,6 +55,7 @@ class Game{
         this.enemyPosition = [];
         this.inspectingCharacter = null;
         this.eventEffect = []; // What effect will take when move into battle phase
+        this.stash = []; // A shared stash
         this.stepOnEvent = {}; // The event waiting to be trigger
     }
 
@@ -92,6 +95,7 @@ class Game{
                     }, 2000)
                 break;
                 case 'battle':
+                    displayTurn()
                     this.#initBattlePhase()
                 break;
                 case 'intermission':
@@ -441,7 +445,7 @@ class Game{
         // Check if victory
         switch(this.tileMap.objective.victory.target){
             case 'enemy':
-                if(this.enemy.length === this.tileMap.objective.velocity.value){
+                if(this.enemy.length === this.tileMap.objective.victory.value){
                     result = 'win'
                 }
             break;
@@ -525,6 +529,7 @@ class Game{
 
         // Check if player win or lose
         const situation = this.#winOrLose()
+        console.log('win or lose :>>>', situation)
         if(situation.length){
             if(situation === 'win'){
                 // Get stage clear bonus
@@ -539,8 +544,8 @@ class Game{
                     switch(target){
                         case 'turn':
                             if(this.turn <= value){
-                                for(let j=0; j <= prize.length; j++){
-                                    if(prize.id.includes('exp')){
+                                for(let j=0; j < prize.length; j++){
+                                    if(prize[j].id.includes('exp')){
                                         this.player.map(p => {
                                             p.exp += prize[j].amount
 
@@ -567,13 +572,14 @@ class Game{
                         }
                     }
                 }
-                
-                // Display options
 
                 // Proceed to the next phase
                 // this.phaseCount += 1
                 // this.beginNextPhase()
             }
+
+            // Display battle result
+            displayResult(situation === 'win')
         }else{
             // If it is the player's turn
             if(this.turnType === 0){

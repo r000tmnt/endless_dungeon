@@ -36,17 +36,7 @@ export default class TextBox{
     }
 
     setConversationWindow = (width, height, fontSize, fontSize_md, fontSize_sm) => {
-    
-        resizeHiddenElement(conversationWindow.style, width, height, fontSize_md)
-    
-        dialogueControl.style.transform = `translateX(${(width - dialogueControl.clientWidth) - (fontSize_md * 2)}px)`
-        dialogueControl.style.fontSize = `${fontSize_sm}px`
-    
-        dialogue.style.fontSize = fontSize + 'px'
-        dialogue.style.width = (width - (fontSize_md * 2)) + 'px'
-        dialogue.style.height = Math.floor(height * 0.3) + 'px'
-        dialogue.style.padding = fontSize_sm + 'px'
-        dialogue.style.top = (Math.floor(height * 0.7) - (fontSize_md * 2)) + 'px' 
+        this.resizeConversationWindow(width, height, fontSize, fontSize_md, fontSize_sm)
         dialogue.classList.remove('invisible')
     
         conversationWindow.classList.remove('invisible')
@@ -221,6 +211,19 @@ export default class TextBox{
             this.textLength = dialogue[this.dialogueCounter].message[this.messageCounter].content.length - 1
             this.#loadConversation(dialogue[this.dialogueCounter].message)
         }, 500)
+    }
+
+    resizeConversationWindow(width, height, fontSize, fontSize_md, fontSize_sm){
+        resizeHiddenElement(conversationWindow.style, width, height, fontSize_md)
+    
+        dialogueControl.style.transform = `translateX(${(width - dialogueControl.clientWidth) - (fontSize_md * 2)}px)`
+        dialogueControl.style.fontSize = `${fontSize_sm}px`
+    
+        dialogue.style.fontSize = fontSize + 'px'
+        dialogue.style.width = (width - (fontSize_md * 2)) + 'px'
+        dialogue.style.height = Math.floor(height * 0.3) + 'px'
+        dialogue.style.padding = fontSize_sm + 'px'
+        dialogue.style.top = (Math.floor(height * 0.7) - (fontSize_md * 2)) + 'px' 
     }
 
     #loadConversation = (message) => {

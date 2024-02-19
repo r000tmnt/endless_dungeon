@@ -48,18 +48,9 @@ export default class Character {
         if(this?.attributes?.hp <= 0){
             if(!this.characterIsMoving){
                 this.characterIsMoving = true
-                switch(this.characterType){
-                    case 2:
-                        // Leave the body
-                        // removeCharacter(2)
-                    break    
-                    case 3:
-                        this.#fadeOutTimer(ctx, this.characterType)
-                    break
-                } 
-            }else{
-                this.#fadeOutTimer(ctx, this.characterType)
             }
+            
+            this.#fadeOutTimer(ctx, this.characterType)
         }else
         // If the image of the character is loaded
         if(!this.characterIsMoving && this.characterImage?.src?.length){

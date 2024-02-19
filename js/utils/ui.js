@@ -21,7 +21,6 @@ let canvasPosition
 const appWrapper = document.getElementById('wrapper')
 const turnCounter = document.getElementById('turn')
 turnCounter.innerText = 'Turn 1'
-turnCounter.classList.add('invisible')
 
 const phaseWrapper = document.getElementById('Phase_Transition');
 const phaseElement = document.getElementById('phase');
@@ -258,6 +257,14 @@ for(let i=0; i < actionMenuOptions.length; i++){
                     game.characterAnimationPhaseEnded(game.inspectingCharacter)
                 }, 500)
             })
+        break;
+        case 'stash':
+            game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
+        break;
+        case 'finish':
+            game.phaseCount += 1
+            game.beginNextPhase()
+        break;
     }
 }
 
@@ -277,20 +284,26 @@ const getPercentage = (type, character) => {
     return percentage
 }
 
+// Display the battle result screen
 export const displayResult = (win) => {
+    const { width, height } = setting.general.camera
+    const { fontSize_md, fontSize_sm } = setting.general
 
-    const title = levelClear.firstChild
+    resizeHiddenElement(levelClear.style, width, height, fontSize_md)
+    const title = levelClear.children[0]
 
     if(win){
         title.innerText = "Victory"
 
         const optional = levelClear.querySelector('#optional')
+        optional.classList.remove('invisible')
 
         if(game.tileMap.objective.optional.length){
             game.tileMap.objective.optional.map(o => {
                 const condition = document.createElement('li')
                 if(o.target === 'turn'){
                     condition.innerText = `Finish the level in ${o.value} turns\n`
+                    condition.style.margin = `${fontSize_sm}px 0`
 
                     if(game.turn <= o.value){
                         setTimeout(() => {
@@ -310,7 +323,6 @@ export const displayResult = (win) => {
         }
 
         setTimeout(() => {
-            optional.style.transformX = -100 + '%'
             levelClear.querySelector('.action').classList.remove('invisible')
         }, 1000)
     }else{
@@ -318,10 +330,15 @@ export const displayResult = (win) => {
 
         setTimeout(() => {
             levelClear.querySelector('.tap').classList.remove('invisible')
+
+            levelClear.addEventListener('click', () => {
+                // Back to title screen or intermission
+            })
         }, 1000)        
     }
 
     levelClear.classList.remove('invisible')
+    levelClear.classList.add('open_window')
 }
 
 export const preparePickUpWindow = () => {
@@ -338,6 +355,10 @@ export const resizeHiddenElement = (target, width, height, size) => {
     target.padding = size + 'px'
     target.width = width + 'px'
     target.height = height + 'px'
+}
+
+export const displayTurn = () => {
+    turnCounter.classList.remove('invisible')
 }
 
 export const countTurn = (turn) => {
@@ -377,7 +398,7 @@ export const cancelAction = () => {
         actionMenu.classList.add('action_menu_open') 
     }
 
-    action.mode = ''  
+    game.action.mode = ''  
 }
 
 export const displayUIElement = () => {
@@ -641,5 +662,9 @@ export const resize = () => {
             configWindow.style.fontSize = fontSize_md + 'px'
             resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontSize_sm)
         break;
+    }
+
+    if(game.level.phase[game.phaseCount] === 'conversation'){
+        game.textBox.resizeConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
     }
 }

@@ -503,10 +503,13 @@ export default class Action{
                         game.tileMap.changeTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
                     }else{
                         // If player lose, drop all items
-                        if(player.bag.length){
-                            game.tileMap.setEventOnTile({x: player.x, y: player.y}, player.bag)
-                            game.tileMap.changeTile(parseInt(player.y / tileSize), parseInt(player.x / tileSize), 4)
+                        if(enemy.bag.length){
+                            game.tileMap.setEventOnTile({x: enemy.x, y: enemy.y}, enemy.bag)
+                            game.tileMap.changeTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
                         }
+
+                        // Need to change the timing to check on objective
+                        game.characterAnimationPhaseEnded(player)
                     }
                 }else{
                     game.characterAnimationPhaseEnded(player)
