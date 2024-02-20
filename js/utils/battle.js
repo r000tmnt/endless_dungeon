@@ -42,6 +42,38 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
         hitRate = Math.abs(hitRate - Math.floor(hitRate * (LvDistance/100)))
     }
 
+    // Check if there's other thing that can alter the hit rate, such as skill or item
+    // Evade is greater then Hit
+    if(enemy.attributes.status.findIndex(s => s.name === 'Evade') >= 0){
+        hitRate = 0
+        evadeRate = 100
+
+        // remove the enhanced status
+        enemy.removeStatus('Evade')
+    }else{
+        switch(true){
+            case player.attributes.status.findIndex(s => s.name === 'Hit') >= 0:
+                hitRate = 100
+                evadeRate = 0
+
+                // remove the enhancd status
+                player.removeStatus('Hit')
+            break;
+            case player.attributes.status.findIndex(s => s.name === 'Focus') >= 0:
+                hitRate += Math.floor(hitRate * 0.3)
+                evadeRate -= Math.floor(evadeRate * 0.3 )
+
+                // focus will last a whole turn
+            break;
+            case enemy.attributes.status.findIndex(s => s.name === 'Focus') >= 0:
+                hitRate -= Math.floor(hitRate * 0.3)
+                evadeRate += Math.floor(evadeRate * 0.3 )
+
+                // focus will last a whole turn
+            break;
+        }
+    }
+
     totalRate = hitRate + evadeRate
 
     const hitRates = [ { name: 'hitRate', value: hitRate }, { name: 'evadeRate', value: evadeRate } ]
@@ -54,6 +86,14 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
 
     if(firstDiceRoll.name === 'hitRate'){
         // Check if crit
+        if(player.attributes.status.find(s => s.name ==='crit')){
+            critRate = 100
+            hitRate = 0
+
+            // remove the enhanced status
+            player.removeStatus('crit')
+        }
+
         totalRate = hitRate + critRate
 
         const critRates = [ { name: 'hitRate', value: hitRate }, { name: 'critRate', value: critRate} ]
