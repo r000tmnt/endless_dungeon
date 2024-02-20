@@ -240,8 +240,6 @@ export default class Action{
         const statusTable = statusWindow.children[3]
         const tableNode = statusTable.querySelectorAll('.status-node')
         const avatar = document.getElementById('avatar')
-        
-        this.mode = 'status'
 
         statusWindow.style.fontSize = fontSize + 'px'
         statusInfo.style.fontSize = fontSize_md + 'px' 

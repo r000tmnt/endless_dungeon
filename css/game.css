@@ -518,3 +518,12 @@ li{
     content: 'Action';
     font-size: var(--fontSize);
   }
+
+  #warn{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: black;
+    /* margin: 0; */
+    /* white-space: pre-line; */
+  }

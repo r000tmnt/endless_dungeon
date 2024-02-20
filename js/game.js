@@ -154,10 +154,12 @@ class Game{
             const canvasReady = setInterval(() => {
                 if(this.tileMap !== null && this.grid !== null && this.player.length && this.enemy.length){
                     // Simulate click on the canvas where the first moving character is 
-                    this.#clickOnPlayer(0)
-                    clearInterval(canvasReady)                 
-                }
+                    clearInterval(canvasReady)
 
+                    setTimeout(() => {
+                        this.#clickOnPlayer(0)
+                    }, 300)                 
+                }
             }, 100)
         }, 300)
     }
@@ -332,6 +334,10 @@ class Game{
                     console.log('enemy phase')
                     this.turnType = 1
                     this.enemy[index].attributes.ap = this.enemy[index].attributes.maxAp
+
+                    // Check if there is status effect on enemy
+                    // this.enemy.map(e => {})
+
                     this.#enemyAI(this.enemy[index], index)                 
                 }
             }else{
@@ -341,6 +347,9 @@ class Game{
                     this.player[index].attributes.ap = this.player[index].attributes.maxAp
                     this.turn += 1 
                     countTurn(this.turn)
+
+                    // Check if there is status effect on player
+                    // this.player.map(p => {})
 
                     // Simulate canvas click where the current acting character is
                     this.#clickOnPlayer(index)

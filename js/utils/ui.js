@@ -65,6 +65,9 @@ const objectiveWindow = document.getElementById('objective')
 
 // UI after Battle finished
 const levelClear = document.getElementById('levelClear')
+const resultAction = document.getElementById('resultAction')
+const resultActionOptions = resultAction.querySelectorAll('li')
+const warn = document.getElementById('warn')
 
 // option menu child click event
 for(let i=0; i < options.length; i++){
@@ -148,14 +151,22 @@ for(let i=0; i < backBtn.length; i++){
         break;
         case 'pick':
             backBtn[i].addEventListener('click', async() => {
+                if(game.action.mode === 'pickAfterBattle'){
+                    pickUpWindow.classList.add('invisible')
+                    pickUpWindow.classList.remove('open_window')
+                    clearPickUpWindow(pickUpWindow.style)
+                    levelClear.classList.remove('invisible')
+                    levelClear.classList.add('open_window')
+                }else{
+                    // Check if the tile has an event
+                    await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
+                    pickUpWindow.classList.add('invisible')
+                    pickUpWindow.classList.remove('open_window')
+                    clearPickUpWindow(pickUpWindow.style)
+                    prepareCharacterCaption(game.inspectingCharacter)
+                    displayUIElement()                    
+                }
                 game.action.mode = ''
-                // Check if the tile has an event
-                await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
-                pickUpWindow.classList.add('invisible')
-                pickUpWindow.classList.remove('open_window')
-                clearPickUpWindow(pickUpWindow.style)
-                prepareCharacterCaption(game.inspectingCharacter)
-                displayUIElement()
             })
         break;
         case 'party':
@@ -231,18 +242,14 @@ for(let i=0; i < actionMenuOptions.length; i++){
         break; 
         case 'pick':
             actionMenuOptions[i].addEventListener('click', () => {
+                game.action.mode = 'pick'
                 preparePickUpWindow()
             })
-        break;
-        case 'pickAfterBattle':
-            // Choose which character to take items if there's more then one in the party
-
-            // const partySubWindow = 
-
         break;
         case 'status':
             actionMenuOptions[i].addEventListener('click', () => {
                 hideUIElement()
+                game.action.mode = 'status'
                 const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
                 const { width, height } = camera
                 resizeHiddenElement(statusWindow.style, width, height, fontSize_sm)
@@ -258,15 +265,85 @@ for(let i=0; i < actionMenuOptions.length; i++){
                 }, 500)
             })
         break;
+    }
+}
+
+// Result action child click event
+for(let i=0; i < resultActionOptions.length; i++){
+    switch(resultActionOptions[i].dataset.action){
         case 'stash':
-            game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
+            resultActionOptions[i].addEventListener('click', () => {
+                game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
+            })
+        break;
+        case 'pickAfterBattle':
+            // Choose which character to take items if there's more then one in the party
+            resultActionOptions[i].addEventListener('click', () => {
+                game.action.mode = 'pickAfterBattle'
+                if(game.player.length > 1){
+                    const partySubMenu = levelClear.querySelector('#party')
+    
+                    const { itemBlockSize } = setting.inventory
+    
+                    game.player.map(p => {
+                        const member = document.createElement('img')
+                        member.style.width = itemBlockSize + 'px'
+                        member.style.height = itemBlockSize + 'px'
+                        member.src = p.characterImage
+    
+                        member.addEventListener('click', () => {
+                            game.inspectingCharacter = p
+                            preparePickUpWindow()
+                            partySubMenu.classList.remove('open_window')
+                            partySubMenu.classList.add('invisible')
+                        })
+
+                        partySubMenu.append(member)
+                    })
+
+                    partySubMenu.classList.remove('invisible')
+                    partySubMenu.classList.add('open_window')
+                }else{
+                    game.inspectingCharacter = game.player[0]
+                    preparePickUpWindow()
+                }
+
+                levelClear.classList.remove('open_window')
+                levelClear.classList.add('invisible')
+            })
         break;
         case 'finish':
-            game.phaseCount += 1
-            game.beginNextPhase()
+            resultActionOptions[i].addEventListener('click', () => {
+                if(game.stepOnEvent.item.length){
+                    const { fontSize_md, camera } = setting.general
+                    warn.style.width = (camera.width - (fontSize_md * 2)) + 'px'
+                    warn.style.padding = fontSize_md + 'px'
+                    warn.classList.remove('invisible')
+                    warn.classList.add('open_window')
+                }else{
+                    game.phaseCount += 1
+                    game.beginNextPhase()                
+                    levelClear.classList.remove('open_window')
+                    levelClear.classList.add('invisible')                    
+                }
+            })
         break;
     }
 }
+
+const finishBtn = levelClear.getElementsByTagName('button')
+
+finishBtn[0].addEventListener('click', () => {
+    warn.classList.remove('open_window')
+    warn.classLisr.add('invisible')
+})
+
+finishBtn[1].addEventListener('click', () => {
+    game.phaseCount += 1
+    game.beginNextPhase()                
+    levelClear.classList.remove('open_window')
+    levelClear.classList.add('invisible')
+})
 
 // Calculate the percentage of an attribute
 const getPercentage = (type, character) => {
@@ -327,10 +404,7 @@ export const displayResult = (win) => {
         }
 
         setTimeout(() => {
-            const resultAction = levelClear.querySelector('.action')
-            const actionOption = resultAction.querySelectorAll('li')
-
-            actionOption.forEach(o => o.style.margin = `${fontSize_sm}px 0`)
+            resultActionOptions.forEach(o => o.style.margin = `${fontSize_sm}px 0`)
             resultAction.classList.remove('invisible')
         }, 1000)
     }else{
@@ -352,7 +426,6 @@ export const displayResult = (win) => {
 
 export const preparePickUpWindow = () => {
     hideUIElement()
-    game.action.mode = 'pick'
     const { fontSize, fontSize_sm, camera } = setting.general
     const { width, height } = camera
     const { itemBlockSize, itemBlockMargin } = setting.inventory
@@ -614,6 +687,10 @@ export const resize = () => {
     phaseWrapper.style.width = cameraWidth + 'px'
     phaseWrapper.style.height = cameraHeight + 'px' 
     phaseElement.style.fontSize = fontSize + 'px';
+
+    // Set warning window style
+    warn.style.width = (cameraWidth - (fontSize_md * 2)) + 'px'
+    warn.style.padding = fontSize_md + 'px'
 
     // Set back button style
     for(let i=0; i < backBtn.length; i++){
