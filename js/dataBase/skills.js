@@ -37,6 +37,44 @@ export default{
                 "status": "Poison",
                 "desc": "Bite the enemy. Cause the foe to get poisoned"
             }
+        },
+        {
+            "id": "status_1",
+            "name": "Focus",
+            "weapon": "none",
+            "type": "defense",
+            "cost": {
+                "attribute": "mp",
+                "value": 3
+            },
+            "effect": {
+                "type": "status",
+                "range": 0, // Apply on the player itself
+                "base_on_attribute": "none",
+                "multiply_as": "percentage",
+                "base_number": 3,
+                "status": "Focus",
+                "desc": "Enhance the hit rate and evade rate by 30% on oneself"
+            }
+        },
+        {
+            "id": "status_2",
+            "name": "Clarity",
+            "weapon": "none",
+            "type": "defense",
+            "cost": {
+                "attribute": "mp",
+                "value": 5
+            },
+            "effect": {
+                "type": "status",
+                "range": 1,
+                "base_on_attribute": "none",
+                "multiply_as": "percentage",
+                "base_number": 3,
+                "status": "Focus",
+                "desc": " Enhance the hit rate and evade rate by 30% to the pointed target"
+            }
         }
     ],
 
