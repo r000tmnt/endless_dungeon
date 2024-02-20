@@ -250,7 +250,7 @@ export default class Character {
                     this.class = job.name
                     this.attributes = {
                         ...job.base_attribute,
-                        status: 'Healthy'
+                        status: [{ name: 'Focus', turn: 2 }]
                     }     
                     this.prefer_attributes = job.prefer_attributes
                     this.#loadImage(type, job.id)     
@@ -301,7 +301,7 @@ export default class Character {
                     this.class = job.name
                     this.attributes = {
                         ...job.base_attribute,
-                        status: 'Healthy'
+                        status: []
                     }     
                     this.prefer_attributes = job.prefer_attributes
                     this.#loadImage(type, job.id)     
@@ -356,5 +356,11 @@ export default class Character {
 
     setStatus(status){
         this.status = status
+    }
+
+    removeStatus = (status) => {
+        const index = this.attributes.status.findIndex(s => s.name === status)
+
+        this.attributes.status.splice(index, 1)
     }
 }
