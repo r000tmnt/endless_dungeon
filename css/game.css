@@ -494,6 +494,27 @@ li{
     background: rgba(0, 0, 0, 0.7);
   }
 
+  #levelClear > p{
+    text-align: center;
+    font-weight: 700;
+  }
+
+  #optional::before{
+    content: 'Objective';
+    font-size: var(--fontSize);
+  }
+
   #levelClear > ul > li{
     background-color: black;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .tap{
+    text-align: center;
+  }
+
+  #resultAction::before{
+    content: 'Action';
+    font-size: var(--fontSize);
   }

@@ -287,13 +287,17 @@ const getPercentage = (type, character) => {
 // Display the battle result screen
 export const displayResult = (win) => {
     const { width, height } = setting.general.camera
-    const { fontSize_md, fontSize_sm } = setting.general
+    const { fontSize, fontSize_md, fontSize_sm } = setting.general
 
     resizeHiddenElement(levelClear.style, width, height, fontSize_md)
     const title = levelClear.children[0]
+    title.style.fontSize = (fontSize * 2) + 'px'
 
     if(win){
         title.innerText = "Victory"
+        title.style.color = 'gold'
+
+        document.documentElement.style.setProperty('--fontSize', fontSize_md + 'px')
 
         const optional = levelClear.querySelector('#optional')
         optional.classList.remove('invisible')
@@ -323,10 +327,15 @@ export const displayResult = (win) => {
         }
 
         setTimeout(() => {
-            levelClear.querySelector('.action').classList.remove('invisible')
+            const resultAction = levelClear.querySelector('.action')
+            const actionOption = resultAction.querySelectorAll('li')
+
+            actionOption.forEach(o => o.style.margin = `${fontSize_sm}px 0`)
+            resultAction.classList.remove('invisible')
         }, 1000)
     }else{
         title.innerText = 'Game Over'
+        title.style.color = 'grey'
 
         setTimeout(() => {
             levelClear.querySelector('.tap').classList.remove('invisible')

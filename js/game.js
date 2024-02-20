@@ -135,7 +135,6 @@ class Game{
         // Temporary solution, define player from setting
         if(!this.player.length){
             this.#createCharacter(setting.player, this.player, this.playerPosition, 2)
-          
         }
 
         if(!this.enemy.length){
@@ -152,7 +151,15 @@ class Game{
         // Display canvas
         setTimeout(() => {
             resize()
-        }, 500)
+            const canvasReady = setInterval(() => {
+                if(this.tileMap !== null && this.grid !== null && this.player.length && this.enemy.length){
+                    // Simulate click on the canvas where the first moving character is 
+                    this.#clickOnPlayer(0)
+                    clearInterval(canvasReady)                 
+                }
+
+            }, 100)
+        }, 300)
     }
 
     #setUpCanvasEvent = () => {
@@ -326,23 +333,17 @@ class Game{
                     this.turnType = 1
                     this.enemy[index].attributes.ap = this.enemy[index].attributes.maxAp
                     this.#enemyAI(this.enemy[index], index)                 
-                }else{
-                    this.turnType = 1
-                    this.#nextTurn()
-                    // TODO: Display result screen
                 }
             }else{
                 if(this.player.length){
                     console.log('player phase')
                     this.turnType = 0
                     this.player[index].attributes.ap = this.player[index].attributes.maxAp
-                    this.grid.setPointedBlock({ ...this.playerPosition[index] })
                     this.turn += 1 
-                    countTurn(this.turn)               
-                }else{
-                    this.turnType = 0
-                    this.#nextTurn()
-                    // TODO: Display result screen
+                    countTurn(this.turn)
+
+                    // Simulate canvas click where the current acting character is
+                    this.#clickOnPlayer(index)
                 }
             }            
         }, 1500)
@@ -463,6 +464,16 @@ class Game{
         return result
     }
 
+    // Simulate canvas click on where the player is
+    #clickOnPlayer = (index) => {
+        this.grid.setPointedBlock({...this.playerPosition[index]})
+        this.inspectingCharacter = this.player[index]  
+        this.checkIfStepOnTheEvent(this.inspectingCharacter.x, this.inspectingCharacter.y)
+        prepareCharacterCaption(this.inspectingCharacter, setting.tileSize)
+        this.#checkAp(this.inspectingCharacter)                   
+        displayUIElement()
+    }
+ 
     // Check the content of dropped items
     checkDroppedItem = async(dropItems) => {
         const playerHasKey = false
@@ -562,7 +573,7 @@ class Game{
                     }
                 }
 
-                // Display all the remaining items on the ground
+                // Get all the remaining items on the ground
                 const { event } = this.tileMap
                 
                 for(let i=0; i < event.length; i++){
@@ -588,23 +599,27 @@ class Game{
                 this.playerPosition[index].col = parseInt(currentActingPlayer.x / tileSize)  
         
                 // Check if the tile has an event
-                await this.checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
+                // await this.checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
         
-                currentActingPlayer.animation = ''
-                prepareCharacterCaption(currentActingPlayer)
+                // currentActingPlayer.animation = ''
+                // prepareCharacterCaption(currentActingPlayer)
         
-                // If the player is ran out of action point, move to the enemy phase
+                // If the player is ran out of action point
+                // Check if the next player exist 
+                // If not, move to the enemy phase
                 if(currentActingPlayer.attributes.ap === 0) {
-                    this.grid.setPointedBlock({})
-                    currentActingPlayer.wait = true
-                    currentActingPlayer.setWalkableSpace([])
-                    this.#nextTurn(0)
+                    if(this.player[index + 1] !== undefined){
+                        // Simulate click on canvas where the next player is
+                        this.#clickOnPlayer(index + 1)
+                    }else{
+                        this.grid.setPointedBlock({})
+                        currentActingPlayer.wait = true
+                        currentActingPlayer.setWalkableSpace([])
+                        this.#nextTurn(0)                        
+                    }
                 }else{
-                    this.grid.setPointedBlock({ ...this.playerPosition[index] })
-                    this.inspectingCharacter = currentActingPlayer
-                    this.#checkAp(currentActingPlayer)
-                    // Display Action options
-                    displayUIElement()
+                    // Simulate click on canvas where the current player is
+                    this.#clickOnPlayer(index)
                 }
         
                 this.action.mode = ''
@@ -637,8 +652,6 @@ class Game{
                 }         
             }      
         }
-    
-
     }
 
     removeCharacter = (type, id) => {
