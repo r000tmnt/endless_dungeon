@@ -267,6 +267,15 @@ export default class Action{
                 case 'exp':
                     tableNode[i].innerText = `${inspectingCharacter.exp? inspectingCharacter.exp : 0 } / ${inspectingCharacter.requiredExp? inspectingCharacter.requiredExp : 0}`
                 break;
+                case 'status':
+                    if(inspectingCharacter.attributes.status.length){
+                        inspectingCharacter.attributes.status.map(s => {
+                            tableNode[i].innerHTML += `${s.name} `
+                        })
+                    }else{
+                        tableNode[i].innerText = 'Healty'
+                    }
+                break;
                 default:
                     tableNode[i].innerText = `${inspectingCharacter.attributes[`${tableNode[i].dataset.attribute}`]}`
                 break;
