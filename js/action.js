@@ -509,7 +509,13 @@ export default class Action{
                         }
 
                         // Need to change the timing to check on objective
-                        game.characterAnimationPhaseEnded(player)
+                        const enemyFadeOutWatcher = setInterval(() => {
+                            if(!enemy.characterIsMoving){
+                                game.characterAnimationPhaseEnded(player)
+                                clearInterval(enemyFadeOutWatcher)
+                            }
+                        }, 100)
+                        
                     }
                 }else{
                     game.characterAnimationPhaseEnded(player)
