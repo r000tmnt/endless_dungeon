@@ -316,33 +316,43 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
     // 1. Check if there's the same item in the bag
     // 2. check if the item will surpass the stack limit
 
+    let target, targetLimit
+
+    if(game.action.mode === 'stash'){
+        target = game.stash
+        targetLimit = game.stashLimit
+    }else{
+        target = currentActingPlayer.bag
+        targetLimit = currentActingPlayer.bagLimit
+    }
+
     itemsToTake.forEach((item, index) => {
         // Get the index of displayed item
         const items = document.querySelectorAll('.item')
         const itemIndex = Array.from(items).findIndex(i => i.dataset.id === item.id)
 
         // Check if there's the same item
-        const inventoryIndex = currentActingPlayer.bag.findIndex(b => b.id === item.id)
+        const inventoryIndex = target.findIndex(b => b.id === item.id)
         if(inventoryIndex >= 0){
-            const itemData = getItemType(currentActingPlayer.bag[inventoryIndex])
+            const itemData = getItemType(target[inventoryIndex])
 
-            const leftOver = itemData.stackLimit - (currentActingPlayer.bag[inventoryIndex].amount + item.amount)
+            const leftOver = itemData.stackLimit - (target[inventoryIndex].amount + item.amount)
 
             // If the item is stackable and will not surpass the limit if added
-            if((currentActingPlayer.bag[inventoryIndex].amount + item.amount) <= itemData.stackLimit){
+            if((target[inventoryIndex].amount + item.amount) <= itemData.stackLimit){
                 // Stack the item
-                currentActingPlayer.bag[inventoryIndex].amount += item.amount
+                target[inventoryIndex].amount += item.amount
 
                 // Remove the item on the screen
                 droppedItems.removeChild(items[itemIndex])
             }else{
                 // Stack up to the limit
-                currentActingPlayer.bag[inventoryIndex].amount = itemData.stackLimit
+                target[inventoryIndex].amount = itemData.stackLimit
 
                 // If there are available space in the bag
-                if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
+                if(target.length < targetLimit){
                     // Take the item
-                    currentActingPlayer.bag.push({ id: item.id, type: item.type, amount: Math.abs(leftOver) })
+                    target.push({ id: item.id, type: item.type, amount: Math.abs(leftOver) })
                     
                     // Remove the item on the screen
                     droppedItems.removeChild(items[itemIndex])
@@ -353,9 +363,9 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
                 }
             }
         // If there are available space in the bag
-        }else if(currentActingPlayer.bag.length < currentActingPlayer.bagLimit){
+        }else if(target.length < targetLimit){
             // Take the item
-            currentActingPlayer.bag.push({ id: item.id, type: item.type, amount: item.amount })
+            target.push({ id: item.id, type: item.type, amount: item.amount })
 
             // Remove the item on the screen
             droppedItems.removeChild(items[itemIndex])
@@ -861,7 +871,14 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventIte
     btn.children[0].setAttribute('disabled', 'true')
     
     // Set botton click event
+    // Take All
     btn.children[0].addEventListener('click', () => {
+        itemsToTake = eventItem
+        pickUpItem(currentActingPlayer, tileMap)
+    })
+
+    // Take individual
+    btn.children[1].addEventListener('click', () => {
         pickUpItem(currentActingPlayer, tileMap)
     })
 

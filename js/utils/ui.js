@@ -273,7 +273,9 @@ for(let i=0; i < resultActionOptions.length; i++){
     switch(resultActionOptions[i].dataset.action){
         case 'stash':
             resultActionOptions[i].addEventListener('click', () => {
-                game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
+                // game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
+                game.action.mode = 'stash'
+                preparePickUpWindow()
             })
         break;
         case 'pickAfterBattle':

@@ -56,6 +56,7 @@ class Game{
         this.inspectingCharacter = null;
         this.eventEffect = []; // What effect will take when move into battle phase
         this.stash = []; // A shared stash
+        this.stashLimit = 1000;
         this.stepOnEvent = {}; // The event waiting to be trigger
     }
 
@@ -153,12 +154,14 @@ class Game{
             resize()
             const canvasReady = setInterval(() => {
                 if(this.tileMap !== null && this.grid !== null && this.player.length && this.enemy.length){
-                    // Simulate click on the canvas where the first moving character is 
-                    clearInterval(canvasReady)
+                    if(this.player.findIndex(p => !p.characterImage.length) < 0){
+                        // Simulate click on the canvas where the first moving character is 
+                        clearInterval(canvasReady)
 
-                    setTimeout(() => {
-                        this.#clickOnPlayer(0)
-                    }, 300)                 
+                        setTimeout(() => {
+                            this.#clickOnPlayer(0)
+                        }, 300)                          
+                    }
                 }
             }, 100)
         }, 300)
