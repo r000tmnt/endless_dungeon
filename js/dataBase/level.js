@@ -35,7 +35,8 @@ export default{
             // conversation - 對話階段, 
             // battle - 戰鬥階段
             // intermission - 整備階段
-            "phase": [ 'conversation', 'titleCard', 'battle', 'conversation', 'intermission' ],
+            // end - 回到標題畫面
+            "phase": [ 'conversation', 'titleCard', 'battle', 'conversation', 'end' ],
             "event": [
                 // Before battle phase
                 {
@@ -272,53 +273,64 @@ export default{
                                             "content": "It appears to be in a shape of key. At least that what you can think of."
                                         },
                                         {
-                                            "option": [
-                                                {
-                                                    "value": "Take the key",
-                                                    "style": "",
-                                                    "size": "",
-                                                    "content": "You take a closer look at the key.\nRealize what you heard before is in fact came from the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
-                                                    "effect": [
-                                                        {
-                                                            "target": "player_1", // Default to the first player created
-                                                            "attribute": "item",
-                                                            "type": 6,
-                                                            "value": "key_dark_1"
-                                                        }
-                                                    ]
-                                                },
-                                                {
-                                                    "value": "Leave it",
-                                                    "style": "",
-                                                    "size": "",
-                                                    "content": "You walk away from the key.\nTowards to the edge of the space.\nIn the gloomy light, you bearly see a door-ish shape in front of you. It won't open no matter how hard you push against it.",
-                                                    "effect": []
-                                                }
-                                            ],
+                                            "style": "",
+                                            "size": "",
+                                            "content": "You take a closer look at the key.\nRealize what you heard before is in fact came from the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
+                                            // "option": [
+                                            //     {
+                                            //         "value": "Take the key",
+                                            //         "style": "",
+                                            //         "size": "",
+                                            //         "content": "You take a closer look at the key.\nRealize what you heard before is in fact came from the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
+                                            //         "effect": [
+                                            //             {
+                                            //                 "target": "player_1", // Default to the first player created
+                                            //                 "attribute": "item",
+                                            //                 "type": 6,
+                                            //                 "value": "key_dark_1"
+                                            //             }
+                                            //         ]
+                                            //     },
+                                            //     {
+                                            //         "value": "Leave it",
+                                            //         "style": "",
+                                            //         "size": "",
+                                            //         "content": "You walk away from the key.\nTowards to the edge of the space.\nIn the gloomy light, you bearly see a door-ish shape in front of you. It won't open no matter how hard you push against it.",
+                                            //         "effect": []
+                                            //     }
+                                            // ],
                                         },
                                         {
+                                            "style": "",
+                                            "size": "",
+                                            "content": "With the lights from the key.\nYou're able to find a door in the end of the tunnel.\nAlthought you're not sure about the use of this key in your hand. You insert it into the key hole and open the door.",
                                             // Check if the key item is stored in eventEffect
-                                            "condition":{
-                                                "match": "key_dark_1",
-                                                "yes": {
-                                                    "style": "",
-                                                    "size": "",
-                                                    "content": "As you reach the end of the space. The light on the key grow stronger.\nEnough for you to see a door.\nYou try to unlock it with the key and it work.",
-                                                    "effect": []
-                                                },
-                                                "no": {
-                                                    "style": "",
-                                                    "size": "",
-                                                    "content": "You consider the fact that you need a key to open the door.\nBut there's another problem on the table.\nWhile you try your options, the monster you fought rise again, make a wierd noise.",
-                                                    "effect": [
-                                                        {
-                                                            "phase": "battle",
-                                                            "level": "p-1-1",
-                                                            "type": "random"
-                                                        }
-                                                    ]
-                                                }
-                                            }
+                                            // "condition":{
+                                            //     "match": "key_dark_1",
+                                            //     "yes": {
+                                            //         "style": "",
+                                            //         "size": "",
+                                            //         "content": "As you reach the end of the space. The light on the key grow stronger.\nEnough for you to see a door.\nYou try to unlock it with the key and it work.",
+                                            //         "effect": []
+                                            //     },
+                                            //     "no": {
+                                            //         "style": "",
+                                            //         "size": "",
+                                            //         "content": "You consider the fact that you need a key to open the door.\nBut there's another problem on the table.\nWhile you try your options, the monster you fought rise again, make a wierd noise.",
+                                            //         "effect": [
+                                            //             {
+                                            //                 "phase": "battle",
+                                            //                 "level": "p-1-1",
+                                            //                 "type": "random"
+                                            //             }
+                                            //         ]
+                                            //     }
+                                            // }
+                                        },
+                                        {
+                                            "style": "yellow",
+                                            "size": "",
+                                            "content": "This is the end of the demo.\nThank you for playing the game."
                                         }
                                     ]
                                 }
