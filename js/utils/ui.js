@@ -151,22 +151,7 @@ for(let i=0; i < backBtn.length; i++){
         break;
         case 'pick':
             backBtn[i].addEventListener('click', async() => {
-                if(game.action.mode === 'pickAfterBattle'){
-                    pickUpWindow.classList.add('invisible')
-                    pickUpWindow.classList.remove('open_window')
-                    clearPickUpWindow(pickUpWindow.style)
-                    levelClear.classList.remove('invisible')
-                    levelClear.classList.add('open_window')
-                }else{
-                    // Check if the tile has an event
-                    await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
-                    pickUpWindow.classList.add('invisible')
-                    pickUpWindow.classList.remove('open_window')
-                    clearPickUpWindow(pickUpWindow.style)
-                    prepareCharacterCaption(game.inspectingCharacter)
-                    displayUIElement()                    
-                }
-                game.action.mode = ''
+                await closePickUpWindow()
             })
         break;
         case 'party':
@@ -276,6 +261,9 @@ for(let i=0; i < resultActionOptions.length; i++){
                 // game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
                 game.action.mode = 'stash'
                 preparePickUpWindow()
+
+                levelClear.classList.remove('open_window')
+                levelClear.classList.add('invisible')
             })
         break;
         case 'pickAfterBattle':
@@ -433,6 +421,25 @@ export const preparePickUpWindow = () => {
     const { itemBlockSize, itemBlockMargin } = setting.inventory
     resizeHiddenElement(pickUpWindow.style, width, height, fontSize_sm)
     constructPickUpWindow(game.inspectingCharacter, width, game.stepOnEvent.item, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin)
+}
+
+export const closePickUpWindow = async() => {
+    if(game.action.mode === 'pickAfterBattle' || game.action.mode === 'stash'){
+        pickUpWindow.classList.add('invisible')
+        pickUpWindow.classList.remove('open_window')
+        clearPickUpWindow(pickUpWindow.style)
+        levelClear.classList.remove('invisible')
+        levelClear.classList.add('open_window')
+    }else{
+        // Check if the tile has an event
+        await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
+        pickUpWindow.classList.add('invisible')
+        pickUpWindow.classList.remove('open_window')
+        clearPickUpWindow(pickUpWindow.style)
+        prepareCharacterCaption(game.inspectingCharacter)
+        displayUIElement()                    
+    }
+    game.action.mode = ''
 }
 
 export const resizeHiddenElement = (target, width, height, size) => {
