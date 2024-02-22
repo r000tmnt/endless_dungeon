@@ -7,7 +7,7 @@ import other from '../dataBase/item/item_other.js'
 
 import game from '../game.js'
 import { getAvailableSpace } from './pathFinding.js'
-import { resizeHiddenElement } from './ui.js'
+import { resizeHiddenElement, closePickUpWindow } from './ui.js'
 import setting from './setting.js'
 // and more ...
 
@@ -406,8 +406,7 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
         tileMap.modifyEventOnTile('remove', {x: currentActingPlayer.x, y: currentActingPlayer.y})
 
         // Close pick up window
-        pickUpWindow.classList.add('invisible')
-        pickUpWindow.classList.remove('open_window')
+        closePickUpWindow()
     }
 }
 
@@ -867,8 +866,9 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventIte
     // btn.style.padding = `${Math.floorfontSize_sm}px 0`
     btn.style.bottom = fontSize_sm + 'px'
     btn.children[0].style.fontSize = fontSize + 'px'
-    btn.children[0].style.margin = "0 auto"
-    btn.children[0].setAttribute('disabled', 'true')
+    btn.children[1].style.fontSize = fontSize + 'px'
+    // btn.children[0].style.margin = "0 auto"
+    btn.children[1].setAttribute('disabled', 'true')
     
     // Set botton click event
     // Take All
@@ -903,12 +903,12 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventIte
                 // Remove from the array
                 itemsToTake.splice(itemSelected, 1)
                 item.classList.remove('item-selected')
-                if(!itemsToTake.length) btn.children[0].setAttribute('disabled', 'ture')
+                if(!itemsToTake.length) btn.children[1].setAttribute('disabled', 'ture')
             }else{
                 // Append to the array
                 itemsToTake.push(eventItem[i])
                 item.classList.add('item-selected')
-                btn.children[0].removeAttribute('disabled')
+                btn.children[1].removeAttribute('disabled')
             }
         })
 
