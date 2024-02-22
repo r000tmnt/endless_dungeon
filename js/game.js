@@ -147,21 +147,20 @@ class Game{
         }
 
         this.#setUpCanvasEvent()
-        this.#gameLoop()
 
         // Display canvas
         setTimeout(() => {
             resize()
+            this.#gameLoop()
             const canvasReady = setInterval(() => {
+                // Make sure every thing is loaded
                 if(this.tileMap !== null && this.grid !== null && this.player.length && this.enemy.length){
-                    if(this.player.findIndex(p => !p.characterImage.length) < 0){
-                        // Simulate click on the canvas where the first moving character is 
-                        clearInterval(canvasReady)
+                    // Simulate click on the canvas where the first moving character is 
+                    clearInterval(canvasReady)
 
-                        setTimeout(() => {
-                            this.#clickOnPlayer(0)
-                        }, 300)                          
-                    }
+                    setTimeout(() => {
+                        this.#clickOnPlayer(0)
+                    }, 300)  
                 }
             }, 100)
         }, 300)
