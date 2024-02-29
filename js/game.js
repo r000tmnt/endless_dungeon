@@ -68,7 +68,7 @@ class Game{
     init = async() => {
         this.option.setConfigOption(setting);
         
-        this.beginNextPhase()
+        // this.beginNextPhase()
     }
 
     beginNextPhase(){

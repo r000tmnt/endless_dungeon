@@ -22,6 +22,11 @@ const appWrapper = document.getElementById('wrapper')
 const turnCounter = document.getElementById('turn')
 turnCounter.innerText = 'Turn 1'
 
+// Title scrren UI
+const titleScreen = document.getElementById("titleScreen");
+const titleAction = document.getElementById("titleAction").querySelectorAll('li');
+
+// Phase tranisition UI
 const phaseWrapper = document.getElementById('Phase_Transition');
 const phaseElement = document.getElementById('phase');
 
@@ -68,6 +73,27 @@ const levelClear = document.getElementById('levelClear')
 const resultAction = document.getElementById('resultAction')
 const resultActionOptions = resultAction.querySelectorAll('li')
 const warn = document.getElementById('warn')
+
+// Title screen action child click event
+for(let i=0; i < titleAction.length; i++){
+    switch(titleAction[i].dataset.action){
+        case 'start':
+            titleAction[i].addEventListener('click', (e) => {
+                e.stopPropagation();
+            })
+        break;
+        case 'load':
+            titleAction[i].addEventListener('click', (e) => {
+                e.stopPropagation();
+            })
+        break;
+        case 'exit':
+            titleAction[i].addEventListener('click', (e) => {
+                e.stopPropagation();
+            })
+        break;
+    }
+}
 
 // option menu child click event
 for(let i=0; i < options.length; i++){
@@ -684,8 +710,12 @@ export const resize = () => {
         options[i].style.fontSize = fontSize + 'px';
     }
 
-    appWrapper.style.width = cameraWidth  + 'px';
+    appWrapper.style.width = cameraWidth + 'px';
     appWrapper.style.height = cameraHeight + 'px';
+
+    titleScreen.style.width = cameraWidth + 'px';
+    titleScreen.style.height = cameraHeight + 'px';
+    titleScreen.firstChild.style.fontSize = fontSize + 'px';
     
     characterCaption.style.width = Math.floor(50 * (cameraWidth / 100)) + 'px'
     characterName.style.fontSize = fontSize + 'px';
