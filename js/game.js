@@ -131,11 +131,13 @@ class Game{
 
     #initBattlePhase = () => {
         // Proceed to battle phase
-        this.tileMap = new TileMap(32, this.level);
+        const { tileSize } = setting.general
 
-        this.grid = new Grid(this.tileMap.map, 32, {});
+        this.tileMap = new TileMap(tileSize, this.level);
 
-        this.range = new Range(this.tileMap.map, 32);
+        this.grid = new Grid(this.tileMap.map, tileSize, {});
+
+        this.range = new Range(this.tileMap.map, tileSize);
 
         // Temporary solution, define player from setting
         if(!this.player.length){
@@ -155,14 +157,14 @@ class Game{
         // Display canvas
         setTimeout(() => {
             resize()
-            this.#gameLoop()
             const canvasReady = setInterval(() => {
                 // Make sure every thing is loaded
                 if(this.tileMap !== null && this.grid !== null && this.player.length && this.enemy.length){
-                    // Simulate click on the canvas where the first moving character is 
+                    this.#gameLoop()
                     clearInterval(canvasReady)
 
                     setTimeout(() => {
+                        // Simulate click on the canvas where the first moving character is 
                         this.#clickOnPlayer(0)
                     }, 300)  
                 }
@@ -314,13 +316,9 @@ class Game{
             this.action.beginAnimationPhase(currentActingPlayer)
         }
 
-        if(this.player.length) {
-            this.player.forEach(p => p.draw(this.ctx, setting.general.filter))
-        }
+        this.player.forEach(p => p.draw(this.ctx, setting.general.filter))
 
-        if(this.enemy.length){
-            this.enemy.forEach(e => e.draw(this.ctx, setting.general.filter))
-        }
+        this.enemy.forEach(e => e.draw(this.ctx, setting.general.filter))
 
         if(setting.general.showGrid){
             this.grid.draw(this.ctx)
