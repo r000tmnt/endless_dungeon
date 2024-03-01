@@ -97,6 +97,15 @@ body{
     background-color: black;
 }
 
+#titleScreen{
+    text-align: center;
+    color: white;
+}
+
+#titleScreen > .tap{
+    opacity: 0;
+}
+
 #game{
     transition: all .3s ease-in-out;
 }

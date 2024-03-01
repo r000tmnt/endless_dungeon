@@ -303,7 +303,7 @@ export default{
                                         {
                                             "style": "",
                                             "size": "",
-                                            "content": "With the lights from the key.\nYou're able to find a door in the end of the tunnel.\nAlthought you're not sure about the use of this key in your hand. You insert it into the key hole and open the door.",
+                                            "content": "With the lights from the key.\nYou're able to find a door in the end of the tunnel.\nAlthough you're not sure about the use of this key in your hand. You insert it into the key hole and open the door.",
                                             // Check if the key item is stored in eventEffect
                                             // "condition":{
                                             //     "match": "key_dark_1",

@@ -25,20 +25,20 @@ import {
     redefineDeviceWidth,
     redefineFontSize,
     displayResult,
-    displayTurn
+    displayTurn,
+    displayTitleScreen
 } from './utils/ui.js'
 // import { getItemType } from './utils/inventory.js'
 import { levelUp } from './utils/battle.js'
 
 import setting from './utils/setting.js';
-import level from './dataBase/level.js';
 import weapon from './dataBase/item/item_weapon';
 import armor from './dataBase/item/item_armor';
 
 class Game{
     constructor(){
         this.ctx = canvas.getContext("2d");
-        this.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
+        this.level = null;
         this.phaseCount = 0;
         this.turn = 1;
         this.turnType = 0;
@@ -68,6 +68,7 @@ class Game{
     init = async() => {
         this.option.setConfigOption(setting);
         
+        displayTitleScreen()
         // this.beginNextPhase()
     }
 
@@ -100,6 +101,9 @@ class Game{
                     this.#initBattlePhase()
                 break;
                 case 'intermission':
+                break;
+                case 'end':
+
                 break;
             }
         }

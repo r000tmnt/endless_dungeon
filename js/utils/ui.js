@@ -9,6 +9,7 @@ import {
 
 import setting from './setting.js';
 import game from '../game.js';
+import level from '../dataBase/level.js';
 
 // Get UI element and bind a click event
 const aspectRatio = 9 / 16
@@ -80,6 +81,8 @@ for(let i=0; i < titleAction.length; i++){
         case 'start':
             titleAction[i].addEventListener('click', (e) => {
                 e.stopPropagation();
+                game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
+                game.beginNextPhase()
             })
         break;
         case 'load':
@@ -375,6 +378,31 @@ const getPercentage = (type, character) => {
     }
 
     return percentage
+}
+
+// Display title screen
+export const displayTitleScreen = () => {
+    titleScreen.classList.remove('invisible')
+    titleScreen.classList.add('open_window')
+
+    const tap = titleScreen.children[1]
+
+    // Display tap to start
+    const tapInterval = setInterval(() => {
+        if(tap.classList.contains('fade_in')){
+            tap.classList.remove("fade_in")
+            tap.classList.add("fade_out")
+        }else{
+            tap.classList.remove("fade_out")
+            tap.classList.add("fade_in")
+        }
+    }, 1000);
+
+    titleScreen.addEventListener('click', () => {
+        clearInterval(tapInterval)
+        tap.classList.add("invisible")
+        titleAction.classList.remove('invisible')
+    })
 }
 
 // Display the battle result screen
@@ -673,69 +701,82 @@ export const resize = () => {
 
     const { fontSize, fontSize_md, fontSize_sm } = redefineFontSize(cameraWidth)
 
-    game?.tileMap?.changeTileSize(tileSize)
-    game?.grid?.setTileSize(tileSize)
-    game?.range?.setTileSize(tileSize)
-
-    // Get the player position relative to the canvas size
-    game.player.forEach((p, index) => {
-        p.setCharacterTileSize(tileSize)
-        p.setCharacterPosition(game.playerPosition[index].col * tileSize, game.playerPosition[index].row * tileSize) 
-    })
- 
-    console.log('player :>>>', game.player)
-
-    game.enemy.forEach((e, index) => {
-        e.setCharacterTileSize(tileSize)
-        e.setCharacterPosition(game.enemyPosition[index].col * tileSize, game.enemyPosition[index].row * tileSize)
-    })
-
-    console.log('enemy :>>>', game.enemy)
-
-    game?.action?.setFontSize(Math.floor(fontSize * 2))
-
-    // calculation the percentage of the attribute
-    for(let i=0; i < gauges.length; i++){
-        // console.log(gauges[i].firstElementChild)
-        gauges[i].firstElementChild.style.height = fontSize_sm + 'px';
-    }
-
-    // action menu child font size
-    for(let i=0; i < actionMenuOptions.length; i++){
-        actionMenuOptions[i].style.fontSize = fontSize + 'px';
-    }
-
-    // option menu child font size
-    for(let i=0; i < options.length; i++){
-        options[i].style.fontSize = fontSize + 'px';
-    }
-
     appWrapper.style.width = cameraWidth + 'px';
     appWrapper.style.height = cameraHeight + 'px';
 
-    titleScreen.style.width = cameraWidth + 'px';
-    titleScreen.style.height = cameraHeight + 'px';
-    titleScreen.firstChild.style.fontSize = fontSize + 'px';
-    
-    characterCaption.style.width = Math.floor(50 * (cameraWidth / 100)) + 'px'
-    characterName.style.fontSize = fontSize + 'px';
-    characterLv.style.fontSize = fontSize_sm + 'px';
-    characterAp.style.fontSize = fontSize_sm + 'px';
+    // 根據所處的階段調整畫面尺寸
+    switch(game?.level?.phase[game.phaseCount]){
+        case 'battle':
+            characterCaption.style.width = Math.floor(50 * (cameraWidth / 100)) + 'px'
+            characterName.style.fontSize = fontSize + 'px';
+            characterLv.style.fontSize = fontSize_sm + 'px';
+            characterAp.style.fontSize = fontSize_sm + 'px';
+        
+            // Set phase transition style
+            phaseWrapper.style.width = cameraWidth + 'px'
+            phaseWrapper.style.height = cameraHeight + 'px' 
+            phaseElement.style.fontSize = fontSize + 'px';
 
-    // Set phase transition style
-    phaseWrapper.style.width = cameraWidth + 'px'
-    phaseWrapper.style.height = cameraHeight + 'px' 
-    phaseElement.style.fontSize = fontSize + 'px';
+            // Set warning window style
+            warn.style.width = (cameraWidth - (fontSize_md * 2)) + 'px'
+            warn.style.padding = fontSize_md + 'px'
 
-    // Set warning window style
-    warn.style.width = (cameraWidth - (fontSize_md * 2)) + 'px'
-    warn.style.padding = fontSize_md + 'px'
+            game?.tileMap?.changeTileSize(tileSize)
+            game?.grid?.setTileSize(tileSize)
+            game?.range?.setTileSize(tileSize)
+        
+            // Get the player position relative to the canvas size
+            game.player.forEach((p, index) => {
+                p.setCharacterTileSize(tileSize)
+                p.setCharacterPosition(game.playerPosition[index].col * tileSize, game.playerPosition[index].row * tileSize) 
+            })
+         
+            console.log('player :>>>', game.player)
+        
+            game.enemy.forEach((e, index) => {
+                e.setCharacterTileSize(tileSize)
+                e.setCharacterPosition(game.enemyPosition[index].col * tileSize, game.enemyPosition[index].row * tileSize)
+            })
+        
+            console.log('enemy :>>>', game.enemy)
+        
+            game?.action?.setFontSize(Math.floor(fontSize * 2))
+        
+            // calculation the percentage of the attribute
+            for(let i=0; i < gauges.length; i++){
+                // console.log(gauges[i].firstElementChild)
+                gauges[i].firstElementChild.style.height = fontSize_sm + 'px';
+            }
+        
+            // action menu child font size
+            for(let i=0; i < actionMenuOptions.length; i++){
+                actionMenuOptions[i].style.fontSize = fontSize + 'px';
+            }
+        
+            // option menu child font size
+            for(let i=0; i < options.length; i++){
+                options[i].style.fontSize = fontSize + 'px';
+            }
 
-    // Set back button style
-    for(let i=0; i < backBtn.length; i++){
-        backBtn[i].style.transform = `translateX(-${fontSize_sm}px)`
-        backBtn[i].style.top = fontSize_sm + 'px'      
-        backBtn[i].style.fontSize = fontSize_md + 'px'  
+            // Set back button style
+            for(let i=0; i < backBtn.length; i++){
+                backBtn[i].style.transform = `translateX(-${fontSize_sm}px)`
+                backBtn[i].style.top = fontSize_sm + 'px'      
+                backBtn[i].style.fontSize = fontSize_md + 'px'  
+            }
+        break;
+        case 'conversation':
+            game?.textBox?.resizeConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
+        break;
+        case "intermission":
+        break;
+        case 'end':
+        break;
+        default:
+            titleScreen.style.width = cameraWidth + 'px';
+            titleScreen.style.height = cameraHeight + 'px';
+            titleScreen.children[0].style.fontSize = fontSize + 'px';
+        break;
     }
 
     canvas.height = game?.tileMap?.map.length * tileSize;
@@ -787,9 +828,5 @@ export const resize = () => {
             configWindow.style.fontSize = fontSize_md + 'px'
             resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontSize_sm)
         break;
-    }
-
-    if(game.level.phase[game.phaseCount] === 'conversation'){
-        game.textBox.resizeConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
     }
 }
