@@ -51,71 +51,72 @@ export default class Character {
             }
             
             this.#fadeOutTimer(ctx, this.characterType)
-        }else
-        // If the image of the character is loaded
-        if(!this.characterIsMoving && this.characterImage?.src?.length){
-            
-            if(filter === 'retro'){
-                const color = (this.characterType === 2)? '#33BBFF' : '#FF3333'
+        }else{
+            switch(filter){
+                case 'retro':
+                    const color = (this.characterType === 2)? '#33BBFF' : '#FF3333'
 
-                const tempCanvas = document.createElement('canvas')
-                const tempContext = tempCanvas.getContext('2d')
-                tempCanvas.width = this.tileSize
-                tempCanvas.height = this.tileSize
+                    const tempCanvas = document.createElement('canvas')
+                    const tempContext = tempCanvas.getContext('2d')
+                    tempCanvas.width = this.tileSize
+                    tempCanvas.height = this.tileSize
+    
+                    // set composite mode
+                    // tempContext.globalCompositeOperation = "multiply";
+                    tempContext.fillStyle = color
+                    tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
+    
+                    // set composite mode
+                    tempContext.globalCompositeOperation = "destination-in";
+                    tempContext.drawImage(this.characterImage, 0, 0, this.tileSize, this.tileSize)
+    
+                    // tempContext.globalCompositeOperation = "source-over";
+                    ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
+    
+                    tempCanvas.remove()
+                break;
+                default:
+                    ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)  
+                break;
+            }
 
-                // set composite mode
-                // tempContext.globalCompositeOperation = "multiply";
-                tempContext.fillStyle = color
-                tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
+            switch(this.animation){
+                case 'item':
+                    const frame = ['rgb(144, 255, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)']
 
-                // set composite mode
-                tempContext.globalCompositeOperation = "destination-in";
-                tempContext.drawImage(this.characterImage, 0, 0, this.tileSize, this.tileSize)
-
-                // tempContext.globalCompositeOperation = "source-over";
-                ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
-
-                tempCanvas.remove()
-            }else
-
-            //TODO: Need to know if the item is used on the character somehow...
-            if(this.animation === 'item'){
-                const frame = ['rgb(144, 255, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)']
-
-                const tempCanvas = document.createElement('canvas')
-                const tempContext = tempCanvas.getContext('2d')
-                tempCanvas.width = this.tileSize
-                tempCanvas.height = this.tileSize
-                // draw color
-                tempContext.fillStyle = frame[this.animationFrame]
-                tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
-
-                console.log('current rendering frame :>>>', tempContext.fillStyle)
-
-                // set composite mode
-                tempContext.globalCompositeOperation = "destination-in";
-
-                tempContext.drawImage(this.characterImage, 0, 0, this.tileSize, this.tileSize)
-                // const imgBitMap = await createImageBitmap(this.characterImage)
-                // this.worker.postMessage({mode: this.animation, image: imgBitMap, tileSize: this.tileSize})
-
-                // this.worker.onmessage = (msg) => {
-                //     console.log('sprite altered :>>>', msg)
-                //     if(msg.data.buffer){
-                //         ctx.clearRect(this.x, this.y, this.tileSize, this.tileSize)
-                //         ctx.save()
-                        ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
-                //         ctx.restore()
-                //     }
-                // }
-                tempCanvas.remove()
-                if(this.animationFrame + 1 > (frame.length - 1)){
-                    this.animationFrame = 0
-                }else{
-                    this.animationFrame += 1
-                }
-            }else{
-                ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)                
+                    const tempCanvas = document.createElement('canvas')
+                    const tempContext = tempCanvas.getContext('2d')
+                    tempCanvas.width = this.tileSize
+                    tempCanvas.height = this.tileSize
+                    // draw color
+                    tempContext.fillStyle = frame[this.animationFrame]
+                    tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
+    
+                    console.log('current rendering frame :>>>', tempContext.fillStyle)
+    
+                    // set composite mode
+                    tempContext.globalCompositeOperation = "destination-in";
+    
+                    tempContext.drawImage(this.characterImage, 0, 0, this.tileSize, this.tileSize)
+                    // const imgBitMap = await createImageBitmap(this.characterImage)
+                    // this.worker.postMessage({mode: this.animation, image: imgBitMap, tileSize: this.tileSize})
+    
+                    // this.worker.onmessage = (msg) => {
+                    //     console.log('sprite altered :>>>', msg)
+                    //     if(msg.data.buffer){
+                    //         ctx.clearRect(this.x, this.y, this.tileSize, this.tileSize)
+                    //         ctx.save()
+                            ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
+                    //         ctx.restore()
+                    //     }
+                    // }
+                    tempCanvas.remove()
+                    if(this.animationFrame + 1 > (frame.length - 1)){
+                        this.animationFrame = 0
+                    }else{
+                        this.animationFrame += 1
+                    }
+                break;
             }
         }
     }

@@ -26,7 +26,10 @@ import {
     redefineFontSize,
     displayResult,
     displayTurn,
-    displayTitleScreen
+    displayTitleScreen,
+    setCanvasPosition,
+    setBattlePhaseUIElement,
+    alterPhaseTransitionStyle
 } from './utils/ui.js'
 // import { getItemType } from './utils/inventory.js'
 import { levelUp } from './utils/battle.js'
@@ -88,13 +91,16 @@ class Game{
                     this.textBox.setConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
                 break;
                 case 'titleCard':
+                    alterPhaseTransitionStyle('rgb(0, 0, 0)')
                     // Display the title of the level
                     togglePhaseTransition(`${this.level.id}\n${this.level.name}`, 1500)
+
+                    setTimeout(() => alterPhaseTransitionStyle('rgba(0, 0, 0, 0.7)'), 2000)
                     
                     setTimeout(() => {
                         this.phaseCount += 1
                         this.beginNextPhase()
-                    }, 2000)
+                    }, 1000)
                 break;
                 case 'battle':
                     displayTurn()
@@ -109,7 +115,7 @@ class Game{
         }
     }
 
-    #createCharacter = (source, property, position, type) => {
+    #createCharacter = (source, property, position, type, tileSize) => {
         source.forEach((p) => {
             const newPlayer = this.tileMap.getCharacter(this.velocity, type, p.name, p.job)
             property.push(newPlayer)
@@ -122,8 +128,8 @@ class Game{
         property.forEach(p => {
             position.push(
                 {
-                    row: parseInt(p.y / 32),
-                    col: parseInt(p.x / 32)
+                    row: parseInt(p.y / tileSize),
+                    col: parseInt(p.x / tileSize)
                 }
             )
         })  
@@ -133,43 +139,53 @@ class Game{
         // Proceed to battle phase
         const { tileSize } = setting.general
 
+        const cameraWidth = setting.general.camera.width
+
+        const { fontSize, fontSize_md, fontSize_sm } = redefineFontSize(cameraWidth)
+
         this.tileMap = new TileMap(tileSize, this.level);
 
         this.grid = new Grid(this.tileMap.map, tileSize, {});
 
         this.range = new Range(this.tileMap.map, tileSize);
 
+        setCanvasPosition(tileSize)
+
+        setBattlePhaseUIElement(cameraWidth, fontSize, fontSize_md, fontSize_sm)
+
         // Temporary solution, define player from setting
         if(!this.player.length){
-            this.#createCharacter(setting.player, this.player, this.playerPosition, 2)
+            this.#createCharacter(setting.player, this.player, this.playerPosition, 2, tileSize)
         }
 
         if(!this.enemy.length){
-            this.#createCharacter(this.tileMap.enemy, this.enemy, this.enemyPosition, 3)       
+            this.#createCharacter(this.tileMap.enemy, this.enemy, this.enemyPosition, 3, tileSize)       
         }
 
         if(this.eventEffect.length){
             this.#applyOptionEffect(this.eventEffect)
         }
 
+        this.#gameLoop()
+
         this.#setUpCanvasEvent()
 
         // Display canvas
-        setTimeout(() => {
-            resize()
-            const canvasReady = setInterval(() => {
-                // Make sure every thing is loaded
-                if(this.tileMap !== null && this.grid !== null && this.player.length && this.enemy.length){
-                    this.#gameLoop()
-                    clearInterval(canvasReady)
+        const canvasReady = setInterval(() => {
+            // Make sure every thing is loaded
+            if(this.tileMap !== null && this.grid !== null){
+                const playerReady = this.player.map(p => p.characterImage.src.length > 0)
+                const enemyReady = this.enemy.map(e => e.characterImage.src.length > 0)
 
+                if(playerReady.length === this.player.length && enemyReady.length === this.enemy.length){
+                    clearInterval(canvasReady)
                     setTimeout(() => {
                         // Simulate click on the canvas where the first moving character is 
                         this.#clickOnPlayer(0)
-                    }, 300)  
+                    }, 1500)                          
                 }
-            }, 100)
-        }, 300)
+            }
+        }, 100)
     }
 
     #setUpCanvasEvent = () => {
@@ -311,9 +327,11 @@ class Game{
             this.range.draw(this.ctx, this.action.selectableSpace, this.action.mode, this.action.selectedSkill.type)
         }
 
-        if(this.action.mode === 'move' && this.action.reachableDirections.length && !this.action.animationInit){
-            const currentActingPlayer = (this.turnType === 0)? this.player.find(p => p.walkableSpace.length) : this.enemy.find(e => e.walkableSpace.length)
-            this.action.beginAnimationPhase(currentActingPlayer)
+        if(this.action.mode === 'move'){
+            if(this.action.reachableDirections.length && !this.action.animationInit){
+                const currentActingPlayer = (this.turnType === 0)? this.player.find(p => p.walkableSpace.length) : this.enemy.find(e => e.walkableSpace.length)
+                this.action.beginAnimationPhase(currentActingPlayer)                
+            }
         }
 
         this.player.forEach(p => p.draw(this.ctx, setting.general.filter))

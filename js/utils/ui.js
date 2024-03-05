@@ -516,6 +516,10 @@ export const countTurn = (turn) => {
     turnCounter.innerText = `Turn ${turn}` 
 }
 
+export const alterPhaseTransitionStyle = (bgColor) => {
+    phaseWrapper.style.background = bgColor
+}
+
 export const togglePhaseTransition = (text, time) => {
     phaseElement.innerText = text
     // Phase transition fade in
@@ -700,6 +704,47 @@ export const redefineFontSize = (cameraWidth) => {
     return { fontSize, fontSize_md, fontSize_sm }
 }
 
+export const setCanvasPosition = (tileSize) => {
+    canvas.height = game.tileMap.map.length * tileSize;
+    canvas.width = game.tileMap.map[0].length * tileSize;
+    // Get canvas position after resize
+    canvasPosition = canvas.getBoundingClientRect();
+}
+
+export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_sm) => {
+        // calculation the percentage of the attribute
+        for(let i=0; i < gauges.length; i++){
+            // console.log(gauges[i].firstElementChild)
+            gauges[i].firstElementChild.style.height = fontSize_sm + 'px';
+        }
+    
+        // action menu child font size
+        for(let i=0; i < actionMenuOptions.length; i++){
+            actionMenuOptions[i].style.fontSize = fontSize + 'px';
+        }
+    
+        // option menu child font size
+        for(let i=0; i < options.length; i++){
+            options[i].style.fontSize = fontSize + 'px';
+        }       
+        
+        characterCaption.style.width = Math.floor(50 * (width / 100)) + 'px'
+        characterName.style.fontSize = fontSize + 'px';
+        characterLv.style.fontSize = fontSize_sm + 'px';
+        characterAp.style.fontSize = fontSize_sm + 'px';
+    
+        // Set warning window style
+        warn.style.width = (width - (fontSize_md * 2)) + 'px'
+        warn.style.padding = fontSize_md + 'px'
+    
+        // Set back button style
+        for(let i=0; i < backBtn.length; i++){
+            backBtn[i].style.transform = `translateX(-${fontSize_sm}px)`
+            backBtn[i].style.top = fontSize_sm + 'px'      
+            backBtn[i].style.fontSize = fontSize_md + 'px'  
+        }
+}
+
 export const resize = () => {
     console.log('resize')
 
@@ -707,123 +752,92 @@ export const resize = () => {
 
     const { fontSize, fontSize_md, fontSize_sm } = redefineFontSize(cameraWidth)
 
-    game?.tileMap?.changeTileSize(tileSize)
-    game?.grid?.setTileSize(tileSize)
-    game?.range?.setTileSize(tileSize)
-
-    // Get the player position relative to the canvas size
-    game.player.forEach((p, index) => {
-        p.setCharacterTileSize(tileSize)
-        p.setCharacterPosition(game.playerPosition[index].col * tileSize, game.playerPosition[index].row * tileSize) 
-    })
- 
-    console.log('player :>>>', game.player)
-
-    game.enemy.forEach((e, index) => {
-        e.setCharacterTileSize(tileSize)
-        e.setCharacterPosition(game.enemyPosition[index].col * tileSize, game.enemyPosition[index].row * tileSize)
-    })
-
-    console.log('enemy :>>>', game.enemy)
-
-    game?.action?.setFontSize(Math.floor(fontSize * 2))
-
-    // calculation the percentage of the attribute
-    for(let i=0; i < gauges.length; i++){
-        // console.log(gauges[i].firstElementChild)
-        gauges[i].firstElementChild.style.height = fontSize_sm + 'px';
-    }
-
-    // action menu child font size
-    for(let i=0; i < actionMenuOptions.length; i++){
-        actionMenuOptions[i].style.fontSize = fontSize + 'px';
-    }
-
-    // option menu child font size
-    for(let i=0; i < options.length; i++){
-        options[i].style.fontSize = fontSize + 'px';
-    }
-
     appWrapper.style.width = cameraWidth  + 'px';
     appWrapper.style.height = cameraHeight + 'px';
 
     titleScreen.style.width = cameraWidth  + 'px';
     titleScreen.style.height = cameraHeight + 'px';
     titleScreen.children[0].style.fontSize = fontSize + 'px';
-    
-    characterCaption.style.width = Math.floor(50 * (cameraWidth / 100)) + 'px'
-    characterName.style.fontSize = fontSize + 'px';
-    characterLv.style.fontSize = fontSize_sm + 'px';
-    characterAp.style.fontSize = fontSize_sm + 'px';
 
     // Set phase transition style
     phaseWrapper.style.width = cameraWidth + 'px'
     phaseWrapper.style.height = cameraHeight + 'px' 
     phaseElement.style.fontSize = fontSize + 'px';
 
-    // Set warning window style
-    warn.style.width = (cameraWidth - (fontSize_md * 2)) + 'px'
-    warn.style.padding = fontSize_md + 'px'
+    if(game.level !== null){
+        switch(game.level.phase[game.phaseCount]){
+            case 'conversation':
+                game.textBox.resizeConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
+            break;
+            case 'battle':
+                if(!characterCaption.classList.contains('invisible')) prepareCharacterCaption(game.inspectingCharacter)
 
-    // Set back button style
-    for(let i=0; i < backBtn.length; i++){
-        backBtn[i].style.transform = `translateX(-${fontSize_sm}px)`
-        backBtn[i].style.top = fontSize_sm + 'px'      
-        backBtn[i].style.fontSize = fontSize_md + 'px'  
-    }
+                setCanvasPosition(tileSize)
 
-    canvas.height = game?.tileMap?.map.length * tileSize;
-    canvas.width = game?.tileMap?.map[0].length * tileSize;
-    // Get canvas position after resize
-    canvasPosition = canvas.getBoundingClientRect();
+                setBattlePhaseUIElement(cameraWidth, fontSize, fontSize_md, fontSize_sm)
 
-    console.log('canvas element :>>>', canvas)
-    console.log('canvas position :>>>', canvasPosition)
+                game.tileMap.changeTileSize(tileSize)
+                game.grid.setTileSize(tileSize)
+                game.range.setTileSize(tileSize)
 
-    if(!characterCaption.classList.contains('invisible')) prepareCharacterCaption(game.inspectingCharacter)
+                // Get the player position relative to the canvas size
+                game.player.forEach((p, index) => {
+                    p.setCharacterTileSize(tileSize)
+                    p.setCharacterPosition(game.playerPosition[index].col * tileSize, game.playerPosition[index].row * tileSize) 
+                })
+            
+                console.log('player :>>>', game.player)
 
-    switch(game.action.mode){
-        case 'item':
-            // Set inventory style
-            resizeHiddenElement(Inventory.style, cameraWidth, cameraHeight, fontSize_sm)
-            resizeInventory(cameraWidth, fontSize, fontSize_sm)
-        break;
-        case 'status':
-            // Set status window style
-            resizeHiddenElement(statusWindow.style, cameraWidth, cameraHeight, fontSize_sm)
-            avatar.style.width = Math.floor(cameraWidth * 0.3) + 'px';
-            avatar.style.height = Math.floor(cameraWidth * 0.3) + 'px';
-            action.resizeStatusWindow()
-        break;
-        case 'pick':
-            // Set pick up window style
-            resizeHiddenElement(pickUpWindow.style, cameraWidth, cameraHeight, fontSize_sm)
-            resizePickUp(fontSize, cameraWidth)
-        break;
-        case 'skill':
-            // Set skill window style
-            resizeHiddenElement(skillWindow.style, cameraWidth, cameraHeight, fontSize_sm)
-            action.resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, tileSize)
-        break;
-    }
+                game.enemy.forEach((e, index) => {
+                    e.setCharacterTileSize(tileSize)
+                    e.setCharacterPosition(game.enemyPosition[index].col * tileSize, game.enemyPosition[index].row * tileSize)
+                })
 
-    switch(game.option.mode){
-        case 'party':
-            // Set party window style
-            resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontSize_sm)
-            game.option.resizePartyWindow(setting)
-        break;
-        case 'objective':
-            game.option.resizeObjectiveWindow(objectiveWindow, setting)
-        break;
-        case 'config':
-            // Set config window style
-            configWindow.style.fontSize = fontSize_md + 'px'
-            resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontSize_sm)
-        break;
-    }
+                console.log('enemy :>>>', game.enemy)
 
-    if(game.level.phase[game.phaseCount] === 'conversation'){
-        game.textBox.resizeConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
+                game.action.setFontSize(Math.floor(fontSize * 2))
+
+                switch(game.action.mode){
+                    case 'item':
+                        // Set inventory style
+                        resizeHiddenElement(Inventory.style, cameraWidth, cameraHeight, fontSize_sm)
+                        resizeInventory(cameraWidth, fontSize, fontSize_sm)
+                    break;
+                    case 'status':
+                        // Set status window style
+                        resizeHiddenElement(statusWindow.style, cameraWidth, cameraHeight, fontSize_sm)
+                        avatar.style.width = Math.floor(cameraWidth * 0.3) + 'px';
+                        avatar.style.height = Math.floor(cameraWidth * 0.3) + 'px';
+                        action.resizeStatusWindow()
+                    break;
+                    case 'pick':
+                        // Set pick up window style
+                        resizeHiddenElement(pickUpWindow.style, cameraWidth, cameraHeight, fontSize_sm)
+                        resizePickUp(fontSize, cameraWidth)
+                    break;
+                    case 'skill':
+                        // Set skill window style
+                        resizeHiddenElement(skillWindow.style, cameraWidth, cameraHeight, fontSize_sm)
+                        action.resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, tileSize)
+                    break;
+                }
+
+                switch(game.option.mode){
+                    case 'party':
+                        // Set party window style
+                        resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontSize_sm)
+                        game.option.resizePartyWindow(setting)
+                    break;
+                    case 'objective':
+                        game.option.resizeObjectiveWindow(objectiveWindow, setting)
+                    break;
+                    case 'config':
+                        // Set config window style
+                        configWindow.style.fontSize = fontSize_md + 'px'
+                        resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontSize_sm)
+                    break;
+                }
+            break;
+        }
     }
 }
