@@ -27,6 +27,9 @@ turnCounter.innerText = 'Turn 1'
 const titleScreen = document.getElementById("titleScreen");
 const titleAction = document.getElementById("titleAction").querySelectorAll('li');
 
+// Loading screen UI
+const loadingScreen = document.getElementById("Loading");
+
 // Phase tranisition UI
 const phaseWrapper = document.getElementById('Phase_Transition');
 const phaseElement = document.getElementById('phase');
@@ -516,6 +519,22 @@ export const countTurn = (turn) => {
     turnCounter.innerText = `Turn ${turn}` 
 }
 
+export const toggleLoadingScreen = (display) =>{
+    if(display){
+        loadingScreen.classList.remove('invisible')
+    }else{
+        loadingScreen.classList.add('invisible')
+    }
+}
+
+export const toggleCanvas = (display) => {
+    if(display){
+        canvas.classList.remove('invisible')
+    }else{
+        canvas.classList.add('invisible')
+    }
+}
+
 export const alterPhaseTransitionStyle = (bgColor) => {
     phaseWrapper.style.background = bgColor
 }
@@ -584,7 +603,7 @@ export const prepareCharacterCaption = (inspectingCharacter, tileSize) => {
         gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], inspectingCharacter) + '%';
     }
 
-    const position = (inspectingCharacter.characterType === 2)? game.playerPosition[game.player.findIndex(p => p.id === inspectingCharacter.id)] : game.enemyPosition[game.enemy.findIndex(e => e.id === inspectingCharacter.id)]
+    const position = (inspectingCharacter.type === 2)? game.playerPosition[game.player.findIndex(p => p.id === inspectingCharacter.id)] : game.enemyPosition[game.enemy.findIndex(e => e.id === inspectingCharacter.id)]
 
     // Shift UI position based on the character position
     if(position.row > 7 && position.col < Math.floor(9/2)){
@@ -758,6 +777,10 @@ export const resize = () => {
     titleScreen.style.width = cameraWidth  + 'px';
     titleScreen.style.height = cameraHeight + 'px';
     titleScreen.children[0].style.fontSize = fontSize + 'px';
+
+    loadingScreen.style.width = cameraWidth + 'px'
+    loadingScreen.style.height = cameraHeight + 'px'
+    loadingScreen.style.fontSize = fontSize_md + 'px'
 
     // Set phase transition style
     phaseWrapper.style.width = cameraWidth + 'px'
