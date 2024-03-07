@@ -29,7 +29,9 @@ import {
     displayTitleScreen,
     setCanvasPosition,
     setBattlePhaseUIElement,
-    alterPhaseTransitionStyle
+    alterPhaseTransitionStyle,
+    toggleLoadingScreen,
+    toggleCanvas
 } from './utils/ui.js'
 // import { getItemType } from './utils/inventory.js'
 import { levelUp } from './utils/battle.js'
@@ -91,19 +93,60 @@ class Game{
                     this.textBox.setConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
                 break;
                 case 'titleCard':
-                    alterPhaseTransitionStyle('rgb(0, 0, 0)')
-                    // Display the title of the level
-                    togglePhaseTransition(`${this.level.id}\n${this.level.name}`, 1500)
+                    // If the next phase is a battle
+                    if(this.level.phase[this.phaseCount + 1] === 'battle'){
+                    // cover up screen
+                    toggleLoadingScreen(true)
+                    // Preparing battle phase
+                    this.phaseCount += 1
+                    this.beginNextPhase()
 
-                    setTimeout(() => alterPhaseTransitionStyle('rgba(0, 0, 0, 0.7)'), 2000)
-                    
-                    setTimeout(() => {
-                        this.phaseCount += 1
-                        this.beginNextPhase()
-                    }, 1000)
+                    // Display canvas if ready
+                    const canvasReady = setInterval(() => {
+                        // Make sure every thing is loaded
+                        if(this.tileMap.ready && this.grid !== null){
+                            const playerReady = this.player.map(p => p.characterImage.src.length > 0 && p.ready)
+                            const enemyReady = this.enemy.map(e => e.characterImage.src.length > 0 && e.ready)
+
+                            if(playerReady.length === this.player.length && enemyReady.length === this.enemy.length){
+                                clearInterval(canvasReady)
+
+                                // Hide loading screen
+                                toggleLoadingScreen(false)
+
+                                alterPhaseTransitionStyle('rgb(0, 0, 0)')
+                                // Display the title of the level
+                                togglePhaseTransition(`${this.level.id}\n${this.level.name}`, 1500)
+
+                                // Display canvas
+                                setTimeout(() => {
+                                    toggleCanvas(true)
+                                    displayTurn()
+
+                                    setTimeout(() => {
+                                        // Simulate click on the canvas where the first moving character is 
+                                        this.#clickOnPlayer(0)
+                                    }, 700) 
+                                }, 1800)
+            
+                                setTimeout(() => {
+                                    alterPhaseTransitionStyle('rgba(0, 0, 0, 0.7)')
+                                }, 2000)                         
+                            }
+                        }
+                    }, 100)
+                    }else{
+                        // Display the title of the level
+                        togglePhaseTransition(`${this.level.id}\n${this.level.name}`, 1500)
+
+                        // Begin next phase
+                        setTimeout(() => {
+                            this.phaseCount += 1
+                            this.beginNextPhase()
+                        }, 2000)
+                    }
                 break;
                 case 'battle':
-                    displayTurn()
                     this.#initBattlePhase()
                 break;
                 case 'intermission':
@@ -149,6 +192,8 @@ class Game{
 
         this.range = new Range(this.tileMap.map, tileSize);
 
+        this.action.setFontSize(Math.floor(fontSize * 2))
+
         setCanvasPosition(tileSize)
 
         setBattlePhaseUIElement(cameraWidth, fontSize, fontSize_md, fontSize_sm)
@@ -169,23 +214,6 @@ class Game{
         this.#gameLoop()
 
         this.#setUpCanvasEvent()
-
-        // Display canvas
-        const canvasReady = setInterval(() => {
-            // Make sure every thing is loaded
-            if(this.tileMap !== null && this.grid !== null){
-                const playerReady = this.player.map(p => p.characterImage.src.length > 0)
-                const enemyReady = this.enemy.map(e => e.characterImage.src.length > 0)
-
-                if(playerReady.length === this.player.length && enemyReady.length === this.enemy.length){
-                    clearInterval(canvasReady)
-                    setTimeout(() => {
-                        // Simulate click on the canvas where the first moving character is 
-                        this.#clickOnPlayer(0)
-                    }, 1500)                          
-                }
-            }
-        }, 100)
     }
 
     #setUpCanvasEvent = () => {
@@ -253,7 +281,7 @@ class Game{
                     break;
                     default:
                         // if this tile is player
-                        if(this.inspectingCharacter?.characterType === 2){
+                        if(this.inspectingCharacter?.type === 2){
                             console.log('I am player')
 
                             //Reset action menu option style
@@ -267,7 +295,7 @@ class Game{
                             hideOptionMenu()
                         }else
                         // if this tile is enemy
-                        if(this.inspectingCharacter?.characterType === 3){
+                        if(this.inspectingCharacter?.type === 3){
                             // Fill the element with a portion of the character info
                             console.log('I am the enemy')
 
