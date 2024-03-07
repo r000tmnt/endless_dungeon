@@ -463,7 +463,7 @@ export default class Action{
                     tileMap.removeCharacter(row, col)
 
                     // Calculate item drop rate
-                    if(player.characterType === 2){
+                    if(player.type === 2){
                         gainExp(player, enemy)
 
                         // Sort in ascending order for accuracy
@@ -517,7 +517,7 @@ export default class Action{
 
                         // Need to change the timing to check on objective
                         const enemyFadeOutWatcher = setInterval(() => {
-                            if(!enemy.characterIsMoving){
+                            if(!enemy.isMoving){
                                 game.characterAnimationPhaseEnded(player)
                                 clearInterval(enemyFadeOutWatcher)
                             }
