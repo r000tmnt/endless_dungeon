@@ -17,21 +17,22 @@ export default class Character {
      * @param {object} attributes - Attributes setting for the character 
      * @param {array} map - A reference of the tile map 
      */
-    constructor(x, y, tileSize, velocity, type, attributes, map){
-        this.x = x
-        this.y = y
-        this.pt = 0
-        this.tileSize = tileSize
-        this.velocity = velocity
-        this.tileMap = map
-        this.#createCharacter(attributes, type)
-        this.characterType = type
-        this.characterIsMoving = false
-        this.destination = null
-        this.walkableSpace = []
-        this.wait = false
-        this.animation = ''
-        this.animationFrame = 0
+    constructor(x, y, tileSize, velocity, type, attributes, map, save = null){
+        this.x = x;
+        this.y = y;
+        this.pt = 0;
+        this.tileSize = tileSize;
+        this.velocity = velocity;
+        this.tileMap = map;
+        this.#createCharacter(attributes, type, save);
+        this.type = type;
+        this.isMoving = false;
+        this.destination = null;
+        this.walkableSpace = [];
+        this.wait = false;
+        this.animation = '';
+        this.animationFrame = 0;
+        this.ready = false;
         // this.worker = new Worker('../js/worker/spriteAnimation.js')
     }
 
@@ -46,15 +47,15 @@ export default class Character {
 
         // If the character is dead
         if(this?.attributes?.hp <= 0){
-            if(!this.characterIsMoving){
-                this.characterIsMoving = true
+            if(!this.isMoving){
+                this.isMoving = true
             }
             
-            this.#fadeOutTimer(ctx, this.characterType)
+            this.#fadeOutTimer(ctx, this.type)
         }else{
             switch(filter){
                 case 'retro':
-                    const color = (this.characterType === 2)? '#33BBFF' : '#FF3333'
+                    const color = (this.type === 2)? '#33BBFF' : '#FF3333'
 
                     const tempCanvas = document.createElement('canvas')
                     const tempContext = tempCanvas.getContext('2d')
@@ -74,9 +75,13 @@ export default class Character {
                     ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
     
                     tempCanvas.remove()
+
+                    this.ready = true
                 break;
                 default:
                     ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)  
+
+                    this.ready = true
                 break;
             }
 
@@ -152,7 +157,7 @@ export default class Character {
      * @param {object} destination - An object that represent a block which the character is going for
      */
     #move(ctx, destination){
-        if(!this.characterIsMoving){
+        if(!this.isMoving){
             console.log('destination :>>>', destination)
             // col ====x, row === y
             const { row, col } = destination
@@ -161,7 +166,7 @@ export default class Character {
             const currentCol = this.x / this.tileSize
 
             console.log('Init walking animation')
-            this.characterIsMoving = true
+            this.isMoving = true
             this.movingDirection = ''
             this.destination_y = 0
             this.destination_x = 0
@@ -199,7 +204,7 @@ export default class Character {
             ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
         }else{
             // Stop timer
-            this.characterIsMoving = false
+            this.isMoving = false
             if(this.y === this.destination_y && this.x === this.destination_x){
                 this.#stopMoving()                                     
             }  
@@ -214,7 +219,7 @@ export default class Character {
         game.action.animationInit = false
     }
 
-    async #fadeOutTimer(ctx, characterType){
+    async #fadeOutTimer(ctx, type){
         if(this.alpha > 0){
             console.log('blinking')
             ctx.save()
@@ -224,8 +229,8 @@ export default class Character {
             this.alpha -= 0.01
         }else{
             console.log('blinking finished')
-            this.characterIsMoving = false
-            game.removeCharacter(characterType, this.id)
+            this.isMoving = false
+            game.removeCharacter(type, this.id)
         }
     }
 
@@ -235,16 +240,13 @@ export default class Character {
      * @param {number} type - 2: player, 3: mob 
      * @returns 
      */
-    #createCharacter(attributes, type){
+    #createCharacter(attributes, type, save){
 
         switch(type){
             case 2:{
-                const job = classes.getOne(attributes.class)
-        
-                console.log(job)  
-                
-                // Assign the attributes to the object
-                if(job){
+                if(save === null){
+                    const job = classes.getOne(attributes.class)
+
                     this.id = `${String(Date.now())}P${String(performance.now())}`
                     this.name = attributes.name
                     this.lv = 1
@@ -256,7 +258,7 @@ export default class Character {
                     this.prefer_attributes = job.prefer_attributes
                     this.#loadImage(type, job.id)     
 
-                    // If the character in an a player, set the initial exp and the required points to level up
+                    // If is a player character, set the initial exp and the required points to level up
                     this.exp = 95
                     this.pt = 0
                     this.requiredExp = 100
@@ -271,56 +273,86 @@ export default class Character {
                         foot: {},
                         accessory: {}
                     }
-
-                    // Equip with default setting
-                    for(let i=0; i < job.bag.length; i++){
-                        if(job.bag[i].type === 3 ||job.bag[i].type === 4){
-                            const itemData = job.bag[i].type === 3? weapon.getOne(job.bag[i].id) : armor.getOne(job.bag[i].id)
-                            this.equip[itemData.position] = { 
-                                id: itemData.id,
-                                name: itemData.name
-                            }
-                            // Change attribute value
-                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                                this.attributes[key] += itemData.effect.base_attribute[key]
-                            }
-                        }
+                }else{
+                    // Create character from save file
+                    this.id = save.id
+                    this.name = save.name
+                    this.lv = save.lv
+                    this.class = save.class
+                    this.attributes = JSON.parse(JSON.stringify(save.attributes))
+                    this.prefer_attributes = save.prefer_attributes
+                    this.#loadImage(type, save.id)
+                    this.exp = save.exp
+                    this.pt = save.pt
+                    this.requiredExp = save.requiredExp
+                    this.bag = JSON.parse(JSON.stringify(save.bag))
+                    this.skill = save.skill
+                    this.bagLimit = save.bagLimit
+                    this.equip = JSON.parse(JSON.stringify(save.equip))
+                }
+                
+                const equiptment = this.bag.filter(b => b.type === 3 || b.type === 4)
+                // Assign the attributes to the object
+                for(let i=0; i < equiptment; i++){
+                    const itemData = equiptment[i].type === 3? weapon.getOne(job.bag[i].id) : armor.getOne(job.bag[i].id)
+                    this.equip[itemData.position] = { 
+                        id: itemData.id,
+                        name: itemData.name
+                    }
+                    // Change attribute value
+                    for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
+                        this.attributes[key] += itemData.effect.base_attribute[key]
                     }
                 }
             }
             break    
             case 3:{
-                const job = mob.getOne(attributes.class)
-        
-                console.log(job)  
-                
-                // Assign the attributes to the object
-                if(job){
-                    this.id = `${String(Date.now())}E${String(performance.now())}`
-                    this.name = attributes.name
-                    this.lv = 1
-                    this.class = job.name
-                    this.attributes = {
-                        ...job.base_attribute,
-                        status: []
-                    }     
-                    this.prefer_attributes = job.prefer_attributes
-                    this.#loadImage(type, job.id)     
-                    this.pt = 0
-                    this.equip = {
-                        head: {},
-                        body: {},
-                        hand: {},
-                        leg: {},
-                        foot: {},
-                        accessory: {}
+                if(save === null){
+                    const job = mob.getOne(attributes.class)
+                    
+                    // Assign the attributes to the object
+                    if(job){
+                        this.id = `${String(Date.now())}E${String(performance.now())}`
+                        this.name = attributes.name
+                        this.lv = 1
+                        this.class = job.name
+                        this.attributes = {
+                            ...job.base_attribute,
+                            status: []
+                        }     
+                        this.prefer_attributes = job.prefer_attributes
+                        this.#loadImage(type, job.id)     
+                        this.pt = 0
+                        this.equip = {
+                            head: {},
+                            body: {},
+                            hand: {},
+                            leg: {},
+                            foot: {},
+                            accessory: {}
+                        }
+                        // If the character is an enemy, set the given exp for player to gain
+                        this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
+                        this.drop = job.drop
+                        this.skill = job.skill
+                        this.prefer_skill_type = job.prefer_skill_type
+                        this.prefer_action = job.prefer_action
                     }
-                    // If the character is an enemy, set the given exp for player to gain
+                }else{
+                    // Create character from save file
+                    this.id = save.id
+                    this.name = save.name
+                    this.lv = save.lv
+                    this.class = save.class
+                    this.attributes = JSON.parse(JSON.stringify(save.attributes))
+                    this.prefer_attributes = save.prefer_attributes
+                    this.#loadImage(type, save.id)
                     this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
-                    this.drop = job.drop
-                    this.skill = job.skill
-                    this.prefer_skill_type = job.prefer_skill_type
-                    this.prefer_action = job.prefer_action
+                    this.drop = JSON.parse(JSON.stringify(save.drop))
+                    this.skill = save.skill
+                    this.equip = JSON.parse(JSON.stringify(save.equip))
+                    this.prefer_skill_type = save.prefer_skill_type
+                    this.prefer_action = save.prefer_action
                 }
             }
             break
