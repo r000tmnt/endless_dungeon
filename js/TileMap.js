@@ -12,8 +12,9 @@ export default class TileMa {
         this.map = levelData.map;
         this.event = levelData.event;
         this.enemy = levelData.enemy;
-        this.assets = this.#loadAssetImage(levelData.assets)
-        this.objective = levelData.objective
+        this.assets = this.#loadAssetImage(levelData.assets);
+        this.objective = levelData.objective;
+        this.ready = false;
     }
 
     #loadAssetImage(assets){
@@ -58,7 +59,10 @@ export default class TileMa {
                 break;
             }
 
+
             if(img !== null) ctx.drawImage(img, column * this.tileSize, currentRow * this.tileSize, this.tileSize, this.tileSize)
+
+            this.ready = row === currentRow && column === (this.map[currentRow].length - 1)
 
             if(column === (this.map[currentRow].length - 1) && currentRow < (this.map.length - 1) ){
                 currentRow += 1
