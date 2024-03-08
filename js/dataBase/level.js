@@ -275,7 +275,7 @@ export default{
                                         {
                                             "style": "",
                                             "size": "",
-                                            "content": "You take a closer look at the key.\nRealize what you heard before is in fact came from the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
+                                            "content": "You take a closer look at the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
                                             // "option": [
                                             //     {
                                             //         "value": "Take the key",

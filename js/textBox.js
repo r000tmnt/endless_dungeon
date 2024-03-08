@@ -155,7 +155,6 @@ export default class TextBox{
                             if(this.textCounter === this.textLength){
                                this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message) 
                             }
-                            
                         }
                     })
                 break;

@@ -84,8 +84,7 @@ class Game{
         }else{
             switch(this.level.phase[this.phaseCount]){
                 case 'conversation':
-                    const pointer = this.phaseCount > 0? 1 : 0
-                    this.textBox = new TextBox(this.level.event[pointer].scene)
+                    this.textBox = new TextBox(this.level.event[0].scene)
                     const { cameraWidth, cameraHeight } = redefineDeviceWidth()
 
                     const { fontSize, fontSize_md, fontSize_sm } = redefineFontSize(cameraWidth)
@@ -660,7 +659,7 @@ class Game{
                 // Check if the tile has an event
                 // await this.checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
         
-                // currentActingPlayer.animation = ''
+                currentActingPlayer.animation = ''
                 // prepareCharacterCaption(currentActingPlayer)
         
                 // If the player is ran out of action point

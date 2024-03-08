@@ -79,33 +79,33 @@ const resultActionOptions = resultAction.querySelectorAll('li')
 const warn = document.getElementById('warn')
 
 // Title screen action child click event
-for(let i=0; i < titleAction.length; i++){
-    switch(titleAction[i].dataset.action){
-        case 'start':
-            titleAction[i].addEventListener('click', (e) => {
-                e.stopPropagation();
+// for(let i=0; i < titleAction.length; i++){
+//     switch(titleAction[i].dataset.action){
+//         case 'start':
+//             titleAction[i].addEventListener('click', (e) => {
+//                 e.stopPropagation();
 
-                titleScreen.classList.remove('open_window')
-                titleScreen.classList.add('invisible')
+//                 titleScreen.classList.remove('open_window')
+//                 titleScreen.classList.add('invisible')
                 
-                setTimeout(() => {
-                    game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
-                    game.beginNextPhase()                    
-                }, 500)
-            })
-        break;
-        case 'load':
-            titleAction[i].addEventListener('click', (e) => {
-                e.stopPropagation();
-            })
-        break;
-        case 'exit':
-            titleAction[i].addEventListener('click', (e) => {
-                e.stopPropagation();
-            })
-        break;
-    }
-}
+//                 setTimeout(() => {
+//                     game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
+//                     game.beginNextPhase()                    
+//                 }, 500)
+//             })
+//         break;
+//         case 'load':
+//             titleAction[i].addEventListener('click', (e) => {
+//                 e.stopPropagation();
+//             })
+//         break;
+//         case 'exit':
+//             titleAction[i].addEventListener('click', (e) => {
+//                 e.stopPropagation();
+//             })
+//         break;
+//     }
+// }
 
 // option menu child click event
 for(let i=0; i < options.length; i++){
@@ -350,7 +350,8 @@ for(let i=0; i < resultActionOptions.length; i++){
                     warn.classList.add('open_window')
                 }else{
                     game.phaseCount += 1
-                    game.beginNextPhase()                
+                    game.beginNextPhase()      
+                    toggleCanvas(false)          
                     levelClear.classList.remove('open_window')
                     levelClear.classList.add('invisible')                    
                 }
@@ -410,7 +411,16 @@ export const displayTitleScreen = () => {
     titleScreen.addEventListener('click', () => {
         clearInterval(tapInterval)
         tap.classList.add("fade_out")
-        document.getElementById("titleAction").classList.remove('invisible')
+        // document.getElementById("titleAction").classList.remove('invisible')
+
+        // Start game
+        titleScreen.classList.remove('open_window')
+        titleScreen.classList.add('invisible')
+        
+        setTimeout(() => {
+            game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
+            game.beginNextPhase()                    
+        }, 500)
     })
 }
 
