@@ -53,7 +53,7 @@ export default class TextBox{
     }
 
     // Conversation click event
-    setConversationEvent = () => {
+    setConversationEvent = (width, height, fontSize_md) => {
         conversationWindow.addEventListener('click', () => {
             if(this.optionOnScreen || this.action === 'auto'){
                 return
@@ -167,10 +167,10 @@ export default class TextBox{
                             // Start auto play
                             this.speed = this.speed * 0.5
                             this.action = 'auto'
+                        }
 
-                            if(this.textCounter === this.textLength){
-                                this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message) 
-                            }
+                        if(this.textCounter > this.textLength){
+                            this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message) 
                         }
                     })
                 break;
@@ -234,7 +234,7 @@ export default class TextBox{
 
     #loadConversation = (message) => {
         // Load the next message if reached the end of current playing messge
-        if(this.textCounter === this.textLength){
+        if(this.textCounter > this.textLength){
             // Reset text counter
             this.textCounter = 0
             // Clear the message on the screen
@@ -350,7 +350,7 @@ export default class TextBox{
                 // Stop animation
                 clearInterval(dialogueAnimation)     
             }else{
-                if(this.textCounter === this.textLength){
+                if(this.textCounter > this.textLength){
 
                     // Store the displayed message to the log
                     this.log.push({
