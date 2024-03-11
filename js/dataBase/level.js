@@ -270,7 +270,7 @@ export default{
                                         {
                                             "style": "",
                                             "size": "",
-                                            "content": "It appears to be in a shape of key. At least that what you can think of."
+                                            "content": "It appears to be in a shape of key. At least that's what you can think of."
                                         },
                                         {
                                             "style": "",
