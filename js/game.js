@@ -84,9 +84,15 @@ class Game{
         }else{
             switch(this.level.phase[this.phaseCount]){
                 case 'conversation':
-                    this.textBox = new TextBox(this.level.event[0].scene)
+                    if(this.textBox !== null){
+                        this.textBox.event = this.level.event[0].scene
+                    }else{
+                        // Defined textBox object and event for the first load
+                        this.textBox = new TextBox(this.level.event[0].scene)
+                        this.textBox.setConversationEvent()
+                    }
+                    
                     const { cameraWidth, cameraHeight } = redefineDeviceWidth()
-
                     const { fontSize, fontSize_md, fontSize_sm } = redefineFontSize(cameraWidth)
         
                     this.textBox.setConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
