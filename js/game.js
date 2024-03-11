@@ -78,7 +78,7 @@ class Game{
     }
 
     beginNextPhase(){
-        if(this.phaseCount > (this.level.phase[this.phaseCount].length - 1)){
+        if(this.phaseCount > (this.level.phase.length - 1)){
             this.phaseCount = 0
             // Load the next level
         }else{
