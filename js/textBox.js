@@ -103,7 +103,7 @@ export default class TextBox{
                             if(optionExist) break
                             for(let j=this.dialogueCounter; j < this.event[i].dialogue.length; j++){
                                 if(optionExist) break
-                                for(let k=this.messageCounter; k < this.event[i].dialogue[j].message.length; k++){
+                                for(let k= this.messageCounter; k < this.event[i].dialogue[j].message.length; k++){
                                     optionExist = this.#checkIfOptionExist(this.event[i].dialogue[j].message[k])
 
                                     // If option found
@@ -122,6 +122,10 @@ export default class TextBox{
                                         const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
                                         this.messageLength = message.length -1
                                         break
+                                    }
+
+                                    if(k === this.event[i].dialogue[j].message.length - 1){
+                                        this.messageCounter = 0
                                     }
                                 }
                             }
@@ -426,7 +430,7 @@ export default class TextBox{
                     }  
 
                     if(this.action === 'skip'){
-                        this.textCounter = this.textLength
+                        this.textCounter = this.textLength + 1
                         this.#loadConversation(message)
                     }else{
                         this.#displayConversation(message.option[i])                      
