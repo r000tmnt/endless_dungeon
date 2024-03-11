@@ -345,7 +345,7 @@ export default class TextBox{
                 // Display all the text in the message
                 content.innerHTML = message.content
                 // Counter add up to the number of text in the message 
-                this.textCounter = this.textLength
+                this.textCounter = this.textLength + 1
                 // Store the displayed message to the log
                 this.log.push({
                     person: this.event[this.sceneCounter].dialogue[this.dialogueCounter].person,
