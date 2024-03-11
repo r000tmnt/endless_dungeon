@@ -42,7 +42,18 @@ export default class TextBox{
         conversationWindow.classList.remove('invisible')
         conversationWindow.classList.add('open_window')
     
-        // Conversation text box click event
+        // Load the first message of conversation
+        setTimeout(() => {
+            const { dialogue } = this.event[this.sceneCounter]
+            this.dialogueLength = dialogue.length - 1
+            this.messageLength = dialogue[this.dialogueCounter].message.length - 1
+            this.textLength = dialogue[this.dialogueCounter].message[this.messageCounter].content.length - 1
+            this.#loadConversation(dialogue[this.dialogueCounter].message)
+        }, 500)
+    }
+
+    // Conversation click event
+    setConversationEvent = () => {
         conversationWindow.addEventListener('click', () => {
             if(this.optionOnScreen || this.action === 'auto'){
                 return
@@ -73,8 +84,8 @@ export default class TextBox{
                     break;
                 }
             }
-        })
-
+        })     
+        
         // Get dialog options
         const controlOptions = dialogueControl.querySelectorAll('li')
 
@@ -118,6 +129,11 @@ export default class TextBox{
                         
                         // Skip the whole conversation if there are no options found
                         if(!optionExist){
+                            this.dialogueCounter = 0;
+                            this.textCounter = 0;
+                            this.messageCounter = 0;
+                            this.sceneCounter = 0
+                            this.action = ''
                             this.#endConversationPhase()
                         }
                     })
@@ -153,7 +169,7 @@ export default class TextBox{
                             this.action = 'auto'
 
                             if(this.textCounter === this.textLength){
-                               this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message) 
+                                this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message) 
                             }
                         }
                     })
@@ -201,16 +217,7 @@ export default class TextBox{
                 break;
             }
         }
-    
-        // First time load conversation
-        setTimeout(() => {
-            const { dialogue } = this.event[this.sceneCounter]
-            this.dialogueLength = dialogue.length - 1
-            this.messageLength = dialogue[this.dialogueCounter].message.length - 1
-            this.textLength = dialogue[this.dialogueCounter].message[this.messageCounter].content.length - 1
-            this.#loadConversation(dialogue[this.dialogueCounter].message)
-        }, 500)
-    }
+    }         
 
     resizeConversationWindow(width, height, fontSize, fontSize_md, fontSize_sm){
         resizeHiddenElement(conversationWindow.style, width, height, fontSize_md)
@@ -301,6 +308,12 @@ export default class TextBox{
     #endConversationPhase(){
         conversationWindow.classList.remove('open_window')
         conversationWindow.classList.add('invisible')
+
+        setTimeout(() => {
+            // Clear text in the box
+            content.innerHTML = ''
+            this.log.splice(0)
+        }, 500)
 
         // Remove the predefined event
         game.level.event.splice(0, 1)
