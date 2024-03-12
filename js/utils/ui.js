@@ -706,7 +706,7 @@ export const redefineDeviceWidth = () => {
 
     if(deviceHeight <= 768){
         deviceWidth = Math.floor(deviceHeight * aspectRatio)       
-    }else
+    }
 
     if(deviceWidth <= 500){
         deviceHeight = Math.floor(deviceWidth * (16/9))
