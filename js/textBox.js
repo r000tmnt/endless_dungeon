@@ -9,8 +9,7 @@ const dialogueControl = document.getElementById('dialogue_control')
 const dialogue = document.getElementById('dialogue')
 // Dialogue options
 const dialogueOptions = document.getElementById('dialogue-options')
-// textBox content
-const content = dialogue.querySelector('#textContent')
+
 // Dialogue log
 const dialogueLog = document.getElementById('dialogue-log')
 const logWrapper = dialogueLog.querySelector('#log')
@@ -109,7 +108,7 @@ export default class TextBox{
                                     // If option found
                                     if(optionExist){
                                         // Clear text in the box
-                                        content.innerHTML = ''
+                                        dialogue.innerHTML = ''
                                         
                                         // Update counters
                                         this.textCounter = 0
@@ -197,7 +196,7 @@ export default class TextBox{
                                 log.append(person)
                             }
 
-                            content.innerHTML = l.content
+                            dialogue.innerHTML = l.content
                             log.append(content)
                             logWrapper.append(log)
                         })
@@ -242,7 +241,7 @@ export default class TextBox{
             // Reset text counter
             this.textCounter = 0
             // Clear the message on the screen
-            content.innerHTML = ''    
+            dialogue.innerHTML = ''    
             // Load thg next dialogue if reached the end of current playing dialougue           
             if(this.messageCounter === this.messageLength){
                 // Reset the message counter
@@ -315,7 +314,7 @@ export default class TextBox{
 
         setTimeout(() => {
             // Clear text in the box
-            content.innerHTML = ''
+            dialogue.innerHTML = ''
             this.log.splice(0)
         }, 500)
 
@@ -331,11 +330,11 @@ export default class TextBox{
         const { style, size } = message
 
         if(style.length){
-            content.style.color = style
+            dialogue.style.color = style
         }
 
         if(size.length){
-            content.style.fontSize = setting.general[size] + 'px'
+            dialogue.style.fontSize = setting.general[size] + 'px'
         }
     
         const dialogueAnimation = setInterval(() => {
@@ -343,7 +342,7 @@ export default class TextBox{
             if(!this.animationInit){
                 // Skipping animation
                 // Display all the text in the message
-                content.innerHTML = message.content
+                dialogue.innerHTML = message.content
                 // Counter add up to the number of text in the message 
                 this.textCounter = this.textLength + 1
                 // Store the displayed message to the log
@@ -373,7 +372,7 @@ export default class TextBox{
                         clearInterval(dialogueAnimation)
                     }
                 }else{
-                    content.innerHTML += message.content[this.textCounter]
+                    dialogue.innerHTML += message.content[this.textCounter]
                     this.textCounter += 1
                 }  
             }
