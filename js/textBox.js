@@ -196,7 +196,7 @@ export default class TextBox{
                                 log.append(person)
                             }
 
-                            dialogue.innerHTML = l.content
+                            content.innerHTML = l.content
                             log.append(content)
                             logWrapper.append(log)
                         })
