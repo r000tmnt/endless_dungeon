@@ -707,7 +707,11 @@ export const redefineDeviceWidth = () => {
     // Checking device screen in aspect ratio
     if((deviceWidth / deviceHeight) !== aspectRatio){
         if(deviceWidth <= 500){
-            deviceHeight = Math.floor(deviceWidth * (16 / 9))
+            const possibileHeight = Math.floor(deviceWidth * (16 / 9))
+            if(possibileHeight <= deviceHeight){
+                deviceHeight = possibileHeight
+            }
+            
         }else{
             deviceWidth = Math.floor(deviceHeight * aspectRatio)
         }
