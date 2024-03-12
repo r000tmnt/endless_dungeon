@@ -79,7 +79,7 @@ export default{
                                                 {
                                                     "value": "Take a look around",                                            "style": "",
                                                     "size": "",
-                                                    "content": "Although there not much light in here, you've notice that you're in a cave.",
+                                                    "content": "Although there's not much light in here, you've notice that you're in a cave.",
                                                     "effect": []
                                                 },
                                                 {
