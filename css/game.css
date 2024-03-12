@@ -67,6 +67,9 @@ body{
     image-rendering: -webkit-crips-edges;
     image-rendering: crips-edges;
     image-rendering: pixelated;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
 }
 
 .disable-scrollbars::-webkit-scrollbar {
@@ -109,6 +112,8 @@ li{
     position: relative;
     overflow: hidden;
     background-color: black;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 #titleScreen{
@@ -171,6 +176,7 @@ li{
 #dialogue{
     box-sizing: border-box;
     line-break: auto;
+    overflow: hidden;
     overflow-y: scroll;
 }
 
@@ -558,4 +564,12 @@ li{
     background: black;
     /* margin: 0; */
     /* white-space: pre-line; */
+  }
+
+  #warn > div {
+    justify-content: end;
+  }
+
+  #warn > div > button{
+    margin: 0 1%;
   }
