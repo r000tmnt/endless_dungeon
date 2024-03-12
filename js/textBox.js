@@ -373,6 +373,7 @@ export default class TextBox{
                     }
                 }else{
                     dialogue.innerHTML += message.content[this.textCounter]
+                    dialogue.scrollTop = dialogue.scrollHeight // Scroll to buttom automatically
                     this.textCounter += 1
                 }  
             }
