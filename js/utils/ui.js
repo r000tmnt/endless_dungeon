@@ -704,14 +704,17 @@ export const redefineDeviceWidth = () => {
     let deviceWidth = window.innerWidth
     let deviceHeight = window.innerHeight
 
-    if(deviceHeight <= 768){
-        deviceWidth = Math.floor(deviceHeight * aspectRatio)       
-    }
+    // Checking device screen in aspect ratio
+    if((deviceWidth / deviceHeight) !== aspectRatio){
+        if(deviceWidth <= 500){
+            deviceHeight = Math.floor(deviceWidth * (16 / 9))
+        }else{
+            deviceWidth = Math.floor(deviceHeight * aspectRatio)
+        }
 
-    if(deviceWidth <= 500){
-        deviceHeight = Math.floor(deviceWidth * (16/9))
-    }else{
-        deviceWidth = Math.floor(deviceHeight * aspectRatio)
+        if(deviceHeight <= 768){
+            deviceWidth = Math.floor(deviceHeight * aspectRatio)       
+        }
     }
 
     // Set up tile size according to the canvas width
