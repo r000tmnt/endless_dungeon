@@ -573,3 +573,16 @@ li{
   #warn > div > button{
     margin: 0 1%;
   }
+
+  #partySubMenu{
+    justify-content: space-evenly;
+  }
+
+  #conversation{
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  #dialogue, #dialogue-options > li{
+    background: rgba(0, 0, 0, 0.7);
+  }

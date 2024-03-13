@@ -38,15 +38,21 @@ export default class TextBox{
         this.resizeConversationWindow(width, height, fontSize, fontSize_md, fontSize_sm)
         dialogue.classList.remove('invisible')
     
-        conversationWindow.classList.remove('invisible')
-        conversationWindow.classList.add('open_window')
-    
         // Load the first message of conversation
         setTimeout(() => {
             const { dialogue } = this.event[this.sceneCounter]
+
+            // Define conunters
             this.dialogueLength = dialogue.length - 1
             this.messageLength = dialogue[this.dialogueCounter].message.length - 1
             this.textLength = dialogue[this.dialogueCounter].message[this.messageCounter].content.length - 1
+
+            // Define background image
+            conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`
+
+            conversationWindow.classList.remove('invisible')
+            conversationWindow.classList.add('open_window')
+
             this.#loadConversation(dialogue[this.dialogueCounter].message)
         }, 500)
     }
@@ -258,7 +264,8 @@ export default class TextBox{
                         this.#endConversationPhase()
                     }else{
                         this.sceneCounter += 1  
-                        this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1      
+                        this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1 
+                        conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`     
                     }
                 }else{
                     // Increase the dialogue counter by one
@@ -395,7 +402,7 @@ export default class TextBox{
             for(let i=0 ; i < message.option.length; i++){
                 const option = document.createElement('li')
                 option.innerHTML = message.option[i].value
-                option.style.background = 'none'
+                // option.style.background = 'none'
                 option.style.margin = `${setting.general.fontSize_sm}px 0`
 
                 const { style, size } = message.option[i]

@@ -309,7 +309,7 @@ for(let i=0; i < resultActionOptions.length; i++){
             resultActionOptions[i].addEventListener('click', () => {
                 game.action.mode = 'pickAfterBattle'
                 if(game.player.length > 1){
-                    const partySubMenu = levelClear.querySelector('#party')
+                    const partySubMenu = levelClear.querySelector('#partySubMenu')
     
                     const { itemBlockSize } = setting.inventory
     
@@ -349,6 +349,13 @@ for(let i=0; i < resultActionOptions.length; i++){
                     warn.classList.remove('invisible')
                     warn.classList.add('open_window')
                 }else{
+                    const partySubMenu = levelClear.querySelector('#partySubMenu')
+
+                    // Remove elements if any
+                    while(partySubMenu.firstChild){
+                        partySubMenu.removeChild(partySubMenu.firstChild)
+                    }
+                    
                     game.phaseCount += 1
                     game.beginNextPhase()      
                     toggleCanvas(false)          

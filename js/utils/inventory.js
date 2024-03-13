@@ -318,6 +318,7 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
 
     let target, targetLimit
 
+    // Set target depend on action mode
     if(game.action.mode === 'stash'){
         target = game.stash
         targetLimit = game.stashLimit

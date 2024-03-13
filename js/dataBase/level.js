@@ -44,7 +44,7 @@ export default{
                     "item": [],
                     "scene": [
                         {
-                            "background": "", // Background image
+                            "background": "cave", // Background image
                             "dialogue": [
                                 {
                                     "person": "none", // character stranding images file
@@ -125,7 +125,7 @@ export default{
                             ]
                         },
                         {
-                            "background": "",
+                            "background": "cave",
                             "dialogue": [
                                 {
                                     "person": "unknow",
