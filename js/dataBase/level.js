@@ -50,7 +50,6 @@ export default{
                             "dialogue": [
                                 {
                                     "person": "none", // character stranding images file
-                                    "expression": "", // suffix of the file name
                                     "message": [
                                         {
                                             "style": "", // color, default as white
@@ -66,7 +65,6 @@ export default{
                                 },
                                 {
                                     "person": "none",
-                                    "expression": "",
                                     "message": [
                                         { 
                                             "style": "", 
@@ -77,7 +75,6 @@ export default{
                                 },
                                 {
                                     "person": "none",
-                                    "expression": "",
                                     "message": [
                                         {
                                             "option": [
@@ -132,7 +129,6 @@ export default{
                             "dialogue": [
                                 {
                                     "person": "unknow",
-                                    "expression": "",
                                     "message": [
                                         {
                                             "style": "",
@@ -143,7 +139,6 @@ export default{
                                 },
                                 {
                                     "person": "none",
-                                    "expression": "",
                                     "message": [
                                         {
                                             "style": "",
@@ -164,7 +159,6 @@ export default{
                                 },
                                 {
                                     "person": "none",
-                                    "expression": "",
                                     "message": [
                                         {
                                             "style": "",
@@ -175,7 +169,6 @@ export default{
                                 },
                                 {
                                     "person": "unknow",
-                                    "expression": "",
                                     "message": [
                                         {
                                             "style": "",
@@ -196,7 +189,6 @@ export default{
                                 },
                                 {
                                     "person": "none",
-                                    "expression": "",
                                     "message": [
                                         {
                                             "style": "",
@@ -207,7 +199,6 @@ export default{
                                 },
                                 {
                                     "person": "none",
-                                    "expression": "",
                                     "message": [
                                         {
                                             "option": [
@@ -249,7 +240,6 @@ export default{
                                 },
                                 {
                                     "person": "unknow",
-                                    "expression": "",
                                     "message": [
                                         {
                                             "style": "",
