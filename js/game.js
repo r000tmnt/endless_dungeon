@@ -25,7 +25,7 @@ import {
     redefineDeviceWidth,
     redefineFontSize,
     displayResult,
-    displayTurn,
+    toggleTurnElement,
     displayTitleScreen,
     setCanvasPosition,
     setBattlePhaseUIElement,
@@ -126,7 +126,7 @@ class Game{
                                 // Display canvas
                                 setTimeout(() => {
                                     toggleCanvas(true)
-                                    displayTurn()
+                                    toggleTurnElement(true)
 
                                     setTimeout(() => {
                                         // Simulate click on the canvas where the first moving character is 
@@ -159,6 +159,7 @@ class Game{
                 case 'end':
                     toggleCanvas(false)
                     displayTitleScreen()
+                    this.phaseCount += 1
                 break;
             }
         }
