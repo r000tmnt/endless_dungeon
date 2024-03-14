@@ -45,6 +45,8 @@ export default{
                     "scene": [
                         {
                             "background": "cave", // Background image
+                            // Define how many person to show on screen
+                            "people": 0,
                             "dialogue": [
                                 {
                                     "person": "none", // character stranding images file
@@ -126,6 +128,7 @@ export default{
                         },
                         {
                             "background": "cave",
+                            "people": 1,
                             "dialogue": [
                                 {
                                     "person": "unknow",
@@ -267,7 +270,8 @@ export default{
                     "item": [],
                     "scene": [
                         {
-                            "background": "",
+                            "background": "cave",
+                            "people": 0,
                             "dialogue": [
                                 {
                                     "person": "none",
