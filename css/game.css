@@ -586,3 +586,7 @@ li{
   #dialogue, #dialogue-options > li{
     background: rgba(0, 0, 0, 0.7);
   }
+
+  #character{
+    justify-content: center; /* Default position */
+  }
