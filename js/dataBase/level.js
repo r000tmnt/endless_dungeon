@@ -127,7 +127,7 @@ export default{
                                     "content": "Due to the darkness, you bearly saw a silhouette of a person standing on the other side of the space."
                                 },
                                 {
-                                    "person": "",
+                                    "person": "unknow",
                                     "style": "",
                                     "size": "",
                                     "content": "You should not come any closer, they will smell you."
