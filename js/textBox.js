@@ -8,6 +8,7 @@ const dialogueControl = document.getElementById('dialogue_control')
 
 // Character portrait wrapper
 const character = document.getElementById('character')
+const portrait = character.querySelectorAll('img')
 
 // textBox
 const textBox = document.getElementById('dialogue')
@@ -60,14 +61,14 @@ export default class TextBox{
             setTimeout(() => {
                 textBox.classList.remove('invisible')
 
-                const { person, expression } = dialogue[this.dialogueCounter]
+                const { person } = dialogue[this.dialogueCounter]
 
                 // Display character portrait if any
                 if(person !== "none"){
-                    const portrait = document.createElement('img')
-                    portrait.src = `${person}_${expression}.png`
-
-                    character.append(portrait)
+                    portrait[0].src = `/assets/images/portrait/${person}.png`
+                    portrait[0].style.width = width + 'px'
+                    portrait[0].style.height = height + 'px'
+                    portrait[0].classList.remove('invisible')
                 }
 
                 // Load the first message of conversation
@@ -79,6 +80,7 @@ export default class TextBox{
     // Conversation click event
     setConversationEvent = (width, height, fontSize_md) => {
         conversationWindow.addEventListener('click', () => {
+            console.log('conversation proceed')
             if(this.optionOnScreen || this.action === 'auto'){
                 return
             }
@@ -286,36 +288,56 @@ export default class TextBox{
                         this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1 
                         conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`     
 
-                        if(this.event[this.sceneCounter].people > 0){
-                            const portraitShown = character.querySelectorAll('img')
+                        const { person } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
 
-                            const { person, expression } = this.event[this.sceneCounter].dialogue
+                        if(person !== 'none' && this.event[this.sceneCounter].people > 0){
+                            const portraitShown = (3 - character.querySelectorAll('.invisible').length)
 
                             // Display one more person on the scrren if the number says so
-                            if(portraitShown.length < this.event[this.sceneCounter].people){
-                                const portrait = document.createElement('img')
-                                portrait.src = `${person}_${expression}.png`
+                            if(portraitShown < this.event[this.sceneCounter].people){
 
-                                // Change order of portraits
-                                if(portraitShown.length === 1){
-                                    portraitShown[0].style.order = 1
-                                    portrait.style.order = 0
-                                    character.style.justifyContent = 'space-evenly'
+                                const { width, height } = setting.general.camera
+
+                                switch(portraitShown){
+                                    case 1: // Change order of portraits
+                                        portrait[0].style.order = 1
+                                        portrait[1].style.order = 0
+                                        portrait[1].style.width = width + 'px'
+                                        portrait[1].style.height = height + 'px'
+                                        portrait[1].src = `/assets/images/portrait/${person}.png`
+                                        portrait[1].classList.remove('invisible')
+                                        character.style.justifyContent = 'space-evenly'                                        
+                                    break;
+                                    case 2: // Change order of portraits
+                                        portrait[0].style.order = 2
+                                        portrait[1].style.order = 1
+                                        portrait[2].style.order = 0
+                                        portrait[2].style.width = width + 'px'
+                                        portrait[2].style.height = height + 'px'
+                                        portrait[2].src = `/assets/images/portrait/${person}.png`
+                                        portrait[2].classList.remove('invisible')
+                                        character.style.justifyContent = 'space-evenly'                                    
+                                    break;
+                                    default: // Place a portrait in the center of screen
+                                        portrait[0].style.width = width + 'px'
+                                        portrait[0].style.height = height + 'px'
+                                        portrait[0].src = `/assets/images/portrait/${person}.png`
+                                        portrait[0].classList.remove('invisible')
+                                        character.style.justifyContent = 'center' 
+                                    break;
                                 }
-
-                                // Change order of portraits
-                                if(portraitShown.length === 2){
-                                    portraitShown[0].style.order = 2
-                                    portraitShown[1].style.order = 2
-                                    portrait.style.order = 0
-                                    character.style.justifyContent = 'space-evenly'
-                                }
-
-                                character.append(portrait)
+                                console.log('show portrait')
                             }else{
                                 // Replace the portrait with the other one
-                                portraitShown[0].src = `${person}_${expression}.png`
+                                portraitShown[0].src = `/assets/images/portrait/${person}.png`
                             }
+                        }else{
+                            // Hide portrait on the screen
+                            portrait.forEach(p => {
+                                if(!p.classList.contains('invisile')){
+                                    p.classList.add('invisible')
+                                }
+                            })
                         }
                     }
                 }else{
