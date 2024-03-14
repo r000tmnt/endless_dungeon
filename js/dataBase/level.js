@@ -49,78 +49,65 @@ export default{
                             "people": 0,
                             "dialogue": [
                                 {
-                                    "person": "none", // character stranding images file
-                                    "message": [
-                                        {
-                                            "style": "", // color, default as white
-                                            "size": "", // Default to setting fontSize, accept fontSize_md, fontSize_sm property
-                                            "content": "......" // text content
-                                        },
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "You feel quite a headache, like you've been hit by a boulder or somthing."
-                                        }
-                                    ]
+                                    "person": "", // character potrait images file. "none" means to clear all potrait, empty string means no changes to the portrait
+                                    "style": "", // color, default as white
+                                    "size": "", // Default to setting fontSize, accept fontSize_md, fontSize_sm property
+                                    "content": "......" // text content
                                 },
                                 {
-                                    "person": "none",
-                                    "message": [
-                                        { 
-                                            "style": "", 
-                                            "size": "", 
-                                            "content": "As you gradually regain your conscious.\nYou first...",
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "You feel quite a headache, like you've been hit by a boulder or somthing."
+                                },
+                                {
+                                    "person": "",
+                                    "style": "", 
+                                    "size": "", 
+                                    "content": "As you gradually regain your conscious.\nYou first...",
+                                },
+                                {
+                                    "person": "",
+                                    "option": [
+                                        {
+                                            "value": "Take a look around",                                            "style": "",
+                                            "size": "",
+                                            "content": "Although there's not much light in here, you've notice that you're in a cave.",
+                                            "effect": []
+                                        },
+                                        {
+                                            "value": "Lay down on the ground",
+                                            "style": "",
+                                            "size": "",
+                                            "content": "You slowly bend down your body against the ground.\nThen you realize that your cloth is in a poor condition,\nnot enough to protect you from the low temperature",
+                                            "effect": [
+                                                {
+                                                    "target": "player_1", // Default to the first player created
+                                                    "attribute": "hp",
+                                                    "value": -1,
+                                                }
+                                            ]
                                         }
                                     ],
                                 },
                                 {
-                                    "person": "none",
-                                    "message": [
-                                        {
-                                            "option": [
-                                                {
-                                                    "value": "Take a look around",                                            "style": "",
-                                                    "size": "",
-                                                    "content": "Although there's not much light in here, you've notice that you're in a cave.",
-                                                    "effect": []
-                                                },
-                                                {
-                                                    "value": "Lay down on the ground",
-                                                    "style": "",
-                                                    "size": "",
-                                                    "content": "You slowly bend down your body against the ground.\nThen you realize that your cloth is in a poor condition,\nnot enough to protect you from the low temperature",
-                                                    "effect": [
-                                                        {
-                                                            "target": "player_1", // Default to the first player created
-                                                            "attribute": "hp",
-                                                            "value": -1,
-                                                        }
-                                                    ]
-                                                }
-                                            ],
-                                        },
-                                    ]
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "You heard a voice whispering beyond the entrence.\nIt is not clear enough for anyone to understand. But it gives you a direction to follow."
                                 },
                                 {
-                                    "person": "none",
-                                    "message": [
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "You heard a voice whispering beyond the entrence.\nIt is not clear enough for anyone to understand. But it gives you a direction to follow."
-                                        },
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "As you walk your way out of the cave. You start to get used to the lack of brightness of your surrounding."
-                                        },
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "That voice draws you further, until you reach a widther space."
-                                        },
-                                    ]
-                                }
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "As you walk your way out of the cave. You start to get used to the lack of brightness of your surrounding."
+                                },
+                                {
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "That voice draws you further, until you reach a widther space."
+                                },
                             ]
                         },
                         {
@@ -129,125 +116,95 @@ export default{
                             "dialogue": [
                                 {
                                     "person": "unknow",
-                                    "message": [
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "Oh...you finially awake."
-                                        }
-                                    ]
+                                    "style": "",
+                                    "size": "",
+                                    "content": "Oh...you finially awake."
                                 },
                                 {
-                                    "person": "none",
-                                    "message": [
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "Due to the darkness, you bearly saw a silhouette of a person standing on the other side of the space."
-                                        }
-                                    ]
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "Due to the darkness, you bearly saw a silhouette of a person standing on the other side of the space."
                                 },
                                 {
-                                    "person": "unknow",
-                                    "message": [
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "You should not come any closer, they will smell you."
-                                        }
-                                    ]
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "You should not come any closer, they will smell you."
                                 },
                                 {
-                                    "person": "none",
-                                    "message": [
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "Just as the mysterious person finish the words. You have take a step already."
-                                        }
-                                    ]
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "Just as the mysterious person finish the words. You have take a step already."
                                 },
                                 {
                                     "person": "unknow",
-                                    "message": [
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "Shit...! What did I told you."
-                                        },
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "You're lucky there's only one of them."
-                                        },
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "Here, catch."
-                                        }
-                                    ]
+                                    "style": "",
+                                    "size": "",
+                                    "content": "Shit...! What did I told you."
+                                },
+                                {
+                                    "person": "unknow",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "You're lucky there's only one of them."
+                                },
+                                {
+                                    "person": "unknow",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "Here, catch."
                                 },
                                 {
                                     "person": "none",
-                                    "message": [
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "The mysterious person throws a knife on the ground near where you are standing.\nWould you...",
-                                        }
-                                    ],
+                                    "style": "",
+                                    "size": "",
+                                    "content": "The mysterious person throws a knife on the ground near where you are standing.\nWould you...",
                                 },
                                 {
-                                    "person": "none",
-                                    "message": [
+                                    "person": "",
+                                    "option": [
                                         {
-                                            "option": [
+                                            "value": "Take the knife",
+                                            "style": "",
+                                            "size": "",
+                                            "content": "Soon as you pick up the kneif on the ground.\nYou heard another voice, and a rotten smell came after.",
+                                            "effect": [ // player equipt with the knife
                                                 {
-                                                    "value": "Take the knife",
-                                                    "style": "",
-                                                    "size": "",
-                                                    "content": "Soon as you pick up the kneif on the ground.\nYou heard another voice, and a rotten smell came after.",
-                                                    "effect": [ // player equipt with the knife
-                                                        {
-                                                            "target": "player_1",
-                                                            "attribute": "equip",
-                                                            "type": 3,
-                                                            "value": "knife_1"
-                                                        }
-                                                    ] 
-                                                },
-                                                {
-                                                    "value": "I trust on my own fist",
-                                                    "style": "",
-                                                    "size": "",
-                                                    "content": "You kicked the knife out of your reach.\nYet it stops in the middle like it hit something solid, and it is not the sound of the ground or stone either.",
-                                                    "effect": [
-                                                        {
-                                                            "target": "enemy_1",
-                                                            "attribute": "hp",
-                                                            "value": -1
-                                                        }   
-                                                    ]
+                                                    "target": "player_1",
+                                                    "attribute": "equip",
+                                                    "type": 3,
+                                                    "value": "knife_1"
                                                 }
-                                            ]
+                                            ] 
                                         },
                                         {
+                                            "value": "I trust on my own fist",
                                             "style": "",
                                             "size": "",
-                                            "content": "A sound of deadman approch towoards you."
-                                        },
+                                            "content": "You kicked the knife out of your reach.\nYet it stops in the middle like it hit something solid, and it is not the sound of the ground or stone either.",
+                                            "effect": [
+                                                {
+                                                    "target": "enemy_1",
+                                                    "attribute": "hp",
+                                                    "value": -1
+                                                }   
+                                            ]
+                                        }
                                     ]
                                 },
                                 {
+                                    "person": "none",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "A sound of deadman approch towoards you."
+                                },
+                                {
                                     "person": "unknow",
-                                    "message": [
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "Suit yourself, I'm out of here"
-                                        }
-                                    ]
-                                    // proceed to battle phase
+                                    "style": "",
+                                    "size": "",
+                                    "content": "Suit yourself, I'm out of here"
                                 }
                             ]
                         }
@@ -265,78 +222,78 @@ export default{
                             "dialogue": [
                                 {
                                     "person": "none",
-                                    "message": [
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "As you defeat the monster.\nA small object made out of metal drop on the ground. It glooms, and lights up the space around it."
-                                        },
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "It appears to be in a shape of key. At least that's what you can think of."
-                                        },
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "You take a closer look at the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
-                                            // "option": [
-                                            //     {
-                                            //         "value": "Take the key",
-                                            //         "style": "",
-                                            //         "size": "",
-                                            //         "content": "You take a closer look at the key.\nRealize what you heard before is in fact came from the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
-                                            //         "effect": [
-                                            //             {
-                                            //                 "target": "player_1", // Default to the first player created
-                                            //                 "attribute": "item",
-                                            //                 "type": 6,
-                                            //                 "value": "key_dark_1"
-                                            //             }
-                                            //         ]
-                                            //     },
-                                            //     {
-                                            //         "value": "Leave it",
-                                            //         "style": "",
-                                            //         "size": "",
-                                            //         "content": "You walk away from the key.\nTowards to the edge of the space.\nIn the gloomy light, you bearly see a door-ish shape in front of you. It won't open no matter how hard you push against it.",
-                                            //         "effect": []
-                                            //     }
-                                            // ],
-                                        },
-                                        {
-                                            "style": "",
-                                            "size": "",
-                                            "content": "With the lights from the key.\nYou're able to find a door in the end of the tunnel.\nAlthough you're not sure about the use of this key in your hand. You insert it into the key hole and open the door.",
-                                            // Check if the key item is stored in eventEffect
-                                            // "condition":{
-                                            //     "match": "key_dark_1",
-                                            //     "yes": {
-                                            //         "style": "",
-                                            //         "size": "",
-                                            //         "content": "As you reach the end of the space. The light on the key grow stronger.\nEnough for you to see a door.\nYou try to unlock it with the key and it work.",
-                                            //         "effect": []
-                                            //     },
-                                            //     "no": {
-                                            //         "style": "",
-                                            //         "size": "",
-                                            //         "content": "You consider the fact that you need a key to open the door.\nBut there's another problem on the table.\nWhile you try your options, the monster you fought rise again, make a wierd noise.",
-                                            //         "effect": [
-                                            //             {
-                                            //                 "phase": "battle",
-                                            //                 "level": "p-1-1",
-                                            //                 "type": "random"
-                                            //             }
-                                            //         ]
-                                            //     }
-                                            // }
-                                        },
-                                        {
-                                            "style": "yellow",
-                                            "size": "",
-                                            "content": "This is the end of the demo.\nThank you for playing the game."
-                                        }
-                                    ]
+                                    "style": "",
+                                    "size": "",
+                                    "content": "As you defeat the monster.\nA small object made out of metal drop on the ground. It glooms, and lights up the space around it."
+                                },
+                                {
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "It appears to be in a shape of key. At least that's what you can think of."
+                                },
+                                {
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "You take a closer look at the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
+                                    // "option": [
+                                    //     {
+                                    //         "value": "Take the key",
+                                    //         "style": "",
+                                    //         "size": "",
+                                    //         "content": "You take a closer look at the key.\nRealize what you heard before is in fact came from the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
+                                    //         "effect": [
+                                    //             {
+                                    //                 "target": "player_1", // Default to the first player created
+                                    //                 "attribute": "item",
+                                    //                 "type": 6,
+                                    //                 "value": "key_dark_1"
+                                    //             }
+                                    //         ]
+                                    //     },
+                                    //     {
+                                    //         "value": "Leave it",
+                                    //         "style": "",
+                                    //         "size": "",
+                                    //         "content": "You walk away from the key.\nTowards to the edge of the space.\nIn the gloomy light, you bearly see a door-ish shape in front of you. It won't open no matter how hard you push against it.",
+                                    //         "effect": []
+                                    //     }
+                                    // ],
+                                },
+                                {
+                                    "person": "",
+                                    "style": "",
+                                    "size": "",
+                                    "content": "With the lights from the key.\nYou're able to find a door in the end of the tunnel.\nAlthough you're not sure about the use of this key in your hand. You insert it into the key hole and open the door.",
+                                    // Check if the key item is stored in eventEffect
+                                    // "condition":{
+                                    //     "match": "key_dark_1",
+                                    //     "yes": {
+                                    //         "style": "",
+                                    //         "size": "",
+                                    //         "content": "As you reach the end of the space. The light on the key grow stronger.\nEnough for you to see a door.\nYou try to unlock it with the key and it work.",
+                                    //         "effect": []
+                                    //     },
+                                    //     "no": {
+                                    //         "style": "",
+                                    //         "size": "",
+                                    //         "content": "You consider the fact that you need a key to open the door.\nBut there's another problem on the table.\nWhile you try your options, the monster you fought rise again, make a wierd noise.",
+                                    //         "effect": [
+                                    //             {
+                                    //                 "phase": "battle",
+                                    //                 "level": "p-1-1",
+                                    //                 "type": "random"
+                                    //             }
+                                    //         ]
+                                    //     }
+                                    // }
+                                },
+                                {
+                                    "person": "",
+                                    "style": "yellow",
+                                    "size": "",
+                                    "content": "This is the end of the demo.\nThank you for playing the game."
                                 }
                             ]
                         }
