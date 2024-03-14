@@ -367,6 +367,7 @@ for(let i=0; i < resultActionOptions.length; i++){
     }
 }
 
+// Button to finish the result screen
 const finishBtn = levelClear.getElementsByTagName('button')
 
 finishBtn[0].addEventListener('click', () => {
@@ -376,9 +377,13 @@ finishBtn[0].addEventListener('click', () => {
 
 finishBtn[1].addEventListener('click', () => {
     game.phaseCount += 1
-    game.beginNextPhase()                
+    game.beginNextPhase()   
+    toggleTurnElement(false)  
+    toggleCanvas(false)           
     levelClear.classList.remove('open_window')
     levelClear.classList.add('invisible')
+    warn.classList.add('invisible')
+    warn.classList.remove('open_window')
 })
 
 // Calculate the percentage of an attribute
@@ -528,8 +533,13 @@ export const resizeHiddenElement = (target, width, height, size) => {
     target.height = height + 'px'
 }
 
-export const displayTurn = () => {
-    turnCounter.classList.remove('invisible')
+export const toggleTurnElement = (display) => 
+{
+    if(display){
+        turnCounter.classList.remove('invisible')
+    }else{
+        turnCounter.classList.add('invisible')
+    }
 }
 
 export const countTurn = (turn) => {
@@ -779,6 +789,9 @@ export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_s
         // Set warning window style
         warn.style.width = (width - (fontSize_md * 2)) + 'px'
         warn.style.padding = fontSize_md + 'px'
+        warn.style.fontSize = fontSize_md + 'px'
+
+        Array.from(finishBtn).forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
     
         // Set back button style
         for(let i=0; i < backBtn.length; i++){
@@ -843,6 +856,10 @@ export const resize = () => {
                 console.log('enemy :>>>', game.enemy)
 
                 game.action.setFontSize(Math.floor(fontSize * 2))
+
+                warn.style.fontSize = fontSize_md + 'px'
+
+                finishBtn.forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
 
                 switch(game.action.mode){
                     case 'item':
