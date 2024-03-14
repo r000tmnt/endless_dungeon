@@ -588,5 +588,6 @@ li{
   }
 
   #character{
-    justify-content: center; /* Default position */
+    /* justify-content: center; */
+    width: 100%;
   }
