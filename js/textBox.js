@@ -389,6 +389,8 @@ export default class TextBox{
             // Reset conversationWinsow style
             conversationWindow.classList.remove('open_window')
             conversationWindow.classList.add('invisible')
+            conversationWindow.style.opacity = null
+            dialogue.style.color = 'white';
 
             // Remove the predefined event
             game.level.event.splice(0, 1)
