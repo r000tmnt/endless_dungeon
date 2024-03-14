@@ -29,11 +29,9 @@ export default class TextBox{
         this.sceneCounter = 0;
         this.dialogueCounter = 0;
         this.textCounter = 0;
-        this.messageCounter = 0;
 
         // Count the length of the event
         this.textLength = 0;
-        this.messageLength = 0;
         this.dialogueLength = 0;
         this.animationInit = false;
         this.speed = 100;
@@ -47,8 +45,7 @@ export default class TextBox{
 
             // Define conunters
             this.dialogueLength = dialogue.length - 1
-            this.messageLength = dialogue[this.dialogueCounter].message.length - 1
-            this.textLength = dialogue[this.dialogueCounter].message[this.messageCounter].content.length - 1
+            this.textLength = dialogue[this.dialogueCounter].content.length - 1
 
             // Define background image
             conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`
@@ -64,7 +61,7 @@ export default class TextBox{
                 const { person } = dialogue[this.dialogueCounter]
 
                 // Display character portrait if any
-                if(person !== "none"){
+                if(person !== "none" && person.length){
                     portrait[0].src = `/assets/images/portrait/${person}.png`
                     portrait[0].style.width = width + 'px'
                     portrait[0].style.height = height + 'px'
@@ -72,7 +69,7 @@ export default class TextBox{
                 }
 
                 // Load the first message of conversation
-                this.#loadConversation(dialogue[this.dialogueCounter].message)
+                this.#loadConversation(dialogue[this.dialogueCounter])
             }, 500)
         }, 500)
     }
@@ -106,7 +103,7 @@ export default class TextBox{
                     break;
                     default:
                         // Load dialogue
-                        this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message)                        
+                        this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter])                        
                     break;
                 }
             }
@@ -129,30 +126,25 @@ export default class TextBox{
                             if(optionExist) break
                             for(let j=this.dialogueCounter; j < this.event[i].dialogue.length; j++){
                                 if(optionExist) break
-                                for(let k= this.messageCounter; k < this.event[i].dialogue[j].message.length; k++){
-                                    optionExist = this.#checkIfOptionExist(this.event[i].dialogue[j].message[k])
+                                optionExist = this.#checkIfOptionExist(this.event[i].dialogue[j])
 
-                                    // If option found
-                                    if(optionExist){
-                                        // Clear text in the box
-                                        textBox.innerHTML = ''
-                                        
-                                        // Update counters
-                                        this.textCounter = 0
-                                        this.sceneCounter = i
-                                        this.dialogueCounter = j
-                                        this.messageCounter = k
+                                // If option found
+                                if(optionExist){
+                                    // Clear text in the box
+                                    textBox.innerHTML = ''
+                                    
+                                    // Update counters
+                                    this.textCounter = 0
+                                    this.sceneCounter = i
+                                    this.dialogueCounter = j
 
-                                        // Update length
-                                        this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1
-                                        const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
-                                        this.messageLength = message.length -1
-                                        break
-                                    }
+                                    // Update length
+                                    this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1
+                                    break
+                                }
 
-                                    if(k === this.event[i].dialogue[j].message.length - 1){
-                                        this.messageCounter = 0
-                                    }
+                                if(j=== this.event[i].dialogue[j].length - 1){
+                                    this.dialogueCounter = 0
                                 }
                             }
                         }
@@ -161,7 +153,6 @@ export default class TextBox{
                         if(!optionExist){
                             this.dialogueCounter = 0;
                             this.textCounter = 0;
-                            this.messageCounter = 0;
                             this.sceneCounter = 0
                             this.action = ''
                             this.#endConversationPhase()
@@ -200,7 +191,7 @@ export default class TextBox{
                         }
 
                         if(this.textCounter > this.textLength){
-                            this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message) 
+                            this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter]) 
                         }
                     })
                 break;
@@ -269,121 +260,101 @@ export default class TextBox{
             this.textCounter = 0
             // Clear the message on the screen
             textBox.innerHTML = ''    
-            // Load thg next dialogue if reached the end of current playing dialougue           
-            if(this.messageCounter === this.messageLength){
-                // Reset the message counter
-                this.messageCounter = 0 
-    
-                // Load the next scence if reached the end of the current playing scene
-                if(this.dialogueCounter === this.dialogueLength){
-                    this.dialogueCounter = 0
-    
-                    // Stop the conversation phase if reached the end of the event
-                    if(this.sceneCounter === (this.event.length - 1)){
-                        this.sceneCounter = 0
-                        this.action = ''
-                        this.#endConversationPhase()
-                    }else{
-                        this.sceneCounter += 1  
-                        this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1 
-                        conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`     
 
-                        const { person } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
+            // Load the next scence if reached the end of the current one
+            if(this.dialogueCounter === this.dialogueLength){
+                this.dialogueCounter = 0
 
-                        if(person !== 'none' && this.event[this.sceneCounter].people > 0){
-                            const portraitShown = (3 - character.querySelectorAll('.invisible').length)
+                // Stop the conversation phase if reached the end of the event
+                if(this.sceneCounter === (this.event.length - 1)){
+                    this.sceneCounter = 0
+                    this.action = ''
+                    this.#endConversationPhase()
+                }else{
+                    this.sceneCounter += 1  
+                    this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1 
+                    conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`     
 
-                            // Display one more person on the scrren if the number says so
-                            if(portraitShown < this.event[this.sceneCounter].people){
+                    const { person } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
 
-                                const { width, height } = setting.general.camera
-
-                                switch(portraitShown){
-                                    case 1: // Change order of portraits
-                                        portrait[0].style.order = 1
-                                        portrait[1].style.order = 0
-                                        portrait[1].style.width = width + 'px'
-                                        portrait[1].style.height = height + 'px'
-                                        portrait[1].src = `/assets/images/portrait/${person}.png`
-                                        portrait[1].classList.remove('invisible')
-                                        character.style.justifyContent = 'space-evenly'                                        
-                                    break;
-                                    case 2: // Change order of portraits
-                                        portrait[0].style.order = 2
-                                        portrait[1].style.order = 1
-                                        portrait[2].style.order = 0
-                                        portrait[2].style.width = width + 'px'
-                                        portrait[2].style.height = height + 'px'
-                                        portrait[2].src = `/assets/images/portrait/${person}.png`
-                                        portrait[2].classList.remove('invisible')
-                                        character.style.justifyContent = 'space-evenly'                                    
-                                    break;
-                                    default: // Place a portrait in the center of screen
-                                        portrait[0].style.width = width + 'px'
-                                        portrait[0].style.height = height + 'px'
-                                        portrait[0].src = `/assets/images/portrait/${person}.png`
-                                        portrait[0].classList.remove('invisible')
-                                        character.style.justifyContent = 'center' 
-                                    break;
-                                }
-                                console.log('show portrait')
-                            }else{
-                                // Replace the portrait with the other one
-                                portraitShown[0].src = `/assets/images/portrait/${person}.png`
+                    if(person === 'none'){
+                        // Hide portrait on the screen
+                        portrait.forEach(p => {
+                            if(!p.classList.contains('invisible')){
+                                p.classList.add('invisible')
                             }
+                        })
+                    }else
+                    if(person.length && this.event[this.sceneCounter].people > 0){
+                        const portraitShown = (3 - character.querySelectorAll('.invisible').length)
+
+                        // Display one more person on the scrren if the number says so
+                        if(portraitShown < this.event[this.sceneCounter].people){
+
+                            const { width, height } = setting.general.camera
+
+                            switch(portraitShown){
+                                case 1: // Change order of portraits
+                                    portrait[0].style.order = 1
+                                    portrait[1].style.order = 0
+                                    portrait[1].style.width = width + 'px'
+                                    portrait[1].style.height = height + 'px'
+                                    portrait[1].src = `/assets/images/portrait/${person}.png`
+                                    portrait[1].classList.remove('invisible')
+                                    character.style.justifyContent = 'space-evenly'                                        
+                                break;
+                                case 2: // Change order of portraits
+                                    portrait[0].style.order = 2
+                                    portrait[1].style.order = 1
+                                    portrait[2].style.order = 0
+                                    portrait[2].style.width = width + 'px'
+                                    portrait[2].style.height = height + 'px'
+                                    portrait[2].src = `/assets/images/portrait/${person}.png`
+                                    portrait[2].classList.remove('invisible')
+                                    character.style.justifyContent = 'space-evenly'                                    
+                                break;
+                                default: // Place a portrait in the center of screen
+                                    portrait[0].style.width = width + 'px'
+                                    portrait[0].style.height = height + 'px'
+                                    portrait[0].src = `/assets/images/portrait/${person}.png`
+                                    portrait[0].classList.remove('invisible')
+                                    character.style.justifyContent = 'unset' 
+                                break;
+                            }
+                            console.log('show portrait')
                         }else{
-                            // Hide portrait on the screen
-                            portrait.forEach(p => {
-                                if(!p.classList.contains('invisile')){
-                                    p.classList.add('invisible')
-                                }
-                            })
+                            // Replace the portrait with the other one
+                            portraitShown[0].src = `/assets/images/portrait/${person}.png`
                         }
                     }
-                }else{
-                    // Increase the dialogue counter by one
-                    this.dialogueCounter += 1 
                 }
-
-                const { message } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
-                this.messageLength = message.length - 1
-                
-                if(this.action === 'skip'){
-                    console.log('skipping conversation')
-                    dialogueControl.children[0].click()
-                }else{
-                    const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
-
-                    if(!optionExist){
-                        this.textLength = message[this.messageCounter].content.length - 1
-                        this.#displayConversation(message[this.messageCounter])                     
-                    }                     
-                }
-
             }else{
-                // Increate the message counter by one
-                this.messageCounter += 1
-
-                if(this.action === 'skip'){
-                    console.log('skipping conversation')
-                    dialogueControl.children[0].click()
-                }else{
-                    const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
-
-                    if(!optionExist){
-                        this.textLength = message[this.messageCounter].content.length - 1
-                        this.#displayConversation(message[this.messageCounter])                     
-                    }                    
-                }
+                // Increase the dialogue counter by one
+                this.dialogueCounter += 1 
             }
+
+            const message = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
+            
+            if(this.action === 'skip'){
+                console.log('skipping conversation')
+                dialogueControl.children[0].click()
+            }else{
+                const optionExist = this.#checkIfOptionExist(message)
+
+                if(!optionExist){
+                    this.textLength = message.content.length - 1
+                    this.#displayConversation(message)                     
+                }                     
+            }
+
         }else{
             if(this.action === 'skip'){
                 console.log('skipping conversation')
                 dialogueControl.children[0].click()
             }else{
-                const optionExist = this.#checkIfOptionExist(message[this.messageCounter])
+                const optionExist = this.#checkIfOptionExist(message)
 
-                if(!optionExist) this.#displayConversation(message[this.messageCounter])                
+                if(!optionExist) this.#displayConversation(message)                
             }
         }
     }
@@ -445,7 +416,7 @@ export default class TextBox{
                         // Stop current timer
                         clearInterval(dialogueAnimation)
                         // Start a new timer
-                        this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].message)
+                        this.#loadConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter])
                     }else{
                         // Stop animation
                         this.animationInit = false
