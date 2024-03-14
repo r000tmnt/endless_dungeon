@@ -35,6 +35,8 @@ export default class TextBox{
         this.dialogueLength = 0;
         this.animationInit = false;
         this.speed = 100;
+        this.dialogueAnimation = null;
+        this.optionSelected = 0
     }
 
     setConversationWindow = (width, height, fontSize, fontSize_md, fontSize_sm) => {
@@ -191,8 +193,13 @@ export default class TextBox{
                             this.action = 'auto'
                         }
 
-                        if(this.textCounter > this.textLength){
-                            this.#loadConversation() 
+                        clearInterval(this.dialogueAnimation)
+
+                        // In case if there are options to display when switching auto mode
+                        if(this.event[this.sceneCounter].dialogue[this.dialogueCounter].option !== undefined){
+                            this.#displayConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter].option[this.optionSelected])  
+                        }else{
+                            this.#displayConversation(this.event[this.sceneCounter].dialogue[this.dialogueCounter])  
                         }
                     })
                 break;
@@ -216,6 +223,8 @@ export default class TextBox{
                             }
 
                             content.innerHTML = l.content
+                            log.style.margin = `${fontSize_md / 2}px 0`
+                            log.style.padding = `${fontSize_md / 2}px`
                             log.append(content)
                             logWrapper.append(log)
                         })
@@ -390,7 +399,8 @@ export default class TextBox{
             conversationWindow.classList.remove('open_window')
             conversationWindow.classList.add('invisible')
             conversationWindow.style.opacity = null
-            dialogue.style.color = 'white';
+            dialogue.style.color = 'white'
+            this.speed = 100
 
             // Remove the predefined event
             game.level.event.splice(0, 1)
@@ -409,6 +419,7 @@ export default class TextBox{
     }
     
     #displayConversation = (message) => {
+        console.log("message :>>> ", message)
         this.animationInit = true
 
         const { style, size } = message
@@ -421,7 +432,7 @@ export default class TextBox{
             dialogue.style.fontSize = setting.general[size] + 'px'
         }
     
-        const dialogueAnimation = setInterval(() => {
+        this.dialogueAnimation = setInterval(() => {
             // If the user wants to skip the dialogue or the messag is fully displayed
             if(!this.animationInit){
                 // Skipping animation
@@ -435,7 +446,7 @@ export default class TextBox{
                     content: message.content
                 })
                 // Stop animation
-                clearInterval(dialogueAnimation)     
+                clearInterval(this.dialogueAnimation)     
             }else{
                 if(this.textCounter > this.textLength){
 
@@ -447,13 +458,13 @@ export default class TextBox{
 
                     if(this.action === 'auto'){
                         // Stop current timer
-                        clearInterval(dialogueAnimation)
+                        clearInterval(this.dialogueAnimation)
                         // Start a new timer
                         this.#loadConversation()
                     }else{
                         // Stop animation
                         this.animationInit = false
-                        clearInterval(dialogueAnimation)
+                        clearInterval(this.dialogueAnimation)
                     }
                 }else{
                     textBox.innerHTML += message.content[this.textCounter]
@@ -499,6 +510,7 @@ export default class TextBox{
                 // Bind click event
                 option.addEventListener('click', (event) => {
                     event.stopPropagation()
+                    this.optionSelected = i
                     this.optionOnScreen = false
                     // Hide & clear option
                     dialogueControl.classList.remove('invisible')
