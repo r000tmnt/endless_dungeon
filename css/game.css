@@ -175,7 +175,8 @@ li{
 
 #dialogue{
     box-sizing: border-box;
-    line-break: auto;
+    white-space: pre-line;
+    /* line-break: auto; */
     overflow: hidden;
     overflow-y: scroll;
 }
