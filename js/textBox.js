@@ -5,8 +5,12 @@ import { resizeHiddenElement } from "./utils/ui";
 // Conversation UI
 const conversationWindow = document.getElementById('conversation')
 const dialogueControl = document.getElementById('dialogue_control')
-// textBox parent wrapper
-const dialogue = document.getElementById('dialogue')
+
+// Character portrait wrapper
+const character = document.getElementById('character')
+
+// textBox
+const textBox = document.getElementById('dialogue')
 // Dialogue options
 const dialogueOptions = document.getElementById('dialogue-options')
 
@@ -36,9 +40,7 @@ export default class TextBox{
 
     setConversationWindow = (width, height, fontSize, fontSize_md, fontSize_sm) => {
         this.resizeConversationWindow(width, height, fontSize, fontSize_md, fontSize_sm)
-        dialogue.classList.remove('invisible')
     
-        // Load the first message of conversation
         setTimeout(() => {
             const { dialogue } = this.event[this.sceneCounter]
 
@@ -50,10 +52,27 @@ export default class TextBox{
             // Define background image
             conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`
 
+            // Display conversation window
             conversationWindow.classList.remove('invisible')
             conversationWindow.classList.add('open_window')
 
-            this.#loadConversation(dialogue[this.dialogueCounter].message)
+            // Display text box
+            setTimeout(() => {
+                textBox.classList.remove('invisible')
+
+                const { person, expression } = dialogue[this.dialogueCounter]
+
+                // Display character portrait if any
+                if(person !== "none"){
+                    const portrait = document.createElement('img')
+                    portrait.src = `${person}_${expression}.png`
+
+                    character.append(portrait)
+                }
+
+                // Load the first message of conversation
+                this.#loadConversation(dialogue[this.dialogueCounter].message)
+            }, 500)
         }, 500)
     }
 
@@ -114,7 +133,7 @@ export default class TextBox{
                                     // If option found
                                     if(optionExist){
                                         // Clear text in the box
-                                        dialogue.innerHTML = ''
+                                        textBox.innerHTML = ''
                                         
                                         // Update counters
                                         this.textCounter = 0
@@ -247,7 +266,7 @@ export default class TextBox{
             // Reset text counter
             this.textCounter = 0
             // Clear the message on the screen
-            dialogue.innerHTML = ''    
+            textBox.innerHTML = ''    
             // Load thg next dialogue if reached the end of current playing dialougue           
             if(this.messageCounter === this.messageLength){
                 // Reset the message counter
@@ -266,6 +285,38 @@ export default class TextBox{
                         this.sceneCounter += 1  
                         this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1 
                         conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`     
+
+                        if(this.event[this.sceneCounter].people > 0){
+                            const portraitShown = character.querySelectorAll('img')
+
+                            const { person, expression } = this.event[this.sceneCounter].dialogue
+
+                            // Display one more person on the scrren if the number says so
+                            if(portraitShown.length < this.event[this.sceneCounter].people){
+                                const portrait = document.createElement('img')
+                                portrait.src = `${person}_${expression}.png`
+
+                                // Change order of portraits
+                                if(portraitShown.length === 1){
+                                    portraitShown[0].style.order = 1
+                                    portrait.style.order = 0
+                                    character.style.justifyContent = 'space-evenly'
+                                }
+
+                                // Change order of portraits
+                                if(portraitShown.length === 2){
+                                    portraitShown[0].style.order = 2
+                                    portraitShown[1].style.order = 2
+                                    portrait.style.order = 0
+                                    character.style.justifyContent = 'space-evenly'
+                                }
+
+                                character.append(portrait)
+                            }else{
+                                // Replace the portrait with the other one
+                                portraitShown[0].src = `${person}_${expression}.png`
+                            }
+                        }
                     }
                 }else{
                     // Increase the dialogue counter by one
@@ -321,7 +372,7 @@ export default class TextBox{
 
         setTimeout(() => {
             // Clear text in the box
-            dialogue.innerHTML = ''
+            textBox.innerHTML = ''
             this.log.splice(0)
         }, 500)
 
@@ -349,7 +400,7 @@ export default class TextBox{
             if(!this.animationInit){
                 // Skipping animation
                 // Display all the text in the message
-                dialogue.innerHTML = message.content
+                textBox.innerHTML = message.content
                 // Counter add up to the number of text in the message 
                 this.textCounter = this.textLength + 1
                 // Store the displayed message to the log
@@ -379,7 +430,7 @@ export default class TextBox{
                         clearInterval(dialogueAnimation)
                     }
                 }else{
-                    dialogue.innerHTML += message.content[this.textCounter]
+                    textBox.innerHTML += message.content[this.textCounter]
                     dialogue.scrollTop = dialogue.scrollHeight // Scroll to buttom automatically
                     this.textCounter += 1
                 }  
