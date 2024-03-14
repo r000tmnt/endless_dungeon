@@ -20,15 +20,17 @@ A demo of dungeon clawer game build with Html canvas and Javascript
                 * [item_type].json
     - css
         * [className].css
-    -public    
+    - public    
         - assets
             - image
                 - class
                     * [class_type_level].png
                 - env
-                    * [name].png
+                    * [environment].png
                 - mob
                     * [mob_type_level].png
+                - portrait
+                    * [person_name].png
 
 ## FrameWork
 [Vite](https://vitejs.dev/)                    
