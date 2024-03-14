@@ -169,7 +169,7 @@ export default{
                                             "value": "Take the knife",
                                             "style": "",
                                             "size": "",
-                                            "content": "Soon as you pick up the kneif on the ground.\nYou heard another voice, and a rotten smell came after.",
+                                            "content": "Soon as you pick up the knife on the ground.\nYou heard another voice, and a rotten smell came after.",
                                             "effect": [ // player equipt with the knife
                                                 {
                                                     "target": "player_1",
