@@ -41,7 +41,21 @@ export default class Character {
             attack: []
         };
         this.ready = false;
+        this.frameTimer = 0;
         // this.worker = new Worker('../js/worker/spriteAnimation.js')
+
+        const animation = ['idle', 'top', 'down', 'left', 'right']
+
+        for(let i=0; i < animation.length; i++){
+            this.#loadAnimation(animation[i], 2, this.type, attributes.class)
+
+            if(i === (animation.length - 1)){
+                console.log(this.animationData)
+                this.animation = 'idle'
+
+                console.log(this)
+            }            
+        }
     }
 
     /**
@@ -83,9 +97,13 @@ export default class Character {
                     ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
     
                     tempCanvas.remove()
+                    
+                    this.ready = true
                 break;
                 default:
                     ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)  
+
+                    this.ready = true
                 break;
             }
 
@@ -128,12 +146,14 @@ export default class Character {
                 }
                 break;
                 default:{
-                    // console.log('animation:>>> ', this.animation)
+                //     // console.log('animation:>>> ', this.animation)
                     if(this.animation.length){
                         
-                        const frame = this.animationData[this.animation].length
-
-                        ctx.drawImage(this.animationData[this.animation][this.animationFrame], this.x, this.y, this.tileSize, this.tileSize)       
+                        const frame = this.animationData[this.animation]
+                        // console.log(frame[this.animationFrame])
+                        // ctx.clearRect(this.x, this.y, this.tileSize, this.tileSize);
+                        ctx.drawImage(frame[this.animationFrame], this.x, this.y, this.tileSize, this.tileSize)     
+                        // ctx.store()  
                         
                         if(this.animationFrame + 1 > (frame.length - 1)){
                             this.animationFrame = 0
@@ -141,6 +161,23 @@ export default class Character {
                             this.animationFrame += 1
                         }                        
                     }
+                //else{
+                //         // Load idle animation
+                //         this.#loadAnimation('idle', 2, this.type, this.class_id)
+                //         this.animation = 'idle'
+                //         // const animation = ['idle', 'top', 'down', 'left', 'right']
+
+                //         // for(let i=0; i < animation.length; i++){
+                //         //     this.#loadAnimation(animation[i], 2, this.type, this.class)
+                
+                //         //     if(i === (animation.length - 1)){
+                //         //         console.log(this.animationData)
+                //         //         this.animation = 'idle'
+                
+                //         //         console.log(this)
+                //         //     }            
+                //         // }
+                //     }
                 }
                 break;
             }
@@ -188,7 +225,6 @@ export default class Character {
 
             console.log('Init walking animation')
             this.isMoving = true
-            this.movingDirection = ''
             this.destination_y = 0
             this.destination_x = 0
 
@@ -197,7 +233,7 @@ export default class Character {
             if(row < currentRow || row > currentRow){
                 this.destination_y = row * this.tileSize
                 this.destination_x = currentCol * this.tileSize
-                this.movingDirection = (row < currentRow)? 'top' : 'down'
+                this.animation = (row < currentRow)? 'top' : 'down'
             }
 
             // If the target is at the left side
@@ -205,7 +241,7 @@ export default class Character {
             if(col < currentCol || col > currentCol){
                 this.destination_x = col * this.tileSize
                 this.destination_y = currentRow * this.tileSize
-                this.movingDirection = (col < currentCol)? 'left' : 'right'           
+                this.animation = (col < currentCol)? 'left' : 'right'           
             }
 
             game.action.animationInit = true
@@ -218,16 +254,17 @@ export default class Character {
 
     #movementInterval = (ctx) => {
         if(this.y !== this.destination_y){
-            this.y = (this.movingDirection === 'top')? this.y - this.velocity : this.y + this.velocity
+            this.y = (this.animation === 'top')? this.y - this.velocity : this.y + this.velocity
             ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
         }else if(this.x !== this.destination_x){
-            this.x = (this.movingDirection === 'left')? this.x - this.velocity : this.x + this.velocity
+            this.x = (this.animation === 'left')? this.x - this.velocity : this.x + this.velocity
             ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
         }else{
             // Stop timer
             this.isMoving = false
             if(this.y === this.destination_y && this.x === this.destination_x){
-                this.#stopMoving()                                     
+                this.#stopMoving()  
+                this.animation = 'idle'                                   
             }  
         }
     }
@@ -272,6 +309,7 @@ export default class Character {
                     this.name = attributes.name
                     this.lv = 1
                     this.class = job.name
+                    this.class_id = attributes.class
                     this.attributes = {
                         ...job.base_attribute,
                         status: [{ name: 'Focus', turn: 2 }]
@@ -301,6 +339,7 @@ export default class Character {
                     this.name = save.name
                     this.lv = save.lv
                     this.class = save.class
+                    this.class_id = save.class
                     this.attributes = JSON.parse(JSON.stringify(save.attributes))
                     this.prefer_attributes = save.prefer_attributes
                     this.#loadImage(type, save.id)
@@ -313,10 +352,10 @@ export default class Character {
                     this.equip = JSON.parse(JSON.stringify(save.equip))
                 }
                 
-                const equiptment = this.bag.filter(b => b.type === 3 || b.type === 4)
+                const equipment = this.bag.filter(b => b.type === 3 || b.type === 4)
                 // Assign the attributes to the object
-                for(let i=0; i < equiptment; i++){
-                    const itemData = equiptment[i].type === 3? weapon.getOne(job.bag[i].id) : armor.getOne(job.bag[i].id)
+                for(let i=0; i < equipment; i++){
+                    const itemData = equipment[i].type === 3? weapon.getOne(job.bag[i].id) : armor.getOne(job.bag[i].id)
                     this.equip[itemData.position] = { 
                         id: itemData.id,
                         name: itemData.name
@@ -338,6 +377,7 @@ export default class Character {
                         this.name = attributes.name
                         this.lv = 1
                         this.class = job.name
+                        this.class_id = attributes.class
                         this.attributes = {
                             ...job.base_attribute,
                             status: []
@@ -366,6 +406,7 @@ export default class Character {
                     this.name = save.name
                     this.lv = save.lv
                     this.class = save.class
+                    this.class_id = save.class_id
                     this.attributes = JSON.parse(JSON.stringify(save.attributes))
                     this.prefer_attributes = save.prefer_attributes
                     this.#loadImage(type, save.id)
@@ -384,20 +425,6 @@ export default class Character {
         let idle = [], top = [], down = [], left = [], right = []
 
         this.animationData = { idle, top, down, left, right }
-
-        const animation = ['idle', 'top', 'down', 'left', 'right']
-
-        for(let i=0; i < animation.length; i++){
-            this.#loadAnimation(animation[i], 2, type, attributes.class)
-
-            if(i === (animation.length - 1)){
-                console.log(this.animationData)
-                this.ready = true
-                this.animation = 'idle'
-
-                console.log(this)
-            }            
-        }
     }
 
     /**

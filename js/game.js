@@ -176,7 +176,7 @@ class Game{
         // Sort from fastest to slowest, define acting order
         property.sort((a, b) => b.attributes.spd - a.attributes.spd)
 
-        // Keep the memerizing the position for each player
+        // Keep the memorizing the position for each player
         property.forEach(p => {
             position.push(
                 {
