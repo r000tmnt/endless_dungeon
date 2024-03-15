@@ -32,6 +32,14 @@ export default class Character {
         this.wait = false;
         this.animation = '';
         this.animationFrame = 0;
+        this.animationData = {
+            idle: [],
+            top: [],
+            down: [],
+            left: [],
+            right: [],
+            attack: []
+        };
         this.ready = false;
         // this.worker = new Worker('../js/worker/spriteAnimation.js')
     }
@@ -75,18 +83,14 @@ export default class Character {
                     ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
     
                     tempCanvas.remove()
-
-                    this.ready = true
                 break;
                 default:
                     ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)  
-
-                    this.ready = true
                 break;
             }
 
             switch(this.animation){
-                case 'item':
+                case 'item':{
                     const frame = ['rgb(144, 255, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)']
 
                     const tempCanvas = document.createElement('canvas')
@@ -121,6 +125,23 @@ export default class Character {
                     }else{
                         this.animationFrame += 1
                     }
+                }
+                break;
+                default:{
+                    // console.log('animation:>>> ', this.animation)
+                    if(this.animation.length){
+                        
+                        const frame = this.animationData[this.animation].length
+
+                        ctx.drawImage(this.animationData[this.animation][this.animationFrame], this.x, this.y, this.tileSize, this.tileSize)       
+                        
+                        if(this.animationFrame + 1 > (frame.length - 1)){
+                            this.animationFrame = 0
+                        }else{
+                            this.animationFrame += 1
+                        }                        
+                    }
+                }
                 break;
             }
         }
@@ -246,7 +267,7 @@ export default class Character {
             case 2:{
                 if(save === null){
                     const job = classes.getOne(attributes.class)
-
+                    this.animation = ''
                     this.id = `${String(Date.now())}P${String(performance.now())}`
                     this.name = attributes.name
                     this.lv = 1
@@ -275,6 +296,7 @@ export default class Character {
                     }
                 }else{
                     // Create character from save file
+                    this.animation = ''
                     this.id = save.id
                     this.name = save.name
                     this.lv = save.lv
@@ -357,6 +379,25 @@ export default class Character {
             }
             break
         }
+
+        // Preparing animation frames
+        let idle = [], top = [], down = [], left = [], right = []
+
+        this.animationData = { idle, top, down, left, right }
+
+        const animation = ['idle', 'top', 'down', 'left', 'right']
+
+        for(let i=0; i < animation.length; i++){
+            this.#loadAnimation(animation[i], 2, type, attributes.class)
+
+            if(i === (animation.length - 1)){
+                console.log(this.animationData)
+                this.ready = true
+                this.animation = 'idle'
+
+                console.log(this)
+            }            
+        }
     }
 
     /**
@@ -379,8 +420,26 @@ export default class Character {
         this.characterImage = classImage
     }
 
-    #loadAnimation(job){
+    #loadAnimation(animationName, frames, type, className){
         // TODO - Load character animation assets
+        for(let i=0; i < frames; i++){
+            const newFrame = new Image()
+            
+            switch(type){
+                case 2:
+                    newFrame.src = `/assets/images/class/animation/${className}_${animationName}_${i + 1}.png`
+                break;
+                case 3:
+                    newFrame.src = `/assets/images/mob/animation/${className}_${animationName}_${i + 1}.png`
+                break;
+            }
+
+            this.animationData[animationName][i] = newFrame
+        }
+    }
+
+    #animate(animationName){
+        this.animation = animationName
     }
 
     setSkills(skill){

@@ -62,7 +62,7 @@ export default class TileMa {
 
             if(img !== null) ctx.drawImage(img, column * this.tileSize, currentRow * this.tileSize, this.tileSize, this.tileSize)
 
-            this.ready = row === currentRow && column === (this.map[currentRow].length - 1)
+            this.ready = row === (this.map.length - 1) && column === (this.map[currentRow].length - 1)
 
             if(column === (this.map[currentRow].length - 1) && currentRow < (this.map.length - 1) ){
                 currentRow += 1
