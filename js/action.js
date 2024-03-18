@@ -391,7 +391,7 @@ export default class Action{
             
             if(this.mode === 'item'){
                 player.attributes.ap -= 1
-                player.animation = 'item'
+                // player.animation = 'item'
                 const { message, type } = useItem(player)
 
                 this.#displayMessage(canvas, message, this.messageConfig.size, (type === 0)? 'rgb(0, 255, 0)' : 'yellow', player.x, player.y - tileSize)   
