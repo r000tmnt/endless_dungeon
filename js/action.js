@@ -365,7 +365,6 @@ export default class Action{
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
-            currentActingPlayer.animation = 'move'
             currentActingPlayer.attributes.ap -= 1
             this.reachableDirections = await prepareDirections(tileMap, playerPosition, { row, col }, this.reachableDirections)
             // characterCaption.classList.remove('visible')
@@ -660,6 +659,8 @@ export default class Action{
 
             if(this.reachableDirections.length){
                 // Start moving
+                enemy.animationFrame = 0
+                enemy.frameTimer = 0
                 enemy.setWalkableSpace(this.selectableSpace)
                 this.beginAnimationPhase(enemy)  
             }else{
