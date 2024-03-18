@@ -669,7 +669,9 @@ class Game{
                 // Check if the tile has an event
                 // await this.checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
         
-                currentActingPlayer.animation = ''
+                currentActingPlayer.animation = 'idle'
+                currentActingPlayer.animationFrame = 0
+                currentActingPlayer.frameTimer = 0
                 // prepareCharacterCaption(currentActingPlayer)
         
                 // If the player is ran out of action point
