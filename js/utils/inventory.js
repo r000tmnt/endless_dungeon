@@ -620,7 +620,10 @@ export const useItem = (currentActingPlayer) => {
 
     const { effect } = selectedItem
 
-    // const itemActions = document.getElementById('itemAction').querySelectorAll('li')
+    // Change the name of animation
+    if(effect.desc.includes('Restore')){
+        currentActingPlayer.animation = 'cure'
+    }
 
     switch(effect.target){
         case 'status':
