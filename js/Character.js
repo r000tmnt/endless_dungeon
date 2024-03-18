@@ -39,17 +39,23 @@ export default class Character {
             left: [],
             right: [],
             attack: [],
-            cure: []
+            cure: [],
+            damage: []
         };
         this.ready = false;
         this.frameTimer = 0;
         this.colorFrame = 0
         this.colors = {
-            cure: ['rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)']
+            cure: ['rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)'],
+            damage: [ /** Flickering image in set interval by changing alpha value  */ ],
+            poison: [],
+            burn: [],
+            debuff: [],
+            buff: []
         }
         // this.worker = new Worker('../js/worker/spriteAnimation.js')
 
-        const animation = ['idle', 'top', 'down', 'left', 'right']
+        const animation = ['idle', 'top', 'down', 'left', 'right', 'attack']
 
         for(let i=0; i < animation.length; i++){
             this.#loadAnimation(animation[i], 2, this.type, attributes.class)
@@ -67,7 +73,8 @@ export default class Character {
 
     /**
      * Draw the character on the canvas
-     * @param {function} ctx - canvas.getContext("2d")
+     * @param {object} ctx - canvas.getContext("2d")
+     * @param {string} filter - The name of filter to apply on the image
      */
     async draw(ctx, filter){
         if(this.destination !== null){
@@ -83,6 +90,11 @@ export default class Character {
             this.#fadeOutTimer(ctx, this.type)
         }else{
             switch(this.animation){
+                case 'attack':{
+                    const frame = this.#setFilter(filter)
+                    this.#animationTimer(ctx, 50, frame, false)
+                }
+                break;
                 case 'cure':{
                     const originalFrame = this.animationData[this.animation][this.animationFrame]
 
@@ -113,19 +125,19 @@ export default class Character {
                         }                        
                     }
 
-                    this.#animationTimer(ctx, 50, newFrame)
+                    this.#animationTimer(ctx, 50, newFrame, true)
 
                     tempCanvas.remove()
                 }
                 break;
                 case 'idle':{
                     const frame = this.#setFilter(filter)
-                    this.#animationTimer(ctx, 50, frame)
+                    this.#animationTimer(ctx, 50, frame, true)
                 }
                 break;
                 case 'top': case 'down': case 'left': case 'right':{
                     const frame = this.#setFilter(filter)
-                    this.#animationTimer(ctx, 20, frame)
+                    this.#animationTimer(ctx, 20, frame, true)
                 }
                 break
                 // default:{
@@ -147,10 +159,19 @@ export default class Character {
         this.walkableSpace = JSON.parse(JSON.stringify(walkableSpace))
     }
 
+    /**
+     * Set the tile size of the character sprite
+     * @param {int} tileSize - A number represent the size of a tile on the tile map 
+     */
     setCharacterTileSize(tileSize){
         this.tileSize = tileSize
     }
 
+    /**
+     * Set the position of the character
+     * @param {int} x - The number of x axis
+     * @param {*} y - The number of y axis
+     */
     setCharacterPosition(x, y){
         this.x = x
         this.y = y
@@ -166,6 +187,11 @@ export default class Character {
         this.frameTimer = 0
     }
 
+    /**
+     * Apply filter effect to the image if player wish so.
+     * @param {string} filter - The name of filter to apply on the image 
+     * @returns - The frame(image) to render on the screen
+     */
     #setFilter(filter){
         let newFrame
         switch(filter){
@@ -237,20 +263,21 @@ export default class Character {
             }
 
             game.action.animationInit = true
-            this.#movementInterval(ctx)           
+            this.#movementInterval()           
         }else{
-            this.#movementInterval(ctx)
+            this.#movementInterval()
         }
         // window.requestAnimationFrame(movementInterval)
     }
 
-    #movementInterval = (ctx) => {
+    /**
+     * Moving the image of the character pixel by pixel
+     */
+    #movementInterval = () => {
         if(this.y !== this.destination_y){
             this.y = (this.animation === 'top')? this.y - this.velocity : this.y + this.velocity
-            // this.#animationTimer(ctx, 20, this.animationData[this.animation][this.animationFrame])
         }else if(this.x !== this.destination_x){
             this.x = (this.animation === 'left')? this.x - this.velocity : this.x + this.velocity
-            // this.#animationTimer(ctx, 20, this.animationData[this.animation][this.animationFrame])
         }else{
             // Stop timer
             this.isMoving = false
@@ -262,6 +289,9 @@ export default class Character {
         }
     }
 
+    /**
+     * Reset properties to stop walking animation
+     */
     #stopMoving(){
         console.log('Stop walking animation')
         // this.walkableSpace.splice(0)
@@ -270,6 +300,11 @@ export default class Character {
         game.action.animationInit = false
     }
 
+    /**
+     * Fade out the character image upon defeated
+     * @param {obj} ctx - The context of the canvas  
+     * @param {int} type - The type of the character, player or enemy...etc 
+     */
     async #fadeOutTimer(ctx, type){
         if(this.alpha > 0){
             console.log('blinking')
@@ -292,7 +327,6 @@ export default class Character {
      * @returns 
      */
     #createCharacter(attributes, type, save){
-
         switch(type){
             case 2:{
                 if(save === null){
@@ -440,6 +474,13 @@ export default class Character {
         this.characterImage = classImage
     }
 
+    /**
+     * Dynamically fetch the assets of animation by name and type
+     * @param {string} animationName - The name of animation
+     * @param {int} frames - The number of frames for the animation
+     * @param {int} type - The type of the character this animation belongs to
+     * @param {int} className - The class of the character
+     */
     #loadAnimation(animationName, frames, type, className){
         // TODO - Load character animation assets
         for(let i=0; i < frames; i++){
@@ -458,7 +499,14 @@ export default class Character {
         }
     }
 
-    #animationTimer = (ctx, count, frame) => {
+    /**
+     * Count animation frame
+     * @param {object} ctx - The context of the canvas 
+     * @param {int} count - A number as the interval to count before changing image 
+     * @param {HTMLImageElement} frame - The image to render
+     * @param {bool} loop - A value to decide to animation will loop or not 
+     */
+    #animationTimer = (ctx, count, frame, loop) => {
         this.frameTimer += 1
         if(this.frameTimer >= count){
             this.frameTimer = 0
@@ -468,7 +516,7 @@ export default class Character {
             // ctx.restore()  
             
             if(this.animationFrame + 1 > (this.animationData[this.animation].length - 1)){
-                this.animationFrame = 0
+                this.animationFrame = (loop)? 0 : this.animationFrame
             }else{
                 this.animationFrame += 1
             }                             
@@ -478,14 +526,18 @@ export default class Character {
         }
     }
 
+    /**
+     * Character learn skill
+     * @param {string} skill - The string to identify which skill the character to learn 
+     */
     setSkills(skill){
-        this.skills.push(skill)
+        this.skill.push(skill)
     }
 
-    setStatus(status){
-        this.status = status
-    }
-
+    /**
+     * Remove the status from the character
+     * @param {string} status - The name of the status 
+     */
     removeStatus = (status) => {
         const index = this.attributes.status.findIndex(s => s.name === status)
 
