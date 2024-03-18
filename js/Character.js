@@ -38,10 +38,15 @@ export default class Character {
             down: [],
             left: [],
             right: [],
-            attack: []
+            attack: [],
+            cure: []
         };
         this.ready = false;
         this.frameTimer = 0;
+        this.colorFrame = 0
+        this.colors = {
+            cure: ['rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)']
+        }
         // this.worker = new Worker('../js/worker/spriteAnimation.js')
 
         const animation = ['idle', 'top', 'down', 'left', 'right']
@@ -56,6 +61,8 @@ export default class Character {
                 console.log(this)
             }            
         }
+
+        this.animationData.cure = [...this.animationData.idle]
     }
 
     /**
@@ -75,82 +82,51 @@ export default class Character {
             
             this.#fadeOutTimer(ctx, this.type)
         }else{
-            switch(filter){
-                case 'retro':
-                    const color = (this.type === 2)? '#33BBFF' : '#FF3333'
-
-                    const tempCanvas = document.createElement('canvas')
-                    const tempContext = tempCanvas.getContext('2d')
-                    tempCanvas.width = this.tileSize
-                    tempCanvas.height = this.tileSize
-    
-                    // set composite mode
-                    // tempContext.globalCompositeOperation = "multiply";
-                    tempContext.fillStyle = color
-                    tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
-    
-                    // set composite mode
-                    tempContext.globalCompositeOperation = "destination-in";
-                    tempContext.drawImage(this.animationData[this.animation][this.animationFrame], 0,0, this.tileSize, this.tileSize)
-    
-                    // tempContext.globalCompositeOperation = "source-over";
-                    ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
-    
-                    tempCanvas.remove()
-                    
-                    this.ready = true
-                break;
-                default:
-                    ctx.drawImage(this.animationData[this.animation][this.animationFrame], this.x, this.y, this.tileSize, this.tileSize) 
-
-                    this.ready = true
-                break;
-            }
-
             switch(this.animation){
-                case 'item':{
-                    const frame = ['rgb(144, 255, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)']
+                case 'cure':{
+                    const originalFrame = this.animationData[this.animation][this.animationFrame]
 
                     const tempCanvas = document.createElement('canvas')
                     const tempContext = tempCanvas.getContext('2d')
                     tempCanvas.width = this.tileSize
                     tempCanvas.height = this.tileSize
                     // draw color
-                    tempContext.fillStyle = frame[this.animationFrame]
+                    tempContext.fillStyle = this.colors[this.animation][this.colorFrame]
                     tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
     
-                    console.log('current rendering frame :>>>', tempContext.fillStyle)
-                    console.log('current rendering frame :>>>', tempContext.fillStyle)
+                    console.log('current rendering color :>>>', tempContext.fillStyle)
+                    console.log('current rendering frame :>>>', originalFrame)
     
                     // set composite mode
                     tempContext.globalCompositeOperation = "destination-in";
     
-                    tempContext.drawImage(this.animationData[this.animation][this.animationFrame], 0, 0, this.tileSize, this.tileSize)
-                    // const imgBitMap = await createImageBitmap(this.characterImage)
-                    // this.worker.postMessage({mode: this.animation, image: imgBitMap, tileSize: this.tileSize})
-    
-                    // this.worker.onmessage = (msg) => {
-                    //     console.log('sprite altered :>>>', msg)
-                    //     if(msg.data.buffer){
-                    //         ctx.clearRect(this.x, this.y, this.tileSize, this.tileSize)
-                    //         ctx.save()
-                            ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
-                    //         ctx.restore()
-                    //     }
-                    // }
+                    tempContext.drawImage(originalFrame, 0, 0, this.tileSize, this.tileSize)
+
+                    const newFrame = tempCanvas
+                    
+                    // Change the overlay color every 5 ms
+                    if((this.frameTimer % 5) === 0 ){
+                        if(this.colorFrame + 1 > (this.colors[this.animation].length - 1)){
+                            this.colorFrame = 0
+                        }else{
+                            this.colorFrame += 1
+                        }                        
+                    }
+
+                    this.#animationTimer(ctx, 50, newFrame)
+
                     tempCanvas.remove()
-                    if(this.animationFrame + 1 > (frame.length - 1)){
-                        this.animationFrame = 0
-                    }else{
-                        this.animationFrame += 1
-                    }   
                 }
                 break;
-                case 'idle':
-                    this.#animationTimer(ctx, 50, this.animationData[this.animation][this.animationFrame])
+                case 'idle':{
+                    const frame = this.#setFilter(filter)
+                    this.#animationTimer(ctx, 50, frame)
+                }
                 break;
-                case 'top': case 'down': case 'left': case 'right':
-                    this.#animationTimer(ctx, 20, this.animationData[this.animation][this.animationFrame])
+                case 'top': case 'down': case 'left': case 'right':{
+                    const frame = this.#setFilter(filter)
+                    this.#animationTimer(ctx, 20, frame)
+                }
                 break
                 // default:{
                 // //     // console.log('animation:>>> ', this.animation)
@@ -188,6 +164,41 @@ export default class Character {
         this.destination = destination
         this.animationFrame = 0
         this.frameTimer = 0
+    }
+
+    #setFilter(filter){
+        let newFrame
+        switch(filter){
+            case 'retro':
+                const color = (this.type === 2)? '#33BBFF' : '#FF3333'
+
+                const tempCanvas = document.createElement('canvas')
+                const tempContext = tempCanvas.getContext('2d')
+                tempCanvas.width = this.tileSize
+                tempCanvas.height = this.tileSize
+
+                // set composite mode
+                // tempContext.globalCompositeOperation = "multiply";
+                tempContext.fillStyle = color
+                tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
+
+                // set composite mode
+                tempContext.globalCompositeOperation = "destination-in";
+                tempContext.drawImage(this.animationData[this.animation][this.animationFrame], 0,0, this.tileSize, this.tileSize)
+
+                newFrame = tempCanvas
+
+                // tempContext.globalCompositeOperation = "source-over";
+                // ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
+
+                tempCanvas.remove()
+            break;
+            default:
+                newFrame = this.animationData[this.animation][this.animationFrame]
+            break;
+        }
+
+        return newFrame
     }
 
     /**
@@ -461,6 +472,9 @@ export default class Character {
             }else{
                 this.animationFrame += 1
             }                             
+        }else{
+            // Draw the same picture
+            ctx.drawImage(frame, this.x, this.y, this.tileSize, this.tileSize)
         }
     }
 
