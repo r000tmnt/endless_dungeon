@@ -52,7 +52,7 @@ export default class Character {
             if(i === (animation.length - 1)){
                 console.log(this.animationData)
                 this.animation = 'idle'
-
+                this.ready = true
                 console.log(this)
             }            
         }
@@ -91,7 +91,7 @@ export default class Character {
     
                     // set composite mode
                     tempContext.globalCompositeOperation = "destination-in";
-                    tempContext.drawImage(this.characterImage, 0, 0, this.tileSize, this.tileSize)
+                    tempContext.drawImage(this.animationData[this.animation][this.animationFrame], 0,0, this.tileSize, this.tileSize)
     
                     // tempContext.globalCompositeOperation = "source-over";
                     ctx.drawImage(tempCanvas, this.x, this.y, this.tileSize, this.tileSize)
@@ -101,7 +101,7 @@ export default class Character {
                     this.ready = true
                 break;
                 default:
-                    ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)  
+                    ctx.drawImage(this.animationData[this.animation][this.animationFrame], this.x, this.y, this.tileSize, this.tileSize) 
 
                     this.ready = true
                 break;
@@ -120,11 +120,12 @@ export default class Character {
                     tempContext.fillRect(0, 0, this.tileSize, this.tileSize)
     
                     console.log('current rendering frame :>>>', tempContext.fillStyle)
+                    console.log('current rendering frame :>>>', tempContext.fillStyle)
     
                     // set composite mode
                     tempContext.globalCompositeOperation = "destination-in";
     
-                    tempContext.drawImage(this.characterImage, 0, 0, this.tileSize, this.tileSize)
+                    tempContext.drawImage(this.animationData[this.animation][this.animationFrame], 0, 0, this.tileSize, this.tileSize)
                     // const imgBitMap = await createImageBitmap(this.characterImage)
                     // this.worker.postMessage({mode: this.animation, image: imgBitMap, tileSize: this.tileSize})
     
@@ -142,44 +143,22 @@ export default class Character {
                         this.animationFrame = 0
                     }else{
                         this.animationFrame += 1
-                    }
+                    }   
                 }
                 break;
-                default:{
-                //     // console.log('animation:>>> ', this.animation)
-                    if(this.animation.length){
-                        
-                        const frame = this.animationData[this.animation]
-                        // console.log(frame[this.animationFrame])
-                        // ctx.clearRect(this.x, this.y, this.tileSize, this.tileSize);
-                        ctx.drawImage(frame[this.animationFrame], this.x, this.y, this.tileSize, this.tileSize)     
-                        // ctx.store()  
-                        
-                        if(this.animationFrame + 1 > (frame.length - 1)){
-                            this.animationFrame = 0
-                        }else{
-                            this.animationFrame += 1
-                        }                        
-                    }
-                //else{
-                //         // Load idle animation
-                //         this.#loadAnimation('idle', 2, this.type, this.class_id)
-                //         this.animation = 'idle'
-                //         // const animation = ['idle', 'top', 'down', 'left', 'right']
-
-                //         // for(let i=0; i < animation.length; i++){
-                //         //     this.#loadAnimation(animation[i], 2, this.type, this.class)
-                
-                //         //     if(i === (animation.length - 1)){
-                //         //         console.log(this.animationData)
-                //         //         this.animation = 'idle'
-                
-                //         //         console.log(this)
-                //         //     }            
-                //         // }
+                case 'idle':
+                    this.#animationTimer(ctx, 50, this.animationData[this.animation][this.animationFrame])
+                break;
+                case 'top': case 'down': case 'left': case 'right':
+                    this.#animationTimer(ctx, 20, this.animationData[this.animation][this.animationFrame])
+                break
+                // default:{
+                // //     // console.log('animation:>>> ', this.animation)
+                //     if(this.animation.length){
+                //         this.#animationTimer(ctx, 50, this.animationData[this.animation][this.animationFrame])
                 //     }
-                }
-                break;
+                // }
+                // break;
             }
         }
     }
@@ -207,6 +186,8 @@ export default class Character {
      */
     setDestination(destination){
         this.destination = destination
+        this.animationFrame = 0
+        this.frameTimer = 0
     }
 
     /**
@@ -255,16 +236,17 @@ export default class Character {
     #movementInterval = (ctx) => {
         if(this.y !== this.destination_y){
             this.y = (this.animation === 'top')? this.y - this.velocity : this.y + this.velocity
-            ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
+            // this.#animationTimer(ctx, 20, this.animationData[this.animation][this.animationFrame])
         }else if(this.x !== this.destination_x){
             this.x = (this.animation === 'left')? this.x - this.velocity : this.x + this.velocity
-            ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
+            // this.#animationTimer(ctx, 20, this.animationData[this.animation][this.animationFrame])
         }else{
             // Stop timer
             this.isMoving = false
             if(this.y === this.destination_y && this.x === this.destination_x){
                 this.#stopMoving()  
-                this.animation = 'idle'                                   
+                this.animation = 'idle'
+                this.animationFrame = 0
             }  
         }
     }
@@ -465,8 +447,21 @@ export default class Character {
         }
     }
 
-    #animate(animationName){
-        this.animation = animationName
+    #animationTimer = (ctx, count, frame) => {
+        this.frameTimer += 1
+        if(this.frameTimer >= count){
+            this.frameTimer = 0
+            // ctx.save();
+            // ctx.clearRect(this.x, this.y, this.tileSize, this.tileSize);
+            ctx.drawImage(frame, this.x, this.y, this.tileSize, this.tileSize)     
+            // ctx.restore()  
+            
+            if(this.animationFrame + 1 > (this.animationData[this.animation].length - 1)){
+                this.animationFrame = 0
+            }else{
+                this.animationFrame += 1
+            }                             
+        }
     }
 
     setSkills(skill){
