@@ -142,21 +142,19 @@ export default class Character {
                 }
                 break;
                 case 'damage':{
-                    if(this.frameTimer >= 5){
-                        this.frameTimer = 0
-                        const frame = this.#setFilter(filter)
-                        console.log('blinking')
-                        ctx.save()
-                        ctx.globalAlpha = this.colors[this.animation][this.colorFrame]
-                        ctx.drawImage(frame, this.x, this.y, this.tileSize, this.tileSize)
-                        ctx.restore()
-                        
-                        if(this.colorFrame === (this.colors[this.animation].length - 1)){
-                            this.colorFrame = 0
-                        }else{
-                            this.colorFrame += 1
-                        }                        
-                    }
+                    this.frameTimer = 0
+                    const frame = this.#setFilter(filter)
+                    console.log('blinking')
+                    ctx.save()
+                    ctx.globalAlpha = this.colors[this.animation][this.colorFrame]
+                    this.#animationTimer(ctx, 10, frame, true)
+                    ctx.restore()
+                    
+                    if(this.colorFrame === (this.colors[this.animation].length - 1)){
+                        this.colorFrame = 0
+                    }else{
+                        this.colorFrame += 1
+                    }   
                 }
                 break;
             }
