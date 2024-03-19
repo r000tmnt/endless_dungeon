@@ -1,6 +1,7 @@
 import game from './game'
 import setting from './utils/setting';
 import { resizeHiddenElement } from "./utils/ui";
+import Audio from './audio';
 
 // Conversation UI
 const conversationWindow = document.getElementById('conversation')
@@ -51,6 +52,12 @@ export default class TextBox{
 
             // Define background image
             conversationWindow.style.backgroundImage = `url(${__BASE_URL__}assets/images/bg/${this.event[this.sceneCounter].background}.png)`
+            // Define background audio
+            const bgAudio = new Audio(`${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`, 'bg')
+
+            console.log(bgAudio)
+
+            document.body.append(bgAudio)
 
             // Display conversation window
             conversationWindow.classList.remove('invisible')
