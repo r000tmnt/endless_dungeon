@@ -106,6 +106,7 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
 
         if(secondDiceRoll.name === 'critRate'){
             console.log('crit!')
+            enemy.animation = 'damage'
             const criticalHit = Math.round(damage * 1.5)
             resultMessage = String(criticalHit)
             resultStyle = 'orange'
@@ -113,6 +114,7 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
             console.log('enmey hp:>>>', enemy.attributes.hp)
         }else{
             console.log('hit!')
+            enemy.animation = 'damage'
             resultMessage = String(damage)
             enemy.attributes.hp -= damage
             console.log('enmey hp:>>>', enemy.attributes.hp)
