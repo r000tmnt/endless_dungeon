@@ -491,6 +491,14 @@ export const displayResult = (win) => {
 
             levelClear.addEventListener('click', () => {
                 // Back to title screen or intermission
+                game.phaseCount = game.level.phase.length - 1
+                game.beginNextPhase()
+                toggleTurnElement(false)  
+                toggleCanvas(false)           
+                levelClear.classList.remove('open_window')
+                levelClear.classList.add('invisible')
+                warn.classList.add('invisible')
+                warn.classList.remove('open_window')
             })
         }, 1000)        
     }
