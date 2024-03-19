@@ -31,7 +31,8 @@ import {
     setBattlePhaseUIElement,
     alterPhaseTransitionStyle,
     toggleLoadingScreen,
-    toggleCanvas
+    toggleCanvas,
+    prepareInventory
 } from './utils/ui.js'
 // import { getItemType } from './utils/inventory.js'
 import { levelUp } from './utils/battle.js'
@@ -63,6 +64,108 @@ class Game{
         this.stash = []; // A shared stash
         this.stashLimit = 1000;
         this.stepOnEvent = {}; // The event waiting to be trigger
+        this.canvasEvent = async(event) => {
+            const { tileSize, fontSize, fontSize_sm } = setting.general
+
+            const { row, col } = getPosition(event, tileSize)
+
+            // Hight light pointed block
+            this.grid.setPointedBlock({ row, col })
+            
+            // If not playing animation
+            if(!this.action.animationInit){
+                
+                // Define who is on the tile you clicked
+                this.inspectingCharacter = this.player.find(p => p.y === (row * tileSize) && p.x === (col * tileSize))
+
+                // If is not a player, checking enmey instead
+                if(this.inspectingCharacter === undefined){
+                    this.inspectingCharacter = this.enemy.find(e => e.y === (row * tileSize) && e.x === (col * tileSize))
+                }
+
+                let movable = false
+
+                switch(this.action.mode){
+                    case 'move':{
+                        const currentActingPlayer = this.player.find(p => p.walkableSpace.length)
+                    
+                        const position = this.playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
+
+                        movable = this.action.move(this.tileMap, row, col, position, currentActingPlayer)  
+                        
+                        movable.then(result => {
+                            console.log(result)
+                                                    
+                            if(!result){
+                                cancelAction()
+                                this.inspectingCharacter = currentActingPlayer
+                            }else{
+                                hideUIElement()
+                            }
+                        })
+                    }
+                    break;
+                    case 'attack': case 'skill': case 'item':{
+                        const currentActingPlayer = this.player.find(p => p.walkableSpace.length)
+                    
+                        const position = this.playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
+                        
+                        const possibleEncounterEnemyPosition = this.limitPositonToCheck(currentActingPlayer.attributes.moveSpeed, position, this.enemyPosition)
+                        movable = await this.action.command(canvas, row, col, currentActingPlayer, this.inspectingCharacter, possibleEncounterEnemyPosition, tileSize, this.tileMap)
+
+                        if(!movable){
+                            if(this.action.mode === 'skill'){
+                                // Back to skill window
+                                this.action.setSKillWindow(currentActingPlayer, this.tileMap, position)
+                            }else if(this.action.mode === 'item'){
+                                // Back to inventory
+                                this.inspectingCharacter = currentActingPlayer
+                                prepareInventory(currentActingPlayer)
+                            }else{
+                                cancelAction()
+                                this.inspectingCharacter = currentActingPlayer
+                            }
+                        }else{
+                            hideUIElement()
+                        }
+                    }
+                    break;
+                    default:
+                        // if this tile is player
+                        if(this.inspectingCharacter?.type === 2){
+                            console.log('I am player')
+
+                            //Reset action menu option style
+                            resetActionMenu(this.inspectingCharacter.x, this.inspectingCharacter.y)
+
+                            this.#checkAp(this.inspectingCharacter)
+
+                            prepareCharacterCaption(this.inspectingCharacter, tileSize)
+
+                            displayUIElement()
+                            hideOptionMenu()
+                        }else
+                        // if this tile is enemy
+                        if(this.inspectingCharacter?.type === 3){
+                            // Fill the element with a portion of the character info
+                            console.log('I am the enemy')
+
+                            // Hide parts of action menu
+                            alterActionMenu()
+
+                            prepareCharacterCaption(this.inspectingCharacter)
+
+                            // Open UI element
+                            displayUIElement()
+                            hideOptionMenu()
+                        }else{
+                            toggleOptionMenu()
+                            toggleActionMenuAndCharacterCaption()
+                        }  
+                    break;
+                }
+            }
+        };
     }
 
     // Initialize the game
@@ -227,103 +330,7 @@ class Game{
 
     #setUpCanvasEvent = () => {
         // get mouse position and divide by tile size to see where the row and the column it clicked
-        canvas.addEventListener('mousedown', async(event) =>{
-            const { tileSize } = setting.general
-
-            const { row, col } = getPosition(event, tileSize)
-
-            // Hight light pointed block
-            this.grid.setPointedBlock({ row, col })
-            
-            // If not playing animation
-            if(!this.action.animationInit){
-                
-                // Define who is on the tile you clicked
-                this.inspectingCharacter = this.player.find(p => p.y === (row * tileSize) && p.x === (col * tileSize))
-
-                // If is not a player, checking enmey instead
-                if(this.inspectingCharacter === undefined){
-                    this.inspectingCharacter = this.enemy.find(e => e.y === (row * tileSize) && e.x === (col * tileSize))
-                }
-
-                let movable = false
-
-                switch(this.action.mode){
-                    case 'move':{
-                        const currentActingPlayer = this.player.find(p => p.walkableSpace.length)
-                    
-                        const position = this.playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
-
-                        movable = this.action.move(this.tileMap, row, col, position, currentActingPlayer)      
-                        
-                        if(!movable){
-                            cancelAction()
-                            this.inspectingCharacter = currentActingPlayer
-                        }else{
-                            hideUIElement()
-                        }
-                    }
-                    break;
-                    case 'attack': case 'skill': case 'item':{
-                        const currentActingPlayer = this.player.find(p => p.walkableSpace.length)
-                    
-                        const position = this.playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
-                        
-                        const possibleEncounterEnemyPosition = this.limitPositonToCheck(currentActingPlayer.attributes.moveSpeed, position, this.enemyPosition)
-                        movable = await this.action.command(canvas, row, col, currentActingPlayer, this.inspectingCharacter, possibleEncounterEnemyPosition, tileSize, this.tileMap)
-
-                        if(!movable){
-                            if(this.action.mode === 'skill'){
-                                // Back to skill window
-                                this.action.setSKillWindow(currentActingPlayer, this.tileMap, position)
-                            }else if(this.action.mode === 'item'){
-                                // Back to inventory
-                                constructInventoryWindow(currentActingPlayer)
-                            }else{
-                                cancelAction()
-                                this.inspectingCharacter = currentActingPlayer
-                            }
-                        }else{
-                            hideUIElement()
-                        }
-                    }
-                    break;
-                    default:
-                        // if this tile is player
-                        if(this.inspectingCharacter?.type === 2){
-                            console.log('I am player')
-
-                            //Reset action menu option style
-                            resetActionMenu(this.inspectingCharacter.x, this.inspectingCharacter.y)
-
-                            this.#checkAp(this.inspectingCharacter)
-
-                            prepareCharacterCaption(this.inspectingCharacter, tileSize)
-
-                            displayUIElement()
-                            hideOptionMenu()
-                        }else
-                        // if this tile is enemy
-                        if(this.inspectingCharacter?.type === 3){
-                            // Fill the element with a portion of the character info
-                            console.log('I am the enemy')
-
-                            // Hide parts of action menu
-                            alterActionMenu()
-
-                            prepareCharacterCaption(this.inspectingCharacter)
-
-                            // Open UI element
-                            displayUIElement()
-                            hideOptionMenu()
-                        }else{
-                            toggleOptionMenu()
-                            toggleActionMenuAndCharacterCaption()
-                        }  
-                    break;
-                }
-            }
-        })
+        canvas.addEventListener('mousedown', this.canvasEvent)
     }  
     
     // Enemy movement decision
