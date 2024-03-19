@@ -253,15 +253,7 @@ for(let i=0; i < actionMenuOptions.length; i++){
             })
         break;
         case 'item':
-            actionMenuOptions[i].addEventListener('click', async() => {
-                hideUIElement()
-                game.action.mode = 'item'
-                const { fontSize, fontSize_sm, camera } = setting.general
-                const { width, height } = camera
-                const { itemBlockSize, itemBlockMargin } = setting.inventory
-                resizeHiddenElement(Inventory.style, width, height, fontSize_sm)
-                constructInventoryWindow(game.inspectingCharacter, game.enemyPosition, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin, width)
-            })
+            actionMenuOptions[i].addEventListener('click', () => prepareInventory(game.inspectingCharacter))
         break; 
         case 'pick':
             actionMenuOptions[i].addEventListener('click', () => {
@@ -378,12 +370,7 @@ finishBtn[0].addEventListener('click', () => {
 finishBtn[1].addEventListener('click', () => {
     game.phaseCount += 1
     game.beginNextPhase()   
-    toggleTurnElement(false)  
-    toggleCanvas(false)           
-    levelClear.classList.remove('open_window')
-    levelClear.classList.add('invisible')
-    warn.classList.add('invisible')
-    warn.classList.remove('open_window')
+    endBattlePhase()
 })
 
 // Calculate the percentage of an attribute
@@ -400,6 +387,30 @@ const getPercentage = (type, character) => {
     }
 
     return percentage
+}
+
+const endBattlePhase = () => {
+    toggleTurnElement(false)  
+    toggleCanvas(false)         
+    canvas.removeEventListener('mousedown', game.canvasEvent)  
+    levelClear.classList.remove('open_window')
+    levelClear.classList.add('invisible')
+    warn.classList.add('invisible')
+    warn.classList.remove('open_window')
+}
+
+/**
+ * Prepare to open inventory
+ * @param {object} currentActingPlayer - The player this inventory belongs to 
+ */
+export const prepareInventory = async(currentActingPlayer) => {
+    hideUIElement()
+    game.action.mode = 'item'
+    const { fontSize, fontSize_sm, camera } = setting.general
+    const { width, height } = camera
+    const { itemBlockSize, itemBlockMargin } = setting.inventory
+    resizeHiddenElement(Inventory.style, width, height, fontSize_sm)
+    constructInventoryWindow(currentActingPlayer, game.enemyPosition, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin, width)
 }
 
 // Display title screen
@@ -493,12 +504,7 @@ export const displayResult = (win) => {
                 // Back to title screen or intermission
                 game.phaseCount = game.level.phase.length - 1
                 game.beginNextPhase()
-                toggleTurnElement(false)  
-                toggleCanvas(false)           
-                levelClear.classList.remove('open_window')
-                levelClear.classList.add('invisible')
-                warn.classList.add('invisible')
-                warn.classList.remove('open_window')
+                endBattlePhase()
             })
         }, 1000)        
     }
