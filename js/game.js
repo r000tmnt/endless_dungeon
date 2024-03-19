@@ -671,7 +671,7 @@ class Game{
         
                 currentActingPlayer.animation = 'idle'
                 currentActingPlayer.animationFrame = 0
-                // currentActingPlayer.frameTimer = 0
+                currentActingPlayer.colorFrame = 0
                 // prepareCharacterCaption(currentActingPlayer)
         
                 // If the player is ran out of action point
