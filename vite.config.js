@@ -75,4 +75,6 @@ export default defineConfig(({mode}) => {
   if(mode === 'test'){
     config.base = '/endless_dungeon/'
   }
+
+  return config
 });
