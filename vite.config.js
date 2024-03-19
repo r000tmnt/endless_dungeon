@@ -3,8 +3,9 @@ import { defineConfig } from "vite";
 // import path, { resolve } from "path";
 import pkgJSON from './package.json'
 
-export default defineConfig({
-  // 指定預設的根目錄
+export default defineConfig(({mode}) => {
+  const config = {
+      // 指定預設的根目錄
   base: "./",
   // 定義全域常數
   define: {
@@ -69,4 +70,9 @@ export default defineConfig({
 //     // 官方列為實驗性功能，可以找出是由哪個來源建構的css
 //     devSourceMap: true,
 //   },
+  }
+
+  if(mode === 'test'){
+    config.base = '/endless_dungeon/'
+  }
 });
