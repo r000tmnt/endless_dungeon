@@ -50,7 +50,7 @@ export default class TextBox{
             this.textLength = dialogue[this.dialogueCounter].content.length - 1
 
             // Define background image
-            conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`
+            conversationWindow.style.backgroundImage = `url(${__BASE_URL__}assets/images/bg/${this.event[this.sceneCounter].background}.png)`
 
             // Display conversation window
             conversationWindow.classList.remove('invisible')
@@ -64,7 +64,7 @@ export default class TextBox{
 
                 // Display character portrait if any
                 if(person !== "none" && person.length){
-                    portrait[0].src = `/assets/images/portrait/${person}.png`
+                    portrait[0].src = `${__BASE_URL__}assets/images/portrait/${person}.png`
                     portrait[0].style.width = width + 'px'
                     portrait[0].style.height = height + 'px'
 
@@ -283,7 +283,7 @@ export default class TextBox{
                 }else{
                     this.sceneCounter += 1  
                     this.dialogueLength = this.event[this.sceneCounter].dialogue.length - 1 
-                    conversationWindow.style.backgroundImage = `url(/assets/images/bg/${this.event[this.sceneCounter].background}.png)`     
+                    conversationWindow.style.backgroundImage = `url(${__BASE_URL__}assets/images/bg/${this.event[this.sceneCounter].background}.png)`     
 
                     this.#checkConversationPerson()
                 }
@@ -326,7 +326,7 @@ export default class TextBox{
                         portrait[1].style.order = 0
                         portrait[1].style.width = width + 'px'
                         portrait[1].style.height = height + 'px'
-                        portrait[1].src = `/assets/images/portrait/${person}.png`
+                        portrait[1].src = `${__BASE_URL__}assets/images/portrait/${person}.png`
 
                         this.#loadCharacterPortrait(portrait[1], () => this.#porceedToNextDialogue())
                         character.style.justifyContent = 'space-evenly'                                        
@@ -337,7 +337,7 @@ export default class TextBox{
                         portrait[2].style.order = 0
                         portrait[2].style.width = width + 'px'
                         portrait[2].style.height = height + 'px'
-                        portrait[2].src = `/assets/images/portrait/${person}.png`
+                        portrait[2].src = `${__BASE_URL__}assets/images/portrait/${person}.png`
 
                         this.#loadCharacterPortrait(portrait[2], () => this.#porceedToNextDialogue())
                         character.style.justifyContent = 'space-evenly'                                    
@@ -345,7 +345,7 @@ export default class TextBox{
                     default: // Place a portrait in the center of screen
                         portrait[0].style.width = width + 'px'
                         portrait[0].style.height = height + 'px'
-                        portrait[0].src = `/assets/images/portrait/${person}.png`
+                        portrait[0].src = `${__BASE_URL__}assets/images/portrait/${person}.png`
 
                         this.#loadCharacterPortrait(portrait[0], () => this.#porceedToNextDialogue())
                         character.style.justifyContent = 'unset' 
@@ -354,7 +354,7 @@ export default class TextBox{
                 console.log('show portrait')
             }else{
                 // Replace the portrait with the other one
-                portrait[0].src = `/assets/images/portrait/${person}.png`
+                portrait[0].src = `${__BASE_URL__}assets/images/portrait/${person}.png`
 
                 this.#porceedToNextDialogue()
             }
