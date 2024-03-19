@@ -25,7 +25,8 @@ turnCounter.innerText = 'Turn 1'
 
 // Title scrren UI
 const titleScreen = document.getElementById("titleScreen");
-const titleAction = document.getElementById("titleAction").querySelectorAll('li');
+// const titleAction = document.getElementById("titleAction").querySelectorAll('li');
+const version = document.getElementById('version')
 
 // Loading screen UI
 const loadingScreen = document.getElementById("Loading");
@@ -77,6 +78,9 @@ const levelClear = document.getElementById('levelClear')
 const resultAction = document.getElementById('resultAction')
 const resultActionOptions = resultAction.querySelectorAll('li')
 const warn = document.getElementById('warn')
+
+// Display app version
+version.innerHTML = `Version: ${__APP_VERSION__}`
 
 // Title screen action child click event
 // for(let i=0; i < titleAction.length; i++){
