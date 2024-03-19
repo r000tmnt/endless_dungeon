@@ -45,6 +45,7 @@ export default{
                     "scene": [
                         {
                             "background": "cave", // Background image
+                            "audio": "cave_ambience", // Background audio
                             // Define how many person to show on screen
                             "people": 0,
                             "dialogue": [
@@ -112,6 +113,7 @@ export default{
                         },
                         {
                             "background": "cave",
+                            "audio": "cave_ambience",
                             "people": 1,
                             "dialogue": [
                                 {
