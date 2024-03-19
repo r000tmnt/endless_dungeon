@@ -79,7 +79,7 @@ export default class Character {
      */
     async draw(ctx, filter){
         if(this.destination !== null){
-            this.#move(ctx, this.destination)
+            this.#move(this.destination)
         }
 
         // If the character is dead
@@ -242,7 +242,7 @@ export default class Character {
      * @param {object} ctx - Canvas context that inculdes various function to control the element
      * @param {object} destination - An object that represent a block which the character is going for
      */
-    #move(ctx, destination){
+    #move(destination){
         if(!this.isMoving){
             console.log('destination :>>>', destination)
             // col ====x, row === y
@@ -292,8 +292,7 @@ export default class Character {
             // Stop timer
             this.isMoving = false
             if(this.y === this.destination_y && this.x === this.destination_x){
-                this.#stopMoving()  
-                this.animation = 'idle'
+                this.#stopMoving()
                 this.animationFrame = 0
             }  
         }
