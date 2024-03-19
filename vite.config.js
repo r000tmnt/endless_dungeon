@@ -1,10 +1,15 @@
 // vite.config.js
 import { defineConfig } from "vite";
 // import path, { resolve } from "path";
+import pkgJSON from './package.json'
 
 export default defineConfig({
   // 指定預設的根目錄
   base: "./",
+  // 定義全域常數
+  define: {
+    "__APP_VERSION__": JSON.stringify(pkgJSON.version)
+  },
   // 判別現在是開發環境或打包後部署上去的遠端環境，遠端名稱要跟你的Github專案一樣
   publicPath: process.env.NODE_ENV === "production" ? "/endless_dungeon/" : "./",
 //   resolve: {
