@@ -1,11 +1,12 @@
 {
   "name": "browser_dungen_crowler_game",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:test": "vite build --mode test --outDir dist-test",
     "preview": "vite preview"
   },
   "devDependencies": {
