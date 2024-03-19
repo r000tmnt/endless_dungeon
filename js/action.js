@@ -457,6 +457,7 @@ export default class Action{
 
             // Wait for damage animation to finish
             setTimeout(async() => {
+                player.animation = 'idle'
                 enemy.animation = 'idle'
                 // Check if the enemy is defeated
                 if(enemy.attributes.hp <= 0){
@@ -570,6 +571,9 @@ export default class Action{
                 // Finish the phase
                 // Reset steps
                 this.steps = 0
+
+                // Reset animation
+                currentActingPlayer.animation = 'idle'
 
                 // Clear the array
                 this.selectableSpace.splice(0)
