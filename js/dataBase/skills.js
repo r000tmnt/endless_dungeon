@@ -9,6 +9,7 @@ export default{
                 "attribute": "mp",
                 "value": 3
             },
+            "animation": "slash",
             "effect":
             {
                 "type": "dmg",
@@ -28,6 +29,7 @@ export default{
                 "attribute": "mp",
                 "value": 1
             },
+            "animation": "attack",
             "effect": {
                 "type": "status",
                 "range": 1,
@@ -47,6 +49,7 @@ export default{
                 "attribute": "mp",
                 "value": 3
             },
+            "animation": "enchant",
             "effect": {
                 "type": "status",
                 "range": 0, // Apply on the player itself
@@ -66,6 +69,7 @@ export default{
                 "attribute": "mp",
                 "value": 5
             },
+            "animation": "enchant",
             "effect": {
                 "type": "status",
                 "range": 1,

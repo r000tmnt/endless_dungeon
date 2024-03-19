@@ -419,7 +419,7 @@ export default class Action{
                         }
                         break;
                         case 'skill':{
-                            player.animation = 'skill'
+                            player.animation = this.selectedSkill.animation
                             const skillName = document.getElementById('skillName').children[0]
                             const { attribute, value } = this.selectedSkill.cost
                             player.attributes[attribute] -= value
