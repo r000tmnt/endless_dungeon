@@ -5,7 +5,6 @@ import Range from './range.js';
 import Option from './option.js';
 import TextBox from './textBox.js';
 
-import { constructInventoryWindow } from './utils/inventory.js'
 import { 
     canvas, 
     resize, 
