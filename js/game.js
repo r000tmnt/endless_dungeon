@@ -669,7 +669,7 @@ class Game{
                 // Check if the tile has an event
                 // await this.checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
         
-                currentActingPlayer.animation = 'idle'
+                // currentActingPlayer.animation = 'idle'
                 currentActingPlayer.animationFrame = 0
                 currentActingPlayer.colorFrame = 0
                 // prepareCharacterCaption(currentActingPlayer)
