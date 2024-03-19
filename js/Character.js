@@ -473,10 +473,10 @@ export default class Character {
         this.alpha = 1
         switch(type){
             case 2:
-                classImage.src = `/assets/images/class/${id}.png`
+                classImage.src = `${__BASE_URL__}assets/images/class/${id}.png`
             break
             case 3:
-                classImage.src = `/assets/images/mob/${id}.png`
+                classImage.src = `${__BASE_URL__}assets/images/mob/${id}.png`
             break
         }
 
@@ -497,10 +497,10 @@ export default class Character {
             
             switch(type){
                 case 2:
-                    newFrame.src = `/assets/images/class/animation/${className}_${animationName}_${i + 1}.png`
+                    newFrame.src = `${__BASE_URL__}assets/images/class/animation/${className}_${animationName}_${i + 1}.png`
                 break;
                 case 3:
-                    newFrame.src = `/assets/images/mob/animation/${className}_${animationName}_${i + 1}.png`
+                    newFrame.src = `${__BASE_URL__}assets/images/mob/animation/${className}_${animationName}_${i + 1}.png`
                 break;
             }
 

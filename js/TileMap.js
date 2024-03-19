@@ -22,7 +22,7 @@ export default class TileMa {
         assets.forEach(a => {
             const img = new Image();
             if(a.length){
-                img.src = `/assets/images/env/${a}`;
+                img.src = `${__BASE_URL__}assets/images/env/${a}`;
                 tempAssets.push(img)
             }else{
                 tempAssets.push('')
