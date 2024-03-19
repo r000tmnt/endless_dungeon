@@ -551,7 +551,7 @@ class Game{
  
     // Check the content of dropped items
     checkDroppedItem = async(dropItems) => {
-        const playerHasKey = false
+        let playerHasKey = false
         const dropKey = dropItems.findIndex(i => i.id.includes('key')) >= 0
     
         for(let i=0; i < this.player.length; i++){
