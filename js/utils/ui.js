@@ -390,8 +390,11 @@ const getPercentage = (type, character) => {
 }
 
 const endBattlePhase = () => {
-    toggleTurnElement(false)  
-    toggleCanvas(false)         
+    toggleTurnElement(false)
+    toggleCanvas(false)     
+    countTurn(0)
+    game.action.mode = ''
+    game.turnType = 0    
     canvas.removeEventListener('mousedown', game.canvasEvent)  
     levelClear.classList.remove('open_window')
     levelClear.classList.add('invisible')
