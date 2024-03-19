@@ -25,10 +25,14 @@ A demo of dungeon clawer game build with Html canvas and Javascript
             - image
                 - class
                     * [class_type_level].png
+                    - animation
+                        * [class_type_level_animation_frame].png
                 - env
                     * [environment].png
                 - mob
                     * [mob_type_level].png
+                    - animation
+                        * [mob_type_level_animation_frame].png
                 - portrait
                     * [person_name].png
 
@@ -37,3 +41,4 @@ A demo of dungeon clawer game build with Html canvas and Javascript
 
 ## Library
 [long-press-event](https://www.npmjs.com/package/long-press-event)
+[ vite-plugin-top-level-await](https://github.com/Menci/vite-plugin-top-level-await)
