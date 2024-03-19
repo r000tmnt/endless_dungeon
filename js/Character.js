@@ -47,7 +47,7 @@ export default class Character {
         this.colorFrame = 0
         this.colors = {
             cure: ['rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)'],
-            damage: [ /** Flickering image in set interval by changing alpha value  */ ],
+            damage: [ 0, 1, 0, 1 ], // Flickering image in set interval by changing alpha value
             poison: [],
             burn: [],
             debuff: [],
@@ -69,6 +69,7 @@ export default class Character {
         }
 
         this.animationData.cure = [...this.animationData.idle]
+        this.animationData.damage = [...this.animationData.idle]
     }
 
     /**
@@ -92,7 +93,7 @@ export default class Character {
             switch(this.animation){
                 case 'attack':{
                     const frame = this.#setFilter(filter)
-                    this.#animationTimer(ctx, 50, frame, false)
+                    this.#animationTimer(ctx, 2, frame, false)
                 }
                 break;
                 case 'cure':{
@@ -139,14 +140,25 @@ export default class Character {
                     const frame = this.#setFilter(filter)
                     this.#animationTimer(ctx, 20, frame, true)
                 }
-                break
-                // default:{
-                // //     // console.log('animation:>>> ', this.animation)
-                //     if(this.animation.length){
-                //         this.#animationTimer(ctx, 50, this.animationData[this.animation][this.animationFrame])
-                //     }
-                // }
-                // break;
+                break;
+                case 'damage':{
+                    if(this.frameTimer >= 5){
+                        this.frameTimer = 0
+                        const frame = this.#setFilter(filter)
+                        console.log('blinking')
+                        ctx.save()
+                        ctx.globalAlpha = this.colors[this.animation][this.colorFrame]
+                        ctx.drawImage(frame, this.x, this.y, this.tileSize, this.tileSize)
+                        ctx.restore()
+                        
+                        if(this.colorFrame === (this.colors[this.animation].length - 1)){
+                            this.colorFrame = 0
+                        }else{
+                            this.colorFrame += 1
+                        }                        
+                    }
+                }
+                break;
             }
         }
     }
@@ -307,7 +319,7 @@ export default class Character {
      */
     async #fadeOutTimer(ctx, type){
         if(this.alpha > 0){
-            console.log('blinking')
+            console.log('fading')
             ctx.save()
             ctx.globalAlpha = this.alpha
             ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
@@ -517,8 +529,10 @@ export default class Character {
             
             if(this.animationFrame + 1 > (this.animationData[this.animation].length - 1)){
                 this.animationFrame = (loop)? 0 : this.animationFrame
+                console.log('set animation frame :>>>', this.animation)
             }else{
                 this.animationFrame += 1
+                console.log('increse animation frame count :>>>', this.animationFrame)
             }                             
         }else{
             // Draw the same picture
