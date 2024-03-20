@@ -7,10 +7,12 @@ export default class Audio{
         audio.classList.add('absolute')
         audio.style.zIndex = -1
         
+        // Asign different types of click event for different types of audio
         if(type === 'bg'){
             audio.addEventListener('canplaythrough', () => {
                 console.log('canplaythrough')
                 audio.muted = false
+                audio.loop = true
                 audio.play().catch(e => {
                     window.addEventListener('click', () => {
                         console.log('play once')
