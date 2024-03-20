@@ -4,6 +4,7 @@ import Action from './action.js';
 import Range from './range.js';
 import Option from './option.js';
 import TextBox from './textBox.js';
+import Audio from './audio.js';
 
 import { 
     canvas, 
@@ -63,6 +64,8 @@ class Game{
         this.stash = []; // A shared stash
         this.stashLimit = 1000;
         this.stepOnEvent = {}; // The event waiting to be trigger
+
+        // Canvas mouse down event
         this.canvasEvent = async(event) => {
             const { tileSize, fontSize, fontSize_sm } = setting.general
 
@@ -165,6 +168,15 @@ class Game{
                 }
             }
         };
+
+        // Audio
+        this.bgAudio = null;
+        this.clickSound = null;
+        this.menuOpenSound = null;
+        this.menuCloseSound = null;
+        this.attackSound = null;
+        this.potionSound = null;
+        this.walkingSound = null;
     }
 
     // Initialize the game
@@ -174,6 +186,9 @@ class Game{
     // 1-3. Quit ---> Close the game
     init = async() => {
         this.option.setConfigOption(setting);
+
+        // Define click sound effect
+        game.clickSound = new Audio(`${__BASE_URL__}assets/audio/click.wav`, 'click')
         
         displayTitleScreen()
         // this.beginNextPhase()
