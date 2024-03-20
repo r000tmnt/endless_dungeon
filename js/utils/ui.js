@@ -191,7 +191,7 @@ export const uiInit = (game) => {
     for(let i=0; i < backBtn.length; i++){
         switch(backBtn[i].dataset.action){
             case 'skill':
-                game.menuCloseSound.bindTarget(backBtn[i])
+                game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', async() => {
                     game.action.mode = ''
                     // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
@@ -205,7 +205,7 @@ export const uiInit = (game) => {
                 })
             break;
             case 'status':
-                game.menuCloseSound.bindTarget(backBtn[i])
+                game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', async() => {
                     game.action.mode = ''
                     // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
@@ -220,7 +220,7 @@ export const uiInit = (game) => {
                 })
             break;
             case 'item':
-                game.menuCloseSound.bindTarget(backBtn[i])
+                game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', async() => {
                     game.action.mode = ''
                     // Check if the tile has an event
@@ -233,13 +233,13 @@ export const uiInit = (game) => {
                 })
             break;
             case 'pick':
-                game.menuCloseSound.bindTarget(backBtn[i])
+                game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', async() => {
                     await closePickUpWindow()
                 })
             break;
             case 'party':
-                game.menuCloseSound.bindTarget(backBtn[i])
+                game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', () => {
                     partyWindow.classList.add('invisible')
                     partyWindow.classList.remove('open_window')
@@ -248,7 +248,7 @@ export const uiInit = (game) => {
                 })
             break;
             case 'objective':
-                game.menuCloseSound.bindTarget(backBtn[i])
+                game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', () => {
                     game.option.mode = ''
                     objectiveWindow.classList.add('invisible')
@@ -256,7 +256,7 @@ export const uiInit = (game) => {
                 })
             break;
             case 'config':
-                game.menuCloseSound.bindTarget(backBtn[i])
+                game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', () => {
                     game.option.mode = ''
                     configWindow.classList.add('invisible')
@@ -306,18 +306,18 @@ export const uiInit = (game) => {
                 })
             break;
             case 'item':
-                game.menuOpenSound.bindTarget(actionMenuOptions[i])
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', () => prepareInventory(game.inspectingCharacter))
             break; 
             case 'pick':
-                game.menuOpenSound.bindTarget(actionMenuOptions[i])
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', () => {
                     game.action.mode = 'pick'
                     preparePickUpWindow()
                 })
             break;
             case 'status':
-                game.menuOpenSound.bindTarget(actionMenuOptions[i])
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', () => {
                     hideUIElement()
                     game.action.mode = 'status'
@@ -633,6 +633,9 @@ export const hideUIElement = () => {
 }
 
 export const cancelAction = () => {
+    game.actionCancelSound.element.muted = false
+    game.actionCancelSound.element.play()
+
     if(!characterCaption.classList.contains('invisible')){
         characterCaption.classList.add('invisible') 
     }else{
