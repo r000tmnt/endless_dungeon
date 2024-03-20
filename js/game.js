@@ -7,6 +7,7 @@ import TextBox from './textBox.js';
 import Audio from './audio.js';
 
 import { 
+    uiInit,
     canvas, 
     resize, 
     getPosition, 
@@ -177,6 +178,10 @@ class Game{
         this.attackSound = null;
         this.potionSound = null;
         this.walkingSound = null;
+        this.equipSound = null;
+        this.unEquipSound = null;
+        this.keySound = null;
+        this.selectSound = null;
     }
 
     // Initialize the game
@@ -187,8 +192,8 @@ class Game{
     init = async() => {
         this.option.setConfigOption(setting);
 
-        // Define click sound effect
-        game.clickSound = new Audio(`${__BASE_URL__}assets/audio/click.wav`, 'click')
+        // Define sound effects
+        game.menuOpenSound = new Audio(`${__BASE_URL__}assets/audio/menu_selection.mp3`, 'interface')
         
         displayTitleScreen()
         // this.beginNextPhase()
@@ -772,6 +777,8 @@ class Game{
 const game = new Game()
 
 await game.init()
+
+uiInit(game)
 
 export default game
 
