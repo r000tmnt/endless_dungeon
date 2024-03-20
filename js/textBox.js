@@ -58,7 +58,13 @@ export default class TextBox{
                 game.bgAudio = new Audio(`${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`, 'bg')
             }else{
                 // Change audio source
-                game.bgAudio.src = `${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`
+                game.bgAudio.element.src = `${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`
+            }
+
+            if(game.clickSound === null){
+                game.clickSound = new Audio(`${__BASE_URL__}assets/audio/click.wav`, 'click', conversationWindow)
+            }else{
+                game.clickSound.element.src = `${__BASE_URL__}assets/audio/click.wav`
             }
             
             // Display conversation window
@@ -404,10 +410,12 @@ export default class TextBox{
         conversationWindow.style.opacity = 0
 
         setTimeout(() => {
-            // Stop background audio
-            game.bgAudio.pause()
             // Reset backgroud audio time line back to the start
-            game.bgAudio.currentTime = 0
+            game.bgAudio.element.currentTime = 0
+            // Stop background audio
+            game.bgAudio.element.pause()
+            // Canacel event
+            game.bgAudio.cancelEvent('canplaythrough')
 
             // Remove the predefined event
             game.level.event.splice(0, 1)
