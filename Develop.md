@@ -9,7 +9,7 @@ A demo of dungeon clawer game build with Html canvas and Javascript
 
 ## Project structure
 - Root
-    index.html
+    - index.html
     - js
         * [className].js
         - utils
