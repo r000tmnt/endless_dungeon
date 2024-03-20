@@ -270,6 +270,7 @@ export const uiInit = (game) => {
     for(let i=0; i < actionMenuOptions.length; i++){
         switch(actionMenuOptions[i].dataset.action){
             case 'move':
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', async() => {
                     hideUIElement() 
                     const { tileSize } = setting.general
@@ -284,6 +285,7 @@ export const uiInit = (game) => {
                 })
             break;
             case 'attack':
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', async() => {
                     hideUIElement() 
                     const { tileSize } = setting.general
@@ -292,6 +294,7 @@ export const uiInit = (game) => {
                 })
             break;   
             case "skill":
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 game.menuOpenSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', () => {
                     hideUIElement()
@@ -325,6 +328,7 @@ export const uiInit = (game) => {
                 })
             break;
             case 'stay':
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', async() => {
                     hideUIElement()
                     setTimeout(() => {
