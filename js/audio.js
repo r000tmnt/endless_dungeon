@@ -1,32 +1,51 @@
 export default class Audio{
-    constructor(source, type){
-        const audio = document.createElement('audio')
-        audio.src = source
-        audio.muted = true
-        // audio.classList.add('invisible')
-        audio.classList.add('absolute')
-        audio.style.zIndex = -1
-        
-        // Asign different types of click event for different types of audio
-        if(type === 'bg'){
-            audio.addEventListener('canplaythrough', () => {
-                console.log('canplaythrough')
-                audio.muted = false
-                audio.loop = true
-                audio.play().catch(e => {
-                    window.addEventListener('click', () => {
-                        console.log('play once')
-                        audio.play()
-                    }, { once: true })
-                })
-            })            
-        }else{
-            window.addEventListener("click", () => {
-                audio.muted = false
-                audio.play()
-             });
+    /**
+     * 
+     * @param {string} source - The path of the audio file 
+     * @param {string} type - The types of the audio file
+     * @param {object} target - The element to trigger the sound effect  
+     * @returns 
+     */
+    constructor(source, type, target = null){
+        this.element = document.createElement('audio')
+
+        this.canPlayThroughEvent = () => {
+            console.log('canplaythrough')
+            this.element.muted = false
+            this.element.loop = true
+            this.element.play()
         }
 
-        return audio
+        this.element.src = source
+        this.element.muted = true
+        
+        // Asign different types of click event for different types of audio
+        switch(type){
+            case 'bg':
+                this.element.addEventListener('canplaythrough', this.canPlayThroughEvent, { once: true })  
+            break;
+            case 'interface':
+                // if(target != null){                
+                // }
+            break;
+            default:
+                this.bindTarget(target)
+            break;
+        }
+    }
+
+    /**
+     * Remove the event listener on the audio element
+     * @param {string} eventType - The type of the event 
+     */
+    cancelEvent(eventType){
+        this.element.removeEventListener(eventType, this.canPlayThroughEvent)
+    }
+
+    bindTarget(target){
+        target.addEventListener("click", () => {
+            this.element.muted = false
+            this.element.play()
+        });    
     }
 }
