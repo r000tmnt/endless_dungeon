@@ -45,7 +45,7 @@ export default class Character {
         };
         this.ready = false;
         this.frameTimer = 0;
-        this.colorFrame = 0
+        this.colorFrame = 0;
         this.colors = {
             cure: ['rgb(144, 255, 144)', 'rgb(144, 238, 144)', 'rgb(144, 255, 144)', 'rgb(144, 238, 144)'],
             damage: [ 0, 1, 0, 1 ], // Flickering image in set interval by changing alpha value
@@ -54,7 +54,10 @@ export default class Character {
             debuff: [],
             buff: []
         }
-        this.footSteps = []
+
+        // Sound effects
+        this.attackSound = null;
+        this.footSteps = [];
 
         switch(true){
             case attributes.class.includes('fighter'):
@@ -62,6 +65,7 @@ export default class Character {
                 this.footSteps.push(new Audio(`${__BASE_URL__}assets/audio/step_rock_r.mp3`, 'step'))
             break;
             case attributes.class.includes('zombie'):
+                this.attackSound = new Audio(`${__BASE_URL__}assets/audio/monster_bite.mp3`, 'attack')
                 this.footSteps.push(new Audio(`${__BASE_URL__}assets/audio/step_dirt_l.mp3`, 'step'))
                 this.footSteps.push(new Audio(`${__BASE_URL__}assets/audio/step_dirt_r.mp3`, 'step'))
             break;
