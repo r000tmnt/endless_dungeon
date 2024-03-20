@@ -37,7 +37,7 @@ export default class TextBox{
         this.animationInit = false;
         this.speed = 100;
         this.dialogueAnimation = null;
-        this.optionSelected = 0
+        this.optionSelected = 0;
     }
 
     setConversationWindow = (width, height, fontSize, fontSize_md, fontSize_sm) => {
@@ -52,13 +52,15 @@ export default class TextBox{
 
             // Define background image
             conversationWindow.style.backgroundImage = `url(${__BASE_URL__}assets/images/bg/${this.event[this.sceneCounter].background}.png)`
-            // Define background audio
-            const bgAudio = new Audio(`${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`, 'bg')
 
-            console.log(bgAudio)
-
-            document.body.append(bgAudio)
-
+            // Define background audio if needed
+            if(game.bgAudio === null){
+                game.bgAudio = new Audio(`${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`, 'bg')
+            }else{
+                // Change audio source
+                game.bgAudio.src = `${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`
+            }
+            
             // Display conversation window
             conversationWindow.classList.remove('invisible')
             conversationWindow.classList.add('open_window')
@@ -402,17 +404,22 @@ export default class TextBox{
         conversationWindow.style.opacity = 0
 
         setTimeout(() => {
+            // Stop background audio
+            game.bgAudio.pause()
+            // Reset backgroud audio time line back to the start
+            game.bgAudio.currentTime = 0
+
+            // Remove the predefined event
+            game.level.event.splice(0, 1)
+            game.phaseCount += 1
+            game.beginNextPhase()
+
             // Reset conversationWinsow style
             conversationWindow.classList.remove('open_window')
             conversationWindow.classList.add('invisible')
             conversationWindow.style.opacity = null
             dialogue.style.color = 'white'
             this.speed = 100
-
-            // Remove the predefined event
-            game.level.event.splice(0, 1)
-            game.phaseCount += 1
-            game.beginNextPhase()
 
             // Clear text in the box
             textBox.innerHTML = ''
