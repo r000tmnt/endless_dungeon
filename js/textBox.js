@@ -154,6 +154,8 @@ export default class TextBox{
                         
                         // Skip the whole conversation if there are no options found
                         if(!optionExist){
+                            // Stop animation
+                            clearInterval(this.dialogueAnimation)  
                             this.dialogueCounter = 0;
                             this.textCounter = 0;
                             this.sceneCounter = 0
@@ -405,7 +407,7 @@ export default class TextBox{
             // Remove the predefined event
             game.level.event.splice(0, 1)
             game.phaseCount += 1
-            game.beginNextPhase()
+            game.beginNextPhase() 
 
             // Clear text in the box
             textBox.innerHTML = ''
