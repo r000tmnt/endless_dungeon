@@ -2,6 +2,7 @@ import weapon from "../dataBase/item/item_weapon"
 import armor from "../dataBase/item/item_armor"
 import setting from "./setting"
 import game from "../game"
+import Audio from "../audio"
 
 const diceRoll = async(hitRates, totalRate) => {
     for(let i=0; i < hitRates.length; i++){
@@ -104,8 +105,28 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
         console.log('totalRate :>>>', totalRate)
         console.log('Second dice roll :>>>', secondDiceRoll)
 
+        if(player.equip?.hand !== undefined){
+            switch(true){
+                case player.equip.hand.id.includes('knife'):
+                    if(player.attackSound === null){
+                        player.attackSound = new Audio(`${__BASE_URL__}assets/audio/knife_stab.mp3`, 'attack')
+                    }else{
+                        player.attackSound.element.src = `${__BASE_URL__}assets/audio/knife_stab.mp3`
+                    }
+
+                    player.attackSound.element.muted = false
+                    player.attackSound.element.play()
+                break;
+            }            
+        }else{
+            player.attackSound.element.muted = false
+            player.attackSound.element.play()
+        }
+
+
         if(secondDiceRoll.name === 'critRate'){
             console.log('crit!')
+
             enemy.animation = 'damage'
             const criticalHit = Math.round(damage * 1.5)
             resultMessage = String(criticalHit)
