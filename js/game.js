@@ -175,6 +175,7 @@ class Game{
         this.clickSound = null;
         this.menuOpenSound = null;
         this.menuCloseSound = null;
+        this.actionSelectSound = null;
         this.attackSound = null;
         this.potionSound = null;
         this.walkingSound = null;
@@ -195,6 +196,7 @@ class Game{
         // Define sound effects
         game.menuOpenSound = new Audio(`${__BASE_URL__}assets/audio/menu_selection.mp3`, 'interface')
         game.menuCloseSound = new Audio(`${__BASE_URL__}assets/audio/menu_close.mp3`, 'interface')
+        game.actionSelectSound = new Audio(`${__BASE_URL__}assets/audio/action_select.mp3`, 'interface')
         
         displayTitleScreen()
         // this.beginNextPhase()
