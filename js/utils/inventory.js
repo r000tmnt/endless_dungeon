@@ -731,6 +731,8 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
         item.innerText = itemData.name
         itemCount.innerText = currentActingPlayer.bag[i].amount
 
+        game.clickSound.bindTarget(item)
+
         // Check if item equipped
         if(Object.values(currentActingPlayer.equip).findIndex(e => e.id === itemData.id) >= 0){
             // Prepare to show a little text on the bottom left of the block
@@ -919,6 +921,8 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventIte
         // Setting inner text
         item.innerText = itemData.name
         itemCount.innerText = eventItem[i].amount
+
+        game.clickSound.bindTarget(item)
 
         console.log(item)
 
