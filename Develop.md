@@ -13,11 +13,11 @@ A demo of dungeon clawer game build with Html canvas and Javascript
     - js
         * [className].js
         - utils
-            *[functionality].js
+            * [functionality].js
         - dataBase
-            * [typeName].json
-            -item
-                * [item_type].json
+            * [typeName].js
+            - item
+                * [item_type].js
     - css
         * [className].css
     - public    
@@ -41,4 +41,5 @@ A demo of dungeon clawer game build with Html canvas and Javascript
 
 ## Library
 [long-press-event](https://www.npmjs.com/package/long-press-event)
-[ vite-plugin-top-level-await](https://github.com/Menci/vite-plugin-top-level-await)
+
+[vite-plugin-top-level-await](https://github.com/Menci/vite-plugin-top-level-await)
