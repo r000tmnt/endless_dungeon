@@ -14,3 +14,6 @@
 ## 0.1.3
 - Reference the long-press-event script as type module.
 - Define global const for base url to fetch assets.
+
+## 0.1.4
+- Stop appending undefined text into textBox when the conversation phase ended in skip mode.
