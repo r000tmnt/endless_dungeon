@@ -178,6 +178,7 @@ class Game{
         this.actionSelectSound = null;
         this.actionCancelSound = null;
         this.attackSound = null;
+        this.missSound = null;
         this.potionSound = null;
         this.walkingSound = null;
         this.equipSound = null;
@@ -200,6 +201,7 @@ class Game{
         this.actionSelectSound = new Audio(`${__BASE_URL__}assets/audio/action_select.mp3`, 'interface')
         this.actionCancelSound = new Audio(`${__BASE_URL__}assets/audio/action_cancel.mp3`, 'interface')
         this.potionSound = new Audio(`${__BASE_URL__}assets/audio/potion_drink.mp3`, 'item')
+        this.missSound = new Audio(`${__BASE_URL__}assets/audio/miss.mp3`, 'attack')
         
         displayTitleScreen()
         // this.beginNextPhase()
