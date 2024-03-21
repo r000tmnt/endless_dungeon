@@ -11,7 +11,6 @@ export default class Audio{
     constructor(source, type, target = null){
         this.element = document.createElement('audio')
         this.element.src = source
-        this.element.muted = true
 
         // this.ctx = new AudioContext()
         // this.audio = null
@@ -34,28 +33,14 @@ export default class Audio{
                     // this.playSound.loop = true
                     // this.play()
                     this.element.volume = setting.general.bgm / 100
-                    this.element.muted = false
                     this.element.loop = true
                     this.element.play()   
                 break;
                 case 'interface': case 'step': case 'attack': case 'item': case 'status':
                     this.element.volume = setting.general.se / 100
                 break;
-                default:
-                    this.element.volume = setting.general.bgm / 100
-                    this.bindTarget(target)
-                break;
             }
         // })
-
-        // this.canPlayThroughEvent = () => {
-        //     if(this.element.readyState > 3){
-        //         console.log('canplaythrough')
-        //         this.element.muted = false
-        //         this.element.loop = true
-        //         this.element.play()                
-        //     }
-        // }
     }
 
     // play(){
@@ -73,7 +58,6 @@ export default class Audio{
     bindTarget(target){
         target.addEventListener("click", () => {
             // this.play()
-            this.element.muted = false
             this.element.play()
         });    
     }
