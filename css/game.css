@@ -429,9 +429,13 @@ li{
     border: 1px solid yellow;
 }
 
-.no-event{
+.button_disable{
     pointer-events: none;
     background: #cccccc;
+}
+
+.lock_canvas{
+    pointer-events: none;
 }
 
 .btn-group{
