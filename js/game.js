@@ -185,6 +185,7 @@ class Game{
         this.unEquipSound = null;
         this.keySound = null;
         this.selectSound = null;
+        this.levelUpSound = null;
     }
 
     // Initialize the game
@@ -202,6 +203,7 @@ class Game{
         this.actionCancelSound = new Audio(`${__BASE_URL__}assets/audio/action_cancel.mp3`, 'interface')
         this.potionSound = new Audio(`${__BASE_URL__}assets/audio/potion_drink.mp3`, 'item')
         this.missSound = new Audio(`${__BASE_URL__}assets/audio/miss.mp3`, 'attack')
+        this.levelUpSound = new Audio(`${__BASE_URL__}assets/audio/level_up.mp3`, 'status')
         
         displayTitleScreen()
         // this.beginNextPhase()
@@ -259,6 +261,9 @@ class Game{
                                 setTimeout(() => {
                                     toggleCanvas(true)
                                     toggleTurnElement(true)
+                                    // Play background music
+                                    // this.bgAudio.element.src = ``
+                                    // this.bgAudio.element.play()
 
                                     setTimeout(() => {
                                         // Simulate click on the canvas where the first moving character is 
