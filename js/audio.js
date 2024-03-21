@@ -26,7 +26,7 @@ export default class Audio{
             case 'bg':
                 this.element.addEventListener('canplaythrough', this.canPlayThroughEvent, { once: true })  
             break;
-            case 'interface': case 'step': case 'attack': case 'item':
+            case 'interface': case 'step': case 'attack': case 'item': case 'status':
                 // if(target != null){                
                 // }
             break;
