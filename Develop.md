@@ -36,6 +36,9 @@ A demo of dungeon clawer game build with Html canvas and Javascript
                 - portrait
                     * [person_name].png
 
+            - audio
+                * [audio_name].[file_type]
+
 ## FrameWork
 [Vite](https://vitejs.dev/)                    
 
