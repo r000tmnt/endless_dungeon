@@ -120,12 +120,10 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
                         player.attackSound.element.src = `${__BASE_URL__}assets/audio/knife_stab.mp3`
                     }
 
-                    player.attackSound.element.muted = false
                     player.attackSound.element.play()
                 break;
             }            
         }else{
-            player.attackSound.element.muted = false
             player.attackSound.element.play()
         }
 
@@ -164,7 +162,6 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
         }
     }else{
         console.log('miss!')
-        game.missSound.element.muted = false
         game.missSound.element.play()
         resultMessage = 'MISS!'
     }
@@ -348,8 +345,7 @@ export const skillAttack = async(skill, player, enemy) => {
 
 // Player level up if the exp reached the required amount
 export const levelUp = (player) => {
-    // Play sound effect (need to make it short)
-    game.levelUpSound.element.muted = false
+    // Play sound effect
     game.levelUpSound.element.play()
 
     // Prepare level up message

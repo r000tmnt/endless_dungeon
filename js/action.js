@@ -365,7 +365,6 @@ export default class Action{
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
-            game.actionSelectSound.element.mute = false
             game.actionSelectSound.element.play()
             currentActingPlayer.attributes.ap -= 1
             this.reachableDirections = await prepareDirections(tileMap, playerPosition, { row, col }, this.reachableDirections)

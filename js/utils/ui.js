@@ -669,7 +669,6 @@ export const hideUIElement = () => {
 }
 
 export const cancelAction = () => {
-    game.actionCancelSound.element.muted = false
     game.actionCancelSound.element.play()
 
     if(!characterCaption.classList.contains('invisible')){

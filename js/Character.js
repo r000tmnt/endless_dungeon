@@ -156,7 +156,6 @@ export default class Character {
                     const frame = this.#setFilter(filter)
                     // Play the foot steop sound effect
                     // if(this.frameTimer === 20){
-                        this.footSteps[this.animationFrame].element.muted = false
                         this.footSteps[this.animationFrame].element.play()
                     // }
                     this.#animationTimer(ctx, 20, frame, true)
