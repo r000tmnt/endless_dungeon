@@ -129,6 +129,10 @@ const getPercentage = (type, character) => {
 }
 
 const endBattlePhase = () => {
+    // Reset backgroud audio time line back to the start
+    game.bgAudio.element.currentTime = 0
+    // Stop background audio
+    game.bgAudio.element.pause()
     toggleTurnElement(false)
     toggleCanvas(false)     
     countTurn(0)
@@ -150,7 +154,7 @@ export const uiInit = (game) => {
     for(let i=0; i < options.length; i++){
         switch(options[i].dataset.option){
             case 'party':
-                game.menuOpenSound.bindTarget(options[i])
+                game.actionSelectSound.bindTarget(options[i])
                 options[i].addEventListener('click', () => {
                     game.option.mode = 'party'
                     game.option.setPartyWindow(game.player, setting, game.action)
@@ -159,14 +163,14 @@ export const uiInit = (game) => {
                 })
             break;
             case 'objective':
-                game.menuOpenSound.bindTarget(options[i])
+                game.actionSelectSound.bindTarget(options[i])
                 options[i].addEventListener('click', () => {
                     game.option.mode = 'objective'
                     game.option.setObjectiveWindow(objectiveWindow, setting, game.tileMap.objective)
                 })
             break;
             case 'config':
-                game.menuOpenSound.bindTarget(options[i])
+                game.actionSelectSound.bindTarget(options[i])
                 options[i].addEventListener('click', () => {
                     game.option.mode = 'config'
                     game.option.setConfigWindow(setting)
@@ -175,6 +179,7 @@ export const uiInit = (game) => {
                 })
             break;
             case 'end':
+                game.actionSelectSound.bindTarget(options[i])
                 options[i].addEventListener('click', () => {
                     game.player.forEach(p => {
                         p.attributes.ap = 0
