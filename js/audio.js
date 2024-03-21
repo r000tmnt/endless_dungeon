@@ -9,14 +9,14 @@ export default class Audio{
     constructor(source, type, target = null){
         this.element = document.createElement('audio')
 
-        this.canPlayThroughEvent = () => {
-            if(this.element.readyState > 3){
-                console.log('canplaythrough')
-                this.element.muted = false
-                this.element.loop = true
-                this.element.play()                
-            }
-        }
+        // this.canPlayThroughEvent = () => {
+        //     if(this.element.readyState > 3){
+        //         console.log('canplaythrough')
+        //         this.element.muted = false
+        //         this.element.loop = true
+        //         this.element.play()                
+        //     }
+        // }
 
         this.element.src = source
         this.element.muted = true
@@ -24,7 +24,9 @@ export default class Audio{
         // Asign different types of click event for different types of audio
         switch(type){
             case 'bg':
-                this.element.addEventListener('canplaythrough', this.canPlayThroughEvent, { once: true })  
+                this.element.muted = false
+                this.element.loop = true
+                this.element.play()   
             break;
             case 'interface': case 'step': case 'attack': case 'item': case 'status':
                 // if(target != null){                
@@ -40,9 +42,9 @@ export default class Audio{
      * Remove the event listener on the audio element
      * @param {string} eventType - The type of the event 
      */
-    cancelEvent(eventType){
-        this.element.removeEventListener(eventType, this.canPlayThroughEvent)
-    }
+    // cancelEvent(eventType){
+    //     this.element.removeEventListener(eventType, this.canPlayThroughEvent)
+    // }
 
     bindTarget(target){
         target.addEventListener("click", () => {
