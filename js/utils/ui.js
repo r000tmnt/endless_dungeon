@@ -69,6 +69,8 @@ const partyWindow = document.getElementById('party')
 
 // Config UI
 const configWindow = document.getElementById('config')
+const bgmRange = document.getElementById('bgm')
+const seRange = document.getElementById('se')
 
 // Objective UI
 const objectiveWindow = document.getElementById('objective')
@@ -433,6 +435,36 @@ export const uiInit = (game) => {
     finishBtn[1].addEventListener('click', () => {
         game.phaseCount += 1 
         endBattlePhase()
+    })
+
+    // Input range bind event
+    bgmRange.value = setting.general.bgm
+    bgmRange.addEventListener('input', (e) => {
+        const volume = Number(e.target.value)
+        setting.general.bgm = volume
+        game.bgAudio.element.volume = volume / 100
+        console.log("volume:>>> ", game.bgAudio.element.value)
+    })
+
+    // Input range bind event
+    seRange.value = setting.general.se
+    seRange.addEventListener('input', (e) => {
+        const volume = Number(e.target.value) / 100
+        setting.general.bgm = Number(e.target.value)
+        game.clickSound.element.volume = volume
+        game.menuOpenSound.element.volume = volume
+        game.menuCloseSound.element.volume = volume
+        game.actionSelectSound.element.volume = volume
+        game.actionCancelSound.element.volume = volume
+        // game.attackSound.element.volume = volume
+        game.missSound.element.volume = volume
+        game.potionSound.element.volume = volume
+        // game.walkingSound.element.volume = volume
+        // game.equipSound.element.volume = volume
+        // game.unEquipSound.element.volume = volume
+        // game.keySound.element.volume = volume
+        // game.selectSound.element.volume = volume
+        game.levelUpSound.element.volume = volume
     })
 }
 
