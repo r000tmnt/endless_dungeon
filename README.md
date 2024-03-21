@@ -13,3 +13,5 @@ Thanks to opengameart.org and <a href="https://opengameart.org/content/ui-sounds
 Thanks to <a href="https://pixabay.com/sound-effects/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=102220">Pixabay</a> for menu sound effect from
 
 Thanks to <a href="https://opengameart.org/content/footstep-sounds">OwlishMedia</a> for foot step sound effect
+
+Thanks to <a href="https://opengameart.org/content/swish-bamboo-stick-weapon-swhoshes">Iwan Gabovitch</a> for swoshes sound effect
