@@ -59,6 +59,7 @@ export default class TextBox{
             }else{
                 // Change audio source
                 game.bgAudio.element.src = `${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`
+                game.bgAudio.element.play()
             }
 
             if(game.clickSound === null){
@@ -415,7 +416,7 @@ export default class TextBox{
             // Stop background audio
             game.bgAudio.element.pause()
             // Canacel event
-            game.bgAudio.cancelEvent('canplaythrough')
+            // game.bgAudio.cancelEvent('canplaythrough')
 
             // Remove the predefined event
             game.level.event.splice(0, 1)
