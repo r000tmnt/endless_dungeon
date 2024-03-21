@@ -135,14 +135,15 @@ const endBattlePhase = () => {
     game.bgAudio.element.pause()
     toggleTurnElement(false)
     toggleCanvas(false)     
-    countTurn(0)
-    game.action.mode = ''
-    game.turnType = 0    
+    countTurn(0) 
     canvas.removeEventListener('mousedown', game.canvasEvent)  
     levelClear.classList.remove('open_window')
     levelClear.classList.add('invisible')
     warn.classList.add('invisible')
     warn.classList.remove('open_window')
+    game.action.mode = ''
+    game.turnType = 0  
+    game.beginNextPhase()   
 }
 
 /**
@@ -430,8 +431,7 @@ export const uiInit = (game) => {
     })
 
     finishBtn[1].addEventListener('click', () => {
-        game.phaseCount += 1
-        game.beginNextPhase()   
+        game.phaseCount += 1 
         endBattlePhase()
     })
 }
@@ -540,7 +540,6 @@ export const displayResult = (win) => {
             levelClear.addEventListener('click', () => {
                 // Back to title screen or intermission
                 game.phaseCount = game.level.phase.length - 1
-                game.beginNextPhase()
                 endBattlePhase()
             })
         }, 1000)        
