@@ -705,9 +705,9 @@ export const toggleActionMenuOption = (action, disable, mode = '') => {
                 }
             }else
             if(disable){
-                actionMenuOptions[i].classList.add('no-event')
+                actionMenuOptions[i].classList.add('button_disable')
             }else{
-                actionMenuOptions[i].classList.remove('no-event')
+                actionMenuOptions[i].classList.remove('button_disable')
             }
             return
         }

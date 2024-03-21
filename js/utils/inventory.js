@@ -64,13 +64,13 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
             case 'lower':
                 if(attributes[clickedItem.effect.target] >= attributes[clickedItem.useCondition.target]){
                     itemActions[0].style.pointerEvents = 'none'
-                    itemActions[0].classList.add('no-event')
+                    itemActions[0].classList.add('button_disable')
                 }
             break;
             case 'equal':
                 if(attributes[clickedItem.effect.target] !== attributes[clickedItem.useCondition.target]){
                     itemActions[0].style.pointerEvents = 'none'
-                    itemActions[0].classList.add('no-event')
+                    itemActions[0].classList.add('button_disable')
                 }
             break;
         }
