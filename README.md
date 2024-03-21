@@ -15,3 +15,7 @@ Thanks to <a href="https://pixabay.com/sound-effects/?utm_source=link-attributio
 Thanks to <a href="https://opengameart.org/content/footstep-sounds">OwlishMedia</a> for foot step sound effect
 
 Thanks to <a href="https://opengameart.org/content/swish-bamboo-stick-weapon-swhoshes">Iwan Gabovitch</a> for swoshes sound effect
+
+Thanks to <a href="https://opengameart.org/content/liquid-bottle-drink-set">qubodup</a> for potion sound effect
+
+Thanks to <a href="https://opengameart.org/content/free-music-pack">tricksntraps</a> for background music
