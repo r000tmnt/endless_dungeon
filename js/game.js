@@ -199,6 +199,7 @@ class Game{
         this.menuCloseSound = new Audio(`${__BASE_URL__}assets/audio/menu_close.mp3`, 'interface')
         this.actionSelectSound = new Audio(`${__BASE_URL__}assets/audio/action_select.mp3`, 'interface')
         this.actionCancelSound = new Audio(`${__BASE_URL__}assets/audio/action_cancel.mp3`, 'interface')
+        this.potionSound = new Audio(`${__BASE_URL__}assets/audio/potion_drink.mp3`, 'item')
         
         displayTitleScreen()
         // this.beginNextPhase()
