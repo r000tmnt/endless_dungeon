@@ -241,6 +241,7 @@ export default{
                     "scene": [
                         {
                             "background": "cave",
+                            "audio": "cave_ambience",
                             "people": 0,
                             "dialogue": [
                                 {
