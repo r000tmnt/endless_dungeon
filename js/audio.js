@@ -25,6 +25,7 @@ export default class Audio{
         switch(type){
             case 'bg':
                 this.element.muted = false
+                this.element.volume = 0.5
                 this.element.loop = true
                 this.element.play()   
             break;
