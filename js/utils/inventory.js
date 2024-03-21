@@ -775,11 +775,13 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
     for(let i=0; i < itemActions.length; i++){
         switch(itemActions[i].dataset.action){
             case 'use':
+                game.clickSound.bindTarget(itemActions[i])
                 itemActions[i].addEventListener('click', () => {
                     setItemSpace(currentActingPlayer, enemyPosition, tileMap)
                 })
             break;
             case 'equip':
+                game.clickSound.bindTarget(itemActions[i])
                 itemActions[i].addEventListener('click', () => {
                     if(itemActions[i].innerText === 'Unequip'){
                         UnequipItem(currentActingPlayer, itemActions)
@@ -789,6 +791,7 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
                 })
             break;
             case 'drop':
+                game.clickSound.bindTarget(itemActions[i])
                 itemActions[i].addEventListener('click', () => {
                     // Open slider
 
@@ -832,11 +835,13 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
                 })
             break;
             case 'give':
+                game.clickSound.bindTarget(itemActions[i])
                 itemActions[i].addEventListener('click', () => {
                     giveItem(currentActingPlayer)
                 })
             break;
             case 'close':
+                game.actionCancelSound.bindTarget(itemActions[i])
                 itemActions[i].addEventListener('click', () => {
                     subMenu.classList.remove('open_subWindow')
                     subMenu.classList.add('invisible')
