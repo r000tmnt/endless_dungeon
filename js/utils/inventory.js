@@ -639,6 +639,10 @@ export const useItem = (currentActingPlayer) => {
         break;
         default:
             if(effect.type === 0){
+                // Play sound effect
+                game.potionSound.element.muted = false
+                game.potionSound.element.play()
+
                 currentActingPlayer.attributes[`${effect.target}`] += effect.amount
 
                 resultMessage = String(effect.amount)
