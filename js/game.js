@@ -262,8 +262,8 @@ class Game{
                                     toggleCanvas(true)
                                     toggleTurnElement(true)
                                     // Play background music
-                                    // this.bgAudio.element.src = ``
-                                    // this.bgAudio.element.play()
+                                    this.bgAudio.element.src = `${__BASE_URL__}assets/audio/battle/${this.level.audio}.mp3`
+                                    this.bgAudio.element.play()
 
                                     setTimeout(() => {
                                         // Simulate click on the canvas where the first moving character is 
