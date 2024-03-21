@@ -4,6 +4,12 @@ import setting from "./setting"
 import game from "../game"
 import Audio from "../audio"
 
+// Possible value for attribute growth
+const grows = [0, 1, 3]
+
+// A list of attributes that are allow to growth on level up
+const attributeList = ['maxHp', 'maxMp', 'str', 'def', 'spd', 'int', 'lck', 'spi']
+
 const diceRoll = async(hitRates, totalRate) => {
     for(let i=0; i < hitRates.length; i++){
         hitRates[i].value = hitRates[i].value / totalRate
@@ -254,7 +260,7 @@ const calculatePossibleDamage = (player, enemyDefense, base_on_attribute, base_n
 }
 
 /**
- * 
+ * Calculate the possible damage of the attack
  * @param {object} player - An object contains player attributes 
  * @param {object} enemy - An object contains enemy attributes 
  * @returns 
@@ -342,44 +348,73 @@ export const skillAttack = async(skill, player, enemy) => {
 
 // Player level up if the exp reached the required amount
 export const levelUp = (player) => {
-    // Player level up
-    player.lv += 1
-    // Extend the required exp for the next level
-    player.requiredExp += player.requiredExp * 1.5
+    // Play sound effect (need to make it short)
+    game.levelUpSound.element.muted = false
+    game.levelUpSound.element.play()
 
-    // Give player a few points to spend
-    player.pt = 5
+    // Prepare level up message
+    const { fontSize, fontSize_sm } = setting.general
+    const appWrapper = document.getElementById('wrapper')
+    const message = document.createElement('span')
+    message.classList.add('absolute')
+    message.style.opacity = 0
+    message.style.fontSize = fontSize + 'px'
+    message.style.fontWeight = 'bold'
+    message.style.padding = fontSize_sm + 'px'
+    message.style.color = 'white'
+    message.style.backgrounf = 'black'
+    message.style.top = player.y + 'px'
+    message.style.left = player.x + 'px'
+    message.style.transition = 'all .5s ease-in-out'
+    message.innerText = 'LEVEL UP'
+    appWrapper.append(message)
 
-    const grows = [0, 1, 3]
+    // Display level up message
+    setTimeout(() => {
+        message.style.opacity = 1
+        message.style.top = (player.y - fontSize) + 'px'
 
-    // A list of attributes that are allow to growth on level up
-    const attributeList = ['maxHp', 'maxMp', 'str', 'def', 'spd', 'int', 'lck', 'spi']
+        // Delete level up message
+        setTimeout(() => {
+            message.style.opacity = 0
+            message.style.top = (player.y - (fontSize * 2)) + 'px'
+            
+            setTimeout(() => {
+                message.remove()
+            
+                // Player level up
+                player.lv += 1
+                // Extend the required exp for the next level
+                player.requiredExp += player.requiredExp * 1.5
 
-    console.log('player status before level up :>>>', player.attributes)
+                // Give player a few points to spend
+                player.pt = 5
 
-    // Randomly apply attributes growth
-    for(let attr of attributeList){
-        console.log('key :>>>', attr)
-        const allowIndex = attributeList.findIndex(a => a === attr)
-        const preferIndex = player.prefer_attributes.findIndex(a => attr.includes(a))
-        if(allowIndex >= 0){
-            const randomGrowth = Math.floor(Math.random() * (grows.length -1))
-            player.attributes[attr] += grows[randomGrowth]
-        }
+                console.log('player status before level up :>>>', player.attributes)
 
-        // Guarantee attribute growth
-        if(preferIndex >= 0){
-            player.attributes[attr] += 1
-        }
-    }
+                // Guarantee attribute growth
+                player.prefer_attributes.forEach(attr => {
+                    player.attributes[attr] += 1
+                });
 
-    // Check if exp is enough to level up the character again
-    if(player.exp >= player.requiredExp){
-        levelUp(player)
-    }else{
-        game.characterAnimationPhaseEnded(player)
-        console.log('player status after level up :>>>', player.attributes)        
-    }
+                // Randomly apply attributes growth
+                for(let attr of attributeList){
+                    console.log('key :>>>', attr)
+
+                    const randomGrowth = Math.floor(Math.random() * (grows.length -1))
+                    player.attributes[attr] += grows[randomGrowth]
+                }
+
+                // Check if exp is enough to level up the character again
+                if(player.exp >= player.requiredExp){
+                    levelUp(player)
+                }else{
+                    game.characterAnimationPhaseEnded(player)
+                    console.log('player status after level up :>>>', player.attributes)        
+                }            
+            }, 500)
+        }, 500)                
+    }, 500)
 }
 
 // Player gain expirence upon enemy defeated
@@ -389,38 +424,7 @@ export const gainExp = (player, enemy) => {
         player.exp += enemy.givenExp
 
         if(player.exp >= player.requiredExp){
-            // Prepare level up message
-            const { fontSize, fontSize_sm } = setting.general
-            const appWrapper = document.getElementById('wrapper')
-            const message = document.createElement('span')
-            message.classList.add('absolute')
-            message.style.opacity = 0
-            message.style.fontSize = fontSize + 'px'
-            message.style.fontWeight = 'bold'
-            message.style.padding = fontSize_sm + 'px'
-            message.style.color = 'white'
-            message.style.backgrounf = 'black'
-            message.style.top = player.y + 'px'
-            message.style.left = player.x + 'px'
-            message.style.transition = 'all .5s ease-in-out'
-            message.innerText = 'LEVEL UP'
-            appWrapper.append(message)
-
-            // Display level up message
-            setTimeout(() => {
-                message.style.opacity = 1
-                message.style.top = (player.y - fontSize) + 'px'
-
-                // Delete level up message
-                setTimeout(() => {
-                    message.style.opacity = 0
-                    message.style.top = (player.y - (fontSize * 2)) + 'px'
-                    levelUp(player)
-
-                    setTimeout(() => message.remove(), 500)
-                }, 500)                
-            }, 500)
-
+            levelUp(player)
         }else{
             game.characterAnimationPhaseEnded(player)
         }   
