@@ -111,7 +111,7 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
         console.log('totalRate :>>>', totalRate)
         console.log('Second dice roll :>>>', secondDiceRoll)
 
-        if(player.equip?.hand !== undefined){
+        if(player.equip?.hand?.id !== undefined){
             switch(true){
                 case player.equip.hand.id.includes('knife'):
                     if(player.attackSound === null){
