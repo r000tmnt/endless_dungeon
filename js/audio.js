@@ -10,10 +10,12 @@ export default class Audio{
         this.element = document.createElement('audio')
 
         this.canPlayThroughEvent = () => {
-            console.log('canplaythrough')
-            this.element.muted = false
-            this.element.loop = true
-            this.element.play()
+            if(this.element.readyState > 3){
+                console.log('canplaythrough')
+                this.element.muted = false
+                this.element.loop = true
+                this.element.play()                
+            }
         }
 
         this.element.src = source
