@@ -25,6 +25,7 @@ export default{
                 [1, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 1, 1, 1, 1, 1, 1, 1, 1],
             ],
+            "audio": "Alexander Ehlers - Warped", // Audio for battle phase
             "assets": [ // define in numeric order
                 "",
                 "wall.png",
