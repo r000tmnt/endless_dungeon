@@ -54,12 +54,14 @@ export default class TextBox{
             conversationWindow.style.backgroundImage = `url(${__BASE_URL__}assets/images/bg/${this.event[this.sceneCounter].background}.png)`
 
             // Define background audio if needed
-            if(game.bgAudio === null){
-                game.bgAudio = new Audio(`${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`, 'bg')
-            }else{
-                // Change audio source
-                game.bgAudio.element.src = `${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`
-                game.bgAudio.element.play()
+            if(this.event[this.sceneCounter].audio.length){
+                if(game.bgAudio === null){
+                    game.bgAudio = new Audio(`${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`, 'bg')
+                }else{
+                    // Change audio source
+                    game.bgAudio.element.src = `${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`
+                    game.bgAudio.element.play()
+                }                
             }
 
             if(game.clickSound === null){
