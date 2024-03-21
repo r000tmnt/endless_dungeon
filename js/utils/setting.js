@@ -1,8 +1,8 @@
 export default {
     general: {
         showGrid: true,
-        bgm: 0,
-        se: 0,
+        bgm: 100,
+        se: 100,
         filter: 'default',
         fontSize: 0,
         fontSize_md: 0,
