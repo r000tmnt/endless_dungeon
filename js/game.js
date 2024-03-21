@@ -77,7 +77,6 @@ class Game{
             
             // If not playing animation
             if(!this.action.animationInit){
-                
                 // Define who is on the tile you clicked
                 this.inspectingCharacter = this.player.find(p => p.y === (row * tileSize) && p.x === (col * tileSize))
 
@@ -134,6 +133,7 @@ class Game{
                     }
                     break;
                     default:
+                        game.actionSelectSound.element.play()
                         // if this tile is player
                         if(this.inspectingCharacter?.type === 2){
                             console.log('I am player')
@@ -204,6 +204,7 @@ class Game{
         this.potionSound = new Audio(`${__BASE_URL__}assets/audio/potion_drink.mp3`, 'item')
         this.missSound = new Audio(`${__BASE_URL__}assets/audio/miss.mp3`, 'attack')
         this.levelUpSound = new Audio(`${__BASE_URL__}assets/audio/level_up.mp3`, 'status')
+        this.clickSound = new Audio(`${__BASE_URL__}assets/audio/click.wav`, 'interface')
         
         displayTitleScreen()
         // this.beginNextPhase()
