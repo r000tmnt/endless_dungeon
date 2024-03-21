@@ -63,12 +63,6 @@ export default class TextBox{
                     game.bgAudio.element.play()
                 }                
             }
-
-            if(game.clickSound === null){
-                game.clickSound = new Audio(`${__BASE_URL__}assets/audio/click.wav`, 'click', conversationWindow)
-            }else{
-                game.clickSound.element.src = `${__BASE_URL__}assets/audio/click.wav`
-            }
             
             // Display conversation window
             conversationWindow.classList.remove('invisible')
@@ -97,6 +91,7 @@ export default class TextBox{
 
     // Conversation click event
     setConversationEvent = (width, height, fontSize_md) => {
+        game.clickSound.bindTarget(conversationWindow)
         conversationWindow.addEventListener('click', () => {
             console.log('conversation proceed')
             if(this.optionOnScreen || this.action === 'auto'){
@@ -137,6 +132,7 @@ export default class TextBox{
         for(let i=0; i < controlOptions.length; i++){
             switch(controlOptions[i].dataset.action){
                 case 'skip':
+                    game.clickSound.bindTarget(controlOptions[i])
                     // Jump to the step where options are presents or to go the battle phase
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
@@ -181,6 +177,7 @@ export default class TextBox{
                     })
                 break;
                 case 'hide':
+                    game.clickSound.bindTarget(controlOptions[i])
                     // Hide both text box and control options on the screen
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
@@ -197,6 +194,7 @@ export default class TextBox{
                     })
                 break;
                 case 'auto':
+                    game.clickSound.bindTarget(controlOptions[i])
                     // Increse the dialogue play speed and auto click, stop at options
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
@@ -222,6 +220,7 @@ export default class TextBox{
                     })
                 break;
                 case 'log':
+                    game.clickSound.bindTarget(controlOptions[i])
                     // Display dialogue log
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
@@ -533,6 +532,7 @@ export default class TextBox{
                 }
 
                 // Bind click event
+                game.clickSound.bindTarget(option)
                 option.addEventListener('click', (event) => {
                     event.stopPropagation()
                     this.optionSelected = i
