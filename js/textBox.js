@@ -110,6 +110,12 @@ export default class TextBox{
                     break;
                 }
             }
+
+            // Block click event for a few milliseconds
+            conversationWindow.style.pointerEvents = 'none'
+            setTimeout(() => {
+                conversationWindow.style.pointerEvents = 'auto'
+            }, 300)
         })     
         
         // Get dialog options
