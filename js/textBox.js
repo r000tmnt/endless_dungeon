@@ -74,7 +74,8 @@ export default class TextBox{
                 }else{
                     console.log('first message')
                     // Load the first message of conversation
-                    this.#loadConversation()                   
+                    this.#loadConversation()
+                    this.unLockTextBox()                   
                 }
             }, 500)
         }, 500)
@@ -118,6 +119,7 @@ export default class TextBox{
                     break;
                 }
             }
+            this.unLockTextBox() 
         })     
         
         // Get dialog options
@@ -264,7 +266,7 @@ export default class TextBox{
         // Block click event for a few milliseconds
         setTimeout(() => {
             this.textBoxClicked = false
-        }, 1000)
+        }, 300)
     }
 
     resizeConversationWindow(width, height, fontSize, fontSize_md, fontSize_sm){
@@ -392,8 +394,7 @@ export default class TextBox{
 
             if(!optionExist){
                 this.textLength = message.content.length - 1
-                this.#displayConversation(message)   
-                this.unLockTextBox()                  
+                this.#displayConversation(message)                
             }                     
         }
     }
