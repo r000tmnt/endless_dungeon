@@ -528,7 +528,7 @@ export default class TextBox{
                 if(size.length){
                     option.style.fontSize = setting.general[size] + 'px'
                 }else{
-                    option.style.fontSize = setting.general.fontSize + 'px'
+                    option.style.fontSize = setting.general.fontSize_md + 'px'
                 }
 
                 // Bind click event
