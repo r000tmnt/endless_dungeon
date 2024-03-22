@@ -428,11 +428,13 @@ export const uiInit = (game) => {
     // Button to finish the result screen
     const finishBtn = levelClear.getElementsByTagName('button')
 
+    game.actionCancelSound.bindTarget(finishBtn[0])
     finishBtn[0].addEventListener('click', () => {
         warn.classList.remove('open_window')
         warn.classLisr.add('invisible')
     })
 
+    game.actionSelectSound.bindTarget(finishBtn[1])
     finishBtn[1].addEventListener('click', () => {
         game.phaseCount += 1 
         endBattlePhase()
@@ -600,7 +602,7 @@ export const closePickUpWindow = async() => {
         levelClear.classList.add('open_window')
     }else{
         // Check if the tile has an event
-        await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
+        await game.checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
         pickUpWindow.classList.add('invisible')
         pickUpWindow.classList.remove('open_window')
         clearPickUpWindow(pickUpWindow.style)
