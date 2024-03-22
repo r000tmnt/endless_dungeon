@@ -94,6 +94,10 @@ body{
     flex-wrap: wrap;
 }
 
+.evenly{
+    justify-content: space-evenly;
+}
+
 ul{
     padding: 0;
     margin-left: 3px;
@@ -349,7 +353,7 @@ li{
     margin-top: 5%;
 }
 
-#config_option > tr{
+#config_option > tbody > tr > td > input[type="range"]{
     width: 100%;
 }
 
