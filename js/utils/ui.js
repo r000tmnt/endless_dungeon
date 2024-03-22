@@ -71,6 +71,7 @@ const partyWindow = document.getElementById('party')
 const configWindow = document.getElementById('config')
 const bgmRange = document.getElementById('bgm')
 const seRange = document.getElementById('se')
+const configOption = document.getElementById('config_option')
 
 // Objective UI
 const objectiveWindow = document.getElementById('objective')
@@ -943,7 +944,7 @@ export const resize = () => {
 
                 warn.style.fontSize = fontSize_md + 'px'
 
-                finishBtn.forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
+                Array.from(levelClear.getElementsByTagName('button')).forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
 
                 switch(game.action.mode){
                     case 'item':
@@ -982,6 +983,8 @@ export const resize = () => {
                     case 'config':
                         // Set config window style
                         configWindow.style.fontSize = fontSize_md + 'px'
+                        configOption.style.width = (cameraWidth - (fontSize_md * 2)) + 'px'
+                        configWindow.children[0].style.fontSize = fontSize + 'px'
                         resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontSize_sm)
                     break;
                 }
