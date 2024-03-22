@@ -200,7 +200,7 @@ export default{
                                             "audio": ['click']
                                         },
                                         {
-                                            "value": "I trust on my own fist",
+                                            "value": "I trust in my own fist",
                                             "style": "",
                                             "size": "",
                                             "content": "You kicked the knife out of your reach.\nYet it stops in the middle like it hit something solid, and it is not the sound of the ground or stone either.",
