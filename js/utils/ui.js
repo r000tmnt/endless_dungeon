@@ -439,18 +439,20 @@ export const displayTitleScreen = () => {
     }, 1000);
 
     titleScreen.addEventListener('click', () => {
-        clearInterval(tapInterval)
-        tap.classList.add("fade_out")
-        // document.getElementById("titleAction").classList.remove('invisible')
+        if(titleScreen.classList.contains('open_window')){
+            clearInterval(tapInterval)
+            tap.classList.add("fade_out")
+            // document.getElementById("titleAction").classList.remove('invisible')
 
-        // Start game
-        titleScreen.classList.remove('open_window')
-        titleScreen.classList.add('invisible')
-        
-        setTimeout(() => {
-            game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
-            game.beginNextPhase()                    
-        }, 500)
+            // Start game
+            titleScreen.classList.remove('open_window')
+            titleScreen.classList.add('invisible')
+            
+            setTimeout(() => {
+                game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
+                game.beginNextPhase()                    
+            }, 500)            
+        }
     })
 }
 

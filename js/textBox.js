@@ -25,6 +25,8 @@ export default class TextBox{
         this.log = [];
         this.action = '';
         this.optionOnScreen = false;
+        this.textBoxClicked = true
+
         // Count the scence to display in conversation phase
         this.sceneCounter = 0;
         this.dialogueCounter = 0;
@@ -70,8 +72,9 @@ export default class TextBox{
 
                     this.#loadCharacterPortrait(portrait[0], () => this.#loadConversation())
                 }else{
+                    console.log('first message')
                     // Load the first message of conversation
-                    this.#loadConversation()                    
+                    this.#loadConversation()                   
                 }
             }, 500)
         }, 500)
@@ -80,15 +83,20 @@ export default class TextBox{
     // Conversation click event
     setConversationEvent = (width, height, fontSize_md) => {
         conversationWindow.addEventListener('click', () => {
-            console.log('conversation proceed')
-            if(this.optionOnScreen || this.action === 'auto'){
+            
+            if(this.optionOnScreen || this.action === 'auto' || this.textBoxClicked){
+                console.log('Block')
                 return
             }
 
             if(this.animationInit){
+                console.log('skip the message')
                 // Skip animation / show the whole dialogue
                 this.animationInit = false
+                this.textBoxClicked = true
             }else{
+                console.log('conversation proceed')
+                this.textBoxClicked = true
                 switch(this.action){
                     case 'hide':
                         this.action = ''
@@ -110,12 +118,6 @@ export default class TextBox{
                     break;
                 }
             }
-
-            // Block click event for a few milliseconds
-            conversationWindow.style.pointerEvents = 'none'
-            setTimeout(() => {
-                conversationWindow.style.pointerEvents = 'auto'
-            }, 300)
         })     
         
         // Get dialog options
@@ -256,7 +258,14 @@ export default class TextBox{
                 break;
             }
         }
-    }         
+    }     
+    
+    unLockTextBox(){
+        // Block click event for a few milliseconds
+        setTimeout(() => {
+            this.textBoxClicked = false
+        }, 1000)
+    }
 
     resizeConversationWindow(width, height, fontSize, fontSize_md, fontSize_sm){
         resizeHiddenElement(conversationWindow.style, width, height, fontSize_md)
@@ -383,7 +392,8 @@ export default class TextBox{
 
             if(!optionExist){
                 this.textLength = message.content.length - 1
-                this.#displayConversation(message)                     
+                this.#displayConversation(message)   
+                this.unLockTextBox()                  
             }                     
         }
     }
