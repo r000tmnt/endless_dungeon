@@ -605,7 +605,11 @@ li{
     background-size: cover;
   }
 
-  #dialogue, #dialogue-options > li{
+  #dialogue{
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+#dialogue-options > li{
     border: none;
     background: linear-gradient(to left, rgba(0, 0 , 0, 0), rgba(0, 0 , 0, 0.7) 50%, rgba(0, 0 , 0, 0));
     white-space: nowrap;
