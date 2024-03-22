@@ -411,6 +411,95 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
     }
 }
 
+// Loop through sub menu buttons
+// Set click event to sub menu buttons
+export const defineSubMenu = (game) => {
+    for(let i=0, itemActions = document.getElementById('itemAction').querySelectorAll('li'); i < itemActions.length; i++){
+        switch(itemActions[i].dataset.action){
+            case 'use':
+                game.clickSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    setItemSpace(game.inspectingCharacter, game.enemyPosition, game.tileMap)
+                })
+            break;
+            case 'equip':
+                game.clickSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    if(itemActions[i].innerText === 'Unequip'){
+                        UnequipItem(game.inspectingCharacter, itemActions)
+                    }else{
+                        equipItem(game.inspectingCharacter, itemActions)
+                    }
+                })
+            break;
+            case 'drop':
+                game.clickSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    if(currentActingPlayer.bag[selectedItem.index].amount > 1){
+                        const { fontSize, camera } = setting.general
+                        const { width } = camera
+                        const { itemBlockMargin } = setting.inventory
+    
+                        // Open slider
+                        const slider = document.getElementById('slider')
+                        const range = document.getElementById('range')
+                        const btns = slider.children[2].getElementsByTagName('button')
+    
+                        range.style.width = ((width - fontSize) - itemBlockMargin) + 'px'
+                        range.setAttribute('max', selectedItem.amount)
+    
+                        // Set the size of each block
+                        slider.style.width = (width - fontSize) + 'px'
+                        slider.style.fontSize = fontSize + 'px'
+    
+                        // Blind input event
+                        range.oninput = function() {
+                            slider.children[1].innerText = this.value;
+                        }
+    
+                        Array.from(btns).forEach(btn => {
+                            btn.style.margin = `0 ${fontSize / 2}px`
+                            btn.style.fontSize = (fontSize / 2) + 'px'
+                            btn.style.width = Math.floor(width * (30 / 100)) + 'px'
+                        })
+    
+                        // Cancel button
+                        btns[0].addEventListener('click', () => {
+                            // Reset slider
+                            slider.classList.add('invisible')
+                            subMenu.classList.remove('invisible')
+                            range.setAttribute('value', 1)
+                        })
+    
+                        // Confirm button
+                        btns[1].addEventListener('click', () => {
+                            dropItem(game.inspectingCharacter, itemActions)
+                        })
+    
+                        slider.classList.remove('invisible')
+                        subMenu.classList.add('invisible')                        
+                    }else{
+                        dropItem(game.inspectingCharacter, itemActions)
+                    }
+                })
+            break;
+            case 'give':
+                game.clickSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    giveItem(game.inspectingCharacter)
+                })
+            break;
+            case 'close':
+                game.actionCancelSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    subMenu.classList.remove('open_subWindow')
+                    subMenu.classList.add('invisible')
+                })
+            break;
+        }
+    }
+}
+
 /**
  * Get item data url from type
  * @param {number} itemType - A number represent the type of the item 
@@ -682,7 +771,6 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
     const title = Inventory.children[0]
     const space = document.getElementById('inventory')
     const subMenu = document.getElementById('itemAction')
-    const itemActions = subMenu.querySelectorAll('li')
     const filterButton = document.querySelectorAll('.filter')
     const desc = document.getElementById('item-desc')
 
@@ -716,7 +804,7 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
         // Get item data
         const itemData = getItemType(currentActingPlayer.bag[i])
 
-        item.setAttribute('data-long-press-delay', 500)
+        item.setAttribute('data-long-press-delay', 300)
 
         // Set long-press event
         item.addEventListener('long-press', () => {
@@ -767,89 +855,6 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
         // item.append(itemToolTip)
         item.append(itemCount)
         space.append(item)
-    }
-
-    // Loop through sub menu buttons
-    // Set click event to sub menu buttons
-    for(let i=0; i < itemActions.length; i++){
-        switch(itemActions[i].dataset.action){
-            case 'use':
-                game.clickSound.bindTarget(itemActions[i])
-                itemActions[i].addEventListener('click', () => {
-                    setItemSpace(currentActingPlayer, enemyPosition, tileMap)
-                })
-            break;
-            case 'equip':
-                game.clickSound.bindTarget(itemActions[i])
-                itemActions[i].addEventListener('click', () => {
-                    if(itemActions[i].innerText === 'Unequip'){
-                        UnequipItem(currentActingPlayer, itemActions)
-                    }else{
-                        equipItem(currentActingPlayer, itemActions)
-                    }
-                })
-            break;
-            case 'drop':
-                game.clickSound.bindTarget(itemActions[i])
-                itemActions[i].addEventListener('click', () => {
-                    if(currentActingPlayer.bag[selectedItem.index].amount > 1){
-                        // Open slider
-                        const slider = document.getElementById('slider')
-                        const range = document.getElementById('range')
-                        const btns = slider.children[2].getElementsByTagName('button')
-
-                        range.style.width = ((width - fontSize) - itemBlockMargin) + 'px'
-                        range.setAttribute('max', selectedItem.amount)
-
-                        // Set the size of each block
-                        slider.style.width = (width - fontSize) + 'px'
-                        slider.style.fontSize = fontSize + 'px'
-
-                        // Blind input event
-                        range.oninput = function() {
-                            slider.children[1].innerText = this.value;
-                        }
-
-                        Array.from(btns).forEach(btn => {
-                            btn.style.margin = `0 ${fontSize / 2}px`
-                            btn.style.fontSize = (fontSize / 2) + 'px'
-                            btn.style.width = Math.floor(width * (30 / 100)) + 'px'
-                        })
-
-                        // Cancel button
-                        btns[0].addEventListener('click', () => {
-                            // Reset slider
-                            slider.classList.add('invisible')
-                            subMenu.classList.remove('invisible')
-                            range.setAttribute('value', 1)
-                        })
-
-                        // Confirm button
-                        btns[1].addEventListener('click', () => {
-                            dropItem(currentActingPlayer, itemActions)
-                        })
-
-                        slider.classList.remove('invisible')
-                        subMenu.classList.add('invisible')                        
-                    }else{
-                        dropItem(currentActingPlayer, itemActions)
-                    }
-                })
-            break;
-            case 'give':
-                game.clickSound.bindTarget(itemActions[i])
-                itemActions[i].addEventListener('click', () => {
-                    giveItem(currentActingPlayer)
-                })
-            break;
-            case 'close':
-                game.actionCancelSound.bindTarget(itemActions[i])
-                itemActions[i].addEventListener('click', () => {
-                    subMenu.classList.remove('open_subWindow')
-                    subMenu.classList.add('invisible')
-                })
-            break;
-        }
     }
 
     // Apply style to the item wrapper
