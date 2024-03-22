@@ -57,42 +57,48 @@
 
             <button class="back absolute" data-action="config" type="button">BACK</button>
 
-            <ul id="config_option" class="disable-scrollbars">
-                <!-- BGM -->
-                <p class="flex config_item">
-                    <label for="bgm">BGM</label>
-                    <input id="bgm" min="0" max="100" type="range" data-config="bgm" name="bgm" >  
-                </p>
-                <!-- SE -->
-                <p class="flex config_item">
-                    <label for="se">SE</label> 
-                    <input id="se" min="0" max="100" type="range" data-config="se" name="se" >               
-                </p>
-                <!-- Grid -->
-                <div>
-                    Grid
-                    <p class="flex config_item">
-                        <label for="grid">Display</label>
-                        <input type="radio" data-config="grid" name='grid' value="true"> 
+            <table id="config_option" class="disable-scrollbars">
+                <tbody>
+                    <!-- BGM -->
+                    <tr>
+                        <td>BGM</td>
+                        <td colspan="2">
+                            <input id="bgm" min="0" max="100" type="range" data-config="bgm" name="bgm" > 
+                        </td>
+                    </tr>
+                    <!-- SE -->
+                    <tr>
+                        <td>SE</td>
+                        <td colspan="2">
+                            <input id="se" min="0" max="100" type="range" data-config="se" name="se" > 
+                        </td>    
+                    </tr>
+                    <!-- Grid -->
+                    <tr>
+                        <td>Grid</td>
+                        <td class="flex">
+                            <label for="grid">Display</label>
+                            <input type="radio" data-config="grid" name='grid' value="true">          
 
-                        <label for="grid">Hide</label>
-                        <input type="radio" data-config="grid" name='grid' value="false">             
-                    </p>                
-                </div>
+                            <label for="grid">Hide</label>
+                            <input type="radio" data-config="grid" name='grid' value="false">   
+                        </td>
+                    </tr>
 
-                <!-- Character image filter -->
-                <div>
-                    Unit filter
+                    <!-- Character image filter -->
+                    <tr>
+                        <td>Filter</td>
 
-                    <p class="flex config_item">
-                        <label for="default">Default</label>
-                        <input type="radio" data-config="filter" name="filter" value="default">  
+                        <td class="flex">
+                            <label for="default">Default</label>
+                            <input type="radio" data-config="filter" name="filter" value="default">  
 
-                        <label for="retro">Retro</label>
-                        <input type="radio" data-config="filter" name="filter" value='retro'>
-                    </p>
-                </div>
-            </ul>
+                            <label for="retro">Retro</label>
+                            <input type="radio" data-config="filter" name="filter" value='retro'>
+                        </td>
+                    </tr>                    
+                </tbody>
+            </table>
         </div>
         
         <!-- Objective -->
