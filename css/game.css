@@ -345,8 +345,12 @@ li{
     bottom: 0;
 }
 
-.config_item{
-    align-items: center;
+#config_option{
+    margin-top: 5%;
+}
+
+#config_option > tr{
+    width: 100%;
 }
 
 .back{
