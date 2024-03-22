@@ -20,3 +20,6 @@
 
 ## 0.1.5
 - Block conversation click event for a few milliseconds to avoid messing up the words in textBox by clicking rapidly.
+
+## 0.1.6
+- Title screen click event only procced if the title is still visible to prevent setting up the next phase for multiple times by clicking rapidly.
