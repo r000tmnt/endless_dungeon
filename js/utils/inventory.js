@@ -257,12 +257,12 @@ const removeItem = (currentActingPlayer, value) => {
         const { itemBlockMargin } = setting.inventory
 
         // Rearrange the style start with the index
-        for(let i = selectedItem.index, items = document.querySelectorAll('.item').length; i < items; i++){
+        for(let i = selectedItem.index, items = document.querySelectorAll('.item');  i < items.length; i++){
             // If the index is the middle column
             if(((i + (i+1)) % 3) === 0){
-                items[i].style.margin = `0 ${itemBlockMargin}px`
+                items[i].style.margin = `${itemBlockMargin}px`
             }else{
-                items[i].style.margin = `unset`
+                items[i].style.margin = `${itemBlockMargin}px 0`
             }
         }
 
@@ -404,7 +404,7 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
         }
     }else{
         // Remove the event on the tile
-        tileMap.modifyEventOnTile('remove', {x: currentActingPlayer.x, y: currentActingPlayer.y})
+        game.tileMap.modifyEventOnTile('remove', {x: currentActingPlayer.x, y: currentActingPlayer.y})
 
         // Close pick up window
         closePickUpWindow()
@@ -792,45 +792,48 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
             case 'drop':
                 game.clickSound.bindTarget(itemActions[i])
                 itemActions[i].addEventListener('click', () => {
-                    // Open slider
+                    if(currentActingPlayer.bag[selectedItem.index].amount > 1){
+                        // Open slider
+                        const slider = document.getElementById('slider')
+                        const range = document.getElementById('range')
+                        const btns = slider.children[2].getElementsByTagName('button')
 
-                    const slider = document.getElementById('slider')
-                    const range = document.getElementById('range')
-                    const btns = slider.children[2].getElementsByTagName('button')
+                        range.style.width = ((width - fontSize) - itemBlockMargin) + 'px'
+                        range.setAttribute('max', selectedItem.amount)
 
-                    range.style.width = ((width - fontSize) - itemBlockMargin) + 'px'
-                    range.setAttribute('max', selectedItem.amount)
+                        // Set the size of each block
+                        slider.style.width = (width - fontSize) + 'px'
+                        slider.style.fontSize = fontSize + 'px'
 
-                    // Set the size of each block
-                    slider.style.width = (width - fontSize) + 'px'
-                    slider.style.fontSize = fontSize + 'px'
+                        // Blind input event
+                        range.oninput = function() {
+                            slider.children[1].innerText = this.value;
+                        }
 
-                    // Blind input event
-                    range.oninput = function() {
-                        slider.children[1].innerText = this.value;
-                    }
+                        Array.from(btns).forEach(btn => {
+                            btn.style.margin = `0 ${fontSize / 2}px`
+                            btn.style.fontSize = (fontSize / 2) + 'px'
+                            btn.style.width = Math.floor(width * (30 / 100)) + 'px'
+                        })
 
-                    Array.from(btns).forEach(btn => {
-                        btn.style.margin = `0 ${fontSize / 2}px`
-                        btn.style.fontSize = (fontSize / 2) + 'px'
-                        btn.style.width = Math.floor(cameraWidth * (30 / 100)) + 'px'
-                    })
+                        // Cancel button
+                        btns[0].addEventListener('click', () => {
+                            // Reset slider
+                            slider.classList.add('invisible')
+                            subMenu.classList.remove('invisible')
+                            range.setAttribute('value', 1)
+                        })
 
-                    // Cancel button
-                    btns[0].addEventListener('click', () => {
-                        // Reset slider
-                        slider.classList.add('invisible')
-                        subMenu.classList.remove('invisible')
-                        range.setAttribute('value', 1)
-                    })
+                        // Confirm button
+                        btns[1].addEventListener('click', () => {
+                            dropItem(currentActingPlayer, itemActions)
+                        })
 
-                    // Confirm button
-                    btns[1].addEventListener('click', () => {
+                        slider.classList.remove('invisible')
+                        subMenu.classList.add('invisible')                        
+                    }else{
                         dropItem(currentActingPlayer, itemActions)
-                    })
-
-                    slider.classList.remove('invisible')
-                    subMenu.classList.add('invisible')
+                    }
                 })
             break;
             case 'give':
@@ -886,12 +889,14 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventIte
     
     // Set botton click event
     // Take All
+    game.actionSelectSound.bindTarget(btn.children[0])
     btn.children[0].addEventListener('click', () => {
         itemsToTake = eventItem
         pickUpItem(currentActingPlayer, tileMap)
     })
 
     // Take individual
+    game.actionSelectSound.bindTarget(btn.children[1])
     btn.children[1].addEventListener('click', () => {
         pickUpItem(currentActingPlayer, tileMap)
     })
