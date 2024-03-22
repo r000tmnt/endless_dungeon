@@ -606,7 +606,10 @@ li{
   }
 
   #dialogue, #dialogue-options > li{
-    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    background: linear-gradient(to left, rgba(0, 0 , 0, 0), rgba(0, 0 , 0, 0.7) 50%, rgba(0, 0 , 0, 0));
+    white-space: nowrap;
+    text-align: center;
   }
 
   #character{
