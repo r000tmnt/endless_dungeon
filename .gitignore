@@ -31,7 +31,7 @@ coverage
 *.tsbuildinfo
 
 # Other files
-package-lock.json
+# package-lock.json
 
 # App folder
 android/*
