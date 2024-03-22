@@ -23,3 +23,7 @@
 
 ## 0.1.6
 - Title screen click event only procced if the title is still visible to prevent setting up the next phase for multiple times by clicking rapidly.
+
+## 0.1.7
+- Tile screen click event wait for a second.
+- Shorten the time span of click event block.
