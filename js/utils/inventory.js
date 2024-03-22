@@ -783,6 +783,7 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
     title.style.paddingBottom = (fontSize / 2) + 'px'
 
     filterButton.forEach(f => {
+        game.clickSound.bindTarget(f)
         f.style.fontSize = Math.floor(fontSize / 3) + 'px'
         f.style.width = `${width * 0.1}px`
         f.style.height = `${width * 0.1}px`
