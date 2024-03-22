@@ -35,7 +35,7 @@ import {
     toggleCanvas,
     prepareInventory
 } from './utils/ui.js'
-// import { getItemType } from './utils/inventory.js'
+import { defineSubMenu } from './utils/inventory.js'
 import { levelUp } from './utils/battle.js'
 
 import setting from './utils/setting.js';
@@ -617,6 +617,9 @@ class Game{
         if(event !== undefined){
             this.stepOnEvent = event
             toggleActionMenuOption('pick', false, 'event')
+        }else{
+            this.stepOnEvent = {}
+            toggleActionMenuOption('pick', true, 'event')
         }
     
         return event
@@ -793,6 +796,7 @@ const game = new Game()
 await game.init()
 
 uiInit(game)
+defineSubMenu(game)
 
 export default game
 
