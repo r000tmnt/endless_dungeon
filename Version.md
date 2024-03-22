@@ -8,7 +8,7 @@
 - Install plugin vite-plugin-top-level-await to resolve top level await.
 
 ## 0.1.2
-- Fix the route to reference the long-press-event script.
+- Fix the path to reference the long-press-event script.
 - Update lock file
 
 ## 0.1.3
@@ -17,3 +17,6 @@
 
 ## 0.1.4
 - Stop appending undefined text into textBox when the conversation phase ended in skip mode.
+
+## 0.1.5
+- Block conversation click event for a few milliseconds to avoid messing up the words in textBox by clicking rapidly.
