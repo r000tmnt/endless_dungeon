@@ -24,6 +24,6 @@ export default {
         }
     ],
     saveData: [],
-    levels: [],
+    currentLevel: "", // The id of the level
     clearedLevel: []
 }
