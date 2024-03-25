@@ -140,13 +140,14 @@ export default class TextBox{
 
         // Bind click event to the options
         for(let i=0; i < controlOptions.length; i++){
-            switch(controlOptions[i].dataset.action){
+            const action = controlOptions[i].dataset.action
+            switch(action){
                 case 'skip':
                     game.clickSound.bindTarget(controlOptions[i])
                     // Jump to the step where options are presents or to go the battle phase
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
-                        this.action = 'skip'
+                        this.action = action
                         let optionExist = false
 
                         for(let i=this.sceneCounter; i < this.event.length; i++){
@@ -198,7 +199,7 @@ export default class TextBox{
                             conversationWindow.click()
                         }
                         
-                        this.action = 'hide'
+                        this.action = action
                         dialogue.style.opacity = 0
                         dialogue.classList.add('invisible')
                         dialogueControl.style.opacity = 0
@@ -212,13 +213,13 @@ export default class TextBox{
                         event.stopPropagation()
 
                         // Cancel auto play
-                        if(this.action === 'auto'){
+                        if(this.action === action){
                             this.speed = this.speed * 2
                             this.action = ''             
                         }else{
                             // Start auto play
                             this.speed = this.speed * 0.5
-                            this.action = 'auto'
+                            this.action = action
                         }
 
                         clearInterval(this.dialogueAnimation)
@@ -237,7 +238,7 @@ export default class TextBox{
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
 
-                        this.action = 'log'
+                        this.action = action
                         
                         resizeHiddenElement(dialogueLog.style, width, height, fontSize_md)
 
