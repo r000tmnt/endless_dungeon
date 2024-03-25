@@ -10,6 +10,7 @@ import {
 import setting from './setting.js';
 import game from '../game.js';
 import level from '../dataBase/level.js';
+import { changeLanguage } from './i18n.js'
 
 // Get UI element and bind a click event
 const aspectRatio = 9 / 16
@@ -499,6 +500,22 @@ export const prepareInventory = async(currentActingPlayer) => {
     constructInventoryWindow(currentActingPlayer, game.enemyPosition, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin, width)
 }
 
+export const displayLanguageSelection = () => {
+    const language = document.getElementById('language')
+    language.classList.remove('invisible')
+
+    const lngBtn = Array.from(language.querySelectorAll('button'))
+    lngBtn.forEach(lb => {
+        // lb.style.fontSize =  + 'px'
+        lb.addEventListener('click', () => {
+            localStorage.setItem('lng', lb.dataset.lng)
+            changeLanguage(lb.dataset.lng)
+            language.classList.add('invisible')
+            displayTitleScreen()
+        })
+    })
+}
+
 // Display title screen
 export const displayTitleScreen = () => {
     titleScreen.classList.remove('invisible')
@@ -528,9 +545,12 @@ export const displayTitleScreen = () => {
                 titleScreen.classList.remove('open_window')
                 titleScreen.classList.add('invisible')
                 
-                setTimeout(() => {
-                    game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
-                    game.beginNextPhase()                    
+                setTimeout(async() => {
+                    await level.load('p-1-1').then(() => {
+                        game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
+                        setting.currentLevel = "p-1-1"
+                        game.beginNextPhase()                          
+                    })
                 }, 500)            
             }
         })        
