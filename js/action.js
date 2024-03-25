@@ -31,7 +31,6 @@ export default class Action{
      * @param {Array} enemyPosition - An array represent enemy's position
      */
     async setMove(tileMap, player, playerPosition, moveSpeed, enemyPosition){
-        this.mode = 'move'
         this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, moveSpeed, enemyPosition)
         player.setWalkableSpace(this.selectableSpace)
         console.log("playerWalkableSpace : >>>", this.selectableSpace)  
@@ -45,7 +44,6 @@ export default class Action{
      * @param {number} attackRange - A number indicated the amount of blocks for each direction in straight line  
      */
     async setAttack(tileMap, player, playerPosition, attackRange){
-        this.mode = 'attack'
         this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, attackRange)
         player.setWalkableSpace(this.selectableSpace)
     }
@@ -80,8 +78,6 @@ export default class Action{
 
     // TODO: Skill menu
     setSKillWindow(currentActingPlayer, tileMap, playerPosition, fontSize, fontSize_md, fontSize_sm){
-        this.mode = 'skill'
-        
         const skillWindow = document.getElementById('skill')
         const title = skillWindow.children[0]
         const skillList = document.querySelector('.learned-skills')
@@ -187,7 +183,7 @@ export default class Action{
      * @param {HTMLCollection} statusToggle - A collection of HTMLElement contains both minus and plus button
      */
     lockPlusToggle(statusToggle){
-        statusToggle.forEach(t => t.children[1].classList.add('no-event'))
+        statusToggle.forEach(t => t.children[1].classList.add('button_disable'))
     }
 
     /**
@@ -195,7 +191,7 @@ export default class Action{
      * @param {HTMLCollection} statusToggle - A collection of HTMLElement contains both minus and plus button
      */
     unLockPlusToggle(statusToggle){
-        statusToggle.forEach(t => t.children[1].classList.remove('no-event'))
+        statusToggle.forEach(t => t.children[1].classList.remove('button_disable'))
     }
 
     /**
@@ -203,7 +199,7 @@ export default class Action{
      * @param {HTMLCollection} statusToggle - A collection of HTMLElement contains both minus and plus button
      */
     lockMinusToggle(statusToggle){
-        statusToggle.forEach(t => t.children[0].classList.add('no-event'))
+        statusToggle.forEach(t => t.children[0].classList.add('button_disable'))
     }
 
     /**
@@ -295,7 +291,7 @@ export default class Action{
                     statusAlterCount[attr] = 0
                     // minus
                     const minusBtn = statusToggle[i].children[0]
-                    minusBtn.classList.add('no-event')
+                    minusBtn.classList.add('button_disable')
                     minusBtn.addEventListener('click', () => {
                         inspectingCharacter.attributes[attr] -= 1
                         statusAlterCount[attr] -= 1
@@ -324,7 +320,7 @@ export default class Action{
                         statusAlterCount[attr] += 1
                         inspectingCharacter.pt -= 1
                         statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
-                        minusBtn.classList.remove('no-event')
+                        minusBtn.classList.remove('button_disable')
 
                         // Change the number on the screen
                         this.alterStatusList(inspectingCharacter, attr, Array.from(tableNode))
@@ -365,6 +361,7 @@ export default class Action{
         const inRange = await this.#checkIfInRange(row, col)
 
         if(inRange){
+            game.actionSelectSound.element.play()
             currentActingPlayer.attributes.ap -= 1
             this.reachableDirections = await prepareDirections(tileMap, playerPosition, { row, col }, this.reachableDirections)
             // characterCaption.classList.remove('visible')

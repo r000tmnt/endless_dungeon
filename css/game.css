@@ -94,6 +94,10 @@ body{
     flex-wrap: wrap;
 }
 
+.evenly{
+    justify-content: space-evenly;
+}
+
 ul{
     padding: 0;
     margin-left: 3px;
@@ -192,9 +196,10 @@ li{
 }
 
 #dialogue-options{
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+    margin: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .action_menu_close{
@@ -345,8 +350,12 @@ li{
     bottom: 0;
 }
 
-.config_item{
-    align-items: center;
+#config_option{
+    margin-top: 5%;
+}
+
+#config_option > tbody > tr > td > input[type="range"]{
+    width: 100%;
 }
 
 .back{
@@ -429,9 +438,13 @@ li{
     border: 1px solid yellow;
 }
 
-.no-event{
+.button_disable{
     pointer-events: none;
     background: #cccccc;
+}
+
+.lock_canvas{
+    pointer-events: none;
 }
 
 .btn-group{
@@ -593,8 +606,15 @@ li{
     background-size: cover;
   }
 
-  #dialogue, #dialogue-options > li{
+  #dialogue{
     background: rgba(0, 0, 0, 0.7);
+  }
+
+#dialogue-options > li{
+    border: none;
+    background: linear-gradient(to left, rgba(0, 0 , 0, 0), rgba(0, 0 , 0, 0.7) 50%, rgba(0, 0 , 0, 0));
+    white-space: nowrap;
+    text-align: center;
   }
 
   #character{

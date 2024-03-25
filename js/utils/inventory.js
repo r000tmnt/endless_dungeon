@@ -64,13 +64,13 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
             case 'lower':
                 if(attributes[clickedItem.effect.target] >= attributes[clickedItem.useCondition.target]){
                     itemActions[0].style.pointerEvents = 'none'
-                    itemActions[0].classList.add('no-event')
+                    itemActions[0].classList.add('button_disable')
                 }
             break;
             case 'equal':
                 if(attributes[clickedItem.effect.target] !== attributes[clickedItem.useCondition.target]){
                     itemActions[0].style.pointerEvents = 'none'
-                    itemActions[0].classList.add('no-event')
+                    itemActions[0].classList.add('button_disable')
                 }
             break;
         }
@@ -257,12 +257,12 @@ const removeItem = (currentActingPlayer, value) => {
         const { itemBlockMargin } = setting.inventory
 
         // Rearrange the style start with the index
-        for(let i = selectedItem.index, items = document.querySelectorAll('.item').length; i < items; i++){
+        for(let i = selectedItem.index, items = document.querySelectorAll('.item');  i < items.length; i++){
             // If the index is the middle column
             if(((i + (i+1)) % 3) === 0){
-                items[i].style.margin = `0 ${itemBlockMargin}px`
+                items[i].style.margin = `${itemBlockMargin}px`
             }else{
-                items[i].style.margin = `unset`
+                items[i].style.margin = `${itemBlockMargin}px 0`
             }
         }
 
@@ -404,10 +404,101 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
         }
     }else{
         // Remove the event on the tile
-        tileMap.modifyEventOnTile('remove', {x: currentActingPlayer.x, y: currentActingPlayer.y})
+        game.tileMap.modifyEventOnTile('remove', {x: currentActingPlayer.x, y: currentActingPlayer.y})
 
         // Close pick up window
         closePickUpWindow()
+    }
+}
+
+// Loop through sub menu buttons
+// Set click event to sub menu buttons
+export const defineSubMenu = (game) => {
+    const subMenu = document.getElementById('itemAction')
+
+    for(let i=0, itemActions = document.getElementById('itemAction').querySelectorAll('li'); i < itemActions.length; i++){
+        switch(itemActions[i].dataset.action){
+            case 'use':
+                game.clickSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    setItemSpace(game.inspectingCharacter, game.enemyPosition, game.tileMap)
+                })
+            break;
+            case 'equip':
+                game.clickSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    if(itemActions[i].innerText === 'Unequip'){
+                        UnequipItem(game.inspectingCharacter, itemActions)
+                    }else{
+                        equipItem(game.inspectingCharacter, itemActions)
+                    }
+                })
+            break;
+            case 'drop':
+                game.clickSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    if(currentActingPlayer.bag[selectedItem.index].amount > 1){
+                        const { fontSize, camera } = setting.general
+                        const { width } = camera
+                        const { itemBlockMargin } = setting.inventory
+    
+                        // Open slider
+                        const slider = document.getElementById('slider')
+                        const range = document.getElementById('range')
+                        const btns = slider.children[2].getElementsByTagName('button')
+    
+                        range.style.width = ((width - fontSize) - itemBlockMargin) + 'px'
+                        range.setAttribute('max', selectedItem.amount)
+    
+                        // Set the size of each block
+                        slider.style.width = (width - fontSize) + 'px'
+                        slider.style.fontSize = fontSize + 'px'
+    
+                        // Blind input event
+                        range.oninput = function() {
+                            slider.children[1].innerText = this.value;
+                        }
+    
+                        Array.from(btns).forEach(btn => {
+                            btn.style.margin = `0 ${fontSize / 2}px`
+                            btn.style.fontSize = (fontSize / 2) + 'px'
+                            btn.style.width = Math.floor(width * (30 / 100)) + 'px'
+                        })
+    
+                        // Cancel button
+                        btns[0].addEventListener('click', () => {
+                            // Reset slider
+                            slider.classList.add('invisible')
+                            subMenu.classList.remove('invisible')
+                            range.setAttribute('value', 1)
+                        })
+    
+                        // Confirm button
+                        btns[1].addEventListener('click', () => {
+                            dropItem(game.inspectingCharacter, itemActions)
+                        })
+    
+                        slider.classList.remove('invisible')
+                        subMenu.classList.add('invisible')                        
+                    }else{
+                        dropItem(game.inspectingCharacter, itemActions)
+                    }
+                })
+            break;
+            case 'give':
+                game.clickSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    giveItem(game.inspectingCharacter)
+                })
+            break;
+            case 'close':
+                game.actionCancelSound.bindTarget(itemActions[i])
+                itemActions[i].addEventListener('click', () => {
+                    subMenu.classList.remove('open_subWindow')
+                    subMenu.classList.add('invisible')
+                })
+            break;
+        }
     }
 }
 
@@ -639,6 +730,9 @@ export const useItem = (currentActingPlayer) => {
         break;
         default:
             if(effect.type === 0){
+                // Play sound effect
+                game.potionSound.element.play()
+
                 currentActingPlayer.attributes[`${effect.target}`] += effect.amount
 
                 resultMessage = String(effect.amount)
@@ -679,7 +773,6 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
     const title = Inventory.children[0]
     const space = document.getElementById('inventory')
     const subMenu = document.getElementById('itemAction')
-    const itemActions = subMenu.querySelectorAll('li')
     const filterButton = document.querySelectorAll('.filter')
     const desc = document.getElementById('item-desc')
 
@@ -692,6 +785,7 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
     title.style.paddingBottom = (fontSize / 2) + 'px'
 
     filterButton.forEach(f => {
+        game.clickSound.bindTarget(f)
         f.style.fontSize = Math.floor(fontSize / 3) + 'px'
         f.style.width = `${width * 0.1}px`
         f.style.height = `${width * 0.1}px`
@@ -713,7 +807,7 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
         // Get item data
         const itemData = getItemType(currentActingPlayer.bag[i])
 
-        item.setAttribute('data-long-press-delay', 500)
+        item.setAttribute('data-long-press-delay', 300)
 
         // Set long-press event
         item.addEventListener('long-press', () => {
@@ -730,6 +824,8 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
         // Setting inner text
         item.innerText = itemData.name
         itemCount.innerText = currentActingPlayer.bag[i].amount
+
+        game.clickSound.bindTarget(item)
 
         // Check if item equipped
         if(Object.values(currentActingPlayer.equip).findIndex(e => e.id === itemData.id) >= 0){
@@ -762,81 +858,6 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
         // item.append(itemToolTip)
         item.append(itemCount)
         space.append(item)
-    }
-
-    // Loop through sub menu buttons
-    // Set click event to sub menu buttons
-    for(let i=0; i < itemActions.length; i++){
-        switch(itemActions[i].dataset.action){
-            case 'use':
-                itemActions[i].addEventListener('click', () => {
-                    setItemSpace(currentActingPlayer, enemyPosition, tileMap)
-                })
-            break;
-            case 'equip':
-                itemActions[i].addEventListener('click', () => {
-                    if(itemActions[i].innerText === 'Unequip'){
-                        UnequipItem(currentActingPlayer, itemActions)
-                    }else{
-                        equipItem(currentActingPlayer, itemActions)
-                    }
-                })
-            break;
-            case 'drop':
-                itemActions[i].addEventListener('click', () => {
-                    // Open slider
-
-                    const slider = document.getElementById('slider')
-                    const range = document.getElementById('range')
-                    const btns = slider.children[2].getElementsByTagName('button')
-
-                    range.style.width = ((width - fontSize) - itemBlockMargin) + 'px'
-                    range.setAttribute('max', selectedItem.amount)
-
-                    // Set the size of each block
-                    slider.style.width = (width - fontSize) + 'px'
-                    slider.style.fontSize = fontSize + 'px'
-
-                    // Blind input event
-                    range.oninput = function() {
-                        slider.children[1].innerText = this.value;
-                    }
-
-                    Array.from(btns).forEach(btn => {
-                        btn.style.margin = `0 ${fontSize / 2}px`
-                        btn.style.fontSize = (fontSize / 2) + 'px'
-                        btn.style.width = Math.floor(cameraWidth * (30 / 100)) + 'px'
-                    })
-
-                    // Cancel button
-                    btns[0].addEventListener('click', () => {
-                        // Reset slider
-                        slider.classList.add('invisible')
-                        subMenu.classList.remove('invisible')
-                        range.setAttribute('value', 1)
-                    })
-
-                    // Confirm button
-                    btns[1].addEventListener('click', () => {
-                        dropItem(currentActingPlayer, itemActions)
-                    })
-
-                    slider.classList.remove('invisible')
-                    subMenu.classList.add('invisible')
-                })
-            break;
-            case 'give':
-                itemActions[i].addEventListener('click', () => {
-                    giveItem(currentActingPlayer)
-                })
-            break;
-            case 'close':
-                itemActions[i].addEventListener('click', () => {
-                    subMenu.classList.remove('open_subWindow')
-                    subMenu.classList.add('invisible')
-                })
-            break;
-        }
     }
 
     // Apply style to the item wrapper
@@ -876,12 +897,14 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventIte
     
     // Set botton click event
     // Take All
+    game.actionSelectSound.bindTarget(btn.children[0])
     btn.children[0].addEventListener('click', () => {
         itemsToTake = eventItem
         pickUpItem(currentActingPlayer, tileMap)
     })
 
     // Take individual
+    game.actionSelectSound.bindTarget(btn.children[1])
     btn.children[1].addEventListener('click', () => {
         pickUpItem(currentActingPlayer, tileMap)
     })
@@ -919,6 +942,8 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventIte
         // Setting inner text
         item.innerText = itemData.name
         itemCount.innerText = eventItem[i].amount
+
+        game.clickSound.bindTarget(item)
 
         console.log(item)
 

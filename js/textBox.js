@@ -1,6 +1,7 @@
 import game from './game'
 import setting from './utils/setting';
 import { resizeHiddenElement } from "./utils/ui";
+import Audio from './audio';
 
 // Conversation UI
 const conversationWindow = document.getElementById('conversation')
@@ -38,7 +39,7 @@ export default class TextBox{
         this.animationInit = false;
         this.speed = 100;
         this.dialogueAnimation = null;
-        this.optionSelected = 0
+        this.optionSelected = 0;
     }
 
     setConversationWindow = (width, height, fontSize, fontSize_md, fontSize_sm) => {
@@ -54,6 +55,17 @@ export default class TextBox{
             // Define background image
             conversationWindow.style.backgroundImage = `url(${__BASE_URL__}assets/images/bg/${this.event[this.sceneCounter].background}.png)`
 
+            // Define background audio if needed
+            if(this.event[this.sceneCounter].audio.length){
+                if(game.bgAudio === null){
+                    game.bgAudio = new Audio(`${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`, 'bg')
+                }else{
+                    // Change audio source
+                    game.bgAudio.element.src = `${__BASE_URL__}assets/audio/${this.event[this.sceneCounter].audio}.mp3`
+                    game.bgAudio.element.play()
+                }                
+            }
+            
             // Display conversation window
             conversationWindow.classList.remove('invisible')
             conversationWindow.classList.add('open_window')
@@ -83,6 +95,7 @@ export default class TextBox{
 
     // Conversation click event
     setConversationEvent = (width, height, fontSize_md) => {
+        game.clickSound.bindTarget(conversationWindow)
         conversationWindow.addEventListener('click', () => {
             
             if(this.optionOnScreen || this.action === 'auto' || this.textBoxClicked){
@@ -129,6 +142,7 @@ export default class TextBox{
         for(let i=0; i < controlOptions.length; i++){
             switch(controlOptions[i].dataset.action){
                 case 'skip':
+                    game.clickSound.bindTarget(controlOptions[i])
                     // Jump to the step where options are presents or to go the battle phase
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
@@ -175,6 +189,7 @@ export default class TextBox{
                     })
                 break;
                 case 'hide':
+                    game.clickSound.bindTarget(controlOptions[i])
                     // Hide both text box and control options on the screen
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
@@ -191,6 +206,7 @@ export default class TextBox{
                     })
                 break;
                 case 'auto':
+                    game.clickSound.bindTarget(controlOptions[i])
                     // Increse the dialogue play speed and auto click, stop at options
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
@@ -216,6 +232,7 @@ export default class TextBox{
                     })
                 break;
                 case 'log':
+                    game.clickSound.bindTarget(controlOptions[i])
                     // Display dialogue log
                     controlOptions[i].addEventListener('click', (event) => {
                         event.stopPropagation()
@@ -414,17 +431,24 @@ export default class TextBox{
         conversationWindow.style.opacity = 0
 
         setTimeout(() => {
+            // Reset backgroud audio time line back to the start
+            game.bgAudio.element.currentTime = 0
+            // Stop background audio
+            game.bgAudio.element.pause()
+            // Canacel event
+            // game.bgAudio.cancelEvent('canplaythrough')
+
+            // Remove the predefined event
+            game.level.event.splice(0, 1)
+            game.phaseCount += 1
+            game.beginNextPhase()
+
             // Reset conversationWinsow style
             conversationWindow.classList.remove('open_window')
             conversationWindow.classList.add('invisible')
             conversationWindow.style.opacity = null
             dialogue.style.color = 'white'
             this.speed = 100
-
-            // Remove the predefined event
-            game.level.event.splice(0, 1)
-            game.phaseCount += 1
-            game.beginNextPhase() 
 
             // Clear text in the box
             textBox.innerHTML = ''
@@ -523,10 +547,11 @@ export default class TextBox{
                 if(size.length){
                     option.style.fontSize = setting.general[size] + 'px'
                 }else{
-                    option.style.fontSize = setting.general.fontSize + 'px'
+                    option.style.fontSize = setting.general.fontSize_md + 'px'
                 }
 
                 // Bind click event
+                game.clickSound.bindTarget(option)
                 option.addEventListener('click', (event) => {
                     event.stopPropagation()
                     this.optionSelected = i
