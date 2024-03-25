@@ -351,11 +351,13 @@ export const uiInit = (game) => {
 
     // Result action child click event
     for(let i=0; i < resultActionOptions.length; i++){
-        switch(resultActionOptions[i].dataset.action){
+        const action = resultActionOptions[i].dataset.action
+        switch(action){
             case 'stash':
+                game.actionSelectSound.bindTarget(resultActionOptions[i])
                 resultActionOptions[i].addEventListener('click', () => {
                     // game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
-                    game.action.mode = 'stash'
+                    game.action.mode = action
                     preparePickUpWindow()
 
                     levelClear.classList.remove('open_window')
@@ -364,8 +366,9 @@ export const uiInit = (game) => {
             break;
             case 'pickAfterBattle':
                 // Choose which character to take items if there's more then one in the party
+                game.actionSelectSound.bindTarget(resultActionOptions[i])
                 resultActionOptions[i].addEventListener('click', () => {
-                    game.action.mode = 'pickAfterBattle'
+                    game.action.mode = action
                     if(game.player.length > 1){
                         const partySubMenu = levelClear.querySelector('#partySubMenu')
         
@@ -376,7 +379,7 @@ export const uiInit = (game) => {
                             member.style.width = itemBlockSize + 'px'
                             member.style.height = itemBlockSize + 'px'
                             member.src = p.characterImage
-        
+                            game.actionSelectSound.bindTarget(member)
                             member.addEventListener('click', () => {
                                 game.inspectingCharacter = p
                                 preparePickUpWindow()
@@ -399,6 +402,7 @@ export const uiInit = (game) => {
                 })
             break;
             case 'finish':
+                game.actionSelectSound.bindTarget(resultActionOptions[i])
                 resultActionOptions[i].addEventListener('click', () => {
                     if(game.stepOnEvent.item.length){
                         const { fontSize_md, camera } = setting.general
@@ -431,7 +435,7 @@ export const uiInit = (game) => {
     game.actionCancelSound.bindTarget(finishBtn[0])
     finishBtn[0].addEventListener('click', () => {
         warn.classList.remove('open_window')
-        warn.classLisr.add('invisible')
+        warn.classList.add('invisible')
     })
 
     game.actionSelectSound.bindTarget(finishBtn[1])
@@ -595,6 +599,12 @@ export const preparePickUpWindow = () => {
 
 export const closePickUpWindow = async() => {
     if(game.action.mode === 'pickAfterBattle' || game.action.mode === 'stash'){
+        const partySubMenu = levelClear.querySelector('#partySubMenu')
+
+        while(partySubMenu.firstChild){
+            partySubMenu.removeChild(partySubMenu.firstChild)
+        }
+
         pickUpWindow.classList.add('invisible')
         pickUpWindow.classList.remove('open_window')
         clearPickUpWindow(pickUpWindow.style)
