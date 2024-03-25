@@ -865,7 +865,7 @@ export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_s
     
         // option menu child font size
         for(let i=0; i < options.length; i++){
-            options[i].style.fontSize = fontSize + 'px';
+            options[i].style.fontSize = fontSize_md + 'px';
         }       
         
         characterCaption.style.width = Math.floor(50 * (width / 100)) + 'px'
