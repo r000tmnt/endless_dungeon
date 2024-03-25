@@ -363,49 +363,53 @@ export const uiInit = (game) => {
             case 'stash':
                 game.actionSelectSound.bindTarget(resultActionOptions[i])
                 resultActionOptions[i].addEventListener('click', () => {
-                    // game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
-                    game.action.mode = action
-                    preparePickUpWindow()
+                    if(game.stepOnEvent.item.length){
+                        // game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
+                        game.action.mode = action
+                        preparePickUpWindow()
 
-                    levelClear.classList.remove('open_window')
-                    levelClear.classList.add('invisible')
+                        levelClear.classList.remove('open_window')
+                        levelClear.classList.add('invisible')                        
+                    }
                 })
             break;
             case 'pickAfterBattle':
                 // Choose which character to take items if there's more then one in the party
                 game.actionSelectSound.bindTarget(resultActionOptions[i])
                 resultActionOptions[i].addEventListener('click', () => {
-                    game.action.mode = action
-                    if(game.player.length > 1){
-                        const partySubMenu = levelClear.querySelector('#partySubMenu')
-        
-                        const { itemBlockSize } = setting.inventory
-        
-                        game.player.map(p => {
-                            const member = document.createElement('img')
-                            member.style.width = itemBlockSize + 'px'
-                            member.style.height = itemBlockSize + 'px'
-                            member.src = p.characterImage
-                            game.actionSelectSound.bindTarget(member)
-                            member.addEventListener('click', () => {
-                                game.inspectingCharacter = p
-                                preparePickUpWindow()
-                                partySubMenu.classList.remove('open_window')
-                                partySubMenu.classList.add('invisible')
+                    if(game.stepOnEvent.item.length){
+                        game.action.mode = action
+                        if(game.player.length > 1){
+                            const partySubMenu = levelClear.querySelector('#partySubMenu')
+            
+                            const { itemBlockSize } = setting.inventory
+            
+                            game.player.map(p => {
+                                const member = document.createElement('img')
+                                member.style.width = itemBlockSize + 'px'
+                                member.style.height = itemBlockSize + 'px'
+                                member.src = p.characterImage
+                                game.actionSelectSound.bindTarget(member)
+                                member.addEventListener('click', () => {
+                                    game.inspectingCharacter = p
+                                    preparePickUpWindow()
+                                    partySubMenu.classList.remove('open_window')
+                                    partySubMenu.classList.add('invisible')
+                                })
+
+                                partySubMenu.append(member)
                             })
 
-                            partySubMenu.append(member)
-                        })
+                            partySubMenu.classList.remove('invisible')
+                            partySubMenu.classList.add('open_window')
+                        }else{
+                            game.inspectingCharacter = game.player[0]
+                            preparePickUpWindow()
+                        }
 
-                        partySubMenu.classList.remove('invisible')
-                        partySubMenu.classList.add('open_window')
-                    }else{
-                        game.inspectingCharacter = game.player[0]
-                        preparePickUpWindow()
+                        levelClear.classList.remove('open_window')
+                        levelClear.classList.add('invisible')                        
                     }
-
-                    levelClear.classList.remove('open_window')
-                    levelClear.classList.add('invisible')
                 })
             break;
             case 'finish':
