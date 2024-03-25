@@ -37,5 +37,30 @@
         "dialogue_19": "You take a closer look at the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
         "dialogue_20": "With the lights from the key.\nYou're able to find a door in the end of the tunnel.\nAlthough you're not sure about the use of this key in your hand. You insert it into the key hole and open the door."
     },
-    "demo": "This is the end of the demo.\nThank you for playing the game."
+    "demo": "This is the end of the demo.\nThank you for playing the game.",
+    "ui":{
+        "action": {},
+        "config": {
+            "bgm": "BGM",
+            "se": "SE",
+            "grid": "Grid",
+            "on": "Display",
+            "off": "Hide",
+            "filter": "Filter",
+            "default": "Default",
+            "retro": "Retro",
+            "language": "Language"
+        },
+        "objective":{
+            "victory": "Victory",
+            "fail": "Fail",
+            "optional": "Optional"
+        },
+        "option": {
+            "party": "Party",
+            "objective": "Objective",
+            "config": "Config",
+            "end": "End Turn"
+        }
+    }
 }
