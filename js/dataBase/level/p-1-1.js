@@ -1,7 +1,8 @@
-import { t } from '../../utils/i18n'
+import { t, lng } from '../../utils/i18n'
 
 export default {
     "id": "p-1-1",
+    "lng": lng, // Current language setting
     "name": "Echo from the above",
     "map": [
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
