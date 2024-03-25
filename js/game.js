@@ -5,6 +5,7 @@ import Range from './range.js';
 import Option from './option.js';
 import TextBox from './textBox.js';
 import Audio from './audio.js';
+import { changeLanguage } from './utils/i18n.js'
 
 import { 
     uiInit,
@@ -28,6 +29,7 @@ import {
     displayResult,
     toggleTurnElement,
     displayTitleScreen,
+    displayLanguageSelection,
     setCanvasPosition,
     setBattlePhaseUIElement,
     alterPhaseTransitionStyle,
@@ -206,7 +208,13 @@ class Game{
         this.levelUpSound = new Audio(`${__BASE_URL__}assets/audio/level_up.mp3`, 'status')
         this.clickSound = new Audio(`${__BASE_URL__}assets/audio/click.wav`, 'interface')
         
-        displayTitleScreen()
+        // Display language selection if language not set
+        if(localStorage.getItem('lng') === null){
+            displayLanguageSelection()
+        }else{
+            changeLanguage(localStorage.getItem('lng'))
+            displayTitleScreen()
+        }
         // this.beginNextPhase()
     }
 
@@ -293,6 +301,7 @@ class Game{
                     this.#initBattlePhase()
                 break;
                 case 'intermission':
+                    // Load next level
                 break;
                 case 'end':
                     toggleCanvas(false)
