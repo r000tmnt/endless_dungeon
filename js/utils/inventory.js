@@ -414,6 +414,8 @@ const pickUpItem = (currentActingPlayer, tileMap) => {
 // Loop through sub menu buttons
 // Set click event to sub menu buttons
 export const defineSubMenu = (game) => {
+    const subMenu = document.getElementById('itemAction')
+
     for(let i=0, itemActions = document.getElementById('itemAction').querySelectorAll('li'); i < itemActions.length; i++){
         switch(itemActions[i].dataset.action){
             case 'use':
