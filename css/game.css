@@ -148,6 +148,17 @@ li{
     margin: 0 auto 3% auto;
 }
 
+#language{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+}
+
+#language > button{
+    margin: 15% 0;
+}
+
 #version{
     right: 0;
     bottom: 0;
