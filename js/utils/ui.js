@@ -156,11 +156,12 @@ const endBattlePhase = () => {
 export const uiInit = (game) => {
     // option menu child click event
     for(let i=0; i < options.length; i++){
-        switch(options[i].dataset.option){
+        const action = options[i].dataset.option
+        switch(action){
             case 'party':
                 game.actionSelectSound.bindTarget(options[i])
                 options[i].addEventListener('click', () => {
-                    game.option.mode = 'party'
+                    game.option.mode = action
                     game.option.setPartyWindow(game.player, setting, game.action)
                     partyWindow.classList.remove('invisible')
                     partyWindow.classList.add('open_window')
@@ -169,14 +170,14 @@ export const uiInit = (game) => {
             case 'objective':
                 game.actionSelectSound.bindTarget(options[i])
                 options[i].addEventListener('click', () => {
-                    game.option.mode = 'objective'
+                    game.option.mode = action
                     game.option.setObjectiveWindow(objectiveWindow, setting, game.tileMap.objective)
                 })
             break;
             case 'config':
                 game.actionSelectSound.bindTarget(options[i])
                 options[i].addEventListener('click', () => {
-                    game.option.mode = 'config'
+                    game.option.mode = action
                     game.option.setConfigWindow(setting)
                     configWindow.classList.remove('invisible')
                     configWindow.classList.add('open_window')
@@ -277,10 +278,12 @@ export const uiInit = (game) => {
 
     // action menu child click event
     for(let i=0; i < actionMenuOptions.length; i++){
-        switch(actionMenuOptions[i].dataset.action){
+        const action = actionMenuOptions[i].dataset.action
+        switch(action){
             case 'move':
                 game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', async() => {
+                    game.action.mode = action
                     hideUIElement() 
                     const { tileSize } = setting.general
                     const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
@@ -296,6 +299,7 @@ export const uiInit = (game) => {
             case 'attack':
                 game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', async() => {
+                    game.action.mode = action
                     hideUIElement() 
                     const { tileSize } = setting.general
                     const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
@@ -304,8 +308,8 @@ export const uiInit = (game) => {
             break;   
             case "skill":
                 game.actionSelectSound.bindTarget(actionMenuOptions[i])
-                game.menuOpenSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', () => {
+                    game.action.mode = action
                     hideUIElement()
                     const { tileSize, fontSize, fontSize_md, fontSize_sm, camera } = setting.general
                     const { width, height } = camera
@@ -316,20 +320,23 @@ export const uiInit = (game) => {
             break;
             case 'item':
                 game.actionSelectSound.bindTarget(actionMenuOptions[i])
-                actionMenuOptions[i].addEventListener('click', () => prepareInventory(game.inspectingCharacter))
+                actionMenuOptions[i].addEventListener('click', () => {
+                    game.action.mode = action
+                    prepareInventory(game.inspectingCharacter)
+                })
             break; 
             case 'pick':
                 game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', () => {
-                    game.action.mode = 'pick'
+                    game.action.mode = action
                     preparePickUpWindow()
                 })
             break;
             case 'status':
                 game.actionSelectSound.bindTarget(actionMenuOptions[i])
                 actionMenuOptions[i].addEventListener('click', () => {
+                    game.action.mode = action
                     hideUIElement()
-                    game.action.mode = 'status'
                     const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
                     const { width, height } = camera
                     resizeHiddenElement(statusWindow.style, width, height, fontSize_sm)
@@ -341,7 +348,7 @@ export const uiInit = (game) => {
                 actionMenuOptions[i].addEventListener('click', async() => {
                     hideUIElement()
                     setTimeout(() => {
-                        game.inspectingCharacter.attributes.ap -= 1
+                        game.inspectingCharacter.attributes.ap = 0
                         game.characterAnimationPhaseEnded(game.inspectingCharacter)
                     }, 500)
                 })
@@ -481,7 +488,6 @@ export const uiInit = (game) => {
  */
 export const prepareInventory = async(currentActingPlayer) => {
     hideUIElement()
-    game.action.mode = 'item'
     const { fontSize, fontSize_sm, camera } = setting.general
     const { width, height } = camera
     const { itemBlockSize, itemBlockMargin } = setting.inventory
