@@ -31,7 +31,6 @@ export default class Action{
      * @param {Array} enemyPosition - An array represent enemy's position
      */
     async setMove(tileMap, player, playerPosition, moveSpeed, enemyPosition){
-        this.mode = 'move'
         this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, moveSpeed, enemyPosition)
         player.setWalkableSpace(this.selectableSpace)
         console.log("playerWalkableSpace : >>>", this.selectableSpace)  
@@ -45,7 +44,6 @@ export default class Action{
      * @param {number} attackRange - A number indicated the amount of blocks for each direction in straight line  
      */
     async setAttack(tileMap, player, playerPosition, attackRange){
-        this.mode = 'attack'
         this.selectableSpace = await getAvailableSpace(tileMap, playerPosition, attackRange)
         player.setWalkableSpace(this.selectableSpace)
     }
@@ -80,8 +78,6 @@ export default class Action{
 
     // TODO: Skill menu
     setSKillWindow(currentActingPlayer, tileMap, playerPosition, fontSize, fontSize_md, fontSize_sm){
-        this.mode = 'skill'
-        
         const skillWindow = document.getElementById('skill')
         const title = skillWindow.children[0]
         const skillList = document.querySelector('.learned-skills')
