@@ -2,11 +2,17 @@ import i18next from "i18next";
 import * as en from '../locale/en.json'
 import * as zh from '../locale/zh.json'
 
-export default i18next.init({
-    lag: 'en',
+i18next.init({
+    lng: 'en',
     debug: true,
     resources:{
-        en: en,
-        zh: zh
+        en: {
+            translation: en
+        },
+        zh: {
+            translation: zh
+        }
     }
 })
+
+export const t = i18next.t
