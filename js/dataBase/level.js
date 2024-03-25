@@ -25,6 +25,7 @@ export default{
                 [1, 0, 0, 0, 0, 0, 0, 0, 1],
                 [1, 1, 1, 1, 1, 1, 1, 1, 1],
             ],
+            "audio": "Alexander Ehlers - Warped", // Audio for battle phase
             "assets": [ // define in numeric order
                 "",
                 "wall.png",
@@ -45,6 +46,7 @@ export default{
                     "scene": [
                         {
                             "background": "cave", // Background image
+                            "audio": "cave_ambience", // Background audio
                             // Define how many person to show on screen
                             "people": 0,
                             "dialogue": [
@@ -52,19 +54,22 @@ export default{
                                     "person": "", // character potrait images file. "none" means to clear all potrait, empty string means no changes to the portrait
                                     "style": "", // color, default as white
                                     "size": "", // Default to setting fontSize, accept fontSize_md, fontSize_sm property
-                                    "content": "......" // text content
+                                    "content": "......", // text content
+                                    "audio": [] // Audio name
                                 },
                                 {
                                     "person": "",
                                     "style": "",
                                     "size": "",
-                                    "content": "You feel quite a headache, like you've been hit by a boulder or somthing."
+                                    "content": "You feel quite a headache, like you've been hit by a boulder or somthing.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "",
                                     "style": "", 
                                     "size": "", 
                                     "content": "As you gradually regain your conscious.\nYou first...",
+                                    "audio": []
                                 },
                                 {
                                     "person": "",
@@ -73,7 +78,8 @@ export default{
                                             "value": "Take a look around",                                            "style": "",
                                             "size": "",
                                             "content": "Although there's not much light in here, you've notice that you're in a cave.",
-                                            "effect": []
+                                            "effect": [],
+                                            "audio": ['click']
                                         },
                                         {
                                             "value": "Lay down on the ground",
@@ -86,7 +92,8 @@ export default{
                                                     "attribute": "hp",
                                                     "value": -1,
                                                 }
-                                            ]
+                                            ],
+                                            "audio": ['click']
                                         }
                                     ],
                                 },
@@ -94,73 +101,85 @@ export default{
                                     "person": "",
                                     "style": "",
                                     "size": "",
-                                    "content": "You heard a voice whispering beyond the entrence.\nIt is not clear enough for anyone to understand. But it gives you a direction to follow."
+                                    "content": "You heard a voice whispering beyond the entrence.\nIt is not clear enough for anyone to understand. But it gives you a direction to follow.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "",
                                     "style": "",
                                     "size": "",
-                                    "content": "As you walk your way out of the cave. You start to get used to the lack of brightness of your surrounding."
+                                    "content": "As you walk your way out of the cave. You start to get used to the lack of brightness of your surrounding.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "",
                                     "style": "",
                                     "size": "",
-                                    "content": "That voice draws you further, until you reach a widther space."
+                                    "content": "That voice draws you further, until you reach a widther space.",
+                                    "audio": []
                                 },
                             ]
                         },
                         {
                             "background": "cave",
+                            "audio": "cave_ambience",
                             "people": 1,
                             "dialogue": [
                                 {
                                     "person": "unknow",
                                     "style": "",
                                     "size": "",
-                                    "content": "Oh...you finially awake."
+                                    "content": "Oh...you finially awake.",
+                                    "audio": [],
                                 },
                                 {
                                     "person": "",
                                     "style": "",
                                     "size": "",
-                                    "content": "Due to the darkness, you bearly saw a silhouette of a person standing on the other side of the space."
+                                    "content": "Due to the darkness, you bearly saw a silhouette of a person standing on the other side of the space.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "unknow",
                                     "style": "",
                                     "size": "",
-                                    "content": "You should not come any closer, they will smell you."
+                                    "content": "You should not come any closer, they will smell you.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "",
                                     "style": "",
                                     "size": "",
-                                    "content": "Just as the mysterious person finish the words. You have take a step already."
+                                    "content": "Just as the mysterious person finish the words. You have take a step already.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "unknow",
                                     "style": "",
                                     "size": "",
-                                    "content": "Shit...! What did I told you."
+                                    "content": "Shit...! What did I told you.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "unknow",
                                     "style": "",
                                     "size": "",
-                                    "content": "You're lucky there's only one of them."
+                                    "content": "You're lucky there's only one of them.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "unknow",
                                     "style": "",
                                     "size": "",
-                                    "content": "Here, catch."
+                                    "content": "Here, catch.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "none",
                                     "style": "",
                                     "size": "",
                                     "content": "The mysterious person throws a knife on the ground near where you are standing.\nWould you...",
+                                    "audio": []
                                 },
                                 {
                                     "person": "",
@@ -177,10 +196,11 @@ export default{
                                                     "type": 3,
                                                     "value": "knife_1"
                                                 }
-                                            ] 
+                                            ],
+                                            "audio": ['click']
                                         },
                                         {
-                                            "value": "I trust on my own fist",
+                                            "value": "I trust in my own fist",
                                             "style": "",
                                             "size": "",
                                             "content": "You kicked the knife out of your reach.\nYet it stops in the middle like it hit something solid, and it is not the sound of the ground or stone either.",
@@ -190,7 +210,8 @@ export default{
                                                     "attribute": "hp",
                                                     "value": -1
                                                 }   
-                                            ]
+                                            ],
+                                            "audio": ['click']
                                         }
                                     ]
                                 },
@@ -198,13 +219,15 @@ export default{
                                     "person": "none",
                                     "style": "",
                                     "size": "",
-                                    "content": "A sound of deadman approch towoards you."
+                                    "content": "A sound of deadman approch towoards you.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "unknow",
                                     "style": "",
                                     "size": "",
-                                    "content": "Suit yourself, I'm out of here"
+                                    "content": "Suit yourself, I'm out of here",
+                                    "audio": []
                                 }
                             ]
                         }
@@ -218,25 +241,29 @@ export default{
                     "scene": [
                         {
                             "background": "cave",
+                            "audio": "cave_ambience",
                             "people": 0,
                             "dialogue": [
                                 {
                                     "person": "none",
                                     "style": "",
                                     "size": "",
-                                    "content": "As you defeat the monster.\nA small object made out of metal drop on the ground. It glooms, and lights up the space around it."
+                                    "content": "As you defeat the monster.\nA small object made out of metal drop on the ground. It glooms, and lights up the space around it.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "",
                                     "style": "",
                                     "size": "",
-                                    "content": "It appears to be in a shape of key. At least that's what you can think of."
+                                    "content": "It appears to be in a shape of key. At least that's what you can think of.",
+                                    "audio": []
                                 },
                                 {
                                     "person": "",
                                     "style": "",
                                     "size": "",
                                     "content": "You take a closer look at the key.\nNow it is in your possession, you feel the surge of energy lays inside it.",
+                                    "audio": []
                                     // "option": [
                                     //     {
                                     //         "value": "Take the key",
@@ -266,6 +293,7 @@ export default{
                                     "style": "",
                                     "size": "",
                                     "content": "With the lights from the key.\nYou're able to find a door in the end of the tunnel.\nAlthough you're not sure about the use of this key in your hand. You insert it into the key hole and open the door.",
+                                    "audio": ['key_jiggle', 'door_open']
                                     // Check if the key item is stored in eventEffect
                                     // "condition":{
                                     //     "match": "key_dark_1",
@@ -293,7 +321,8 @@ export default{
                                     "person": "",
                                     "style": "yellow",
                                     "size": "",
-                                    "content": "This is the end of the demo.\nThank you for playing the game."
+                                    "content": "This is the end of the demo.\nThank you for playing the game.",
+                                    "audio": []
                                 }
                             ]
                         }

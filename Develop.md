@@ -9,15 +9,15 @@ A demo of dungeon clawer game build with Html canvas and Javascript
 
 ## Project structure
 - Root
-    index.html
+    - index.html
     - js
         * [className].js
         - utils
-            *[functionality].js
+            * [functionality].js
         - dataBase
-            * [typeName].json
-            -item
-                * [item_type].json
+            * [typeName].js
+            - item
+                * [item_type].js
     - css
         * [className].css
     - public    
@@ -36,9 +36,13 @@ A demo of dungeon clawer game build with Html canvas and Javascript
                 - portrait
                     * [person_name].png
 
+            - audio
+                * [audio_name].[file_type]
+
 ## FrameWork
 [Vite](https://vitejs.dev/)                    
 
 ## Library
 [long-press-event](https://www.npmjs.com/package/long-press-event)
-[ vite-plugin-top-level-await](https://github.com/Menci/vite-plugin-top-level-await)
+
+[vite-plugin-top-level-await](https://github.com/Menci/vite-plugin-top-level-await)

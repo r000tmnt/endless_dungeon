@@ -4,9 +4,10 @@ import Action from './action.js';
 import Range from './range.js';
 import Option from './option.js';
 import TextBox from './textBox.js';
+import Audio from './audio.js';
 
-import { constructInventoryWindow } from './utils/inventory.js'
 import { 
+    uiInit,
     canvas, 
     resize, 
     getPosition, 
@@ -34,7 +35,7 @@ import {
     toggleCanvas,
     prepareInventory
 } from './utils/ui.js'
-// import { getItemType } from './utils/inventory.js'
+import { defineSubMenu } from './utils/inventory.js'
 import { levelUp } from './utils/battle.js'
 
 import setting from './utils/setting.js';
@@ -64,6 +65,8 @@ class Game{
         this.stash = []; // A shared stash
         this.stashLimit = 1000;
         this.stepOnEvent = {}; // The event waiting to be trigger
+
+        // Canvas mouse down event
         this.canvasEvent = async(event) => {
             const { tileSize, fontSize, fontSize_sm } = setting.general
 
@@ -74,7 +77,6 @@ class Game{
             
             // If not playing animation
             if(!this.action.animationInit){
-                
                 // Define who is on the tile you clicked
                 this.inspectingCharacter = this.player.find(p => p.y === (row * tileSize) && p.x === (col * tileSize))
 
@@ -131,6 +133,7 @@ class Game{
                     }
                     break;
                     default:
+                        game.actionSelectSound.element.play()
                         // if this tile is player
                         if(this.inspectingCharacter?.type === 2){
                             console.log('I am player')
@@ -166,6 +169,23 @@ class Game{
                 }
             }
         };
+
+        // Audio
+        this.bgAudio = null;
+        this.clickSound = null;
+        this.menuOpenSound = null;
+        this.menuCloseSound = null;
+        this.actionSelectSound = null;
+        this.actionCancelSound = null;
+        this.attackSound = null;
+        this.missSound = null;
+        this.potionSound = null;
+        this.walkingSound = null;
+        this.equipSound = null;
+        this.unEquipSound = null;
+        this.keySound = null;
+        this.selectSound = null;
+        this.levelUpSound = null;
     }
 
     // Initialize the game
@@ -175,6 +195,16 @@ class Game{
     // 1-3. Quit ---> Close the game
     init = async() => {
         this.option.setConfigOption(setting);
+
+        // Define sound effects
+        this.menuOpenSound = new Audio(`${__BASE_URL__}assets/audio/menu_selection.mp3`, 'interface')
+        this.menuCloseSound = new Audio(`${__BASE_URL__}assets/audio/menu_close.mp3`, 'interface')
+        this.actionSelectSound = new Audio(`${__BASE_URL__}assets/audio/action_select.mp3`, 'interface')
+        this.actionCancelSound = new Audio(`${__BASE_URL__}assets/audio/action_cancel.mp3`, 'interface')
+        this.potionSound = new Audio(`${__BASE_URL__}assets/audio/potion_drink.mp3`, 'item')
+        this.missSound = new Audio(`${__BASE_URL__}assets/audio/miss.mp3`, 'attack')
+        this.levelUpSound = new Audio(`${__BASE_URL__}assets/audio/level_up.mp3`, 'status')
+        this.clickSound = new Audio(`${__BASE_URL__}assets/audio/click.wav`, 'interface')
         
         displayTitleScreen()
         // this.beginNextPhase()
@@ -232,6 +262,9 @@ class Game{
                                 setTimeout(() => {
                                     toggleCanvas(true)
                                     toggleTurnElement(true)
+                                    // Play background music
+                                    this.bgAudio.element.src = `${__BASE_URL__}assets/audio/battle/${this.level.audio}.mp3`
+                                    this.bgAudio.element.play()
 
                                     setTimeout(() => {
                                         // Simulate click on the canvas where the first moving character is 
@@ -584,6 +617,9 @@ class Game{
         if(event !== undefined){
             this.stepOnEvent = event
             toggleActionMenuOption('pick', false, 'event')
+        }else{
+            this.stepOnEvent = {}
+            toggleActionMenuOption('pick', true, 'event')
         }
     
         return event
@@ -758,6 +794,9 @@ class Game{
 const game = new Game()
 
 await game.init()
+
+uiInit(game)
+defineSubMenu(game)
 
 export default game
 

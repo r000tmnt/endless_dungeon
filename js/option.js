@@ -150,12 +150,14 @@ export default class Option{
 
     setConfigWindow(setting){
         const configWindow = document.getElementById('config')
+        const configOption = document.getElementById('config_option')
         const title = configWindow.children[0]
         const { fontSize, fontSize_md, camera } = setting.general
         const { width, height } = camera
 
         title.style.fontSize = fontSize + 'px'
         configWindow.style.fontSize = fontSize_md + 'px'
+        configOption.style.width = (width - (fontSize_md * 2)) + 'px'
 
         resizeHiddenElement(configWindow.style, width, height, fontSize_md)
     }

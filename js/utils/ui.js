@@ -69,6 +69,9 @@ const partyWindow = document.getElementById('party')
 
 // Config UI
 const configWindow = document.getElementById('config')
+const bgmRange = document.getElementById('bgm')
+const seRange = document.getElementById('se')
+const configOption = document.getElementById('config_option')
 
 // Objective UI
 const objectiveWindow = document.getElementById('objective')
@@ -111,271 +114,6 @@ version.innerHTML = `Version: ${__APP_VERSION__}`
 //     }
 // }
 
-// option menu child click event
-for(let i=0; i < options.length; i++){
-    switch(options[i].dataset.option){
-        case 'party':
-            options[i].addEventListener('click', () => {
-                game.option.mode = 'party'
-                game.option.setPartyWindow(game.player, setting, game.action)
-                partyWindow.classList.remove('invisible')
-                partyWindow.classList.add('open_window')
-            })
-        break;
-        case 'objective':
-            options[i].addEventListener('click', () => {
-                game.option.mode = 'objective'
-                game.option.setObjectiveWindow(objectiveWindow, setting, game.tileMap.objective)
-            })
-        break;
-        case 'config':
-            options[i].addEventListener('click', () => {
-                game.option.mode = 'config'
-                game.option.setConfigWindow(setting)
-                configWindow.classList.remove('invisible')
-                configWindow.classList.add('open_window')
-            })
-        break;
-        case 'end':
-            options[i].addEventListener('click', () => {
-                game.player.forEach(p => {
-                    p.attributes.ap = 0
-                    p.wait = true
-                })
-                game.characterAnimationPhaseEnded(game.player[0])
-                option_menu.classList.remove('action_menu_open')
-            })
-        break;
-    }
-}
-
-// Back button click event
-for(let i=0; i < backBtn.length; i++){
-    switch(backBtn[i].dataset.action){
-        case 'skill':
-            backBtn[i].addEventListener('click', async() => {
-                game.action.mode = ''
-                // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
-                skillWindow.classList.add('invisible')
-                skillWindow.classList.remove('open_window')
-                game.action.clearSkillWindow(skillWindow.style)
-                // if(game.inspectingCharacter){
-                //     prepareCharacterCaption(game.inspectingCharacter) 
-                //  }
-                displayUIElement()
-            })
-        break;
-        case 'status':
-            backBtn[i].addEventListener('click', async() => {
-                game.action.mode = ''
-                // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
-                statusWindow.classList.add('invisible')
-                statusWindow.classList.remove('open_window')
-                game.action.resetStatusWindow(statusWindow.style)
-
-                if(game?.inspectingCharacter?.id){
-                    prepareCharacterCaption(game.inspectingCharacter) 
-                    displayUIElement()                    
-                }
-            })
-        break;
-        case 'item':
-            backBtn[i].addEventListener('click', async() => {
-                game.action.mode = ''
-                // Check if the tile has an event
-                await game.checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
-                Inventory.classList.add('invisible')
-                Inventory.classList.remove('open_window')
-                clearInventory(Inventory.style)
-                prepareCharacterCaption(game.inspectingCharacter)
-                displayUIElement()
-            })
-        break;
-        case 'pick':
-            backBtn[i].addEventListener('click', async() => {
-                await closePickUpWindow()
-            })
-        break;
-        case 'party':
-            backBtn[i].addEventListener('click', () => {
-                partyWindow.classList.add('invisible')
-                partyWindow.classList.remove('open_window')
-                game.option.mode = ''
-                game.option.cleatPartyWindow(partyWindow.style)
-            })
-        break;
-        case 'objective':
-            backBtn[i].addEventListener('click', () => {
-                game.option.mode = ''
-                objectiveWindow.classList.add('invisible')
-                objectiveWindow.classList.remove('open_window')
-            })
-        break;
-        case 'config':
-            backBtn[i].addEventListener('click', () => {
-                game.option.mode = ''
-                configWindow.classList.add('invisible')
-                configWindow.classList.remove('open_window')
-            })
-        break;
-    }
-}
-
-// action menu child click event
-for(let i=0; i < actionMenuOptions.length; i++){
-    switch(actionMenuOptions[i].dataset.action){
-        case 'move':
-            actionMenuOptions[i].addEventListener('click', async() => {
-                hideUIElement() 
-                const { tileSize } = setting.general
-                const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
-                const possibleEncounterEnemyPosition = game.limitPositonToCheck(game.inspectingCharacter.attributes.moveSpeed, position, game.enemyPosition)
-                await game.action.setMove(
-                    game.tileMap, 
-                    game.inspectingCharacter, 
-                    position, 
-                    game.inspectingCharacter.attributes.moveSpeed, possibleEncounterEnemyPosition.length? possibleEncounterEnemyPosition : game.enemyPosition
-                )           
-            })
-        break;
-        case 'attack':
-            actionMenuOptions[i].addEventListener('click', async() => {
-                hideUIElement() 
-                const { tileSize } = setting.general
-                const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
-                await game.action.setAttack(game.tileMap, game.inspectingCharacter, position, 1)
-            })
-        break;   
-        case "skill":
-            actionMenuOptions[i].addEventListener('click', () => {
-                hideUIElement()
-                const { tileSize, fontSize, fontSize_md, fontSize_sm, camera } = setting.general
-                const { width, height } = camera
-                resizeHiddenElement(skillWindow.style, width, height, fontSize_sm)
-                const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
-                game.action.setSKillWindow(game.inspectingCharacter, game.tileMap, position, fontSize, fontSize_md, fontSize_sm)
-            })
-        break;
-        case 'item':
-            actionMenuOptions[i].addEventListener('click', () => prepareInventory(game.inspectingCharacter))
-        break; 
-        case 'pick':
-            actionMenuOptions[i].addEventListener('click', () => {
-                game.action.mode = 'pick'
-                preparePickUpWindow()
-            })
-        break;
-        case 'status':
-            actionMenuOptions[i].addEventListener('click', () => {
-                hideUIElement()
-                game.action.mode = 'status'
-                const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
-                const { width, height } = camera
-                resizeHiddenElement(statusWindow.style, width, height, fontSize_sm)
-                game.action.setStatusWindow(game.inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
-            })
-        break;
-        case 'stay':
-            actionMenuOptions[i].addEventListener('click', async() => {
-                hideUIElement()
-                setTimeout(() => {
-                    game.inspectingCharacter.attributes.ap -= 1
-                    game.characterAnimationPhaseEnded(game.inspectingCharacter)
-                }, 500)
-            })
-        break;
-    }
-}
-
-// Result action child click event
-for(let i=0; i < resultActionOptions.length; i++){
-    switch(resultActionOptions[i].dataset.action){
-        case 'stash':
-            resultActionOptions[i].addEventListener('click', () => {
-                // game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
-                game.action.mode = 'stash'
-                preparePickUpWindow()
-
-                levelClear.classList.remove('open_window')
-                levelClear.classList.add('invisible')
-            })
-        break;
-        case 'pickAfterBattle':
-            // Choose which character to take items if there's more then one in the party
-            resultActionOptions[i].addEventListener('click', () => {
-                game.action.mode = 'pickAfterBattle'
-                if(game.player.length > 1){
-                    const partySubMenu = levelClear.querySelector('#partySubMenu')
-    
-                    const { itemBlockSize } = setting.inventory
-    
-                    game.player.map(p => {
-                        const member = document.createElement('img')
-                        member.style.width = itemBlockSize + 'px'
-                        member.style.height = itemBlockSize + 'px'
-                        member.src = p.characterImage
-    
-                        member.addEventListener('click', () => {
-                            game.inspectingCharacter = p
-                            preparePickUpWindow()
-                            partySubMenu.classList.remove('open_window')
-                            partySubMenu.classList.add('invisible')
-                        })
-
-                        partySubMenu.append(member)
-                    })
-
-                    partySubMenu.classList.remove('invisible')
-                    partySubMenu.classList.add('open_window')
-                }else{
-                    game.inspectingCharacter = game.player[0]
-                    preparePickUpWindow()
-                }
-
-                levelClear.classList.remove('open_window')
-                levelClear.classList.add('invisible')
-            })
-        break;
-        case 'finish':
-            resultActionOptions[i].addEventListener('click', () => {
-                if(game.stepOnEvent.item.length){
-                    const { fontSize_md, camera } = setting.general
-                    warn.style.width = (camera.width - (fontSize_md * 2)) + 'px'
-                    warn.style.padding = fontSize_md + 'px'
-                    warn.classList.remove('invisible')
-                    warn.classList.add('open_window')
-                }else{
-                    const partySubMenu = levelClear.querySelector('#partySubMenu')
-
-                    // Remove elements if any
-                    while(partySubMenu.firstChild){
-                        partySubMenu.removeChild(partySubMenu.firstChild)
-                    }
-                    
-                    game.phaseCount += 1
-                    game.beginNextPhase()      
-                    toggleCanvas(false)          
-                    levelClear.classList.remove('open_window')
-                    levelClear.classList.add('invisible')                    
-                }
-            })
-        break;
-    }
-}
-
-// Button to finish the result screen
-const finishBtn = levelClear.getElementsByTagName('button')
-
-finishBtn[0].addEventListener('click', () => {
-    warn.classList.remove('open_window')
-    warn.classLisr.add('invisible')
-})
-
-finishBtn[1].addEventListener('click', () => {
-    game.phaseCount += 1
-    game.beginNextPhase()   
-    endBattlePhase()
-})
 
 // Calculate the percentage of an attribute
 const getPercentage = (type, character) => {
@@ -394,16 +132,358 @@ const getPercentage = (type, character) => {
 }
 
 const endBattlePhase = () => {
+    // Reset backgroud audio time line back to the start
+    game.bgAudio.element.currentTime = 0
+    // Stop background audio
+    game.bgAudio.element.pause()
     toggleTurnElement(false)
     toggleCanvas(false)     
-    countTurn(0)
-    game.action.mode = ''
-    game.turnType = 0    
+    countTurn(0) 
     canvas.removeEventListener('mousedown', game.canvasEvent)  
     levelClear.classList.remove('open_window')
     levelClear.classList.add('invisible')
     warn.classList.add('invisible')
     warn.classList.remove('open_window')
+    game.action.mode = ''
+    game.turnType = 0  
+    game.beginNextPhase()   
+}
+
+/**
+ * Initialize ui elements
+ * @param {object} game - The game object
+ */
+export const uiInit = (game) => {
+    // option menu child click event
+    for(let i=0; i < options.length; i++){
+        const action = options[i].dataset.option
+        switch(action){
+            case 'party':
+                game.actionSelectSound.bindTarget(options[i])
+                options[i].addEventListener('click', () => {
+                    game.option.mode = action
+                    game.option.setPartyWindow(game.player, setting, game.action)
+                    partyWindow.classList.remove('invisible')
+                    partyWindow.classList.add('open_window')
+                })
+            break;
+            case 'objective':
+                game.actionSelectSound.bindTarget(options[i])
+                options[i].addEventListener('click', () => {
+                    game.option.mode = action
+                    game.option.setObjectiveWindow(objectiveWindow, setting, game.tileMap.objective)
+                })
+            break;
+            case 'config':
+                game.actionSelectSound.bindTarget(options[i])
+                options[i].addEventListener('click', () => {
+                    game.option.mode = action
+                    game.option.setConfigWindow(setting)
+                    configWindow.classList.remove('invisible')
+                    configWindow.classList.add('open_window')
+                })
+            break;
+            case 'end':
+                game.actionSelectSound.bindTarget(options[i])
+                options[i].addEventListener('click', () => {
+                    game.player.forEach(p => {
+                        p.attributes.ap = 0
+                        p.wait = true
+                    })
+                    game.characterAnimationPhaseEnded(game.player[0])
+                    option_menu.classList.remove('action_menu_open')
+                })
+            break;
+        }
+    }
+
+    // Back button click event
+    for(let i=0; i < backBtn.length; i++){
+        switch(backBtn[i].dataset.action){
+            case 'skill':
+                game.actionCancelSound.bindTarget(backBtn[i])
+                backBtn[i].addEventListener('click', async() => {
+                    game.action.mode = ''
+                    // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
+                    skillWindow.classList.add('invisible')
+                    skillWindow.classList.remove('open_window')
+                    game.action.clearSkillWindow(skillWindow.style)
+                    // if(game.inspectingCharacter){
+                    //     prepareCharacterCaption(game.inspectingCharacter) 
+                    //  }
+                    displayUIElement()
+                })
+            break;
+            case 'status':
+                game.actionCancelSound.bindTarget(backBtn[i])
+                backBtn[i].addEventListener('click', async() => {
+                    game.action.mode = ''
+                    // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
+                    statusWindow.classList.add('invisible')
+                    statusWindow.classList.remove('open_window')
+                    game.action.resetStatusWindow(statusWindow.style)
+
+                    if(game?.inspectingCharacter?.id){
+                        prepareCharacterCaption(game.inspectingCharacter) 
+                        displayUIElement()                    
+                    }
+                })
+            break;
+            case 'item':
+                game.actionCancelSound.bindTarget(backBtn[i])
+                backBtn[i].addEventListener('click', async() => {
+                    game.action.mode = ''
+                    // Check if the tile has an event
+                    await game.checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
+                    Inventory.classList.add('invisible')
+                    Inventory.classList.remove('open_window')
+                    clearInventory(Inventory.style)
+                    prepareCharacterCaption(game.inspectingCharacter)
+                    displayUIElement()
+                })
+            break;
+            case 'pick':
+                game.actionCancelSound.bindTarget(backBtn[i])
+                backBtn[i].addEventListener('click', async() => {
+                    await closePickUpWindow()
+                })
+            break;
+            case 'party':
+                game.actionCancelSound.bindTarget(backBtn[i])
+                backBtn[i].addEventListener('click', () => {
+                    partyWindow.classList.add('invisible')
+                    partyWindow.classList.remove('open_window')
+                    game.option.mode = ''
+                    game.option.cleatPartyWindow(partyWindow.style)
+                })
+            break;
+            case 'objective':
+                game.actionCancelSound.bindTarget(backBtn[i])
+                backBtn[i].addEventListener('click', () => {
+                    game.option.mode = ''
+                    objectiveWindow.classList.add('invisible')
+                    objectiveWindow.classList.remove('open_window')
+                })
+            break;
+            case 'config':
+                game.actionCancelSound.bindTarget(backBtn[i])
+                backBtn[i].addEventListener('click', () => {
+                    game.option.mode = ''
+                    configWindow.classList.add('invisible')
+                    configWindow.classList.remove('open_window')
+                })
+            break;
+        }
+    }
+
+    // action menu child click event
+    for(let i=0; i < actionMenuOptions.length; i++){
+        const action = actionMenuOptions[i].dataset.action
+        switch(action){
+            case 'move':
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
+                actionMenuOptions[i].addEventListener('click', async() => {
+                    game.action.mode = action
+                    hideUIElement() 
+                    const { tileSize } = setting.general
+                    const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
+                    const possibleEncounterEnemyPosition = game.limitPositonToCheck(game.inspectingCharacter.attributes.moveSpeed, position, game.enemyPosition)
+                    await game.action.setMove(
+                        game.tileMap, 
+                        game.inspectingCharacter, 
+                        position, 
+                        game.inspectingCharacter.attributes.moveSpeed, possibleEncounterEnemyPosition.length? possibleEncounterEnemyPosition : game.enemyPosition
+                    )           
+                })
+            break;
+            case 'attack':
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
+                actionMenuOptions[i].addEventListener('click', async() => {
+                    game.action.mode = action
+                    hideUIElement() 
+                    const { tileSize } = setting.general
+                    const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
+                    await game.action.setAttack(game.tileMap, game.inspectingCharacter, position, 1)
+                })
+            break;   
+            case "skill":
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
+                actionMenuOptions[i].addEventListener('click', () => {
+                    game.action.mode = action
+                    hideUIElement()
+                    const { tileSize, fontSize, fontSize_md, fontSize_sm, camera } = setting.general
+                    const { width, height } = camera
+                    resizeHiddenElement(skillWindow.style, width, height, fontSize_sm)
+                    const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
+                    game.action.setSKillWindow(game.inspectingCharacter, game.tileMap, position, fontSize, fontSize_md, fontSize_sm)
+                })
+            break;
+            case 'item':
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
+                actionMenuOptions[i].addEventListener('click', () => {
+                    game.action.mode = action
+                    prepareInventory(game.inspectingCharacter)
+                })
+            break; 
+            case 'pick':
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
+                actionMenuOptions[i].addEventListener('click', () => {
+                    game.action.mode = action
+                    preparePickUpWindow()
+                })
+            break;
+            case 'status':
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
+                actionMenuOptions[i].addEventListener('click', () => {
+                    game.action.mode = action
+                    hideUIElement()
+                    const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
+                    const { width, height } = camera
+                    resizeHiddenElement(statusWindow.style, width, height, fontSize_sm)
+                    game.action.setStatusWindow(game.inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
+                })
+            break;
+            case 'stay':
+                game.actionSelectSound.bindTarget(actionMenuOptions[i])
+                actionMenuOptions[i].addEventListener('click', async() => {
+                    hideUIElement()
+                    setTimeout(() => {
+                        game.inspectingCharacter.attributes.ap = 0
+                        game.characterAnimationPhaseEnded(game.inspectingCharacter)
+                    }, 500)
+                })
+            break;
+        }
+    }
+
+    // Result action child click event
+    for(let i=0; i < resultActionOptions.length; i++){
+        const action = resultActionOptions[i].dataset.action
+        switch(action){
+            case 'stash':
+                game.actionSelectSound.bindTarget(resultActionOptions[i])
+                resultActionOptions[i].addEventListener('click', () => {
+                    if(game.stepOnEvent.item.length){
+                        // game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
+                        game.action.mode = action
+                        preparePickUpWindow()
+
+                        levelClear.classList.remove('open_window')
+                        levelClear.classList.add('invisible')                        
+                    }
+                })
+            break;
+            case 'pickAfterBattle':
+                // Choose which character to take items if there's more then one in the party
+                game.actionSelectSound.bindTarget(resultActionOptions[i])
+                resultActionOptions[i].addEventListener('click', () => {
+                    if(game.stepOnEvent.item.length){
+                        game.action.mode = action
+                        if(game.player.length > 1){
+                            const partySubMenu = levelClear.querySelector('#partySubMenu')
+            
+                            const { itemBlockSize } = setting.inventory
+            
+                            game.player.map(p => {
+                                const member = document.createElement('img')
+                                member.style.width = itemBlockSize + 'px'
+                                member.style.height = itemBlockSize + 'px'
+                                member.src = p.characterImage
+                                game.actionSelectSound.bindTarget(member)
+                                member.addEventListener('click', () => {
+                                    game.inspectingCharacter = p
+                                    preparePickUpWindow()
+                                    partySubMenu.classList.remove('open_window')
+                                    partySubMenu.classList.add('invisible')
+                                })
+
+                                partySubMenu.append(member)
+                            })
+
+                            partySubMenu.classList.remove('invisible')
+                            partySubMenu.classList.add('open_window')
+                        }else{
+                            game.inspectingCharacter = game.player[0]
+                            preparePickUpWindow()
+                        }
+
+                        levelClear.classList.remove('open_window')
+                        levelClear.classList.add('invisible')                        
+                    }
+                })
+            break;
+            case 'finish':
+                game.actionSelectSound.bindTarget(resultActionOptions[i])
+                resultActionOptions[i].addEventListener('click', () => {
+                    if(game.stepOnEvent.item.length){
+                        const { fontSize_md, camera } = setting.general
+                        warn.style.width = (camera.width - (fontSize_md * 2)) + 'px'
+                        warn.style.padding = fontSize_md + 'px'
+                        warn.classList.remove('invisible')
+                        warn.classList.add('open_window')
+                    }else{
+                        const partySubMenu = levelClear.querySelector('#partySubMenu')
+
+                        // Remove elements if any
+                        while(partySubMenu.firstChild){
+                            partySubMenu.removeChild(partySubMenu.firstChild)
+                        }
+                        
+                        game.phaseCount += 1
+                        game.beginNextPhase()      
+                        toggleCanvas(false)          
+                        levelClear.classList.remove('open_window')
+                        levelClear.classList.add('invisible')                    
+                    }
+                })
+            break;
+        }
+    }
+
+    // Button to finish the result screen
+    const finishBtn = levelClear.getElementsByTagName('button')
+
+    game.actionCancelSound.bindTarget(finishBtn[0])
+    finishBtn[0].addEventListener('click', () => {
+        warn.classList.remove('open_window')
+        warn.classList.add('invisible')
+    })
+
+    game.actionSelectSound.bindTarget(finishBtn[1])
+    finishBtn[1].addEventListener('click', () => {
+        game.phaseCount += 1 
+        endBattlePhase()
+    })
+
+    // Input range bind event
+    bgmRange.value = setting.general.bgm
+    bgmRange.addEventListener('input', (e) => {
+        const volume = Number(e.target.value)
+        setting.general.bgm = volume
+        game.bgAudio.element.volume = volume / 100
+        console.log("volume:>>> ", game.bgAudio.element.value)
+    })
+
+    // Input range bind event
+    seRange.value = setting.general.se
+    seRange.addEventListener('input', (e) => {
+        const volume = Number(e.target.value) / 100
+        setting.general.bgm = Number(e.target.value)
+        game.clickSound.element.volume = volume
+        game.menuOpenSound.element.volume = volume
+        game.menuCloseSound.element.volume = volume
+        game.actionSelectSound.element.volume = volume
+        game.actionCancelSound.element.volume = volume
+        // game.attackSound.element.volume = volume
+        game.missSound.element.volume = volume
+        game.potionSound.element.volume = volume
+        // game.walkingSound.element.volume = volume
+        // game.equipSound.element.volume = volume
+        // game.unEquipSound.element.volume = volume
+        // game.keySound.element.volume = volume
+        // game.selectSound.element.volume = volume
+        game.levelUpSound.element.volume = volume
+    })
 }
 
 /**
@@ -412,7 +492,6 @@ const endBattlePhase = () => {
  */
 export const prepareInventory = async(currentActingPlayer) => {
     hideUIElement()
-    game.action.mode = 'item'
     const { fontSize, fontSize_sm, camera } = setting.general
     const { width, height } = camera
     const { itemBlockSize, itemBlockMargin } = setting.inventory
@@ -514,7 +593,6 @@ export const displayResult = (win) => {
             levelClear.addEventListener('click', () => {
                 // Back to title screen or intermission
                 game.phaseCount = game.level.phase.length - 1
-                game.beginNextPhase()
                 endBattlePhase()
             })
         }, 1000)        
@@ -535,6 +613,12 @@ export const preparePickUpWindow = () => {
 
 export const closePickUpWindow = async() => {
     if(game.action.mode === 'pickAfterBattle' || game.action.mode === 'stash'){
+        const partySubMenu = levelClear.querySelector('#partySubMenu')
+
+        while(partySubMenu.firstChild){
+            partySubMenu.removeChild(partySubMenu.firstChild)
+        }
+
         pickUpWindow.classList.add('invisible')
         pickUpWindow.classList.remove('open_window')
         clearPickUpWindow(pickUpWindow.style)
@@ -542,7 +626,7 @@ export const closePickUpWindow = async() => {
         levelClear.classList.add('open_window')
     }else{
         // Check if the tile has an event
-        await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
+        await game.checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
         pickUpWindow.classList.add('invisible')
         pickUpWindow.classList.remove('open_window')
         clearPickUpWindow(pickUpWindow.style)
@@ -612,6 +696,8 @@ export const hideUIElement = () => {
 }
 
 export const cancelAction = () => {
+    game.actionCancelSound.element.play()
+
     if(!characterCaption.classList.contains('invisible')){
         characterCaption.classList.add('invisible') 
     }else{
@@ -681,9 +767,9 @@ export const toggleActionMenuOption = (action, disable, mode = '') => {
                 }
             }else
             if(disable){
-                actionMenuOptions[i].classList.add('no-event')
+                actionMenuOptions[i].classList.add('button_disable')
             }else{
-                actionMenuOptions[i].classList.remove('no-event')
+                actionMenuOptions[i].classList.remove('button_disable')
             }
             return
         }
@@ -803,7 +889,7 @@ export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_s
     
         // option menu child font size
         for(let i=0; i < options.length; i++){
-            options[i].style.fontSize = fontSize + 'px';
+            options[i].style.fontSize = fontSize_md + 'px';
         }       
         
         characterCaption.style.width = Math.floor(50 * (width / 100)) + 'px'
@@ -816,7 +902,7 @@ export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_s
         warn.style.padding = fontSize_md + 'px'
         warn.style.fontSize = fontSize_md + 'px'
 
-        Array.from(finishBtn).forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
+        Array.from(levelClear.getElementsByTagName('button')).forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
     
         // Set back button style
         for(let i=0; i < backBtn.length; i++){
@@ -884,7 +970,7 @@ export const resize = () => {
 
                 warn.style.fontSize = fontSize_md + 'px'
 
-                finishBtn.forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
+                Array.from(levelClear.getElementsByTagName('button')).forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
 
                 switch(game.action.mode){
                     case 'item':
@@ -923,6 +1009,8 @@ export const resize = () => {
                     case 'config':
                         // Set config window style
                         configWindow.style.fontSize = fontSize_md + 'px'
+                        configOption.style.width = (cameraWidth - (fontSize_md * 2)) + 'px'
+                        configWindow.children[0].style.fontSize = fontSize + 'px'
                         resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontSize_sm)
                     break;
                 }
