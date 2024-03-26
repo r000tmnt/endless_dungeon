@@ -10,7 +10,7 @@ import {
 import setting from './setting.js';
 import game from '../game.js';
 import level from '../dataBase/level.js';
-import { changeLanguage, t } from './i18n.js'
+import { changeLanguage, t, i18n} from './i18n.js'
 
 // Get UI element and bind a click event
 const aspectRatio = 9 / 16
@@ -190,19 +190,24 @@ export const reRenderUi = (game) => {
             // config options
             const tableRows = Array.from(configOption.querySelectorAll('tr'))
 
-            tableRows[0].firstChild.innerText = t('ui.config.bgm')
-            tableRows[1].firstChild.innerText = t('ui.config.se')
-            tableRows[2].firstChild.innerText = t('ui.config.grid')
-            tableRows[3].firstChild.innerText = t('ui.config.filter')
-            tableRows[4].firstChild.innerText = t('ui.config.language')
+            tableRows[0].children[0].innerText = t('ui.config.bgm')
+            tableRows[1].children[0].innerText = t('ui.config.se')
+            tableRows[2].children[0].innerText = t('ui.config.grid')
+            tableRows[3].children[0].innerText = t('ui.config.filter')
+            tableRows[4].children[0].innerText = t('ui.config.language')
 
             const gridLabel = tableRows[2].children[1].querySelectorAll('label')
             const filterLabel = tableRows[3].children[1].querySelectorAll('label')
+            const languageInput = tableRows[4].children[1].querySelectorAll('input')
 
             gridLabel[0].innerText = t('ui.config.on')
             gridLabel[1].innerText = t('ui.config.off')
             filterLabel[0].innerText = t('ui.config.default')
             filterLabel[1].innerText = t('ui.config.retro')
+
+            languageInput.forEach(l => {
+                l.checked = l.value === i18n.language
+            })
         break;
         case 'intermission':
         break;
@@ -539,7 +544,6 @@ export const displayLanguageSelection = () => {
         lb.addEventListener('click', () => {
             localStorage.setItem('lng', lb.dataset.lng)
             changeLanguage(lb.dataset.lng)
-            reRenderUi()
             language.classList.add('invisible')
             displayTitleScreen()
         })
