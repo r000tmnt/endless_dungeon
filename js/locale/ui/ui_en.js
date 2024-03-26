@@ -36,6 +36,7 @@ export default {
         "subMenu": {
             "use": "Use",
             "equip": "Equip",
+            "unequip": "Unequipt",
             "drop": "Drop",
             "give": "Give",
             "close": "Close"

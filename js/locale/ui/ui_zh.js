@@ -36,6 +36,7 @@ export default {
         "subMenu": {
             "use": "使用",
             "equip": "裝備",
+            "unequip": "卸下",
             "drop": "丟棄",
             "give": "給予",
             "close": "關閉"
