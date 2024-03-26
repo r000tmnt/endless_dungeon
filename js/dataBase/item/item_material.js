@@ -1,8 +1,10 @@
+import { t } from '../../utils/i18n'
+
 export default{
     data: [
         {
             "id": "material_meat_2",
-            "name": "Rotten meat",
+            "name": t("item.material_meat_2.name"),
             "stackLimit": 10,
             "type": 2,
             "effect": {
@@ -11,7 +13,7 @@ export default{
                 "target": "status",
                 "amount": "Poison",
                 "rate": 70,
-                "desc": "Please don't eat it."
+                "desc": t("item.material_meat_2.desc")
             }
         },
     ],

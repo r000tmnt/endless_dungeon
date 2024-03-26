@@ -1,8 +1,10 @@
+import { t } from '../../utils/i18n'
+
 export default{
     data: [
         {
             "id": "potion_health_1",
-            "name": "Health potion",
+            "name": t("item.potion_health_1.name"),
             "type": 0,
             "stackLimit": 99,
             "effect":{
@@ -12,7 +14,7 @@ export default{
                 "range": 1,
                 "target": "hp",
                 "amount": 10,
-                "desc": "Restore 10 points of health."
+                "desc": t("item.potion_health_1.desc")
             },
             "useCondition": {
                 "compare": "lower",
@@ -23,7 +25,7 @@ export default{
         },
         {
             "id": "potion_mana_1",
-            "name": "Mana potion",
+            "name": t("item.potion_mana_1.name"),
             "type": 0,
             "stackLimit": 99,
             "effect":{
@@ -33,7 +35,7 @@ export default{
                 "range": 1,
                 "target": "mp",
                 "amount": 10,
-                "desc": "Restore 10 points of mana."
+                "desc": t("item.potion_mana_1.desc")
             },
             "useCondition": {
                 "compare": "lower",
@@ -44,7 +46,7 @@ export default{
         },
         {
             "id": "potion_antidote",
-            "name": "Antidote",
+            "name": t("item.potion_antidote.name"),
             "type": 0,
             "stackLimit": 99,
             "effect":{
@@ -54,7 +56,7 @@ export default{
                 "range": 1,
                 "target": "status",
                 "amount": 0,
-                "desc": "Remove the poison."
+                "desc": t("item.potion_antidote.desc")
             },
             "useCondition": {
                 "compare": "equal",
@@ -65,7 +67,7 @@ export default{
         },
         {
             "id": "potion_revive",
-            "name": "Candle of soul",
+            "name": t("item.potion_revive.name"),
             "type": 0,
             "stackLimit": 99,
             "effect":{
@@ -75,7 +77,7 @@ export default{
                 "range": 1,
                 "target": "all",
                 "amount": 10,
-                "desc": "Revive the character with 10% of health."
+                "desc": t("item.potion_revive.desc")
             },
             "prefix": [],
             "suffix": []

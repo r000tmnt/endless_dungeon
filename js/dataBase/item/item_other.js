@@ -1,12 +1,14 @@
+import { t } from '../../utils/i18n'
+
 export default{
     data: [
         {
             "id": "currency_1",
-            "name": "Gold",
+            "name": t("item.currency_1.name"),
             "stackLimit": 5000,
             "type": 1,
             "effect": {
-                "desc": "A coin to exchange for somthing."
+                "desc": t("item.currency_1.desc")
             }
         },
     ],
