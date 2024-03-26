@@ -1,6 +1,8 @@
 :root{
     --msgColor: yellow;
     --fontSize: 16px;
+    --objective: "Objective";
+    --action: "Action";
 }
 
 @keyframes hint {
@@ -572,7 +574,7 @@ li{
   }
 
   #optional::before{
-    content: 'Objective';
+    content: var(--objective);
     font-size: var(--fontSize);
   }
 
@@ -587,7 +589,7 @@ li{
   }
 
   #resultAction::before{
-    content: 'Action';
+    content: var(--action);
     font-size: var(--fontSize);
   }
 

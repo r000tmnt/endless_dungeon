@@ -63,8 +63,9 @@ export default {
         "end": "End Turn"
     },
     "result": {
-        "win": "WIN",
-        "lose": "LOSE",
+        "action": "Action",
+        "win": "Victory",
+        "lose": "Lose",
         "stash": "Push items to the stash",
         "pickAfterBattle": "Pick up items",
         "finish": "Finish",

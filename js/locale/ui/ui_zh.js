@@ -63,8 +63,9 @@ export default {
         "end": "回合結束"
     },
     "result": {
+        "action": "行動",
         "win": "勝利",
-        "lose": "失敗",
+        "lose": "敗北",
         "stash": "道具推送至倉庫",
         "pickAfterBattle": "捨取道具",
         "finish": "結束",

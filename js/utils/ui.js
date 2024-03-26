@@ -487,6 +487,7 @@ export const uiInit = (game) => {
                 resultActionOptions[i].addEventListener('click', () => {
                     if(game.stepOnEvent.item.length){
                         const { fontSize_md, camera } = setting.general
+                        warn.children[0].innerText = t("ui.result.warn")
                         warn.style.width = (camera.width - (fontSize_md * 2)) + 'px'
                         warn.style.padding = fontSize_md + 'px'
                         warn.classList.remove('invisible')
@@ -606,10 +607,12 @@ export const displayResult = (win) => {
     title.style.fontSize = (fontSize * 2) + 'px'
 
     if(win){
-        title.innerText = "Victory"
+        title.innerText = t("ui.result.win")
         title.style.color = 'gold'
 
         document.documentElement.style.setProperty('--fontSize', fontSize_md + 'px')
+        document.documentElement.style.setProperty('--objective', t("ui.option.objective"))
+        document.documentElement.style.setProperty('--action', t("ui.result.action"))
 
         const optional = levelClear.querySelector('#optional')
         optional.classList.remove('invisible')
@@ -618,7 +621,7 @@ export const displayResult = (win) => {
             game.tileMap.objective.optional.map(o => {
                 const condition = document.createElement('li')
                 if(o.target === 'turn'){
-                    condition.innerText = `Finish the level in ${o.value} turns\n`
+                    condition.innerText = game.option.formObjectiveMessage(game.tileMap.objective, 'optional', i18n.language)
                     condition.style.margin = `${fontSize_sm}px 0`
 
                     if(game.turn <= o.value){
@@ -643,7 +646,7 @@ export const displayResult = (win) => {
             resultAction.classList.remove('invisible')
         }, 1000)
     }else{
-        title.innerText = 'Game Over'
+        title.innerText = t("ui.result.lose")
         title.style.color = 'grey'
 
         setTimeout(() => {
@@ -656,6 +659,12 @@ export const displayResult = (win) => {
             })
         }, 1000)        
     }
+
+    // Button to finish the result screen
+    const finishBtn = levelClear.getElementsByTagName('button')
+    
+    finishBtn[0].innerText = t("ui.inventory.range.cancel")
+    finishBtn[1].innerText = t("ui.inventory.range.confirm")
 
     levelClear.classList.remove('invisible')
     levelClear.classList.add('open_window')

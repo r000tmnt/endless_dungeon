@@ -99,41 +99,48 @@ export default class Option{
             list[i].children[0].style.padding = fontSize_sm + 'px'
             const obj = desc[i].dataset.objective
             list[i].children[0].innerText = t(`ui.objective.${obj}`)
-            switch(obj){
-                case 'victory':
-                    if(objective.victory.target === 'enemy'){
-                        if(objective.victory.value === 0){
-                            desc[i].innerText = (lng === 'en')? 'Defeat All enemies' : '擊退所有敵人'
-                        }else{
-                            desc[i].innerText = (lng === 'en')? `Defeat ${objective.victory.value} enemies` : `打倒${objective.victory.value}個敵人`
-                        }
-                    }
-                break;
-                case 'fail':
-                    if(objective.fail.target === 'player'){
-                        if(typeof objective.fail.value === "number"){
-                            if(objective.fail.value === 0){
-                                desc[i].innerText = (lng === 'en')? 'Party member All down' : '隊伍全滅'
-                            }else{
-                                desc[i].innerText = (lng === 'en')? `Lose ${objective.fail.value} party member` : `${objective.fail.value}個同伴倒下`
-                            }                            
-                        }else{
-                            // TODO: If the targeted player lose
-                        }
-                    }
-                break;
-                case 'optional':
-                    for(let j=0; j < objective.optional.length; j++){
-                        if(objective.optional[j].target === 'turn'){
-                            desc[i].innerText = (lng === 'en')? `Finish the level in ${objective.optional[j].value} turns\n` : `${objective.optional[j].value}回合結束關卡`
-                        }                        
-                    }
-                break;
-            }
+            desc[i].innerText = this.formObjectiveMessage(objective, obj, lng)
         }
 
         target.classList.remove('invisible')
         target.classList.add('open_window')
+    }
+
+    formObjectiveMessage(objective, type, lng){
+        let message = ''
+        switch(type){
+            case 'victory':
+                if(objective.victory.target === 'enemy'){
+                    if(objective.victory.value === 0){
+                        message = (lng === 'en')? 'Defeat All enemies' : '擊退所有敵人'
+                    }else{
+                        message = (lng === 'en')? `Defeat ${objective.victory.value} enemies` : `打倒${objective.victory.value}個敵人`
+                    }
+                }
+            break;
+            case 'fail':
+                if(objective.fail.target === 'player'){
+                    if(typeof objective.fail.value === "number"){
+                        if(objective.fail.value === 0){
+                            message = (lng === 'en')? 'Party member All down' : '隊伍全滅'
+                        }else{
+                            message = (lng === 'en')? `Lose ${objective.fail.value} party member` : `${objective.fail.value}個同伴倒下`
+                        }                            
+                    }else{
+                        // TODO: If the targeted player lose
+                    }
+                }
+            break;
+            case 'optional':
+                for(let j=0; j < objective.optional.length; j++){
+                    if(objective.optional[j].target === 'turn'){
+                        message = (lng === 'en')? `Finish the level in ${objective.optional[j].value} turns\n` : `${objective.optional[j].value}回合結束關卡`
+                    }                        
+                }
+            break;
+        }
+
+        return message
     }
 
     resizeObjectiveWindow(target, setting){
