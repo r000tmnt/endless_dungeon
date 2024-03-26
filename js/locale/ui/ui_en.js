@@ -28,9 +28,10 @@ export default {
     "inventory": {
         "title": "Inventory",
         "filter": {
-            "quiptment": "Equipment",
-            "material": "material",
-            "key": "Key"
+            "1": "Equipment",
+            "2": "Potion",
+            "3": "material",
+            "4": "Key"
         },
         "subMenu": {
             "use": "Use",

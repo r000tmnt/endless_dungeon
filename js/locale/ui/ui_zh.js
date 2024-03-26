@@ -28,9 +28,10 @@ export default {
     "inventory": {
         "title": "物品",
         "filter": {
-            "quiptment": "裝備",
-            "material": "素材",
-            "key": "鑰匙"
+            "1": "裝備",
+            "2": "藥水",
+            "3": "素材",
+            "4": "鑰匙"
         },
         "subMenu": {
             "use": "使用",
