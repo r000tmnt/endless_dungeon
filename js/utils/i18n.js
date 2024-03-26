@@ -16,5 +16,5 @@ i18next.init({
 })
 
 export const t = i18next.t
-export const lng = i18next.language
+export const i18n = i18next
 export const changeLanguage = i18next.changeLanguage
