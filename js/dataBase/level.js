@@ -33,7 +33,7 @@ export default{
      */
     async load(id){
         const index = this.data.findIndex(k => k.id === id)
-        const levelData = await import(`./level/${id}`)
+        const levelData = await import(`./level/${id}.js`)
 
         console.log('level data:>>> ', levelData)
 
