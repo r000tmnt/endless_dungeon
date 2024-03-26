@@ -1,7 +1,6 @@
 import i18next from "i18next";
-import * as en from '../locale/en.json'
-import * as zh from '../locale/zh.json'
-import game from "../game";
+import en from '../locale/en.js'
+import zh from '../locale/zh.js'
 
 i18next.init({
     lng: 'en',
@@ -14,12 +13,6 @@ i18next.init({
             translation: zh
         }
     }
-})
-
-// on language change event
-i18next.on('languageChanged', (lng) => {
-    // Re-render ui elements
-    
 })
 
 export const t = i18next.t
