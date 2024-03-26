@@ -1,4 +1,7 @@
 import { resizeHiddenElement } from './utils/ui.js'
+import game from './game.js'
+import { changeLanguage, i18n } from './utils/i18n.js'
+import { reRenderUi } from './utils/ui.js'
 
 export default class Option{
     constructor(mode){
@@ -166,6 +169,36 @@ export default class Option{
         const options = document.getElementById('config_option').querySelectorAll('input')
         for(let i=0; i< options.length; i++){
             switch(options[i].dataset.config){
+                case 'bgm':
+                    options[i].value = setting.general.bgm
+                    options[i].addEventListener('input', (e) => {
+                        const volume = Number(e.target.value)
+                        setting.general.bgm = volume
+                        game.bgAudio.element.volume = volume / 100
+                        console.log("volume:>>> ", game.bgAudio.element.volume)
+                    })
+                break;
+                case 'se':
+                    options[i].value = setting.general.se
+                    options[i].addEventListener('input', (e) => {
+                        const volume = Number(e.target.value) / 100
+                        setting.general.bgm = Number(e.target.value)
+                        game.clickSound.element.volume = volume
+                        game.menuOpenSound.element.volume = volume
+                        game.menuCloseSound.element.volume = volume
+                        game.actionSelectSound.element.volume = volume
+                        game.actionCancelSound.element.volume = volume
+                        // game.attackSound.element.volume = volume
+                        game.missSound.element.volume = volume
+                        game.potionSound.element.volume = volume
+                        // game.walkingSound.element.volume = volume
+                        // game.equipSound.element.volume = volume
+                        // game.unEquipSound.element.volume = volume
+                        // game.keySound.element.volume = volume
+                        // game.selectSound.element.volume = volume
+                        game.levelUpSound.element.volume = volume
+                    })
+                break;
                 case 'grid':
                     options[i].checked = options[i].value === String(setting.general.showGrid)
 
@@ -182,6 +215,15 @@ export default class Option{
 
                     options[i].addEventListener('click', () => {
                         setting.general.filter = options[i].value
+                    })
+                break;
+                case 'language':
+                    options[i].checked = i18n.language === options[i].value
+                    
+                    options[i].addEventListener('click', (e) => {
+                        localStorage.setItem('lng', e.target.value)
+                        changeLanguage(e.target.value)
+                        reRenderUi(game)
                     })
                 break;
             }
