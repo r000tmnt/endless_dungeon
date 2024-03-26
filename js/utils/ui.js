@@ -179,6 +179,11 @@ export const reRenderUi = (game) => {
             for(let i=0; i < resultActionOptions.length; i++){
                 resultActionOptions[i].innerText = t(`ui.result.${resultActionOptions[i].dataset.action}`)
             }
+
+            // inventory sub menu
+            for(let i=0, itemActions = document.getElementById('itemAction').querySelectorAll('li'); i < itemActions.length; i++){
+                itemActions[i].innerText = t(`ui.inventory.subMenu.${itemActions[i].dataset.action}`)
+            }
         
             // Button to finish the result screen
             const finishBtn = levelClear.getElementsByTagName('button')
