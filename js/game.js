@@ -9,6 +9,7 @@ import { changeLanguage } from './utils/i18n.js'
 
 import { 
     uiInit,
+    reRenderUi,
     canvas, 
     resize, 
     getPosition, 
@@ -223,6 +224,7 @@ class Game{
             this.phaseCount = 0
             // Load the next level
         }else{
+            reRenderUi(game)
             switch(this.level.phase[this.phaseCount]){
                 case 'conversation':
                     const { cameraWidth, cameraHeight } = redefineDeviceWidth()
