@@ -1,6 +1,6 @@
 import { resizeHiddenElement } from './utils/ui.js'
 import game from './game.js'
-import { changeLanguage, i18n } from './utils/i18n.js'
+import { changeLanguage, i18n, t } from './utils/i18n.js'
 import { reRenderUi } from './utils/ui.js'
 
 export default class Option{
@@ -17,6 +17,7 @@ export default class Option{
 
         resizeHiddenElement(partyWindow.style, width, height, fontSize_md)
 
+        partyWindow.children[0].innerText = t('ui.option.party')
         memberList.style.fontSize = fontSize_md + 'px'
         memberList.style.maxHeight = (itemBlockSize * 3) + 'px'
 
@@ -82,7 +83,9 @@ export default class Option{
         const desc = target.querySelectorAll('.desc')
         const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
         const { width, height } = camera
+        const lng = i18n.language
 
+        target.children[0].innerText = t('ui.option.objective')
         target.children[0].style.fontSize = fontSize + 'px'
         target.style.fontSize = fontSize_md + 'px'
         target.style.width = width + 'px'
@@ -94,13 +97,15 @@ export default class Option{
             list[i].style.margin = `${fontSize_md}px 0`
             list[i].children[0].style.marginTop = (0 - fontSize) + 'px'
             list[i].children[0].style.padding = fontSize_sm + 'px'
-            switch(desc[i].dataset.objective){
+            const obj = desc[i].dataset.objective
+            list[i].children[0].innerText = t(`ui.objective.${obj}`)
+            switch(obj){
                 case 'victory':
                     if(objective.victory.target === 'enemy'){
                         if(objective.victory.value === 0){
-                            desc[i].innerText = 'Defeat All enemies'
+                            desc[i].innerText = (lng === 'en')? 'Defeat All enemies' : '擊退所有敵人'
                         }else{
-                            desc[i].innerText = `Defeat ${objective.victory.value} enemies`
+                            desc[i].innerText = (lng === 'en')? `Defeat ${objective.victory.value} enemies` : `打倒${objective.victory.value}個敵人`
                         }
                     }
                 break;
@@ -108,9 +113,9 @@ export default class Option{
                     if(objective.fail.target === 'player'){
                         if(typeof objective.fail.value === "number"){
                             if(objective.fail.value === 0){
-                                desc[i].innerText = 'Party member All down'
+                                desc[i].innerText = (lng === 'en')? 'Party member All down' : '隊伍全滅'
                             }else{
-                                desc[i].innerText = `Lose ${objective.fail.value} party member`
+                                desc[i].innerText = (lng === 'en')? `Lose ${objective.fail.value} party member` : `${objective.fail.value}個同伴倒下`
                             }                            
                         }else{
                             // TODO: If the targeted player lose
@@ -120,7 +125,7 @@ export default class Option{
                 case 'optional':
                     for(let j=0; j < objective.optional.length; j++){
                         if(objective.optional[j].target === 'turn'){
-                            desc[i].innerText = `Finish the level in ${objective.optional[j].value} turns\n`
+                            desc[i].innerText = (lng === 'en')? `Finish the level in ${objective.optional[j].value} turns\n` : `${objective.optional[j].value}回合結束關卡`
                         }                        
                     }
                 break;
@@ -158,6 +163,7 @@ export default class Option{
         const { fontSize, fontSize_md, camera } = setting.general
         const { width, height } = camera
 
+        title.innerText = t('ui.option.config')
         title.style.fontSize = fontSize + 'px'
         configWindow.style.fontSize = fontSize_md + 'px'
         configOption.style.width = (width - (fontSize_md * 2)) + 'px'
@@ -224,6 +230,7 @@ export default class Option{
                         localStorage.setItem('lng', e.target.value)
                         changeLanguage(e.target.value)
                         reRenderUi(game)
+                        document.getElementById('config').children[0].innerText = t('ui.option.config')
                     })
                 break;
             }
