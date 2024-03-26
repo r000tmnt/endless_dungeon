@@ -5,6 +5,6 @@ export default {
     },
     "knife_1":{
         "name": "Combat knife",
-        "desc": "A small knife for self defense"
+        "desc": "A small knife for self defense."
     }
 }
