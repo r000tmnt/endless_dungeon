@@ -1,12 +1,10 @@
-import { t } from '../../utils/i18n'
-
 export default {
     data: [
         {
             "id": "sword_1",
             "type": 3,
             "stackLimit": 1,
-            "name": t("item.sword_1.name"),
+            "name": "Wooden sword",
             "position": "hand",
             "effect": {
                 "base_damage": {
@@ -16,7 +14,7 @@ export default {
                 "base_attribute": {
                     "str": 1
                 },
-                "desc": t("item.sword_1.desc")
+                "desc": "A sword made out of wood,\noften use for practice."
             },
             "prefix": [],
             "suffix": []
@@ -25,7 +23,7 @@ export default {
             "id": "knife_1",
             "type": 3,
             "stackLimit": 1,
-            "name": t("item.knife_1.name"),
+            "name": "Combat knife",
             "position": "hand",
             "effect": {
                 "base_damage": {
@@ -35,7 +33,7 @@ export default {
                 "base_attribute": {
                     "str": 2
                 },
-                "desc": t("item.knife_1.desc")
+                "desc": "A small knife for self defense."
             },
             "prefix": [],
             "suffix": []

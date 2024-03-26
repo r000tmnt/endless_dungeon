@@ -1,10 +1,8 @@
-import { t } from '../../utils/i18n'
-
 export default{
     data: [
         {
             "id": "armor_light_1",
-            "name": t("item.armor_light_1.name"),
+            "name": "Rag",
             "type": 4,
             "stackLimit": 1,
             "position": "body",
@@ -12,7 +10,7 @@ export default{
                 "base_attribute":{
                     "def": 2
                 },
-                "desc": t("item.armor_light_1.desc")
+                "desc": "A cloth in a poor condition"
             },
             "prefix": [],
             "suffix": []
