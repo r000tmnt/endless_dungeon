@@ -86,7 +86,7 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
 
         // Hide or display options
         itemActions[0].style.display = 'none'
-        itemActions[1].innerText = equipped >= 0? 'Unequip' : 'Equip'
+        itemActions[1].innerText = equipped >= 0? t('ui.inventory.subMenu.unequip') : t('ui.inventory.subMenu.equip')
         itemActions[1].style.display = 'block'
 
         // Calculate attribute changes if equip
@@ -428,7 +428,7 @@ export const defineSubMenu = (game) => {
             case 'equip':
                 game.clickSound.bindTarget(itemActions[i])
                 itemActions[i].addEventListener('click', () => {
-                    if(itemActions[i].innerText === 'Unequip'){
+                    if(itemActions[i].innerText === t("ui.inventory.subMenu.unequip")){
                         UnequipItem(game.inspectingCharacter, itemActions)
                     }else{
                         equipItem(game.inspectingCharacter, itemActions)
@@ -532,6 +532,10 @@ export const getItemType = (item) => {
             data = key.getOne(item.id)
         break;
     }
+
+    // Replace text information with translation
+    data.name = t(`item.${item.id}.name`)
+    data.effect.desc = t(`item.${item.id}.desc`)
 
     return data
 }
