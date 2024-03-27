@@ -1,4 +1,7 @@
 import { resizeHiddenElement } from './utils/ui.js'
+import game from './game.js'
+import { changeLanguage, i18n, t } from './utils/i18n.js'
+import { reRenderUi } from './utils/ui.js'
 
 export default class Option{
     constructor(mode){
@@ -14,6 +17,7 @@ export default class Option{
 
         resizeHiddenElement(partyWindow.style, width, height, fontSize_md)
 
+        partyWindow.children[0].innerText = t('ui.option.party')
         memberList.style.fontSize = fontSize_md + 'px'
         memberList.style.maxHeight = (itemBlockSize * 3) + 'px'
 
@@ -79,7 +83,9 @@ export default class Option{
         const desc = target.querySelectorAll('.desc')
         const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
         const { width, height } = camera
+        const lng = i18n.language
 
+        target.children[0].innerText = t('ui.option.objective')
         target.children[0].style.fontSize = fontSize + 'px'
         target.style.fontSize = fontSize_md + 'px'
         target.style.width = width + 'px'
@@ -91,41 +97,50 @@ export default class Option{
             list[i].style.margin = `${fontSize_md}px 0`
             list[i].children[0].style.marginTop = (0 - fontSize) + 'px'
             list[i].children[0].style.padding = fontSize_sm + 'px'
-            switch(desc[i].dataset.objective){
-                case 'victory':
-                    if(objective.victory.target === 'enemy'){
-                        if(objective.victory.value === 0){
-                            desc[i].innerText = 'Defeat All enemies'
-                        }else{
-                            desc[i].innerText = `Defeat ${objective.victory.value} enemies`
-                        }
-                    }
-                break;
-                case 'fail':
-                    if(objective.fail.target === 'player'){
-                        if(typeof objective.fail.value === "number"){
-                            if(objective.fail.value === 0){
-                                desc[i].innerText = 'Party member All down'
-                            }else{
-                                desc[i].innerText = `Lose ${objective.fail.value} party member`
-                            }                            
-                        }else{
-                            // TODO: If the targeted player lose
-                        }
-                    }
-                break;
-                case 'optional':
-                    for(let j=0; j < objective.optional.length; j++){
-                        if(objective.optional[j].target === 'turn'){
-                            desc[i].innerText = `Finish the level in ${objective.optional[j].value} turns\n`
-                        }                        
-                    }
-                break;
-            }
+            const obj = desc[i].dataset.objective
+            list[i].children[0].innerText = t(`ui.objective.${obj}`)
+            desc[i].innerText = this.formObjectiveMessage(objective, obj, lng)
         }
 
         target.classList.remove('invisible')
         target.classList.add('open_window')
+    }
+
+    formObjectiveMessage(objective, type, lng){
+        let message = ''
+        switch(type){
+            case 'victory':
+                if(objective.victory.target === 'enemy'){
+                    if(objective.victory.value === 0){
+                        message = (lng === 'en')? 'Defeat All enemies' : '擊退所有敵人'
+                    }else{
+                        message = (lng === 'en')? `Defeat ${objective.victory.value} enemies` : `打倒${objective.victory.value}個敵人`
+                    }
+                }
+            break;
+            case 'fail':
+                if(objective.fail.target === 'player'){
+                    if(typeof objective.fail.value === "number"){
+                        if(objective.fail.value === 0){
+                            message = (lng === 'en')? 'Party member All down' : '隊伍全滅'
+                        }else{
+                            message = (lng === 'en')? `Lose ${objective.fail.value} party member` : `${objective.fail.value}個同伴倒下`
+                        }                            
+                    }else{
+                        // TODO: If the targeted player lose
+                    }
+                }
+            break;
+            case 'optional':
+                for(let j=0; j < objective.optional.length; j++){
+                    if(objective.optional[j].target === 'turn'){
+                        message = (lng === 'en')? `Finish the level in ${objective.optional[j].value} turns\n` : `${objective.optional[j].value}回合結束關卡`
+                    }                        
+                }
+            break;
+        }
+
+        return message
     }
 
     resizeObjectiveWindow(target, setting){
@@ -155,6 +170,7 @@ export default class Option{
         const { fontSize, fontSize_md, camera } = setting.general
         const { width, height } = camera
 
+        title.innerText = t('ui.option.config')
         title.style.fontSize = fontSize + 'px'
         configWindow.style.fontSize = fontSize_md + 'px'
         configOption.style.width = (width - (fontSize_md * 2)) + 'px'
@@ -166,6 +182,36 @@ export default class Option{
         const options = document.getElementById('config_option').querySelectorAll('input')
         for(let i=0; i< options.length; i++){
             switch(options[i].dataset.config){
+                case 'bgm':
+                    options[i].value = setting.general.bgm
+                    options[i].addEventListener('input', (e) => {
+                        const volume = Number(e.target.value)
+                        setting.general.bgm = volume
+                        game.bgAudio.element.volume = volume / 100
+                        console.log("volume:>>> ", game.bgAudio.element.volume)
+                    })
+                break;
+                case 'se':
+                    options[i].value = setting.general.se
+                    options[i].addEventListener('input', (e) => {
+                        const volume = Number(e.target.value) / 100
+                        setting.general.bgm = Number(e.target.value)
+                        game.clickSound.element.volume = volume
+                        game.menuOpenSound.element.volume = volume
+                        game.menuCloseSound.element.volume = volume
+                        game.actionSelectSound.element.volume = volume
+                        game.actionCancelSound.element.volume = volume
+                        // game.attackSound.element.volume = volume
+                        game.missSound.element.volume = volume
+                        game.potionSound.element.volume = volume
+                        // game.walkingSound.element.volume = volume
+                        // game.equipSound.element.volume = volume
+                        // game.unEquipSound.element.volume = volume
+                        // game.keySound.element.volume = volume
+                        // game.selectSound.element.volume = volume
+                        game.levelUpSound.element.volume = volume
+                    })
+                break;
                 case 'grid':
                     options[i].checked = options[i].value === String(setting.general.showGrid)
 
@@ -182,6 +228,16 @@ export default class Option{
 
                     options[i].addEventListener('click', () => {
                         setting.general.filter = options[i].value
+                    })
+                break;
+                case 'language':
+                    options[i].checked = i18n.language === options[i].value
+                    
+                    options[i].addEventListener('click', (e) => {
+                        localStorage.setItem('lng', e.target.value)
+                        changeLanguage(e.target.value)
+                        reRenderUi(game)
+                        document.getElementById('config').children[0].innerText = t('ui.option.config')
                     })
                 break;
             }

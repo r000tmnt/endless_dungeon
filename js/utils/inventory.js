@@ -9,6 +9,7 @@ import game from '../game.js'
 import { getAvailableSpace } from './pathFinding.js'
 import { resizeHiddenElement, closePickUpWindow } from './ui.js'
 import setting from './setting.js'
+import { t } from './i18n.js'
 // and more ...
 
 /**
@@ -85,7 +86,7 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
 
         // Hide or display options
         itemActions[0].style.display = 'none'
-        itemActions[1].innerText = equipped >= 0? 'Unequip' : 'Equip'
+        itemActions[1].innerText = equipped >= 0? t('ui.inventory.subMenu.unequip') : t('ui.inventory.subMenu.equip')
         itemActions[1].style.display = 'block'
 
         // Calculate attribute changes if equip
@@ -427,7 +428,7 @@ export const defineSubMenu = (game) => {
             case 'equip':
                 game.clickSound.bindTarget(itemActions[i])
                 itemActions[i].addEventListener('click', () => {
-                    if(itemActions[i].innerText === 'Unequip'){
+                    if(itemActions[i].innerText === t("ui.inventory.subMenu.unequip")){
                         UnequipItem(game.inspectingCharacter, itemActions)
                     }else{
                         equipItem(game.inspectingCharacter, itemActions)
@@ -531,6 +532,10 @@ export const getItemType = (item) => {
             data = key.getOne(item.id)
         break;
     }
+
+    // Replace text information with translation
+    data.name = t(`item.${item.id}.name`)
+    data.effect.desc = t(`item.${item.id}.desc`)
 
     return data
 }
@@ -781,12 +786,14 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
     desc.children[0].style.margin = fontSize_sm + 'px'
     desc.children[1].style.whiteSpace = "pre-line"
 
+    title.innerText = t('ui.inventory.title')
     title.style.fontSize = fontSize + 'px'
     title.style.paddingBottom = (fontSize / 2) + 'px'
 
-    filterButton.forEach(f => {
+    filterButton.forEach((f, index) => {
         game.clickSound.bindTarget(f)
-        f.style.fontSize = Math.floor(fontSize / 3) + 'px'
+        f.innerText = t(`ui.inventory.filter.${index + 1}`)
+        f.style.fontSize = Math.floor(fontSize / 2) + 'px'
         f.style.width = `${width * 0.1}px`
         f.style.height = `${width * 0.1}px`
         f.addEventListener('click', () => {
@@ -883,6 +890,7 @@ export const constructPickUpWindow = (currentActingPlayer, cameraWidth, eventIte
     const droppedItems = document.getElementById('dropped-items')
     const btn = document.querySelector('.btn-group')
 
+    title.innerText = t('ui.inventory.pick.title')
     title.style.fontSize = fontSize + 'px'
     title.style.paddingBottom = fontSize_sm + 'px'
 

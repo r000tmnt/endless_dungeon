@@ -2,11 +2,11 @@ export default{
     data: [
         {
             "id": "currency_1",
-            "name": "Gold",
+            "name": "Gold coin",
             "stackLimit": 5000,
             "type": 1,
             "effect": {
-                "desc": "A coin to exchange for somthing."
+                "desc": "The coin to exchange something."
             }
         },
     ],

@@ -5,9 +5,11 @@ import Range from './range.js';
 import Option from './option.js';
 import TextBox from './textBox.js';
 import Audio from './audio.js';
+import { changeLanguage, t } from './utils/i18n.js'
 
 import { 
     uiInit,
+    reRenderUi,
     canvas, 
     resize, 
     getPosition, 
@@ -28,6 +30,7 @@ import {
     displayResult,
     toggleTurnElement,
     displayTitleScreen,
+    displayLanguageSelection,
     setCanvasPosition,
     setBattlePhaseUIElement,
     alterPhaseTransitionStyle,
@@ -206,7 +209,13 @@ class Game{
         this.levelUpSound = new Audio(`${__BASE_URL__}assets/audio/level_up.mp3`, 'status')
         this.clickSound = new Audio(`${__BASE_URL__}assets/audio/click.wav`, 'interface')
         
-        displayTitleScreen()
+        // Display language selection if language not set
+        if(localStorage.getItem('lng') === null){
+            displayLanguageSelection()
+        }else{
+            changeLanguage(localStorage.getItem('lng'))
+            displayTitleScreen()
+        }
         // this.beginNextPhase()
     }
 
@@ -215,6 +224,7 @@ class Game{
             this.phaseCount = 0
             // Load the next level
         }else{
+            reRenderUi(game)
             switch(this.level.phase[this.phaseCount]){
                 case 'conversation':
                     const { cameraWidth, cameraHeight } = redefineDeviceWidth()
@@ -233,51 +243,51 @@ class Game{
                 case 'titleCard':
                     // If the next phase is a battle
                     if(this.level.phase[this.phaseCount + 1] === 'battle'){
-                    // cover up screen
-                    toggleLoadingScreen(true)
-                    // Preparing battle phase
-                    this.phaseCount += 1
-                    this.beginNextPhase()
+                        // cover up screen
+                        toggleLoadingScreen(true)
+                        // Preparing battle phase
+                        this.phaseCount += 1
+                        this.beginNextPhase()
 
-                    // Display canvas if ready
-                    const canvasReady = setInterval(() => {
-                        // Make sure every thing is loaded
-                        if(this.tileMap.ready && this.grid !== null){
-                            const playerReady = this.player.filter(p => p.characterImage.src.length > 0 && p.ready)
-                            const enemyReady = this.enemy.filter(e => e.characterImage.src.length > 0 && e.ready)
+                        // Display canvas if ready
+                        const canvasReady = setInterval(() => {
+                            // Make sure every thing is loaded
+                            if(this.tileMap.ready && this.grid !== null){
+                                const playerReady = this.player.filter(p => p.characterImage.src.length > 0 && p.ready)
+                                const enemyReady = this.enemy.filter(e => e.characterImage.src.length > 0 && e.ready)
 
-                            // console.log(this.player[0].ready)
+                                // console.log(this.player[0].ready)
 
-                            if(playerReady.length === this.player.length && enemyReady.length === this.enemy.length){
-                                clearInterval(canvasReady)
+                                if(playerReady.length === this.player.length && enemyReady.length === this.enemy.length){
+                                    clearInterval(canvasReady)
 
-                                // Hide loading screen
-                                toggleLoadingScreen(false)
+                                    // Hide loading screen
+                                    toggleLoadingScreen(false)
 
-                                alterPhaseTransitionStyle('rgb(0, 0, 0)')
-                                // Display the title of the level
-                                togglePhaseTransition(`${this.level.id}\n${this.level.name}`, 1500)
+                                    alterPhaseTransitionStyle('rgb(0, 0, 0)')
+                                    // Display the title of the level
+                                    togglePhaseTransition(`${this.level.id}\n${t(`${this.level.id}.title`)}`, 1500)
 
-                                // Display canvas
-                                setTimeout(() => {
-                                    toggleCanvas(true)
-                                    toggleTurnElement(true)
-                                    // Play background music
-                                    this.bgAudio.element.src = `${__BASE_URL__}assets/audio/battle/${this.level.audio}.mp3`
-                                    this.bgAudio.element.play()
-
+                                    // Display canvas
                                     setTimeout(() => {
-                                        // Simulate click on the canvas where the first moving character is 
-                                        this.#clickOnPlayer(0)
-                                    }, 700) 
-                                }, 1800)
-            
-                                setTimeout(() => {
-                                    alterPhaseTransitionStyle('rgba(0, 0, 0, 0.7)')
-                                }, 2000)                         
+                                        toggleCanvas(true)
+                                        toggleTurnElement(true)
+                                        // Play background music
+                                        this.bgAudio.element.src = `${__BASE_URL__}assets/audio/battle/${this.level.audio}.mp3`
+                                        this.bgAudio.element.play()
+
+                                        setTimeout(() => {
+                                            // Simulate click on the canvas where the first moving character is 
+                                            this.#clickOnPlayer(0)
+                                        }, 700) 
+                                    }, 1800)
+                
+                                    setTimeout(() => {
+                                        alterPhaseTransitionStyle('rgba(0, 0, 0, 0.7)')
+                                    }, 2000)                         
+                                }
                             }
-                        }
-                    }, 100)
+                        }, 100)
                     }else{
                         // Display the title of the level
                         togglePhaseTransition(`${this.level.id}\n${this.level.name}`, 1500)
@@ -293,6 +303,7 @@ class Game{
                     this.#initBattlePhase()
                 break;
                 case 'intermission':
+                    // Load next level
                 break;
                 case 'end':
                     toggleCanvas(false)

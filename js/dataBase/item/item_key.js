@@ -11,7 +11,7 @@ export default{
                 "enemy_number": 3,
                 "elite_rate": 50,
                 "item_drop_modify": "",
-                "desc": "There's not much enemy in the field"
+                "desc": "There will be less enemy in the field"
             }
         }
     ],

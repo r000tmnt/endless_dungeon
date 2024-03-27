@@ -33,3 +33,8 @@
 - Play audio on button click
 - Adjust dialogue option position and style
 - Fix layout breaks in pick up window after item removed
+
+## 0.3.0 (2024-03-27)
+- Localization for both English and Chinese
+- Language switch in config window
+- Minic the rhythm of speaking in conversation phase

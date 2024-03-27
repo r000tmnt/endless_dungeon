@@ -54,7 +54,7 @@ export default{
                 "range": 1,
                 "target": "status",
                 "amount": 0,
-                "desc": "Remove the poison."
+                "desc": "Remove poison"
             },
             "useCondition": {
                 "compare": "equal",
@@ -65,7 +65,7 @@ export default{
         },
         {
             "id": "potion_revive",
-            "name": "Candle of soul",
+            "name": "Candle od soul",
             "type": 0,
             "stackLimit": 99,
             "effect":{
@@ -75,7 +75,7 @@ export default{
                 "range": 1,
                 "target": "all",
                 "amount": 10,
-                "desc": "Revive the character with 10% of health."
+                "desc": "Revive a player with 10% of health points."
             },
             "prefix": [],
             "suffix": []

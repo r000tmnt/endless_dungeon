@@ -148,6 +148,17 @@ li{
     margin: 0 auto 3% auto;
 }
 
+#language{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+}
+
+#language > button{
+    margin: 15% 0;
+}
+
 #version{
     right: 0;
     bottom: 0;
@@ -296,7 +307,8 @@ li{
     transform: translate(-50%, -50%);
     color: white;
     margin: 0;
-    white-space: pre-line;
+    white-space: nowrap;
+    line-height: 150%;
 }
 
 #Loading{
@@ -561,7 +573,7 @@ li{
   }
 
   #optional::before{
-    content: 'Objective';
+    content: attr(data-title);
     font-size: var(--fontSize);
   }
 
@@ -576,7 +588,7 @@ li{
   }
 
   #resultAction::before{
-    content: 'Action';
+    content: attr(data-title);
     font-size: var(--fontSize);
   }
 

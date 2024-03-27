@@ -5,6 +5,7 @@ import setting from './utils/setting.js';
 import { resizeHiddenElement } from './utils/ui.js'
 import { useItem } from './utils/inventory.js'
 import game from './game.js';
+import { t } from './utils/i18n.js';
 
 export default class Action{
     constructor(mode, selectableSpace, reachableDirections, steps, animationInit){
@@ -84,6 +85,7 @@ export default class Action{
         const { itemBlockSize } = setting.inventory
 
         skillList.style.maxHeight = (itemBlockSize * 3) + 'px'
+        title.innerText = t("ui.action.skill")
         title.style.fontSize = fontSize + 'px'
 
         for(let i=0; i < currentActingPlayer.skill.length; i++){
@@ -106,9 +108,9 @@ export default class Action{
             skillIcon.style.marginRight = `${fontSize_sm}px`
             skillIcon.classList.add('icon')
 
-            skillName.innerText = skillData.name
+            skillName.innerText = t(`skill.${skillData.id}.name`)
             skillCost.innerText = `${skillData.cost.attribute}: ${skillData.cost.value}`
-            skillDesc.innerText = skillData.effect.desc
+            skillDesc.innerText = t(`skill.${skillData.id}.desc`)
 
             skillLabel.classList.add('flex')
             skillLabel.style.justifyContent = 'space-between'
@@ -117,6 +119,7 @@ export default class Action{
 
             skillInfo.append(skillLabel)
             skillInfo.append(skillDesc)
+            skillInfo.style.width = '100%'
 
             // If the required resource is enough and equip with the weapon that the skill needs
             if(currentActingPlayer.attributes[skillData.cost.attribute] >= skillData.cost.value && 
@@ -240,7 +243,7 @@ export default class Action{
         statusWindow.style.fontSize = fontSize + 'px'
         statusInfo.style.fontSize = fontSize_md + 'px' 
         statusInfo.children[0].innerText = inspectingCharacter.name
-        statusInfo.children[1].innerText = inspectingCharacter.class
+        statusInfo.children[1].innerText = t(`job.${inspectingCharacter.class_id}`)
         statusLv.innerText = `Lv ${inspectingCharacter.lv}`
         statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
         statusTable.style.fontSize = fontSize_md + 'px'

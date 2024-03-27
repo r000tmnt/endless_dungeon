@@ -33,7 +33,7 @@ export default {
                 "base_attribute": {
                     "str": 2
                 },
-                "desc": "A small knife for self defense"
+                "desc": "A small knife for self defense."
             },
             "prefix": [],
             "suffix": []

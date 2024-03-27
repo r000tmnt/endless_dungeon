@@ -10,6 +10,7 @@ import {
 import setting from './setting.js';
 import game from '../game.js';
 import level from '../dataBase/level.js';
+import { changeLanguage, t, i18n} from './i18n.js'
 
 // Get UI element and bind a click event
 const aspectRatio = 9 / 16
@@ -69,8 +70,6 @@ const partyWindow = document.getElementById('party')
 
 // Config UI
 const configWindow = document.getElementById('config')
-const bgmRange = document.getElementById('bgm')
-const seRange = document.getElementById('se')
 const configOption = document.getElementById('config_option')
 
 // Objective UI
@@ -147,6 +146,77 @@ const endBattlePhase = () => {
     game.action.mode = ''
     game.turnType = 0  
     game.beginNextPhase()   
+}
+
+export const reRenderUi = (game) => {
+    const phase = game.level.phase[game.phaseCount]
+
+    switch(phase){
+        case 'conversation':
+            const dialogueControl = document.getElementById('dialogue_control').querySelectorAll('li')
+            
+            for(let i=0; i < dialogueControl.length; i++){
+                dialogueControl[i].innerText = t(`ui.conversation.${dialogueControl[i].dataset.action}`)
+            }
+        break;
+        case 'battle':
+            // option menu child inner text
+            for(let i=0; i < options.length; i++){
+                options[i].innerText = t(`ui.option.${options[i].dataset.option}`)
+            }
+        
+            // Back button inner text
+            for(let i=0; i < backBtn.length; i++){
+                backBtn[i].innerText = t('back')
+            }
+        
+            // action menu child inner text
+            for(let i=0; i < actionMenuOptions.length; i++){
+                actionMenuOptions[i].innerText = t(`ui.action.${actionMenuOptions[i].dataset.action}`)
+            }
+        
+            // Result action child inner text
+            for(let i=0; i < resultActionOptions.length; i++){
+                resultActionOptions[i].innerText = t(`ui.result.${resultActionOptions[i].dataset.action}`)
+            }
+
+            // inventory sub menu
+            for(let i=0, itemActions = document.getElementById('itemAction').querySelectorAll('li'); i < itemActions.length; i++){
+                itemActions[i].innerText = t(`ui.inventory.subMenu.${itemActions[i].dataset.action}`)
+            }
+        
+            // Button to finish the result screen
+            const finishBtn = levelClear.getElementsByTagName('button')
+        
+            finishBtn[0].innerText = t('ui.inventory.range.cancel')
+        
+            finishBtn[1].innerText = t('ui.inventory.range.confirm')
+        
+            // config options
+            const tableRows = Array.from(configOption.querySelectorAll('tr'))
+
+            tableRows[0].children[0].innerText = t('ui.config.bgm')
+            tableRows[1].children[0].innerText = t('ui.config.se')
+            tableRows[2].children[0].innerText = t('ui.config.grid')
+            tableRows[3].children[0].innerText = t('ui.config.filter')
+            tableRows[4].children[0].innerText = t('ui.config.language')
+
+            const gridLabel = tableRows[2].children[1].querySelectorAll('label')
+            const filterLabel = tableRows[3].children[1].querySelectorAll('label')
+            const languageInput = tableRows[4].children[1].querySelectorAll('input')
+
+            gridLabel[0].innerText = t('ui.config.on')
+            gridLabel[1].innerText = t('ui.config.off')
+            filterLabel[0].innerText = t('ui.config.default')
+            filterLabel[1].innerText = t('ui.config.retro')
+
+            languageInput.forEach(l => {
+                l.checked = l.value === i18n.language
+            })
+        break;
+        case 'intermission':
+        break;
+    }
 }
 
 /**
@@ -417,6 +487,7 @@ export const uiInit = (game) => {
                 resultActionOptions[i].addEventListener('click', () => {
                     if(game.stepOnEvent.item.length){
                         const { fontSize_md, camera } = setting.general
+                        warn.children[0].innerText = t("ui.result.warn")
                         warn.style.width = (camera.width - (fontSize_md * 2)) + 'px'
                         warn.style.padding = fontSize_md + 'px'
                         warn.classList.remove('invisible')
@@ -454,36 +525,6 @@ export const uiInit = (game) => {
         game.phaseCount += 1 
         endBattlePhase()
     })
-
-    // Input range bind event
-    bgmRange.value = setting.general.bgm
-    bgmRange.addEventListener('input', (e) => {
-        const volume = Number(e.target.value)
-        setting.general.bgm = volume
-        game.bgAudio.element.volume = volume / 100
-        console.log("volume:>>> ", game.bgAudio.element.value)
-    })
-
-    // Input range bind event
-    seRange.value = setting.general.se
-    seRange.addEventListener('input', (e) => {
-        const volume = Number(e.target.value) / 100
-        setting.general.bgm = Number(e.target.value)
-        game.clickSound.element.volume = volume
-        game.menuOpenSound.element.volume = volume
-        game.menuCloseSound.element.volume = volume
-        game.actionSelectSound.element.volume = volume
-        game.actionCancelSound.element.volume = volume
-        // game.attackSound.element.volume = volume
-        game.missSound.element.volume = volume
-        game.potionSound.element.volume = volume
-        // game.walkingSound.element.volume = volume
-        // game.equipSound.element.volume = volume
-        // game.unEquipSound.element.volume = volume
-        // game.keySound.element.volume = volume
-        // game.selectSound.element.volume = volume
-        game.levelUpSound.element.volume = volume
-    })
 }
 
 /**
@@ -497,6 +538,22 @@ export const prepareInventory = async(currentActingPlayer) => {
     const { itemBlockSize, itemBlockMargin } = setting.inventory
     resizeHiddenElement(Inventory.style, width, height, fontSize_sm)
     constructInventoryWindow(currentActingPlayer, game.enemyPosition, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin, width)
+}
+
+export const displayLanguageSelection = () => {
+    const language = document.getElementById('language')
+    language.classList.remove('invisible')
+
+    const lngBtn = Array.from(language.querySelectorAll('button'))
+    lngBtn.forEach(lb => {
+        // lb.style.fontSize =  + 'px'
+        lb.addEventListener('click', () => {
+            localStorage.setItem('lng', lb.dataset.lng)
+            changeLanguage(lb.dataset.lng)
+            language.classList.add('invisible')
+            displayTitleScreen()
+        })
+    })
 }
 
 // Display title screen
@@ -528,9 +585,12 @@ export const displayTitleScreen = () => {
                 titleScreen.classList.remove('open_window')
                 titleScreen.classList.add('invisible')
                 
-                setTimeout(() => {
-                    game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
-                    game.beginNextPhase()                    
+                setTimeout(async() => {
+                    await level.load('tutorial_1').then(() => {
+                        game.level = JSON.parse(JSON.stringify(level.getOne('tutorial_1')));
+                        setting.currentLevel = "tutorial_1"
+                        game.beginNextPhase()                          
+                    })
                 }, 500)            
             }
         })        
@@ -547,19 +607,20 @@ export const displayResult = (win) => {
     title.style.fontSize = (fontSize * 2) + 'px'
 
     if(win){
-        title.innerText = "Victory"
+        title.innerText = t("ui.result.win")
         title.style.color = 'gold'
 
         document.documentElement.style.setProperty('--fontSize', fontSize_md + 'px')
 
         const optional = levelClear.querySelector('#optional')
+        optional.setAttribute("data-title", t("ui.option.objective"))
         optional.classList.remove('invisible')
 
         if(game.tileMap.objective.optional.length){
             game.tileMap.objective.optional.map(o => {
                 const condition = document.createElement('li')
                 if(o.target === 'turn'){
-                    condition.innerText = `Finish the level in ${o.value} turns\n`
+                    condition.innerText = game.option.formObjectiveMessage(game.tileMap.objective, 'optional', i18n.language)
                     condition.style.margin = `${fontSize_sm}px 0`
 
                     if(game.turn <= o.value){
@@ -581,10 +642,11 @@ export const displayResult = (win) => {
 
         setTimeout(() => {
             resultActionOptions.forEach(o => o.style.margin = `${fontSize_sm}px 0`)
+            resultAction.setAttribute("data-title", t("ui.result.action"))
             resultAction.classList.remove('invisible')
         }, 1000)
     }else{
-        title.innerText = 'Game Over'
+        title.innerText = t("ui.result.lose")
         title.style.color = 'grey'
 
         setTimeout(() => {
@@ -597,6 +659,12 @@ export const displayResult = (win) => {
             })
         }, 1000)        
     }
+
+    // Button to finish the result screen
+    const finishBtn = levelClear.getElementsByTagName('button')
+    
+    finishBtn[0].innerText = t("ui.inventory.range.cancel")
+    finishBtn[1].innerText = t("ui.inventory.range.confirm")
 
     levelClear.classList.remove('invisible')
     levelClear.classList.add('open_window')
