@@ -37,9 +37,10 @@ export default class TextBox{
         this.textLength = 0;
         this.dialogueLength = 0;
         this.animationInit = false;
-        this.speed = 100;
-        this.dialogueAnimation = null;
+        this.speed = 100; // normal
+        this.delay = 3; // slow down
         this.optionSelected = 0;
+        this.symbol = /[.。!,，「」\n\/"\?]/g
     }
 
     setConversationWindow = (width, height, fontSize, fontSize_md, fontSize_sm) => {
@@ -214,7 +215,7 @@ export default class TextBox{
 
                         // Cancel auto play
                         if(this.action === action){
-                            this.speed = this.speed * 2
+                            this.speed = 100
                             this.action = ''             
                         }else{
                             // Start auto play
@@ -466,7 +467,7 @@ export default class TextBox{
         console.log("message :>>> ", message)
         this.animationInit = true
 
-        const { style, size } = message
+        const { style, size, content } = message
 
         if(style.length){
             dialogue.style.color = style
@@ -475,19 +476,24 @@ export default class TextBox{
         if(size.length){
             dialogue.style.fontSize = setting.general[size] + 'px'
         }
+
+        // const match = this.symbol.test(content[this.textCounter])
+        const matches = [...content.matchAll(this.symbol)]
+        const matchIndex = matches.map(t => t.index)
+        console.log(matchIndex)
     
         this.dialogueAnimation = setInterval(() => {
             // If the user wants to skip the dialogue or the messag is fully displayed
             if(!this.animationInit){
                 // Skipping animation
                 // Display all the text in the message
-                textBox.innerHTML = message.content
+                textBox.innerHTML = content
                 // Counter add up to the number of text in the message 
                 this.textCounter = this.textLength + 1
                 // Store the displayed message to the log
                 this.log.push({
                     person: this.event[this.sceneCounter].dialogue[this.dialogueCounter].person,
-                    content: message.content
+                    content: content
                 })
                 // Stop animation
                 clearInterval(this.dialogueAnimation)     
@@ -497,7 +503,7 @@ export default class TextBox{
                     // Store the displayed message to the log
                     this.log.push({
                         person: this.event[this.sceneCounter].dialogue[this.dialogueCounter].person,
-                        content: message.content
+                        content: content
                     })
 
                     if(this.action === 'auto'){
@@ -511,9 +517,32 @@ export default class TextBox{
                         clearInterval(this.dialogueAnimation)
                     }
                 }else{
-                    textBox.innerHTML += message.content[this.textCounter]
-                    dialogue.scrollTop = dialogue.scrollHeight // Scroll to buttom automatically
-                    this.textCounter += 1
+                    
+                    // console.log(match)
+
+                    if(matchIndex.findIndex(i => i === this.textCounter) >= 0){
+                        console.log(`character ${content[this.textCounter]} match`)
+                        // this.delay += -1
+
+                        textBox.innerHTML += content[this.textCounter]
+                        dialogue.scrollTop = dialogue.scrollHeight // Scroll to buttom automatically
+                        this.textCounter += 1  
+
+                        // Stop current timer
+                        clearInterval(this.dialogueAnimation)
+
+                        setTimeout(() => {
+                            // Start a new timer
+                            this.#displayConversation(message)
+                        }, this.speed * this.delay)
+
+                    }else{
+                        console.log(`character ${content[this.textCounter]} not match`)
+                        // this.speed = 100
+                        textBox.innerHTML += content[this.textCounter]
+                        dialogue.scrollTop = dialogue.scrollHeight // Scroll to buttom automatically
+                        this.textCounter += 1  
+                    }
                 }  
             }
         }, this.speed)
