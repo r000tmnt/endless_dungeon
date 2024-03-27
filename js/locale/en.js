@@ -6,6 +6,9 @@ import armor from './item/item_armor_en'
 import material from './item/item_material_en'
 import key from './item/item_key_en'
 import other from './item/item_other_en'
+import skill_sword from './skill/sword_en'
+import buff from './skill/buff_en'
+import debuff from './skill/debuff_en'
 
 export default {
     tutorial_1,
@@ -17,6 +20,11 @@ export default {
         ...material,
         ...key,
         ...other
+    },
+    "skill":{
+        ...skill_sword,
+        ...buff,
+        ...debuff
     },
     "demo": "This is the end of the demo.\nThank you for playing the game.",
     "loading": "Loading...",
