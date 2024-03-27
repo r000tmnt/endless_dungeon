@@ -38,3 +38,6 @@
 - Localization for both English and Chinese
 - Language switch in config window
 - Minic the rhythm of speaking in conversation phase
+
+## 0.3.1 (2024-03-27)
+- Update lock file
