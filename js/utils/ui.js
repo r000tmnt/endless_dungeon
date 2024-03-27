@@ -458,7 +458,7 @@ export const uiInit = (game) => {
                                 const member = document.createElement('img')
                                 member.style.width = itemBlockSize + 'px'
                                 member.style.height = itemBlockSize + 'px'
-                                member.src = p.characterImage
+                                member.src = p.image
                                 game.actionSelectSound.bindTarget(member)
                                 member.addEventListener('click', () => {
                                     game.inspectingCharacter = p
