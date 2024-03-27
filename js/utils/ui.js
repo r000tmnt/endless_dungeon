@@ -586,9 +586,9 @@ export const displayTitleScreen = () => {
                 titleScreen.classList.add('invisible')
                 
                 setTimeout(async() => {
-                    await level.load('p-1-1').then(() => {
-                        game.level = JSON.parse(JSON.stringify(level.getOne('p-1-1')));
-                        setting.currentLevel = "p-1-1"
+                    await level.load('tutorial_1').then(() => {
+                        game.level = JSON.parse(JSON.stringify(level.getOne('tutorial_1')));
+                        setting.currentLevel = "tutorial_1"
                         game.beginNextPhase()                          
                     })
                 }, 500)            
