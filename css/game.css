@@ -307,7 +307,8 @@ li{
     transform: translate(-50%, -50%);
     color: white;
     margin: 0;
-    white-space: pre-line;
+    white-space: nowrap;
+    line-height: 150%;
 }
 
 #Loading{
