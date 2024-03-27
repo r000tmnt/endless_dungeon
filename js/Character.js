@@ -1,11 +1,6 @@
 import game from './game.js'
-import classes from './dataBase/class.js'
-import mob from './dataBase/mobs.js'
-import weapon from './dataBase/item/item_weapon.js'
-import armor from './dataBase/item/item_armor.js'
-import potion from './dataBase/item/item_potion.js'
-import key from './dataBase/item/item_key.js'
-import Audio from './audio.js'
+// import potion from './dataBase/item/item_potion.js'
+// import key from './dataBase/item/item_key.js'
 
 export default class Character {
     /**
@@ -15,17 +10,16 @@ export default class Character {
      * @param {number} tileSize - The size of each tile to draw on the canvas 
      * @param {number} velocity - Character movement speed per pixel
      * @param {number} type - The type of the character 
-     * @param {object} attributes - Attributes setting for the character 
      * @param {array} map - A reference of the tile map 
      */
-    constructor(x, y, tileSize, velocity, type, attributes, map, save = null){
+    constructor(x, y, tileSize, velocity, type, map){
         this.x = x;
         this.y = y;
         this.pt = 0;
         this.tileSize = tileSize;
         this.velocity = velocity;
         this.tileMap = map;
-        this.#createCharacter(attributes, type, save);
+        this.alpha = 1;
         this.type = type;
         this.isMoving = false;
         this.destination = null;
@@ -58,34 +52,6 @@ export default class Character {
         // Sound effects
         this.attackSound = null;
         this.footSteps = [];
-
-        switch(true){
-            case attributes.class.includes('fighter'):
-                this.footSteps.push(new Audio(`${__BASE_URL__}assets/audio/step_rock_l.mp3`, 'step'))
-                this.footSteps.push(new Audio(`${__BASE_URL__}assets/audio/step_rock_r.mp3`, 'step'))
-            break;
-            case attributes.class.includes('zombie'):
-                this.attackSound = new Audio(`${__BASE_URL__}assets/audio/monster_bite.mp3`, 'attack')
-                this.footSteps.push(new Audio(`${__BASE_URL__}assets/audio/step_dirt_l.mp3`, 'step'))
-                this.footSteps.push(new Audio(`${__BASE_URL__}assets/audio/step_dirt_r.mp3`, 'step'))
-            break;
-        }
-
-        const animation = ['idle', 'top', 'down', 'left', 'right', 'attack']
-
-        for(let i=0; i < animation.length; i++){
-            this.#loadAnimation(animation[i], 2, this.type, attributes.class)
-
-            if(i === (animation.length - 1)){
-                console.log(this.animationData)
-                this.animation = 'idle'
-                this.ready = true
-                console.log(this)
-            }            
-        }
-
-        this.animationData.cure = [...this.animationData.idle]
-        this.animationData.damage = [...this.animationData.idle]
     }
 
     /**
@@ -339,192 +305,13 @@ export default class Character {
             console.log('fading')
             ctx.save()
             ctx.globalAlpha = this.alpha
-            ctx.drawImage(this.characterImage, this.x, this.y, this.tileSize, this.tileSize)
+            ctx.drawImage(this.image, this.x, this.y, this.tileSize, this.tileSize)
             ctx.restore()
             this.alpha -= 0.01
         }else{
             console.log('blinking finished')
             this.isMoving = false
             game.removeCharacter(type, this.id)
-        }
-    }
-
-    /**
-     * Create an object for the character
-     * @param {object} attributes - character attributes
-     * @param {number} type - 2: player, 3: mob 
-     * @returns 
-     */
-    #createCharacter(attributes, type, save){
-        switch(type){
-            case 2:{
-                if(save === null){
-                    const job = classes.getOne(attributes.class)
-                    this.animation = ''
-                    this.id = `${String(Date.now())}P${String(performance.now())}`
-                    this.name = attributes.name
-                    this.lv = 1
-                    this.class = job.name
-                    this.class_id = attributes.class
-                    this.attributes = {
-                        ...job.base_attribute,
-                        status: [{ name: 'Focus', turn: 2 }]
-                    }     
-                    this.prefer_attributes = job.prefer_attributes
-                    this.#loadImage(type, job.id)     
-
-                    // If is a player character, set the initial exp and the required points to level up
-                    this.exp = 95
-                    this.pt = 0
-                    this.requiredExp = 100
-                    this.bag = job.bag
-                    this.skill = job.skill
-                    this.bagLimit = 100
-                    this.equip = {
-                        head: {},
-                        body: {},
-                        hand: {},
-                        leg: {},
-                        foot: {},
-                        accessory: {}
-                    }
-                }else{
-                    // Create character from save file
-                    this.animation = ''
-                    this.id = save.id
-                    this.name = save.name
-                    this.lv = save.lv
-                    this.class = save.class
-                    this.class_id = save.class
-                    this.attributes = JSON.parse(JSON.stringify(save.attributes))
-                    this.prefer_attributes = save.prefer_attributes
-                    this.#loadImage(type, save.id)
-                    this.exp = save.exp
-                    this.pt = save.pt
-                    this.requiredExp = save.requiredExp
-                    this.bag = JSON.parse(JSON.stringify(save.bag))
-                    this.skill = save.skill
-                    this.bagLimit = save.bagLimit
-                    this.equip = JSON.parse(JSON.stringify(save.equip))
-                }
-                
-                const equipment = this.bag.filter(b => b.type === 3 || b.type === 4)
-                // Assign the attributes to the object
-                for(let i=0; i < equipment; i++){
-                    const itemData = equipment[i].type === 3? weapon.getOne(job.bag[i].id) : armor.getOne(job.bag[i].id)
-                    this.equip[itemData.position] = { 
-                        id: itemData.id,
-                        name: itemData.name
-                    }
-                    // Change attribute value
-                    for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                        this.attributes[key] += itemData.effect.base_attribute[key]
-                    }
-                }
-            }
-            break    
-            case 3:{
-                if(save === null){
-                    const job = mob.getOne(attributes.class)
-                    
-                    // Assign the attributes to the object
-                    if(job){
-                        this.id = `${String(Date.now())}E${String(performance.now())}`
-                        this.name = attributes.name
-                        this.lv = 1
-                        this.class = job.name
-                        this.class_id = attributes.class
-                        this.attributes = {
-                            ...job.base_attribute,
-                            status: []
-                        }     
-                        this.prefer_attributes = job.prefer_attributes
-                        this.#loadImage(type, job.id)     
-                        this.pt = 0
-                        this.equip = {
-                            head: {},
-                            body: {},
-                            hand: {},
-                            leg: {},
-                            foot: {},
-                            accessory: {}
-                        }
-                        // If the character is an enemy, set the given exp for player to gain
-                        this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
-                        this.drop = job.drop
-                        this.skill = job.skill
-                        this.prefer_skill_type = job.prefer_skill_type
-                        this.prefer_action = job.prefer_action
-                    }
-                }else{
-                    // Create character from save file
-                    this.id = save.id
-                    this.name = save.name
-                    this.lv = save.lv
-                    this.class = save.class
-                    this.class_id = save.class_id
-                    this.attributes = JSON.parse(JSON.stringify(save.attributes))
-                    this.prefer_attributes = save.prefer_attributes
-                    this.#loadImage(type, save.id)
-                    this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
-                    this.drop = JSON.parse(JSON.stringify(save.drop))
-                    this.skill = save.skill
-                    this.equip = JSON.parse(JSON.stringify(save.equip))
-                    this.prefer_skill_type = save.prefer_skill_type
-                    this.prefer_action = save.prefer_action
-                }
-            }
-            break
-        }
-
-        // Preparing animation frames
-        let idle = [], top = [], down = [], left = [], right = []
-
-        this.animationData = { idle, top, down, left, right }
-    }
-
-    /**
-     * Load the image of the character
-     * @param {number} type - The type of the character 
-     * @param {string} id - A string to find the asset
-     */
-    #loadImage(type, id){
-        const classImage = new Image()
-        this.alpha = 1
-        switch(type){
-            case 2:
-                classImage.src = `${__BASE_URL__}assets/images/class/${id}.png`
-            break
-            case 3:
-                classImage.src = `${__BASE_URL__}assets/images/mob/${id}.png`
-            break
-        }
-
-        this.characterImage = classImage
-    }
-
-    /**
-     * Dynamically fetch the assets of animation by name and type
-     * @param {string} animationName - The name of animation
-     * @param {int} frames - The number of frames for the animation
-     * @param {int} type - The type of the character this animation belongs to
-     * @param {int} className - The class of the character
-     */
-    #loadAnimation(animationName, frames, type, className){
-        // TODO - Load character animation assets
-        for(let i=0; i < frames; i++){
-            const newFrame = new Image()
-            
-            switch(type){
-                case 2:
-                    newFrame.src = `${__BASE_URL__}assets/images/class/animation/${className}_${animationName}_${i + 1}.png`
-                break;
-                case 3:
-                    newFrame.src = `${__BASE_URL__}assets/images/mob/animation/${className}_${animationName}_${i + 1}.png`
-                break;
-            }
-
-            this.animationData[animationName][i] = newFrame
         }
     }
 

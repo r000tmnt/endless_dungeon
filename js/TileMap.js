@@ -1,4 +1,6 @@
-import Character from "./Character.js";
+// import Character from "./Character.js";
+import Player from './player.js';
+import Enemy from './enemy.js';
 import { getItemType } from './utils/inventory.js'
 // import level from "./dataBase/level.js";
 
@@ -88,13 +90,23 @@ export default class TileMa {
                     
                     // Create a player character
                     // x, y, tile size, velocity, attributes, tile map
-                    return new Character(
+                    return (type === 2)? 
+                    new Player(
                         column * this.tileSize, 
                         row * this.tileSize, 
                         this.tileSize, 
                         velocity,
+                        attributes,
                         tile,
-                        attributes, 
+                        this.map
+                    ) : 
+                    new Enemy(
+                        column * this.tileSize, 
+                        row * this.tileSize, 
+                        this.tileSize, 
+                        velocity,
+                        attributes,
+                        tile,
                         this.map
                     )
                 }
