@@ -611,10 +611,9 @@ export const displayResult = (win) => {
         title.style.color = 'gold'
 
         document.documentElement.style.setProperty('--fontSize', fontSize_md + 'px')
-        document.documentElement.style.setProperty('--objective', t("ui.option.objective"))
-        document.documentElement.style.setProperty('--action', t("ui.result.action"))
 
         const optional = levelClear.querySelector('#optional')
+        optional.setAttribute("data-title", t("ui.option.objective"))
         optional.classList.remove('invisible')
 
         if(game.tileMap.objective.optional.length){
@@ -643,6 +642,7 @@ export const displayResult = (win) => {
 
         setTimeout(() => {
             resultActionOptions.forEach(o => o.style.margin = `${fontSize_sm}px 0`)
+            resultAction.setAttribute("data-title", t("ui.result.action"))
             resultAction.classList.remove('invisible')
         }, 1000)
     }else{
