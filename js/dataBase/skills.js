@@ -1,7 +1,7 @@
 export default{
     data: [
         {
-            "id": "skill_slash_1",
+            "id": "sword_slash_1",
             "name": "Slash",
             "weapon": "sword",
             "type": "offense",
@@ -17,7 +17,7 @@ export default{
                 "base_on_attribute": "str",
                 "multiply_as": "solid",
                 "base_number": 10,
-                "desc": "A quick and powerful strick with sword"
+                "desc": "A quick and powerful strike with sword"
             }
         },
         {
@@ -37,7 +37,7 @@ export default{
                 "multiply_as": "solid",
                 "base_number": 3,
                 "status": "Poison",
-                "desc": "Bite the enemy. Cause the foe to get poisoned"
+                "desc": "Bite into the skin. Cause the foe to get poisoned."
             }
         },
         {
@@ -77,7 +77,7 @@ export default{
                 "multiply_as": "percentage",
                 "base_number": 3,
                 "status": "Focus",
-                "desc": " Enhance the hit rate and evade rate by 30% to the pointed target"
+                "desc": "Enhance the hit rate and evade rate by 30% to the target."
             }
         }
     ],
