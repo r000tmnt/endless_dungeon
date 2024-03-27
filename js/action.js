@@ -243,7 +243,7 @@ export default class Action{
         statusWindow.style.fontSize = fontSize + 'px'
         statusInfo.style.fontSize = fontSize_md + 'px' 
         statusInfo.children[0].innerText = inspectingCharacter.name
-        statusInfo.children[1].innerText = inspectingCharacter.class
+        statusInfo.children[1].innerText = t(`job.${inspectingCharacter.class_id}`)
         statusLv.innerText = `Lv ${inspectingCharacter.lv}`
         statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
         statusTable.style.fontSize = fontSize_md + 'px'
