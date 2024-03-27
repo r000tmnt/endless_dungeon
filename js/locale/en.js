@@ -9,10 +9,12 @@ import other from './item/item_other_en'
 import skill_sword from './skill/sword_en'
 import buff from './skill/buff_en'
 import debuff from './skill/debuff_en'
+import job from './class/class_en'
 
 export default {
     tutorial_1,
     ui,
+    job,
     "item": {
         ...potion,
         ...weapon,

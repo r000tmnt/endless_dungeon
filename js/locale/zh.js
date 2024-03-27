@@ -9,8 +9,10 @@ import other from './item/item_other_zh'
 import skill_sword from './skill/sword_zh'
 import buff from './skill/buff_zh'
 import debuff from './skill/debuff_zh'
+import job from './class/class_zh'
 
 export default {
+    job,
     tutorial_1,
     ui,
     "item": {
