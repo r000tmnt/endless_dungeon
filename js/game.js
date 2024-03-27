@@ -253,8 +253,8 @@ class Game{
                         const canvasReady = setInterval(() => {
                             // Make sure every thing is loaded
                             if(this.tileMap.ready && this.grid !== null){
-                                const playerReady = this.player.filter(p => p.characterImage.src.length > 0 && p.ready)
-                                const enemyReady = this.enemy.filter(e => e.characterImage.src.length > 0 && e.ready)
+                                const playerReady = this.player.filter(p => p.image.src.length > 0 && p.ready)
+                                const enemyReady = this.enemy.filter(e => e.image.src.length > 0 && e.ready)
 
                                 // console.log(this.player[0].ready)
 
