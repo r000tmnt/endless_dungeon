@@ -38,7 +38,7 @@ export default {
                 }
             ],
             "skill": [
-                "skill_slash_1"
+                "sword_slash_1"
             ]
         }
     ],
