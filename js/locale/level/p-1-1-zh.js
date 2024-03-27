@@ -1,4 +1,5 @@
 export default {
+    "title": "來自上方的回音",
     "dialogue_1": "......",
     "dialogue_2": "你頭痛的像是被岩石砸到一樣。",
     "dialogue_3": "在你恢復意識同時，你首先...",

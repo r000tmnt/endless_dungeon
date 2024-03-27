@@ -1,4 +1,5 @@
 export default {
+    "title": "Echo from the above",
     "dialogue_1": "......",
     "dialogue_2": "You feel quite a headache, like you've been hit by a boulder or somthing.",
     "dialogue_3": "As you gradually regain your conscious.\nYou first...",
