@@ -1,4 +1,4 @@
-import tutorial_1 from './level/p-1-1-en'
+import tutorial_1 from './level/tutorial_1_en'
 import ui from './ui/ui_en'
 import potion from './item/item_potion_en'
 import weapon from './item/item_weapon_en'

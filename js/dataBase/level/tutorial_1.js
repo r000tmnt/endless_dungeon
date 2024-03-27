@@ -1,7 +1,7 @@
 import { t } from '../../utils/i18n'
 
 export default {
-    "id": "p-1-1",
+    "id": "tutorial_1",
     "name": "Echo from the above",
     "map": [
         [1, 1, 1, 1, 1, 1, 1, 1, 1],
