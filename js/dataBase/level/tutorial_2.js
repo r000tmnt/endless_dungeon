@@ -333,6 +333,18 @@ export default {
         {
             "name": 'Zombie',
             "job": 'mob_zombie_1'
+        },
+        {
+            "name": 'Zombie',
+            "job": 'mob_zombie_1'
+        },
+        {
+            "name": 'Zombie',
+            "job": 'mob_zombie_1'
+        },
+        {
+            "name": 'Grave Digger',
+            "job": 'mob_zombie_2'
         }
     ],
     "objective": {
