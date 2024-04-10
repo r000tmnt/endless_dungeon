@@ -15,7 +15,7 @@ export default {
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 3, 2, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 1],
@@ -34,6 +34,7 @@ export default {
     // intermission - 整備階段
     // end - 回到標題畫面
     "phase": [ 'conversation', 'titleCard', 'battle', 'conversation', 'end' ],
+    // Pre-defined events
     "event": [
         // Before battle phase
         {
@@ -326,11 +327,26 @@ export default {
             ],
             "trigger": "auto"
         }
-    ], // Pre-defined events
+    ], 
+    // Define how many enemy on the stage
     "enemy": [
         {
             "name": 'Zombie',
-            "job": 'mob_zombie_1'
+            "job": 'mob_zombie_1',
+            "startingPoint": {
+                "x": 2,
+                "y": 11
+            }
+        }
+    ],
+    // Define how many player on the stage
+    "player": [
+        {
+            // Player name and job is for user to define
+            "startingPoint": {
+                "x": 3,
+                "y": 11
+            }
         }
     ],
     "objective": {
