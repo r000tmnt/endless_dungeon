@@ -318,7 +318,7 @@ class Game{
     #createCharacter = (source, property, position, type, tileSize) => {
         const target = (type === 2)? this.tileMap.player : this.tileMap.enemy
         source.forEach((p, index) => {
-            const { x, y } = target[index].startingPosition
+            const { x, y } = target[index].startingPoint
             const newPlayer = new Character(
                 x, 
                 y, 
