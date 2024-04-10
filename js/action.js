@@ -508,12 +508,12 @@ export default class Action{
                             ])
                         }
 
-                        game.tileMap.changeTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
+                        game.tileMap.changeTile(Math.floor(enemy.y / tileSize), Math.floor(enemy.x / tileSize), 4)
                     }else{
                         // If player lose, drop all items
                         if(enemy.bag.length){
                             game.tileMap.setEventOnTile({x: enemy.x, y: enemy.y}, enemy.bag)
-                            game.tileMap.changeTile(parseInt(enemy.y / tileSize), parseInt(enemy.x / tileSize), 4)
+                            game.tileMap.changeTile(Math.floor(enemy.y / tileSize), Math.floor(enemy.x / tileSize), 4)
                         }
 
                         // Need to change the timing to check on objective
@@ -725,7 +725,7 @@ export default class Action{
         for(let i=0; i < playerPosition.length; i++){
             const { row, col } = playerPosition[i]
             if(await this.#checkIfInRange(row, col)){
-                playerInRange.push(player.find(p => row === parseInt(p.y / tileMap.tileSize) && parseInt(p.x / tileMap.tileSize)))
+                playerInRange.push(player.find(p => row === Math.floor(p.y / tileMap.tileSize) && Math.floor(p.x / tileMap.tileSize)))
             }
         }
             
@@ -736,8 +736,8 @@ export default class Action{
 
             // Chose the player with the lowest def
             const targetPlayerPosition = {
-                row: parseInt(playerInRange[0].y / tileMap.tileSize),
-                col: parseInt(playerInRange[0].x / tileMap.tileSize)
+                row: Math.floor(playerInRange[0].y / tileMap.tileSize),
+                col: Math.floor(playerInRange[0].x / tileMap.tileSize)
             }
 
             // let attackRange = 1 
