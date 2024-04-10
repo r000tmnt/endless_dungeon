@@ -44,6 +44,7 @@ import { levelUp } from './utils/battle.js'
 import setting from './utils/setting.js';
 import weapon from './dataBase/item/item_weapon';
 import armor from './dataBase/item/item_armor';
+import Character from './Character.js';
 
 class Game{
     constructor(){
@@ -315,8 +316,18 @@ class Game{
     }
 
     #createCharacter = (source, property, position, type, tileSize) => {
-        source.forEach((p) => {
-            const newPlayer = this.tileMap.getCharacter(this.velocity, type, p.name, p.job)
+        const target = (type === 2)? this.tileMap.player : this.tileMap.enemy
+        source.forEach((p, index) => {
+            const { x, y } = target[index].startingPosition
+            const newPlayer = new Character(
+                x, 
+                y, 
+                tileSize, 
+                this.velocity, 
+                type, 
+                { name: p.name, class: p.job },
+                this.tileMap.map
+            )
             property.push(newPlayer)
         })
         
