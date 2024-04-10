@@ -461,7 +461,6 @@ export default class Action{
                 enemy.animation = 'idle'
                 // Check if the enemy is defeated
                 if(enemy.attributes.hp <= 0){
-                    tileMap.removeCharacter(row, col)
 
                     // Calculate item drop rate
                     if(player.type === 2){
