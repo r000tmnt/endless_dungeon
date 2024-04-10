@@ -94,7 +94,7 @@ class Game{
                     case 'move':{
                         const currentActingPlayer = this.player.find(p => p.walkableSpace.length)
                     
-                        const position = this.playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
+                        const position = this.playerPosition.find(p => p.row === Math.floor(currentActingPlayer.y / tileSize) && p.col === Math.floor(currentActingPlayer.x / tileSize))
 
                         movable = this.action.move(this.tileMap, row, col, position, currentActingPlayer)  
                         
@@ -113,7 +113,7 @@ class Game{
                     case 'attack': case 'skill': case 'item':{
                         const currentActingPlayer = this.player.find(p => p.walkableSpace.length)
                     
-                        const position = this.playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
+                        const position = this.playerPosition.find(p => p.row === Math.floor(currentActingPlayer.y / tileSize) && p.col === Math.floor(currentActingPlayer.x / tileSize))
                         
                         const possibleEncounterEnemyPosition = this.limitPositonToCheck(currentActingPlayer.attributes.moveSpeed, position, this.enemyPosition)
                         movable = await this.action.command(canvas, row, col, currentActingPlayer, this.inspectingCharacter, possibleEncounterEnemyPosition, tileSize, this.tileMap)
@@ -327,8 +327,8 @@ class Game{
         property.forEach(p => {
             position.push(
                 {
-                    row: parseInt(p.y / tileSize),
-                    col: parseInt(p.x / tileSize)
+                    row: Math.floor(p.y / tileSize),
+                    col: Math.floor(p.x / tileSize)
                 }
             )
         })  
@@ -717,8 +717,8 @@ class Game{
             // If it is the player's turn
             if(this.turnType === 0){
                 const index = this.player.findIndex(p => p.animation === currentActingPlayer.animation)
-                this.playerPosition[index].row = parseInt(currentActingPlayer.y / tileSize)
-                this.playerPosition[index].col = parseInt(currentActingPlayer.x / tileSize)  
+                this.playerPosition[index].row = Math.floor(currentActingPlayer.y / tileSize)
+                this.playerPosition[index].col = Math.floor(currentActingPlayer.x / tileSize)  
         
                 // Check if the tile has an event
                 // await this.checkIfStepOnTheEvent(currentActingPlayer.x, currentActingPlayer.y)
@@ -750,8 +750,8 @@ class Game{
                 console.log('reset action mode :>>>', this.action.mode)
             }else{
                 const index = this.enemy.findIndex(e => e.animation === currentActingPlayer.animation)
-                this.enemyPosition[index].row = parseInt(currentActingPlayer.y / tileSize)
-                this.enemyPosition[index].col = parseInt(currentActingPlayer.x / tileSize) 
+                this.enemyPosition[index].row = Math.floor(currentActingPlayer.y / tileSize)
+                this.enemyPosition[index].col = Math.floor(currentActingPlayer.x / tileSize) 
                 // characterAp.innerText = `AP: ${player.attributes.ap}`
                     
                 // Move to the next phase
