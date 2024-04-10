@@ -76,7 +76,6 @@ export default {
                                     "size": "",
                                     "content": t("tutorial_1.option_1.content"),
                                     "effect": [],
-                                    "audio": ['click']
                                 },
                                 {
                                     "value": t("tutorial_1.option_2.value"),
@@ -90,7 +89,6 @@ export default {
                                             "value": -1,
                                         }
                                     ],
-                                    "audio": ['click']
                                 }
                             ],
                         },
