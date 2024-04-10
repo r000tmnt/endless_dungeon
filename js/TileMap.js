@@ -160,8 +160,8 @@ export default class TileMa {
                 
                 // Remove image
                 // let ctx = document.getElementById('game').getContext("2d");
-                const row = parseInt(position.y / this.tileSize)
-                const col = parseInt(position.x / this.tileSize)
+                const row = Math.floor(position.y / this.tileSize)
+                const col = Math.floor(position.x / this.tileSize)
                 // const originalTile = level.getTile(this.id, row, col)
                 this.map[row][col] = 0
                 // ctx.drawImage(this.assets[4], position.x, position.y, this.tileSize, this.tileSize)
