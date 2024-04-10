@@ -356,7 +356,7 @@ export const uiInit = (game) => {
                     game.action.mode = action
                     hideUIElement() 
                     const { tileSize } = setting.general
-                    const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
+                    const position = game.playerPosition.find(p => p.row === Math.floor(game.inspectingCharacter.y / tileSize) && p.col === Math.floor(game.inspectingCharacter.x / tileSize))
                     const possibleEncounterEnemyPosition = game.limitPositonToCheck(game.inspectingCharacter.attributes.moveSpeed, position, game.enemyPosition)
                     await game.action.setMove(
                         game.tileMap, 
@@ -372,7 +372,7 @@ export const uiInit = (game) => {
                     game.action.mode = action
                     hideUIElement() 
                     const { tileSize } = setting.general
-                    const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
+                    const position = game.playerPosition.find(p => p.row === Math.floor(game.inspectingCharacter.y / tileSize) && p.col === Math.floor(game.inspectingCharacter.x / tileSize))
                     await game.action.setAttack(game.tileMap, game.inspectingCharacter, position, 1)
                 })
             break;   
@@ -384,7 +384,7 @@ export const uiInit = (game) => {
                     const { tileSize, fontSize, fontSize_md, fontSize_sm, camera } = setting.general
                     const { width, height } = camera
                     resizeHiddenElement(skillWindow.style, width, height, fontSize_sm)
-                    const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
+                    const position = game.playerPosition.find(p => p.row === Math.floor(game.inspectingCharacter.y / tileSize) && p.col === Math.floor(game.inspectingCharacter.x / tileSize))
                     game.action.setSKillWindow(game.inspectingCharacter, game.tileMap, position, fontSize, fontSize_md, fontSize_sm)
                 })
             break;
@@ -890,8 +890,8 @@ export const getPosition = (event, tileSize) => {
     let positionY = event.clientY - canvasPosition.top
     let positionX = event.clientX - canvasPosition.left
 
-    let row = parseInt( positionY / tileSize)
-    let col = parseInt( positionX / tileSize)
+    let row = Math.floor( positionY / tileSize)
+    let col = Math.floor( positionX / tileSize)
 
     return { row, col }
 }
