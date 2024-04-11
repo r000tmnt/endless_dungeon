@@ -167,9 +167,8 @@ const equipItem = (currentActingPlayer, itemActions) => {
 
         // Apply equipment bonus
         for(let [key, value] of Object.entries(selectedItem.effect.base_attribute)){
-            const newValue = selectedItem.effect.base_attribute[key] + value
-            currentActingPlayer.totalAttribute[key] = newValue
-            currentActingPlayer.change_attribute[key] = newValue
+            currentActingPlayer.totalAttribute[key] += value
+            currentActingPlayer.change_attribute[key] += value
         }  
 
         const { fontSize } = setting.general
@@ -197,9 +196,8 @@ const UnequipItem = (currentActingPlayer, itemActions) => {
 
         // Remove equipment bonus
         for(let [key, value] of Object.entries(selectedItem.effect.base_attribute)){
-            const newValue = value - selectedItem.effect.base_attribute[key]
-            currentActingPlayer.totalAttribute[key] = newValue
-            currentActingPlayer.change_attribute[key] = newValue
+            currentActingPlayer.totalAttribute[key] -= value
+            currentActingPlayer.change_attribute[key] -= value
         }  
 
         // Remove E tag
