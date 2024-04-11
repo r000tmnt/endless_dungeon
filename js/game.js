@@ -320,8 +320,8 @@ class Game{
         source.forEach((p, index) => {
             const { x, y } = target[index].startingPoint
             const newPlayer = new Character(
-                x, 
-                y, 
+                x * tileSize, 
+                y * tileSize, 
                 tileSize, 
                 this.velocity, 
                 type, 
@@ -512,8 +512,8 @@ class Game{
 
                     // Change attribute value
                     for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                        target.totalAttribute[key] = itemData.effect.base_attribute[key] + val
-                        target.change_attribute[key] = itemData.effect.base_attribute[key] + val
+                        target.totalAttribute[key] += val
+                        target.change_attribute[key] += val
                     }
                 }
                 break;
