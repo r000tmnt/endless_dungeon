@@ -25,7 +25,6 @@ export default class Character {
         this.tileSize = tileSize;
         this.velocity = velocity;
         this.tileMap = map;
-        this.#createCharacter(attributes, type, save);
         this.type = type;
         this.isMoving = false;
         this.destination = null;
@@ -61,7 +60,22 @@ export default class Character {
             moveSpeed: 0,
             sight: 0
         },
-        this.totalAttribute = {}
+        this.totalAttribute = {
+            hp: 0, 
+            mp: 0, 
+            maxHp: 0, 
+            maxMp: 0, 
+            str: 0, 
+            def: 0, 
+            int: 0,
+            spd: 0, 
+            spi: 0,
+            ap: 0,
+            lck: 0,
+            maxAp: 0,
+            moveSpeed: 0,
+            sight: 0
+        }
         this.status = []
         this.ready = false;
         this.frameTimer = 0;
@@ -79,6 +93,8 @@ export default class Character {
         this.attackSound = null;
         this.footSteps = [];
 
+        this.#createCharacter(attributes, type, save);
+
         switch(true){
             case attributes.class.includes('fighter'):
                 this.footSteps.push(new Audio(`${__BASE_URL__}assets/audio/step_rock_l.mp3`, 'step'))
@@ -91,18 +107,14 @@ export default class Character {
             break;
         }
 
-        const animation = ['idle', 'top', 'down', 'left', 'right', 'attack']
-
-        for(let i=0; i < animation.length; i++){
-            this.#loadAnimation(animation[i], 2, this.type, attributes.class)
-
-            if(i === (animation.length - 1)){
-                console.log(this.animationData)
-                this.animation = 'idle'
-                this.ready = true
-                console.log(this)
-            }            
+        for(let [key, value] of Object.entries(this.animationData)){
+            this.#loadAnimation(key, 2, this.type, attributes.class)       
         }
+
+        console.log(this.animationData)
+        this.animation = 'idle'
+        this.ready = true
+        console.log(this)
 
         this.animationData.cure = [...this.animationData.idle]
         this.animationData.damage = [...this.animationData.idle]
@@ -430,23 +442,22 @@ export default class Character {
                     this.equip = JSON.parse(JSON.stringify(save.equip))
                 }
 
-                for(let [key, value] in Object.entries(this.base_attribute)){
+                for(let [key, value] of Object.entries(this.base_attribute)){
                     this.totalAttribute[key] = this.change_attribute[key] + value
                 }
                 
                 const equipment = this.bag.filter(b => b.type === 3 || b.type === 4)
                 // Assign the attributes to the object
-                for(let i=0; i < equipment; i++){
-                    const itemData = equipment[i].type === 3? weapon.getOne(job.bag[i].id) : armor.getOne(job.bag[i].id)
+                for(let i=0, e = equipment.length; i < e; i++){
+                    const itemData = equipment[i].type === 3? weapon.getOne(equipment[i].id) : armor.getOne(equipment[i].id)
                     this.equip[itemData.position] = { 
                         id: itemData.id,
                         name: itemData.name
                     }
                     // Change attribute value
                     for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                        const newVal = itemData.effect.base_attribute[key] + val
-                        this.totalAttribute[key] = newVal
-                        this.change_attribute[key] = newVal
+                        this.totalAttribute[key] += val 
+                        this.change_attribute[key] += val
                     }
                 }
             }
@@ -462,7 +473,7 @@ export default class Character {
                         this.lv = 1
                         this.class = job.name
                         this.class_id = attributes.class
-                        this.attributes = {
+                        this.base_attribute = {
                             ...job.base_attribute
                         }     
                         this.prefer_attributes = job.prefer_attributes
@@ -503,17 +514,12 @@ export default class Character {
                     this.prefer_action = save.prefer_action
                 }
 
-                for(let [key, value] in Object.entries(this.base_attribute)){
+                for(let [key, value] of Object.entries(this.base_attribute)){
                     this.totalAttribute[key] = this.change_attribute[key] + value
                 }
             }
             break
         }
-
-        // Preparing animation frames
-        let idle = [], top = [], down = [], left = [], right = []
-
-        this.animationData = { idle, top, down, left, right }
     }
 
     /**
