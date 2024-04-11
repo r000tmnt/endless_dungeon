@@ -33,10 +33,10 @@ const diceRoll = async(hitRates, totalRate) => {
 
 // Calculate Hit rate and Crit rate
 const calculateHitRate = async(player, enemy, damage, status = null) => {
-    let hitRate = player.attributes.spd + player.attributes.lck + damage
-    let evadeRate = enemy.attributes.spd + enemy.attributes.def
-    let critRate =  player.attributes.lck * player.attributes.int
-    let statusRate = (status !== null)? player.attributes.lck + (player.attributes.lck * Math.floor(player.attributes.lck / 100)) : 0
+    let hitRate = player.totalAttribute.spd + player.totalAttribute.lck + damage
+    let evadeRate = enemy.totalAttribute.spd + enemy.totalAttribute.def
+    let critRate =  player.totalAttribute.lck * player.totalAttribute.int
+    let statusRate = (status !== null)? player.totalAttribute.lck + (player.totalAttribute.lck * Math.floor(player.totalAttribute.lck / 100)) : 0
 
     let LvDistance = 0, totalRate = 0
     let resultMessage = '', resultStyle = 'yellow'
@@ -51,7 +51,7 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
 
     // Check if there's other thing that can alter the hit rate, such as skill or item
     // Evade is greater then Hit
-    if(enemy.attributes.status.findIndex(s => s.name === 'Evade') >= 0){
+    if(enemy.status.findIndex(s => s.name === 'Evade') >= 0){
         hitRate = 0
         evadeRate = 100
 
@@ -59,20 +59,20 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
         enemy.removeStatus('Evade')
     }else{
         switch(true){
-            case player.attributes.status.findIndex(s => s.name === 'Hit') >= 0:
+            case player.totalAttribute.status.findIndex(s => s.name === 'Hit') >= 0:
                 hitRate = 100
                 evadeRate = 0
 
                 // remove the enhancd status
                 player.removeStatus('Hit')
             break;
-            case player.attributes.status.findIndex(s => s.name === 'Focus') >= 0:
+            case player.totalAttribute.status.findIndex(s => s.name === 'Focus') >= 0:
                 hitRate += Math.floor(hitRate * 0.3)
                 evadeRate -= Math.floor(evadeRate * 0.3 )
 
                 // focus will last a whole turn
             break;
-            case enemy.attributes.status.findIndex(s => s.name === 'Focus') >= 0:
+            case enemy.totalAttribute.status.findIndex(s => s.name === 'Focus') >= 0:
                 hitRate -= Math.floor(hitRate * 0.3)
                 evadeRate += Math.floor(evadeRate * 0.3 )
 
@@ -93,7 +93,7 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
 
     if(firstDiceRoll.name === 'hitRate'){
         // Check if crit
-        if(player.attributes.status.find(s => s.name ==='crit')){
+        if(player.totalAttribute.status.find(s => s.name ==='crit')){
             critRate = 100
             hitRate = 0
 
@@ -136,16 +136,16 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
             const criticalHit = Math.round(damage * 1.5)
             resultMessage = String(criticalHit)
             resultStyle = 'orange'
-            enemy.attributes.hp -= criticalHit
-            console.log('enmey hp:>>>', enemy.attributes.hp)
+            enemy.totalAttribute.hp -= criticalHit
+            console.log('enmey hp:>>>', enemy.totalAttribute.hp)
         }else{
             console.log('hit!')
             setTimeout(() => {
                 enemy.animation = 'damage'
             }, 300)
             resultMessage = String(damage)
-            enemy.attributes.hp -= damage
-            console.log('enmey hp:>>>', enemy.attributes.hp)
+            enemy.totalAttribute.hp -= damage
+            console.log('enmey hp:>>>', enemy.totalAttribute.hp)
         }
 
         if(statusRate > 0){
@@ -156,7 +156,7 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
 
             if(thirdDiceRoll.name !== 'evadeRate'){
                 console.log('Change status')
-                enemy.attributes.status = effect.status
+                enemy.status = effect.status
                 resultMessage += `,${effect.status}`
             }
         }
@@ -169,46 +169,26 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
     return { resultMessage, resultStyle }
 }
 
-const calculateEnemyMagicDefense = (enemy) => {
-    let defense = 0
-
-    for(let[key, value] of Object.entries(enemy.equip)){
-        if(enemy.equip[key]?.id !== undefined){
-            const itemData = armor.getOne(enemy.equip[key].id)
-
-            if(itemData && itemData.effect.base_attribute?.spi !== undefined){
-                defense += Math.floor(enemy.attributes.spi * ( itemData.effect.base_attribute.spi/100 ))
-            }
-        }
-    }
-
-    if(defense === 0){
-        defense = enemy.attributes.spi + Math.floor(enemy.attributes.spi * (1/100))
-    }else{
-        defense += enemy.attributes.spi
-    }
-
-    return defense
-}
-
 // Calculate enemy defense value
-const calculateEnemyDefense = (enemy) => {
+const calculateEnemyDefense = (enemy, type) => {
+    const attribute = (type === 'dmg')? "def" : "spi"
+
     let defense = 0
 
     for(let[key, value] of Object.entries(enemy.equip)){
         if(enemy.equip[key]?.id !== undefined){
             const itemData = armor.getOne(enemy.equip[key].id)
 
-            if(itemData && itemData.effect.base_attribute?.def !== undefined){
-                defense += Math.floor(enemy.attributes.def * ( itemData.effect.base_attribute.def/100 ))
+            if(itemData && itemData.effect.base_attribute[attribute] !== undefined){
+                defense += Math.floor(enemy.totalAttribute[attribute] * ( itemData.effect.base_attribute.def/100 ))
             }
         }
     }
 
     if(defense === 0){
-        defense = enemy.attributes.def + Math.floor(enemy.attributes.def * (1/100))
+        defense = enemy.totalAttribute[attribute] + Math.floor(enemy.totalAttribute[attribute] * (1/100))
     }else{
-        defense += enemy.attributes.def
+        defense += enemy.totalAttribute[attribute]
     }
 
     return defense
@@ -217,12 +197,13 @@ const calculateEnemyDefense = (enemy) => {
 const calculatePossibleDamage = (player, enemyDefense, base_on_attribute, base_number, multiply_as) => {
     const dmgRange = []
     let damage = 1 // Min dmg
+    const attribute = player.totalAttribute[base_on_attribute]
     // Calculare weapon and attribute bonus
     if(player.equip?.hand?.id !== undefined){
         const itemData = weapon.getOne(player.equip.hand.id)      
 
         // Need something to know if the attck is enhanced by skill or not
-        let minDmg = ((player.attributes[base_on_attribute] + Math.floor(player.attributes[base_on_attribute] * ( itemData.effect.base_attribute[base_on_attribute]/100 ))) - enemyDefense ) + itemData.effect.base_damage.min
+        let minDmg = ((attribute + Math.floor(attribute * ( itemData.effect.base_attribute[base_on_attribute]/100 ))) - enemyDefense ) + itemData.effect.base_damage.min
 
         if(multiply_as === 'solid'){
             minDmg += base_number
@@ -240,7 +221,7 @@ const calculatePossibleDamage = (player, enemyDefense, base_on_attribute, base_n
     }else{
         // Without weapon
         // Need something to know if the attck is enhanced by skill or not
-        let minDmg = (player.attributes[base_on_attribute] - enemyDefense) + 1
+        let minDmg = (attribute - enemyDefense) + 1
 
         if(minDmg <= 0) minDmg = 1
 
@@ -265,16 +246,18 @@ const calculatePossibleDamage = (player, enemyDefense, base_on_attribute, base_n
 export const weaponAttack = async(player, enemy) => {
     const dmgRange = []
     let damage = 1 // Min dmg
-    const enemyDefense = calculateEnemyDefense(enemy)
-
-    console.log('enemy defense :>>>', enemyDefense)
 
     // Calulate damage with weapon
     if(player.equip?.hand?.id !== undefined){
         const itemData = weapon.getOne(player.equip.hand.id)
 
+        const enemyDefense = calculateEnemyDefense(enemy, (itemData.effect.base_attribute === 'str')? 'damage' : 'magic')
+        console.log('enemy defense :>>>', enemyDefense)
+
+        const attr = (itemData.effect.base_attribute === 'str')? "str" : "int"
+
         // Need something to know if the attck is enhanced by skill or not
-        let minDmg = ((player.attributes.str + Math.floor(player.attributes.str * ( itemData.effect.base_attribute.str/100 ))) - enemyDefense) + itemData.effect.base_damage.min
+        let minDmg = ((player.totalAttribute[attr] + Math.floor(player.totalAttribute[attr] * ( itemData.effect.base_attribute[attr]/100 ))) - enemyDefense) + itemData.effect.base_damage.min
 
         if(minDmg <= 0) minDmg = 1
 
@@ -288,7 +271,10 @@ export const weaponAttack = async(player, enemy) => {
     }else{
         // Calulate damage without weapon
         // Need something to know if the attck is base on skill or not
-        let minDmg = (player.attributes.str - enemyDefense) + 1
+        const enemyDefense = calculateEnemyDefense(enemy, 'damage')
+        console.log('enemy defense :>>>', enemyDefense)
+
+        let minDmg = (player.totalAttribute.str - enemyDefense) + 1
 
         if(minDmg <= 0) minDmg = 1
 
@@ -315,7 +301,7 @@ export const skillAttack = async(skill, player, enemy) => {
     if(skill.type === 'offence'){
         switch(type){
             case 'dmg': case 'magic':{
-                const enemyDefense = (skill.type === 'dmg')? calculateEnemyDefense(enemy) : calculateEnemyMagicDefense(enemy)
+                const enemyDefense = calculateEnemyDefense(enemy, skill.type)
 
                 damage = calculatePossibleDamage(player, enemyDefense, base_on_attribute, base_number, multiply_as)
             }
@@ -334,7 +320,7 @@ export const skillAttack = async(skill, player, enemy) => {
         }
 
         if(multiply_as === 'percentage'){
-            damage += Math.floor(enemy.attributes[base_on_attribute] * (base_number / 100))
+            damage += Math.floor(enemy.totalAttribute[base_on_attribute] * (base_number / 100))
         }
     }
 
@@ -386,11 +372,11 @@ export const levelUp = (player) => {
                 // Give player a few points to spend
                 player.pt = 5
 
-                console.log('player status before level up :>>>', player.attributes)
+                console.log('player status before level up :>>>', player.totalAttribute)
 
                 // Guarantee attribute growth
                 player.prefer_attributes.forEach(attr => {
-                    player.attributes[attr] += 1
+                    player.totalAttribute[attr] += 1
                 });
 
                 // Randomly apply attributes growth
@@ -398,7 +384,7 @@ export const levelUp = (player) => {
                     console.log('key :>>>', attr)
 
                     const randomGrowth = Math.floor(Math.random() * (grows.length -1))
-                    player.attributes[attr] += grows[randomGrowth]
+                    player.totalAttribute[attr] += grows[randomGrowth]
                 }
 
                 // Check if exp is enough to level up the character again
@@ -406,7 +392,7 @@ export const levelUp = (player) => {
                     levelUp(player)
                 }else{
                     game.characterAnimationPhaseEnded(player)
-                    console.log('player status after level up :>>>', player.attributes)        
+                    console.log('player status after level up :>>>', player.totalAttribute)        
                 }            
             }, 500)
         }, 500)                
