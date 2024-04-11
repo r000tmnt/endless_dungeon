@@ -120,11 +120,11 @@ const getPercentage = (type, character) => {
     let percentage = 0
 
     if(type === 'hp'){
-        each =  character.attributes.maxHp / 100
-        percentage = Math.round( Math.floor(character.attributes.hp / each) )
+        each =  character.totalAttribute.maxHp / 100
+        percentage = Math.round( Math.floor(character.totalAttribute.hp / each) )
     }else{
-        each = character.attributes.maxMp / 100
-        percentage = Math.round( Math.floor(character.attributes.mp / each) )
+        each = character.totalAttribute.maxMp / 100
+        percentage = Math.round( Math.floor(character.totalAttribute.mp / each) )
     }
 
     return percentage
@@ -257,7 +257,7 @@ export const uiInit = (game) => {
                 game.actionSelectSound.bindTarget(options[i])
                 options[i].addEventListener('click', () => {
                     game.player.forEach(p => {
-                        p.attributes.ap = 0
+                        p.totalAttribute.ap = 0
                         p.wait = true
                     })
                     game.characterAnimationPhaseEnded(game.player[0])
@@ -357,12 +357,12 @@ export const uiInit = (game) => {
                     hideUIElement() 
                     const { tileSize } = setting.general
                     const position = game.playerPosition.find(p => p.row === parseInt(game.inspectingCharacter.y / tileSize) && p.col === parseInt(game.inspectingCharacter.x / tileSize))
-                    const possibleEncounterEnemyPosition = game.limitPositonToCheck(game.inspectingCharacter.attributes.moveSpeed, position, game.enemyPosition)
+                    const possibleEncounterEnemyPosition = game.limitPositonToCheck(game.inspectingCharacter.totalAttribute.moveSpeed, position, game.enemyPosition)
                     await game.action.setMove(
                         game.tileMap, 
                         game.inspectingCharacter, 
                         position, 
-                        game.inspectingCharacter.attributes.moveSpeed, possibleEncounterEnemyPosition.length? possibleEncounterEnemyPosition : game.enemyPosition
+                        game.inspectingCharacter.totalAttribute.moveSpeed, possibleEncounterEnemyPosition.length? possibleEncounterEnemyPosition : game.enemyPosition
                     )           
                 })
             break;
@@ -418,7 +418,7 @@ export const uiInit = (game) => {
                 actionMenuOptions[i].addEventListener('click', async() => {
                     hideUIElement()
                     setTimeout(() => {
-                        game.inspectingCharacter.attributes.ap = 0
+                        game.inspectingCharacter.totalAttribute.ap = 0
                         game.characterAnimationPhaseEnded(game.inspectingCharacter)
                     }, 500)
                 })
@@ -790,7 +790,7 @@ export const prepareCharacterCaption = (inspectingCharacter, tileSize) => {
     // Fill the element with a portion of the character info
     characterName.innerText = inspectingCharacter.name
     characterLv.innerText = `LV ${inspectingCharacter.lv}`
-    characterAp.innerText = `AP: ${inspectingCharacter.attributes.ap}`
+    characterAp.innerText = `AP: ${inspectingCharacter.totalAttribute.ap}`
 
     // Display arrow symbol if there are points to spend
     if(inspectingCharacter.pt > 0){

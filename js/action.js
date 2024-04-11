@@ -122,7 +122,7 @@ export default class Action{
             skillInfo.style.width = '100%'
 
             // If the required resource is enough and equip with the weapon that the skill needs
-            if(currentActingPlayer.attributes[skillData.cost.attribute] >= skillData.cost.value && 
+            if(currentActingPlayer.totalAttribute[skillData.cost.attribute] >= skillData.cost.value && 
                currentActingPlayer.equip.hand?.id.includes(skillData.weapon) ||
                skill.weapon === 'none'
             ){
@@ -216,13 +216,13 @@ export default class Action{
 
         switch(attribute){
             case 'maxHp':
-                tableNode[index].innerText = `${inspectingCharacter.attributes.hp} / ${inspectingCharacter.attributes.maxHp}`
+                tableNode[index].innerText = `${inspectingCharacter.totalAttribute.hp} / ${inspectingCharacter.totalAttribute.maxHp}`
             break;
             case 'maxMp':
-                tableNode[index].innerText = `${inspectingCharacter.attributes.mp} / ${inspectingCharacter.attributes.maxMp}`
+                tableNode[index].innerText = `${inspectingCharacter.totalAttribute.mp} / ${inspectingCharacter.totalAttribute.maxMp}`
             break;
             default:
-                tableNode[index].innerText = `${inspectingCharacter.attributes[attribute]}`
+                tableNode[index].innerText = `${inspectingCharacter.totalAttribute[attribute]}`
             break;
         }
     }
@@ -253,20 +253,20 @@ export default class Action{
         for(let i=0; i < tableNode.length; i++){
             switch(tableNode[i].dataset.attribute){
                 case 'hp':
-                    tableNode[i].innerText = `${inspectingCharacter.attributes.hp} / ${inspectingCharacter.attributes.maxHp}`
+                    tableNode[i].innerText = `${inspectingCharacter.totalAttribute.hp} / ${inspectingCharacter.totalAttribute.maxHp}`
                 break;
                 case 'mp':
-                    tableNode[i].innerText = `${inspectingCharacter.attributes.mp} / ${inspectingCharacter.attributes.maxMp}`
+                    tableNode[i].innerText = `${inspectingCharacter.totalAttribute.mp} / ${inspectingCharacter.totalAttribute.maxMp}`
                 break;
                 case 'ap':
-                    tableNode[i].innerText = `${inspectingCharacter.attributes.ap} / ${inspectingCharacter.attributes.maxAp}`
+                    tableNode[i].innerText = `${inspectingCharacter.totalAttribute.ap} / ${inspectingCharacter.totalAttribute.maxAp}`
                 break;
                 case 'exp':
                     tableNode[i].innerText = `${inspectingCharacter.exp? inspectingCharacter.exp : 0 } / ${inspectingCharacter.requiredExp? inspectingCharacter.requiredExp : 0}`
                 break;
                 case 'status':
-                    if(inspectingCharacter.attributes.status.length){
-                        inspectingCharacter.attributes.status.map(s => {
+                    if(inspectingCharacter.totalAttribute.status.length){
+                        inspectingCharacter.totalAttribute.status.map(s => {
                             tableNode[i].innerHTML += `${s.name} `
                         })
                     }else{
@@ -274,7 +274,7 @@ export default class Action{
                     }
                 break;
                 default:
-                    tableNode[i].innerText = `${inspectingCharacter.attributes[`${tableNode[i].dataset.attribute}`]}`
+                    tableNode[i].innerText = `${inspectingCharacter.totalAttribute[`${tableNode[i].dataset.attribute}`]}`
                 break;
             }
         }
@@ -282,22 +282,18 @@ export default class Action{
         // If there're points to spend
         if(inspectingCharacter.pt > 0){
             const statusToggle = document.querySelectorAll('.attribute-toggle')
-            // Keep a copy of player attributes before changes
-            // const statusBackUp = JSON.parse(JSON.stringify(inspectingCharacter.attributes))
-            const statusAlterCount = {}
 
             for(let i=0; i < statusToggle.length; i++){
                 statusToggle[i].style.fontSize = fontSize_md + 'px'
                 statusToggle[i].classList.remove('invisible')
                 const attr = statusToggle[i].dataset.attribute
                 if(attr !== undefined){
-                    statusAlterCount[attr] = 0
                     // minus
                     const minusBtn = statusToggle[i].children[0]
                     minusBtn.classList.add('button_disable')
                     minusBtn.addEventListener('click', () => {
-                        inspectingCharacter.attributes[attr] -= 1
-                        statusAlterCount[attr] -= 1
+                        inspectingCharacter.totalAttribute[attr] -= 1
+                        inspectingCharacter.base_attribute[attr] -= 1
                         inspectingCharacter.pt += 1
                         statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
 
@@ -319,8 +315,8 @@ export default class Action{
                     // plus
                     const plusBtn = statusToggle[i].children[1]
                     plusBtn.addEventListener('click', () => {
-                        inspectingCharacter.attributes[attr] += 1
-                        statusAlterCount[attr] += 1
+                        inspectingCharacter.totalAttribute[attr] += 1
+                        inspectingCharacter.base_attribute[attr] += 1
                         inspectingCharacter.pt -= 1
                         statusPt.innerText = `Pt: ${inspectingCharacter.pt}`
                         minusBtn.classList.remove('button_disable')
@@ -365,7 +361,7 @@ export default class Action{
 
         if(inRange){
             game.actionSelectSound.element.play()
-            currentActingPlayer.attributes.ap -= 1
+            currentActingPlayer.totalAttribute.ap -= 1
             this.reachableDirections = await prepareDirections(tileMap, playerPosition, { row, col }, this.reachableDirections)
             // characterCaption.classList.remove('visible')
 
@@ -390,7 +386,7 @@ export default class Action{
             this.animationInit = true
             
             if(this.mode === 'item'){
-                player.attributes.ap -= 1
+                player.totalAttribute.ap -= 1
                 // player.animation = 'item'
                 const { message, type } = useItem(player)
 
@@ -412,7 +408,7 @@ export default class Action{
                     switch(this.mode){
                         case 'attack':{
                             player.animation = 'attack'
-                            player.attributes.ap -= 1
+                            player.totalAttribute.ap -= 1
                             const { resultMessage, resultStyle } = await weaponAttack(player, enemy)
                             message += resultMessage
                             style = resultStyle
@@ -422,8 +418,8 @@ export default class Action{
                             player.animation = this.selectedSkill.animation
                             const skillName = document.getElementById('skillName').children[0]
                             const { attribute, value } = this.selectedSkill.cost
-                            player.attributes[attribute] -= value
-                            player.attributes.ap -= 2
+                            player.totalAttribute[attribute] -= value
+                            player.totalAttribute.ap -= 2
     
                             const { resultMessage, resultStyle  } = await skillAttack(this.selectedSkill, player, enemy)
 
@@ -460,7 +456,7 @@ export default class Action{
                 player.animation = 'idle'
                 enemy.animation = 'idle'
                 // Check if the enemy is defeated
-                if(enemy.attributes.hp <= 0){
+                if(enemy.totalAttribute.hp <= 0){
 
                     // Calculate item drop rate
                     if(player.type === 2){
@@ -470,7 +466,7 @@ export default class Action{
                         enemy.drop.sort((a, b) => a.rate - b.rate)
 
                         // Apply luck bonus to the lowest drop rate
-                        enemy.drop[0].rate += Math.floor(enemy.drop[0].rate * (player.attributes.lck / 100) )
+                        enemy.drop[0].rate += Math.floor(enemy.drop[0].rate * (player.totalAttribute.lck / 100) )
                     
                         const totalDropRate = enemy.drop.reduce((accu, current) => accu + current.rate, 0)
 
@@ -637,7 +633,7 @@ export default class Action{
 
     async enemyMove(tileMap, enemy, moveSpeed, enemyPosition, playerPosition){
         this.mode = 'move'
-        enemy.attributes.ap -= 1 
+        enemy.totalAttribute.ap -= 1 
         // get walkable space
         await this.setMove(tileMap, enemy, enemyPosition, moveSpeed, playerPosition)
 
@@ -679,11 +675,7 @@ export default class Action{
     }
 
     async enemyAction(enemy){
-        const possibleActions = [{ name: 'attack', value: 50 }, { name: 'skill', value: 50 }, { name: 'stay', value: 30 }]
-
-        if(enemy.attributes.ap < 2){
-            possibleActions.splice(1, 1)
-        }
+        const possibleActions = (enemy.totalAttribute.ap < 2)? [{ name: 'attack', value: 50 }, { name: 'stay', value: 30 }] : [{ name: 'attack', value: 50 }, { name: 'skill', value: 50 }, { name: 'stay', value: 30 }]
 
         possibleActions.forEach(a => {
             if(a.name === enemy.prefer_action){
@@ -731,7 +723,7 @@ export default class Action{
         if(playerInRange.length){
             console.log('enemyAI found player') 
 
-            playerInRange.sort((a, b) => b.attributes.def - a.attributes.def)
+            playerInRange.sort((a, b) => b.totalAttribute.def - a.totalAttribute.def)
 
             // Chose the player with the lowest def
             const targetPlayerPosition = {
@@ -766,7 +758,7 @@ export default class Action{
                             return skillData                      
                         }
                         
-                        if(enemy.attributes[s.cost.attribute] >= skillData.cost .value && enemy.equip?.hand?.id.includes(skillData.weapon)){
+                        if(enemy.totalAttribute[s.cost.attribute] >= skillData.cost .value && enemy.equip?.hand?.id.includes(skillData.weapon)){
                             return skillData
                         }
                     })
@@ -810,7 +802,7 @@ export default class Action{
                 break;
                 case 'stay':
                     // Spend an action point
-                    enemy.attributes.ap -= 1
+                    enemy.totalAttribute.ap -= 1
                     game.characterAnimationPhaseEnded(enemy)  
                 break;
             }

@@ -116,7 +116,7 @@ class Game{
                     
                         const position = this.playerPosition.find(p => p.row === parseInt(currentActingPlayer.y / tileSize) && p.col === parseInt(currentActingPlayer.x / tileSize))
                         
-                        const possibleEncounterEnemyPosition = this.limitPositonToCheck(currentActingPlayer.attributes.moveSpeed, position, this.enemyPosition)
+                        const possibleEncounterEnemyPosition = this.limitPositonToCheck(currentActingPlayer.totalAttribute.moveSpeed, position, this.enemyPosition)
                         movable = await this.action.command(canvas, row, col, currentActingPlayer, this.inspectingCharacter, possibleEncounterEnemyPosition, tileSize, this.tileMap)
 
                         if(!movable){
@@ -332,7 +332,7 @@ class Game{
         })
         
         // Sort from fastest to slowest, define acting order
-        property.sort((a, b) => b.attributes.spd - a.attributes.spd)
+        property.sort((a, b) => b.totalAttribute.spd - a.totalAttribute.spd)
 
         // Keep the memorizing the position for each player
         property.forEach(p => {
@@ -392,7 +392,7 @@ class Game{
     #enemyAI = async(currentActingEnemy, index) => {
         this.grid.setPointedBlock({ ...this.enemyPosition[index] })
 
-        const { moveSpeed, sight } = currentActingEnemy.attributes
+        const { moveSpeed, sight } = currentActingEnemy.totalAttribute
 
         const possibleEncounterPlayerPosition = this.limitPositonToCheck(moveSpeed, this.enemyPosition[index], this.playerPosition)
 
@@ -410,7 +410,7 @@ class Game{
 
     #checkAp = (inspectingCharacter) => {
         // If player's ap is not enough to use skill
-        if(inspectingCharacter.attributes.ap < 2){
+        if(inspectingCharacter.totalAttribute.ap < 2){
             toggleActionMenuOption('skill', true)
         }else{
             toggleActionMenuOption('skill', false)
@@ -454,7 +454,7 @@ class Game{
                 if(this.enemy.length){
                     console.log('enemy phase')
                     this.turnType = 1
-                    this.enemy[index].attributes.ap = this.enemy[index].attributes.maxAp
+                    this.enemy[index].totalAttribute.ap = this.enemy[index].totalAttribute.maxAp
 
                     // Check if there is status effect on enemy
                     // this.enemy.map(e => {})
@@ -465,7 +465,7 @@ class Game{
                 if(this.player.length){
                     console.log('player phase')
                     this.turnType = 0
-                    this.player[index].attributes.ap = this.player[index].attributes.maxAp
+                    this.player[index].totalAttribute.ap = this.player[index].totalAttribute.maxAp
                     this.turn += 1 
                     countTurn(this.turn)
 
@@ -482,88 +482,50 @@ class Game{
     // Apply effects to the target if any
     #applyOptionEffect = (effect) => {       
         for(let j=0; j < effect.length; j++){
-            const target = effect[j].target.split('_')
-            switch(target[0]){
-                case 'player':
-                    const targetedPlayer = this.player.find(p => p.name === setting.player[Number(target[1]) - 1].name)
-                    switch(effect[j].attribute){
-                        case 'equip':{
-                            let itemData = {}
-                            switch(effect[j].type){
-                                case 3:
-                                    itemData = weapon.getOne(effect[j].value)
-                                break;
-                                case 4:
-                                    itemData = armor.getOne(effect[j].value)
-                                break;
-                            } 
+            const mark = effect[j].target.split('_')
+            const target = (mark[0] === 'player')? 
+                this.player[Number(mark[1]) - 1] : 
+                this.enemy[Number(mark[1]) - 1]
 
-                            targetedPlayer.equip[itemData.position] = {
-                                id: itemData.id,
-                                name: itemData.name
-                            }
-                            
-                            targetedPlayer.bag.push({
-                                id: itemData.id,
-                                type: effect[j].type,
-                                amount: 1
-                            })
+            switch(effect[j].attribute){
+                case 'equip':{
+                    let itemData = {}
+                    switch(effect[j].type){
+                        case 3:
+                            itemData = weapon.getOne(effect[j].value)
+                        break;
+                        case 4:
+                            itemData = armor.getOne(effect[j].value)
+                        break;
+                    } 
 
-                            // Change attribute value
-                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                                targetedPlayer.attributes[key] += itemData.effect.base_attribute[key]
-                            }
-                        }
-                        break;
-                        case 'status':
-                            targetedPlayer.attributes[effect[j].attribute] = effect[j].value     
-                        break;
-                        default:
-                            targetedPlayer.attributes[effect[j].attribute] += effect[j].value                                                
-                        break;
+                    target.equip[itemData.position] = {
+                        id: itemData.id,
+                        name: itemData.name
                     }
+                    
+                    target.bag.push({
+                        id: itemData.id,
+                        type: effect[j].type,
+                        amount: 1
+                    })
+
+                    // Change attribute value
+                    for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
+                        target.totalAttribute[key] = itemData.effect.base_attribute[key] + val
+                        target.change_attribute[key] = itemData.effect.base_attribute[key] + val
+                    }
+                }
                 break;
-                case 'enemy':
-                    const targetedEnemy = this.enemy.find(p => p.name === this.tileMap.enemy[Number(target[1]) - 1].name)
-                    switch(effect[j].attribute){
-                        case 'equip':{
-                            let itemData = {}
-
-                            switch(effect[j].type){
-                                case 3:
-                                    itemData = weapon.getOne(effect[j].value)  
-                                break;
-                                case 4:
-                                    itemData = armor.getOne(effect[j].value)
-                                break;
-                            } 
-
-                            targetedEnemy.equip[itemData.position] = {
-                                id: itemData.id,
-                                name: itemData.name
-                            } 
-
-                            targetedEnemy.drop.push({
-                                id: itemData.id,
-                                type: effect[j].type,
-                                amount: 1
-                            })
-
-                            // Change attribute value
-                            for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                                targetedEnemy.attributes[key] += itemData.effect.base_attribute[key]
-                            }
-                        }
-                        break;
-                        case 'status':
-                            targetedEnemy.attributes[effect[j].attribute] = effect[j].value     
-                        break;
-                        default:
-                            targetedEnemy.attributes[effect[j].attribute] += effect[j].value                                                
-                        break;
-                    }
+                case 'status':
+                    // TODO - Get status data
+                    target.status.push({ name: effect[j].value, turn: null })     
+                break;
+                default:
+                    target.totalAttribute[effect[j].attribute] += effect[j].value                                                
                 break;
             }
+
         }
 
         this.eventEffect.splice(0)
@@ -742,7 +704,7 @@ class Game{
                 // If the player is ran out of action point
                 // Check if the next player exist 
                 // If not, move to the enemy phase
-                if(currentActingPlayer.attributes.ap === 0) {
+                if(currentActingPlayer.totalAttribute.ap === 0) {
                     if(this.player[index + 1] !== undefined){
                         // Simulate click on canvas where the next player is
                         this.#clickOnPlayer(index + 1)
@@ -766,7 +728,7 @@ class Game{
                 // characterAp.innerText = `AP: ${player.attributes.ap}`
                     
                 // Move to the next phase
-                if(currentActingPlayer.attributes.ap === 0){
+                if(currentActingPlayer.totalAttribute.ap === 0){
                     this.action.mode = ''
                     console.log('reset action mode :>>>', this.action.mode)
                     this.grid.setPointedBlock({})

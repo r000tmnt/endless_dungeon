@@ -57,19 +57,19 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
     desc.children[1].innerText = `${clickedItem.name}\n${clickedItem.effect.desc}`
 
     if(clickedItem.type === 0){
-        const { attributes } = currentActingPlayer
+        const { totalAttribute } = currentActingPlayer
         itemActions[0].style.display = 'block'
 
         // Disable the element if the condition is not match
         switch(clickedItem.useCondition.compare){
             case 'lower':
-                if(attributes[clickedItem.effect.target] >= attributes[clickedItem.useCondition.target]){
+                if(totalAttribute[clickedItem.effect.target] >= totalAttribute[clickedItem.useCondition.target]){
                     itemActions[0].style.pointerEvents = 'none'
                     itemActions[0].classList.add('button_disable')
                 }
             break;
             case 'equal':
-                if(attributes[clickedItem.effect.target] !== attributes[clickedItem.useCondition.target]){
+                if(totalAttribute[clickedItem.effect.target] !== totalAttribute[clickedItem.useCondition.target]){
                     itemActions[0].style.pointerEvents = 'none'
                     itemActions[0].classList.add('button_disable')
                 }
@@ -80,7 +80,7 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
     // Check item type
     if(clickedItem.type === 3 || clickedItem.type === 4){
         // If the item is a weapon or armor
-        const { equip, attributes } = currentActingPlayer
+        const { equip, totalAttribute } = currentActingPlayer
 
         const equipped = Object.values(equip).findIndex(e => e.id === clickedItem.id)
 
@@ -103,13 +103,13 @@ const openItemSubMenu = (currentActingPlayer, clickedItem) =>{
                     const itemData = (clickedItem.type === 3)? weapon.getOne(itemToChange.id) : armor.getOne(itemToChange.id)
 
                     if(itemData?.effect?.base_attribute[key]){
-                        attributeChanges = (attributes[key] - itemData.effect.base_attribute[key]) + clickedItem.effect.base_attribute[key] 
+                        attributeChanges = (totalAttribute[key] - itemData.effect.base_attribute[key]) + clickedItem.effect.base_attribute[key] 
                     }                    
                 }else{
-                    attributeChanges = attributes[key] + clickedItem.effect.base_attribute[key] 
+                    attributeChanges = totalAttribute[key] + clickedItem.effect.base_attribute[key] 
                 }
 
-                const attributeTag = `<div style="color:${(attributeChanges > currentActingPlayer.attributes[key])? 'green' : 'red'}">${key} ${attributeChanges}</div>`
+                const attributeTag = `<div style="color:${(attributeChanges > currentActingPlayer.totalAttribute[key])? 'green' : 'red'}">${key} ${attributeChanges}</div>`
 
                 desc.children[1].insertAdjacentHTML('beforeend', attributeTag)
             }else{
@@ -167,7 +167,9 @@ const equipItem = (currentActingPlayer, itemActions) => {
 
         // Apply equipment bonus
         for(let [key, value] of Object.entries(selectedItem.effect.base_attribute)){
-            currentActingPlayer.attributes[key] += selectedItem.effect.base_attribute[key]
+            const newValue = selectedItem.effect.base_attribute[key] + value
+            currentActingPlayer.totalAttribute[key] = newValue
+            currentActingPlayer.change_attribute[key] = newValue
         }  
 
         const { fontSize } = setting.general
@@ -195,7 +197,9 @@ const UnequipItem = (currentActingPlayer, itemActions) => {
 
         // Remove equipment bonus
         for(let [key, value] of Object.entries(selectedItem.effect.base_attribute)){
-            currentActingPlayer.attributes[key] -= selectedItem.effect.base_attribute[key]
+            const newValue = value - selectedItem.effect.base_attribute[key]
+            currentActingPlayer.totalAttribute[key] = newValue
+            currentActingPlayer.change_attribute[key] = newValue
         }  
 
         // Remove E tag
@@ -723,33 +727,43 @@ export const useItem = (currentActingPlayer) => {
 
     switch(effect.target){
         case 'status':
-            currentActingPlayer.attributes.status = 'Healthy'
-            resultMessage = 'RECOVER'
-            // TODO: Stop status timer?
+            // TODO - Get status data
+            if(effect.type === 2){
+                // Change target status ( debuff )
+                if(!currentActingPlayer.status.find(s => s.name === effect.status)){
+                    currentActingPlayer.status.push({ name: effect.status, turn: null })
+                    // resultMessage = effect.amount
+                }
+            }else{
+                const index = currentActingPlayer.status.findIndex(s => s.name === effect.status)
+                currentActingPlayer.status.splice(index, 1)
+                resultMessage = 'RECOVER'
+                // TODO: Stop status timer?
+            }
         break;
         case 'all':
-            currentActingPlayer.attributes.hp = currentActingPlayer.attributes.maxHp
-            currentActingPlayer.attributes.mp = currentActingPlayer.attributes.maxMp
+            currentActingPlayer.totalAttribute.hp = currentActingPlayer.totalAttribute.maxHp
+            currentActingPlayer.totalAttribute.mp = currentActingPlayer.totalAttribute.maxMp
 
-            resultMessage = `${currentActingPlayer.attributes.maxHp},${currentActingPlayer.attributes.maxMp},${currentActingPlayer.attributes.maxAp},${RECOVER}`
+            resultMessage = `${currentActingPlayer.totalAttribute.maxHp},${currentActingPlayer.totalAttribute.maxMp},${currentActingPlayer.totalAttribute.maxAp},${RECOVER}`
         break;
         default:
             if(effect.type === 0){
                 // Play sound effect
                 game.potionSound.element.play()
 
-                currentActingPlayer.attributes[`${effect.target}`] += effect.amount
+                currentActingPlayer.totalAttribute[`${effect.target}`] += effect.amount
 
                 resultMessage = String(effect.amount)
             }else{
                 let effect = ''
                 if(effect.target === 'hp'){
-                    effect = Math.floor(currentActingPlayer.attributes.maxHp * (effect.amount / 100))
+                    effect = Math.floor(currentActingPlayer.totalAttribute.maxHp * (effect.amount / 100))
                 }else{
-                    effect = Math.floor(currentActingPlayer.attributes.maxMp * (effect.amount / 100))
+                    effect = Math.floor(currentActingPlayer.totalAttribute.maxMp * (effect.amount / 100))
                 }
 
-                currentActingPlayer.attributes[`${effect.target}`] += effect                  
+                currentActingPlayer.totalAttribute[`${effect.target}`] += effect                  
 
                 resultMessage = String(effect)
             }
