@@ -43,6 +43,26 @@ export default class Character {
             cure: [],
             damage: []
         };
+        // Combine the two for display
+        this.base_attribute = {}
+        this.change_attribute = {
+            hp: 0, 
+            mp: 0, 
+            maxHp: 0, 
+            maxMp: 0, 
+            str: 0, 
+            def: 0, 
+            int: 0,
+            spd: 0, 
+            spi: 0,
+            ap: 0,
+            lck: 0,
+            maxAp: 0,
+            moveSpeed: 0,
+            sight: 0
+        },
+        this.totalAttribute = {}
+        this.status = []
         this.ready = false;
         this.frameTimer = 0;
         this.colorFrame = 0;
@@ -99,7 +119,7 @@ export default class Character {
         }
 
         // If the character is dead
-        if(this?.attributes?.hp <= 0){
+        if(this.totalAttribute.hp <= 0){
             if(!this.isMoving){
                 this.isMoving = true
             }
@@ -366,10 +386,10 @@ export default class Character {
                     this.lv = 1
                     this.class = job.name
                     this.class_id = attributes.class
-                    this.attributes = {
-                        ...job.base_attribute,
-                        status: [{ name: 'Focus', turn: 2 }]
-                    }     
+                    this.base_attribute = {
+                        ...job.base_attribute
+                    },
+                    this.status = [{ name: 'Focus', turn: 2 }]
                     this.prefer_attributes = job.prefer_attributes
                     this.#loadImage(type, job.id)     
 
@@ -396,8 +416,10 @@ export default class Character {
                     this.lv = save.lv
                     this.class = save.class
                     this.class_id = save.class
-                    this.attributes = JSON.parse(JSON.stringify(save.attributes))
+                    this.base_attribute = JSON.parse(JSON.stringify(save.base_attribute))
+                    this.change_attribute = JSON.parse(JSON.stringify(save.change_attribute))
                     this.prefer_attributes = save.prefer_attributes
+                    this.status = JSON.parse(JSON.stringify(save.status))
                     this.#loadImage(type, save.id)
                     this.exp = save.exp
                     this.pt = save.pt
@@ -406,6 +428,10 @@ export default class Character {
                     this.skill = save.skill
                     this.bagLimit = save.bagLimit
                     this.equip = JSON.parse(JSON.stringify(save.equip))
+                }
+
+                for(let [key, value] in Object.entries(this.base_attribute)){
+                    this.totalAttribute[key] = this.change_attribute[key] + value
                 }
                 
                 const equipment = this.bag.filter(b => b.type === 3 || b.type === 4)
@@ -418,7 +444,9 @@ export default class Character {
                     }
                     // Change attribute value
                     for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                        this.attributes[key] += itemData.effect.base_attribute[key]
+                        const newVal = itemData.effect.base_attribute[key] + val
+                        this.totalAttribute[key] = newVal
+                        this.change_attribute[key] = newVal
                     }
                 }
             }
@@ -435,8 +463,7 @@ export default class Character {
                         this.class = job.name
                         this.class_id = attributes.class
                         this.attributes = {
-                            ...job.base_attribute,
-                            status: []
+                            ...job.base_attribute
                         }     
                         this.prefer_attributes = job.prefer_attributes
                         this.#loadImage(type, job.id)     
@@ -463,7 +490,9 @@ export default class Character {
                     this.lv = save.lv
                     this.class = save.class
                     this.class_id = save.class_id
-                    this.attributes = JSON.parse(JSON.stringify(save.attributes))
+                    this.base_attribute = JSON.parse(JSON.stringify(save.base_attribute))
+                    this.change_attribute = JSON.parse(JSON.stringify(save.change_attribute))
+                    this.status = JSON.parse(JSON.stringify(save.status))
                     this.prefer_attributes = save.prefer_attributes
                     this.#loadImage(type, save.id)
                     this.givenExp = (job.base_attribute.hp * job.base_attribute.mp) / 2
@@ -472,6 +501,10 @@ export default class Character {
                     this.equip = JSON.parse(JSON.stringify(save.equip))
                     this.prefer_skill_type = save.prefer_skill_type
                     this.prefer_action = save.prefer_action
+                }
+
+                for(let [key, value] in Object.entries(this.base_attribute)){
+                    this.totalAttribute[key] = this.change_attribute[key] + value
                 }
             }
             break
@@ -570,8 +603,8 @@ export default class Character {
      * @param {string} status - The name of the status 
      */
     removeStatus = (status) => {
-        const index = this.attributes.status.findIndex(s => s.name === status)
+        const index = this.status.findIndex(s => s.name === status)
 
-        this.attributes.status.splice(index, 1)
+        this.status.splice(index, 1)
     }
 }
