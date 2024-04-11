@@ -11,6 +11,7 @@ export default class TileMa {
         this.map = levelData.map;
         this.event = levelData.event;
         this.enemy = levelData.enemy;
+        this.player = levelData.player;
         this.assets = this.#loadAssetImage(levelData.assets);
         this.objective = levelData.objective;
         this.ready = false;
