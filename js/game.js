@@ -497,11 +497,6 @@ class Game{
                         case 4:
                             itemData = armor.getOne(effect[j].value)
                         break;
-                    } 
-
-                    target.equip[itemData.position] = {
-                        id: itemData.id,
-                        name: itemData.name
                     }
                     
                     target.bag.push({
@@ -511,10 +506,7 @@ class Game{
                     })
 
                     // Change attribute value
-                    for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                        target.totalAttribute[key] += val
-                        target.change_attribute[key] += val
-                    }
+                    target.equipItem(itemData)
                 }
                 break;
                 case 'status':

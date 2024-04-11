@@ -163,14 +163,9 @@ const setItemSpace = async(currentActingPlayer, enemyPosition, tileMap) => {
  */
 const equipItem = (currentActingPlayer, itemActions) => {
     if(Object.entries(selectedItem).length){
-        currentActingPlayer.equip[selectedItem.position] = { id: selectedItem.id, name: selectedItem.name }
-
-        // Apply equipment bonus
-        for(let [key, value] of Object.entries(selectedItem.effect.base_attribute)){
-            currentActingPlayer.totalAttribute[key] += value
-            currentActingPlayer.change_attribute[key] += value
-        }  
-
+        // Assign the slot then apply equipment bonus
+        currentActingPlayer.equipItem(selectedItem
+        )
         const { fontSize } = setting.general
 
         // Create E tag
@@ -191,14 +186,8 @@ const equipItem = (currentActingPlayer, itemActions) => {
  */
 const UnequipItem = (currentActingPlayer, itemActions) => {
     if(Object.entries(selectedItem).length){
-        // clear slot
-        currentActingPlayer.equip[selectedItem.position] = { }
-
-        // Remove equipment bonus
-        for(let [key, value] of Object.entries(selectedItem.effect.base_attribute)){
-            currentActingPlayer.totalAttribute[key] -= value
-            currentActingPlayer.change_attribute[key] -= value
-        }  
+        // clear slot then remove equipment bonus
+        currentActingPlayer.unEquipItem(selectedItem)
 
         // Remove E tag
         document.querySelectorAll('.item')[selectedItem.index].children[0].remove()
