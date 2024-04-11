@@ -58,26 +58,28 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
         // remove the enhanced status
         enemy.removeStatus('Evade')
     }else{
-        switch(true){
-            case player.totalAttribute.status.findIndex(s => s.name === 'Hit') >= 0:
-                hitRate = 100
-                evadeRate = 0
+        if(player.status.length){
+            switch(true){
+                case player.status.findIndex(s => s.name === 'Hit') >= 0:
+                    hitRate = 100
+                    evadeRate = 0
 
-                // remove the enhancd status
-                player.removeStatus('Hit')
-            break;
-            case player.totalAttribute.status.findIndex(s => s.name === 'Focus') >= 0:
-                hitRate += Math.floor(hitRate * 0.3)
-                evadeRate -= Math.floor(evadeRate * 0.3 )
+                    // remove the enhancd status
+                    player.removeStatus('Hit')
+                break;
+                case player.status.findIndex(s => s.name === 'Focus') >= 0:
+                    hitRate += Math.floor(hitRate * 0.3)
+                    evadeRate -= Math.floor(evadeRate * 0.3 )
 
-                // focus will last a whole turn
-            break;
-            case enemy.totalAttribute.status.findIndex(s => s.name === 'Focus') >= 0:
-                hitRate -= Math.floor(hitRate * 0.3)
-                evadeRate += Math.floor(evadeRate * 0.3 )
+                    // focus will last a whole turn
+                break;
+                case enemy.status.findIndex(s => s.name === 'Focus') >= 0:
+                    hitRate -= Math.floor(hitRate * 0.3)
+                    evadeRate += Math.floor(evadeRate * 0.3 )
 
-                // focus will last a whole turn
-            break;
+                    // focus will last a whole turn
+                break;
+            }            
         }
     }
 
@@ -93,7 +95,7 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
 
     if(firstDiceRoll.name === 'hitRate'){
         // Check if crit
-        if(player.totalAttribute.status.find(s => s.name ==='crit')){
+        if(player.status.find(s => s.name ==='crit')){
             critRate = 100
             hitRate = 0
 
@@ -171,7 +173,7 @@ const calculateHitRate = async(player, enemy, damage, status = null) => {
 
 // Calculate enemy defense value
 const calculateEnemyDefense = (enemy, type) => {
-    const attribute = (type === 'dmg')? "def" : "spi"
+    const attribute = (type === 'damage')? "def" : "spi"
 
     let defense = 0
 
@@ -251,10 +253,10 @@ export const weaponAttack = async(player, enemy) => {
     if(player.equip?.hand?.id !== undefined){
         const itemData = weapon.getOne(player.equip.hand.id)
 
-        const enemyDefense = calculateEnemyDefense(enemy, (itemData.effect.base_attribute === 'str')? 'damage' : 'magic')
+        const enemyDefense = calculateEnemyDefense(enemy, (itemData.effect.base_attribute.str)? 'damage' : 'magic')
         console.log('enemy defense :>>>', enemyDefense)
 
-        const attr = (itemData.effect.base_attribute === 'str')? "str" : "int"
+        const attr = (itemData.effect.base_attribute.str)? "str" : "int"
 
         // Need something to know if the attck is enhanced by skill or not
         let minDmg = ((player.totalAttribute[attr] + Math.floor(player.totalAttribute[attr] * ( itemData.effect.base_attribute[attr]/100 ))) - enemyDefense) + itemData.effect.base_damage.min
