@@ -9,7 +9,8 @@ export default{
                 "lv": 1,
                 "type": 2,
                 "target": "status",
-                "amount": "Poison",
+                "status": "Poison",
+                "amount": 5,
                 "rate": 70,
                 "desc": "Please don't eat it."
             }
