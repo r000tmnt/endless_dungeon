@@ -150,6 +150,10 @@ export default class TextBox{
                         event.stopPropagation()
                         this.action = action
                         let optionExist = false
+                        // Clear text in the box
+                        textBox.innerHTML = ''
+                        // Stop animation
+                        clearInterval(this.dialogueAnimation)  
 
                         for(let i=this.sceneCounter; i < this.event.length; i++){
                             if(optionExist) break
@@ -158,10 +162,7 @@ export default class TextBox{
                                 optionExist = this.#checkIfOptionExist(this.event[i].dialogue[j])
 
                                 // If option found
-                                if(optionExist){
-                                    // Clear text in the box
-                                    textBox.innerHTML = ''
-                                    
+                                if(optionExist){        
                                     // Update counters
                                     this.textCounter = 0
                                     this.sceneCounter = i
@@ -180,8 +181,6 @@ export default class TextBox{
                         
                         // Skip the whole conversation if there are no options found
                         if(!optionExist){
-                            // Stop animation
-                            clearInterval(this.dialogueAnimation)  
                             this.dialogueCounter = 0;
                             this.textCounter = 0;
                             this.sceneCounter = 0
