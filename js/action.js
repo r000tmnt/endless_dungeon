@@ -265,8 +265,8 @@ export default class Action{
                     tableNode[i].innerText = `${inspectingCharacter.exp? inspectingCharacter.exp : 0 } / ${inspectingCharacter.requiredExp? inspectingCharacter.requiredExp : 0}`
                 break;
                 case 'status':
-                    if(inspectingCharacter.totalAttribute.status.length){
-                        inspectingCharacter.totalAttribute.status.map(s => {
+                    if(inspectingCharacter.status.length){
+                        inspectingCharacter.status.map(s => {
                             tableNode[i].innerHTML += `${s.name} `
                         })
                     }else{
