@@ -450,15 +450,9 @@ export default class Character {
                 // Assign the attributes to the object
                 for(let i=0, e = equipment.length; i < e; i++){
                     const itemData = equipment[i].type === 3? weapon.getOne(equipment[i].id) : armor.getOne(equipment[i].id)
-                    this.equip[itemData.position] = { 
-                        id: itemData.id,
-                        name: itemData.name
-                    }
+                    
                     // Change attribute value
-                    for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
-                        this.totalAttribute[key] += val 
-                        this.change_attribute[key] += val
-                    }
+                    this.equipItem(itemData)
                 }
             }
             break    
@@ -519,6 +513,27 @@ export default class Character {
                 }
             }
             break
+        }
+    }
+
+    equipItem(itemData){
+        this.equip[itemData.position] = { 
+            id: itemData.id,
+            name: itemData.name
+        }
+
+        for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
+            this.totalAttribute[key] += val 
+            this.change_attribute[key] += val
+        }
+    }
+
+    unEquipItem(itemData){
+        this.equip[itemData.position] = {}
+
+        for(let [key, val] of Object.entries(itemData.effect.base_attribute)){
+            this.totalAttribute[key] -= val 
+            this.change_attribute[key] -= val
         }
     }
 
