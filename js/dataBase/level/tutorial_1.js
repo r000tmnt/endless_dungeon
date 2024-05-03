@@ -38,7 +38,7 @@ export default {
     "event": [
         // Before battle phase
         {
-            "position": [],
+            "position": {},
             "item": [],
             "scene": [
                 {
@@ -234,7 +234,7 @@ export default {
         },
         // After battle phase
         {
-            "position": [],
+            "position": {},
             "item": [],
             "scene": [
                 {
