@@ -6,7 +6,6 @@ export default{
             "stackLimit": 99,
             "type": 6,
             "effect":{
-                "lv": 1,
                 "rare": "N",
                 "enemy_number": 3,
                 "elite_rate": 50,

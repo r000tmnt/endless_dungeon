@@ -6,7 +6,6 @@ export default{
             "type": 0,
             "stackLimit": 99,
             "effect":{
-                "lv": 1,
                 "rare": "N",
                 "type": 0,
                 "range": 1,
@@ -27,7 +26,6 @@ export default{
             "type": 0,
             "stackLimit": 99,
             "effect":{
-                "lv": 1,
                 "rare": "N",
                 "type": 0,
                 "range": 1,
@@ -48,7 +46,6 @@ export default{
             "type": 0,
             "stackLimit": 99,
             "effect":{
-                "lv": 1,
                 "rare": "N",
                 "type": 0,
                 "range": 1,
@@ -69,7 +66,6 @@ export default{
             "type": 0,
             "stackLimit": 99,
             "effect":{
-                "lv": 1,
                 "rare": "N",
                 "type": 1,
                 "range": 1,

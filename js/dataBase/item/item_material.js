@@ -6,8 +6,8 @@ export default{
             "stackLimit": 10,
             "type": 2,
             "effect": {
-                "lv": 1,
                 "type": 2,
+                "rare": "N",
                 "target": "status",
                 "status": "Poison",
                 "amount": 5,
