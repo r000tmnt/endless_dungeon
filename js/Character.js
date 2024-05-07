@@ -417,7 +417,7 @@ export default class Character {
                         body: {},
                         hand: {},
                         leg: {},
-                        foot: {},
+                        feet: {},
                         accessory: {}
                     }
                 }else{
@@ -478,7 +478,7 @@ export default class Character {
                             body: {},
                             hand: {},
                             leg: {},
-                            foot: {},
+                            feet: {},
                             accessory: {}
                         }
                         // If the character is an enemy, set the given exp for player to gain
