@@ -2,31 +2,39 @@ export default{
     data: [
         {
             "type": 0,
-            "category": "sword"
+            "category": "none"
         },
         {
             "type": 1,
-            "category": "kneif"
+            "category": "sword"
         },
         {
             "type": 2,
-            "category": "wand"
+            "category": "kneif"
         },
         {
             "type": 3,
-            "category": "staff"
+            "category": "wand"
         },
         {
             "type": 4,
-            "category": "axe"
+            "category": "staff"
         },
         {
             "type": 5,
-            "category": "bow"
+            "category": "axe"
         },
         {
             "type": 6,
+            "category": "bow"
+        },
+        {
+            "type": 7,
             "category": "gun"
+        },
+        {
+            "type": 8,
+            "category": "status"
         }
     ],
 
