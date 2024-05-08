@@ -10,10 +10,10 @@ export default [
         },
         "animation": "attack",
         "effect": {
-            "type": "status",
+            "type": 2,
             "range": 1,
             "base_on_attribute": "luk",
-            "multiply_as": "solid",
+            "multiply_as": 1,
             "base_number": 3,
             "status": "Poison",
             "desc": "Bite into the skin. Cause the foe to get poisoned."
@@ -30,10 +30,10 @@ export default [
         },
         "animation": "enchant",
         "effect": {
-            "type": "status",
+            "type": 3,
             "range": 0, // Apply on the player itself
             "base_on_attribute": "none",
-            "multiply_as": "percentage",
+            "multiply_as": 2,
             "base_number": 3,
             "status": "Focus",
             "desc": "Enhance the hit rate and evade rate by 30% on oneself"
@@ -50,10 +50,10 @@ export default [
         },
         "animation": "enchant",
         "effect": {
-            "type": "status",
+            "type": 3,
             "range": 1,
             "base_on_attribute": "none",
-            "multiply_as": "percentage",
+            "multiply_as": 2,
             "base_number": 3,
             "status": "Focus",
             "desc": "Enhance the hit rate and evade rate by 30% to the target."

@@ -2,8 +2,7 @@ export default [
     {
         "id": "sword_slash_1",
         "name": "Slash",
-        "weapon": "sword",
-        "type": "offense",
+        "type": 0, // skill weapon type
         "cost": {
             "attribute": "mp",
             "value": 3
@@ -11,10 +10,10 @@ export default [
         "animation": "slash",
         "effect":
         {
-            "type": "dmg",
+            "type": 2, // offence or defence
             "range": 1,
             "base_on_attribute": "str",
-            "multiply_as": "solid",
+            "multiply_as": 0, // solid or percentage
             "base_number": 10,
             "desc": "A quick and powerful strike with sword"
         }
