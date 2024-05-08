@@ -1,6 +1,6 @@
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
 import { skillAttack, weaponAttack, gainExp } from './utils/battle.js';
-import skills from './dataBase/skills.js';
+import skills from './dataBase/skill/skills.js';
 import setting from './utils/setting.js';
 import { resizeHiddenElement } from './utils/ui.js'
 import { useItem } from './utils/inventory.js'
