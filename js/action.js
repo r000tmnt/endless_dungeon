@@ -1,6 +1,7 @@
 import { prepareDirections, getDistance, getAvailableSpace } from './utils/pathFinding.js';
 import { skillAttack, weaponAttack, gainExp } from './utils/battle.js';
 import skills from './dataBase/skill/skills.js';
+import skill_type from './dataBase/skill/skill_type.js';
 import setting from './utils/setting.js';
 import { resizeHiddenElement } from './utils/ui.js'
 import { useItem } from './utils/inventory.js'
@@ -80,6 +81,7 @@ export default class Action{
     // TODO: Skill menu
     setSKillWindow(currentActingPlayer, tileMap, playerPosition, fontSize, fontSize_md, fontSize_sm){
         const skillWindow = document.getElementById('skill')
+        const skillTypes = skill_type.getAll()
         const title = skillWindow.children[0]
         const skillList = document.querySelector('.learned-skills')
         const { itemBlockSize } = setting.inventory
@@ -123,8 +125,8 @@ export default class Action{
 
             // If the required resource is enough and equip with the weapon that the skill needs
             if(currentActingPlayer.totalAttribute[skillData.cost.attribute] >= skillData.cost.value && 
-               currentActingPlayer.equip.hand?.id.includes(skillData.weapon) ||
-               skill.weapon === 'none'
+               currentActingPlayer.equip.hand?.id.includes(skillTypes[skillData.type]) ||
+               skillTypes[skillData.type] === 'none' || skillTypes[skillData.type] === 'status'
             ){
                 skill.addEventListener('click', async() => {
                     // Keep the skill

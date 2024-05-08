@@ -207,7 +207,8 @@ const calculatePossibleDamage = (player, enemyDefense, base_on_attribute, base_n
         // Need something to know if the attck is enhanced by skill or not
         let minDmg = ((attribute + Math.floor(attribute * ( itemData.effect.base_attribute[base_on_attribute]/100 ))) - enemyDefense ) + itemData.effect.base_damage.min
 
-        if(multiply_as === 'solid'){
+        // If multiplay as solid
+        if(multiply_as === 0){
             minDmg += base_number
         }else{
             minDmg += Math.floor(minDmg * (base_number / 100))
@@ -300,7 +301,8 @@ export const skillAttack = async(skill, player, enemy) => {
 
     const { base_on_attribute, multiply_as, base_number, type } = skill.effect
 
-    if(skill.type === 'offence'){
+    // If skill is use for offence perpose
+    if(skill.type === 2){
         switch(type){
             case 'dmg': case 'magic':{
                 const enemyDefense = calculateEnemyDefense(enemy, skill.type)
