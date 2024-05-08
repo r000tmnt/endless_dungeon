@@ -1,7 +1,7 @@
 export default{
     data: [
         {
-            "id": "key_dark_1",
+            "id": "key_silence_1",
             "name": "Key of silence",
             "stackLimit": 99,
             "type": 6,

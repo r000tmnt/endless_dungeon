@@ -41,7 +41,7 @@ export default{
             "suffix": []
         },
         {
-            "id": "potion_antidote",
+            "id": "potion_status_1",
             "name": "Antidote",
             "type": 0,
             "stackLimit": 99,
@@ -61,7 +61,7 @@ export default{
             "suffix": []
         },
         {
-            "id": "potion_revive",
+            "id": "potion_revive_1",
             "name": "Candle od soul",
             "type": 0,
             "stackLimit": 99,

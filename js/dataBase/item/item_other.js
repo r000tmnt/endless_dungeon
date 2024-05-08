@@ -1,7 +1,7 @@
 export default{
     data: [
         {
-            "id": "currency_1",
+            "id": "other_currency_1",
             "name": "Gold coin",
             "stackLimit": 5000,
             "type": 1,

@@ -6,7 +6,7 @@ export default{
         },
         {
             "type": 1,
-            "category": "currency"
+            "category": "other"
         },
         {
             "type": 2,
