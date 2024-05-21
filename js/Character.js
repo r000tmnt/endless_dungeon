@@ -1,6 +1,6 @@
 import game from './game.js'
 import classes from './dataBase/class.js'
-import mob from './dataBase/mobs.js'
+import mob from './dataBase/mob.js'
 import weapon from './dataBase/item/item_weapon.js'
 import armor from './dataBase/item/item_armor.js'
 import potion from './dataBase/item/item_potion.js'
