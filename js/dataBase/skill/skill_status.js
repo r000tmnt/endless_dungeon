@@ -2,7 +2,6 @@ export default [
     {
         "id": "status_poison_1",
         "name": "Poison bite",
-        "weapon": "none",
         "type": 8,
         "cost": {
             "attribute": "mp",
@@ -23,7 +22,6 @@ export default [
     {
         "id": "status_focus_1",
         "name": "Focus",
-        "weapon": "none",
         "type": 8,
         "cost": {
             "attribute": "mp",
@@ -34,7 +32,7 @@ export default [
             "type": 1,
             "range": 0, // Apply on the player itself
             "base_on_attribute": "none",
-            "multiply_as": 2,
+            "multiply_as": 1,
             "base_number": 3,
             "status": "Focus",
             "turn": 1,
@@ -45,7 +43,6 @@ export default [
         "id": "status_focus_2",
         "name": "Clarity",
         "weapon": "none",
-        "type": 8,
         "cost": {
             "attribute": "mp",
             "value": 5
