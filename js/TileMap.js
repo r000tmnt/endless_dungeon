@@ -2,7 +2,7 @@ import { getItemType } from './utils/inventory.js'
 // import level from "./dataBase/level.js";
 
 // class - 物件創建的模板
-export default class TileMa {
+export default class TileMap {
     //付值給實體的物件
     constructor(tileSize, levelData){
         this.id = levelData.id;
