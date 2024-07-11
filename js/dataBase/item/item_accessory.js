@@ -1,15 +1,5 @@
 export default {
-                data: [
-    {
-        "id": "other_currency_1",
-        "name": "Gold coin",
-        "stackLimit": 5000,
-        "type": 1,
-        "effect": {
-            "desc": "The coin to exchange something."
-        }
-    }
-],
+                data: [],
 
                 getAll(){
                     return this.data

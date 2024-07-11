@@ -1,29 +1,30 @@
-export default{
-    data: [
-        {
-            "id": "key_silence_1",
-            "name": "Key of silence",
-            "stackLimit": 99,
-            "type": 6,
-            "effect":{
-                "rare": "N",
-                "enemy_number": 3,
-                "elite_rate": 50,
-                "item_drop_modify": "",
-                "desc": "There will be less enemy in the field"
-            }
+export default {
+                data: [
+    {
+        "id": "key_silence_1",
+        "name": "Key of silence",
+        "stackLimit": 99,
+        "type": 6,
+        "effect":{
+            "rare": "N",
+            "enemy_number": 3,
+            "elite_rate": 50,
+            "item_drop_modify": "",
+            "desc": "There will be less enemy in the field"
         }
-    ],
-
-    getAll(){
-        return this.data
-    },
-
-    getOne(id){
-        return this.data.find(k => k.id === id)
-    },
-
-    search(keyWord){
-        return this.data.filter(k => k.name.includes(keyWord))
     }
-}
+],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(a => a.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(a => a.name.includes(keyWord))
+                }
+            }
+            

@@ -1,0 +1,1 @@
+export default [{"id":"kneif_burning_1","name":"Burning edge","type":2,"cost":{"attribute":"mp","value":"5"},"effect":{"type":0,"range":1,"base_on_attribute":"int","multiplay_as":0,"base_number":0,"desc":"Heat up the edge of the kneif and strike."}}]

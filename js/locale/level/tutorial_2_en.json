@@ -1,0 +1,48 @@
+{
+  "title": "The corridor",
+  "dialogue_1": "A corridor.\nIt seems so out of place from where you've been moments ago.",
+  "dialogue_2": "The key shatter to dust once you across the door.\nThankfully, there are torches hanging on the wall for you to see.",
+  "dialogue_3": "You heard a knocking sound from the distance not far way and see a moving shadow.\nWith cautious, you process the road ahead.",
+  "dialogue_4": "test",
+  "option_1": { "value": "test option", "response": ["not a real thing"] },
+  "dialogue_5": "Still testing",
+  "dialogue_6": "hello there",
+  "dialogue_7": "Hey you! You're not the monster right?\nHave you find a small key? Mine got stolen by those creatures.\nThe voice came from the door near where you standing.",
+  "option_2": {
+    "value": "Open the door",
+    "response": [
+      "You see a man with a bow on his hand. He seems relief from the fact that he is free from the dusty room he's been stuck with.",
+      "Thanks. I thought you'll run away and I'm going to stay like this forever.\nThe name is... by the way.",
+      "Do you got more keys in your bag would you?\n{archer_name} saying it like it is urgent.",
+      "You explain to him what happened in the cave and you stumble your way here."
+    ]
+  },
+  "option_3": {
+    "value": "Walk away quietly",
+    "response": [
+      "Wait. Come back! You...\nYou don't seems to mind the fact that voice sound desperate and keep finding your way out."
+    ]
+  },
+  "dialogue_8": "Something is broken. A man bust out the door you passed by not long ago. It is clear that his angry at you.",
+  "dialogue_9": "You see a man holding a bow and he is ready to fire an arrow.",
+  "option_4": {
+    "value": "Oh Fuc...!",
+    "response": [
+      "You pull out the knife just in time to block the arrow.\nStill, the sharp surface scratched your skin."
+    ]
+  },
+  "option_5": {
+    "value": "Keep running",
+    "response": [
+      "You pick up the pace. Running like your life depends on it.",
+      "You bastard. You left me to die!\nThe man yelling at you. No matter what you said to explain the situation. It seems a fight is inevitable."
+    ]
+  },
+  "dialogue_10": "Alright alright. You win, just take the money.",
+  "dialogue_11": "The man sitting on ground. Waiting for you to take the prize.",
+  "dialogue_12": "What are you looking at? Didn't you lock me in the room so you can force me to handle the money?",
+  "dialogue_13": "That sounds rough. I thought you were try to kill me. Sorry about that.",
+  "dialogue_14": "The village is not far from here. I can take you there if you want.",
+  "dialogue_15": "The man offering you a guide. From the situation you have, it seems to be reasonable choice to take the offer.",
+  "dialogue_16": "Let's go get ourselves a key and leave."
+}

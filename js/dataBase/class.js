@@ -1,19 +1,461 @@
 import class_fighter from "./class/class_fighter"
 
-export default {
-    data: [
-        ...class_fighter
-    ],
+                export default {
+                    data: [
+                        ...class_fighter,
 
-    getAll(){
-        return this.data
-    },
+                    ],
 
-    getOne(id){
-        return this.data.find(c => c.id === id)
-    },
+                getAll(){
+                    return this.data
+                },
 
-    search(keyWord){
-        return this.data.filter(c => c.name.includes(keyWord))
-    }
-}
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            import class_fighter from "./class/class_fighter"
+
+                export default {
+                    data: [
+                        ...class_fighter,
+
+                    ],
+
+                getAll(){
+                    return this.data
+                },
+
+                getOne(id){
+                    return this.data.find(c => c.id === id)
+                },
+
+                search(keyWord){
+                    return this.data.filter(c => c.name.includes(keyWord))
+                }
+            }
+            

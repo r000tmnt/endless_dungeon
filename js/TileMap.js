@@ -9,6 +9,7 @@ export default class TileMap {
         this.name = levelData.name;
         this.tileSize = tileSize;
         this.map = levelData.map;
+        this.depth = levelData.depth
         this.event = levelData.event;
         this.enemy = levelData.enemy;
         this.player = levelData.player;

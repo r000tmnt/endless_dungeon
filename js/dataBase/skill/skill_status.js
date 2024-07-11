@@ -15,7 +15,6 @@ export default [
             "multiply_as": 1,
             "base_number": 3,
             "status": "Poison",
-            "turn": 3, // How long will the effect lasting
             "desc": "Bite into the skin. Cause the foe to get poisoned."
         }
     },
@@ -30,19 +29,18 @@ export default [
         "animation": "enchant",
         "effect": {
             "type": 1,
-            "range": 0, // Apply on the player itself
+            "range": 0,
             "base_on_attribute": "none",
             "multiply_as": 1,
             "base_number": 3,
             "status": "Focus",
-            "turn": 1,
             "desc": "Enhance the hit rate and evade rate by 30% on oneself"
         }
     },
     {
         "id": "status_focus_2",
         "name": "Clarity",
-        "weapon": "none",
+        "type": 8,
         "cost": {
             "attribute": "mp",
             "value": 5
@@ -52,10 +50,9 @@ export default [
             "type": 1,
             "range": 1,
             "base_on_attribute": "none",
-            "multiply_as": 2,
+            "multiply_as": 1,
             "base_number": 3,
             "status": "Focus",
-            "turn": 1,
             "desc": "Enhance the hit rate and evade rate by 30% to the target."
         }
     }

@@ -1,0 +1,14 @@
+{
+    "status_focus_1": {
+        "name": "Focus",
+        "desc": "Enhance the hit rate and evade rate by 30% on oneself."
+    },
+    "status_focus_2": {
+        "name": "Clarity",
+        "desc": "Enhance the hit rate and evade rate by 30% to the target."
+    },
+    "status_poison_1": {
+        "name": "Poison bite",
+        "desc": "Bite into the skin. Cause the foe to get poisoned."
+    }
+}
