@@ -1,4 +1,4 @@
-import tile from "../dataBase/tile"
+// import tile from "../dataBase/tile"
 
 /**
  * Get the distance between point A and point B
@@ -174,10 +174,11 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
 
                 console.log(`checking tile map row:${inspectRow} col:${inspectCol} :>>>`, tileMap.map[inspectRow][inspectCol])
 
-                const walkable = tile.getOne(tileMap.map[inspectRow][inspectCol])
+                // const walkable = tile.getOne(tileMap.map[inspectRow][inspectCol])
+                const walkable = tileMap.depth[inspectRow][inspectCol][0]
 
                 // Check if the block is walkable
-                if(walkable && !onTheSameBlock){
+                if(walkable === 0 && !onTheSameBlock){
                     availableSpace[availableSpace.length - 1].push([inspectRow, inspectCol])
                 }
             }else{
