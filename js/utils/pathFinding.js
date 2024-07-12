@@ -44,22 +44,22 @@ export const getDirections = (tileMap, x, y, target) => {
     const reachableDirections = []
 
     // TOP
-    if(tile.getOne(tileMap.map[y - 1][x])){
+    if(tileMap.depth[y - 1][x][0]){
         reachableDirections.push({ cost: getDistance(x, y-1, target), x, y: y-1 })
     }
 
     // DOWN
-    if(tile.getOne(tileMap.map[y + 1][x])){
+    if(tileMap.depth[y + 1][x][0]){
         reachableDirections.push({ cost: getDistance(x, y+1, target), x, y: y+1 })
     }  
 
     // LEFT
-    if(tile.getOne(tileMap.map[y][x - 1])){
+    if(tileMap.map[y][x - 1][0]){
         reachableDirections.push({ cost: getDistance(x-1, y, target), x: x-1, y })
     }
 
     //RIGHT
-    if(tile.getOne(tileMap.map[y][x + 1])){
+    if(tileMap.map[y][x + 1][0]){
         reachableDirections.push({ cost: getDistance(x+1, y, target), x: x+1, y })
     }
 
@@ -178,7 +178,7 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
                 const walkable = tileMap.depth[inspectRow][inspectCol][0]
 
                 // Check if the block is walkable
-                if(walkable === 0 && !onTheSameBlock){
+                if(walkable && !onTheSameBlock){
                     availableSpace[availableSpace.length - 1].push([inspectRow, inspectCol])
                 }
             }else{
@@ -220,7 +220,7 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
 
                 let onTheSameBlock = (enemyPosition !== null)? enemyPosition.findIndex(e => e.row === inspectRow && e.col === inspectCol) >= 0 : false
 
-                const walkable = tile.getOne(tileMap.map[inspectRow][inspectCol])
+                const walkable = tileMap.depth[inspectRow][inspectCol][0]
                 
                 // Check if the block is walkable
                 if(walkable && !onTheSameBlock){
