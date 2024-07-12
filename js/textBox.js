@@ -424,6 +424,14 @@ export default class TextBox{
             
         if(this.action === 'skip'){
             console.log('skipping conversation')
+
+            // Skip option response if needed
+            if(this.optionSelected >= 0){
+                this.optionSelected = -1
+                this.optionResponse = 0
+                this.dialogueCounter += 1
+            }
+
             dialogueControl.children[0].click()
         }else{
             const optionExist = this.#checkIfOptionExist(message)
