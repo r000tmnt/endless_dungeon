@@ -499,7 +499,7 @@ export default class Action{
                             game.tileMap.setEventOnTile({x: enemy.x, y: enemy.y}, [
                                 {
                                     amount: 1,
-                                    id: "key_dark_1",
+                                    id: "key_silence_1",
                                     type: 6
                                 }
                             ])
