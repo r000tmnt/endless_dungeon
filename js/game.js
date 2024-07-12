@@ -65,10 +65,11 @@ class Game{
         this.enemy = [];
         this.enemyPosition = [];
         this.inspectingCharacter = null;
+        this.selectedOption = [];
         this.eventEffect = []; // What effect will take when move into battle phase
         this.stash = []; // A shared stash
         this.stashLimit = 1000;
-        this.stepOnEvent = {}; // The event waiting to be trigger
+        this.eventsToTrigger = []; // Event waiting to be trigger
 
         // Canvas mouse down event
         this.canvasEvent = async(event) => {
@@ -234,7 +235,7 @@ class Game{
                     if(this.textBox !== null){
                         this.textBox.event = this.level.event[0].scene
                     }else{
-                        // Defined textBox object and event for the first load
+                        // Defined textBox object and the event for the first load
                         this.textBox = new TextBox(this.level.event[0].scene)
                         this.textBox.setConversationEvent(cameraWidth, cameraHeight, fontSize_md)
                     }
@@ -576,7 +577,7 @@ class Game{
             dropItems.push(
                 {
                     amount: 1,
-                    id: "key_dark_1",
+                    id: "key_silence_1",
                     rate: 0.45454545454545453,
                     type: 6
                 }
@@ -588,13 +589,13 @@ class Game{
 
     // Check if the tile has an event
     checkIfStepOnTheEvent = async(x, y) => {
-        const event = this.tileMap.getEventOnTile({x, y})
+        const event = this.tileMap.getEventsAroundTheTile({x, y})
     
         if(event !== undefined){
-            this.stepOnEvent = event
-            toggleActionMenuOption('pick', false, 'event')
+            this.eventsToTrigger = event
+            if(event[0] !== undefined && event[0].item.length) toggleActionMenuOption('pick', false, 'event')
         }else{
-            this.stepOnEvent = {}
+            this.eventsToTrigger.splice(0)
             toggleActionMenuOption('pick', true, 'event')
         }
     
@@ -633,8 +634,8 @@ class Game{
                 // Get stage clear bonus
                 const { optional } = this.level.objective
                 
-                if(!Object.entries(this.stepOnEvent).length){
-                    this.stepOnEvent['item'] = []
+                if(this.eventsToTrigger[0] === undefined || !this.eventsToTrigger.length){
+                    this.eventsToTrigger[0] = { item: [] }
                 }
 
                 for(let i=0; i < optional.length; i++){
@@ -652,7 +653,7 @@ class Game{
                                             }
                                         })
                                     }else{
-                                        this.stepOnEvent.item.push({...prize[j]})
+                                        this.eventsToTrigger[0].item.push({...prize[j]})
                                     }
                                 }
                             }
@@ -666,7 +667,7 @@ class Game{
                 for(let i=0; i < event.length; i++){
                     if(event[i].trigger !== 'auto'){
                         for(let j=0; j < event[i].item.length; j++){
-                            this.stepOnEvent.item.push({...event[i].item[j]})
+                            this.eventsToTrigger[0].item.push({...event[i].item[j]})
                         }
                     }
                 }
