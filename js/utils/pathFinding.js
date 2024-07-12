@@ -44,22 +44,22 @@ export const getDirections = (tileMap, x, y, target) => {
     const reachableDirections = []
 
     // TOP
-    if(tileMap.depth[y - 1][x][0]){
+    if(tileMap.depth[y - 1][x][0] === 1){
         reachableDirections.push({ cost: getDistance(x, y-1, target), x, y: y-1 })
     }
 
     // DOWN
-    if(tileMap.depth[y + 1][x][0]){
+    if(tileMap.depth[y + 1][x][0] === 1){
         reachableDirections.push({ cost: getDistance(x, y+1, target), x, y: y+1 })
     }  
 
     // LEFT
-    if(tileMap.map[y][x - 1][0]){
+    if(tileMap.depth[y][x - 1][0] === 1){
         reachableDirections.push({ cost: getDistance(x-1, y, target), x: x-1, y })
     }
 
     //RIGHT
-    if(tileMap.map[y][x + 1][0]){
+    if(tileMap.depth[y][x + 1][0] === 1){
         reachableDirections.push({ cost: getDistance(x+1, y, target), x: x+1, y })
     }
 
@@ -178,7 +178,7 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
                 const walkable = tileMap.depth[inspectRow][inspectCol][0]
 
                 // Check if the block is walkable
-                if(walkable && !onTheSameBlock){
+                if(walkable  === 1 && !onTheSameBlock){
                     availableSpace[availableSpace.length - 1].push([inspectRow, inspectCol])
                 }
             }else{
@@ -223,7 +223,7 @@ export const getAvailableSpace = async (tileMap, characterPosition, blocksPerDir
                 const walkable = tileMap.depth[inspectRow][inspectCol][0]
                 
                 // Check if the block is walkable
-                if(walkable && !onTheSameBlock){
+                if(walkable  === 1 && !onTheSameBlock){
                     availableSpace[availableSpace.length -1].push([inspectRow, inspectCol])
                 }
             }else{
