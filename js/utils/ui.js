@@ -433,8 +433,8 @@ export const uiInit = (game) => {
             case 'stash':
                 game.actionSelectSound.bindTarget(resultActionOptions[i])
                 resultActionOptions[i].addEventListener('click', () => {
-                    if(game.stepOnEvent.item.length){
-                        // game.stash = JSON.parse(JSON.stringify(game.stepOnEvent.item))
+                    if(game.eventsToTrigger[0].item.length){
+                        // game.stash = JSON.parse(JSON.stringify(game.eventsToTrigger.item))
                         game.action.mode = action
                         preparePickUpWindow()
 
@@ -447,7 +447,7 @@ export const uiInit = (game) => {
                 // Choose which character to take items if there's more then one in the party
                 game.actionSelectSound.bindTarget(resultActionOptions[i])
                 resultActionOptions[i].addEventListener('click', () => {
-                    if(game.stepOnEvent.item.length){
+                    if(game.eventsToTrigger[0].item.length){
                         game.action.mode = action
                         if(game.player.length > 1){
                             const partySubMenu = levelClear.querySelector('#partySubMenu')
@@ -485,7 +485,7 @@ export const uiInit = (game) => {
             case 'finish':
                 game.actionSelectSound.bindTarget(resultActionOptions[i])
                 resultActionOptions[i].addEventListener('click', () => {
-                    if(game.stepOnEvent.item.length){
+                    if(game.eventsToTrigger[0].item.length){
                         const { fontSize_md, camera } = setting.general
                         warn.children[0].innerText = t("ui.result.warn")
                         warn.style.width = (camera.width - (fontSize_md * 2)) + 'px'
@@ -622,6 +622,8 @@ export const displayResult = (win) => {
                 if(o.target === 'turn'){
                     condition.innerText = game.option.formObjectiveMessage(game.tileMap.objective, 'optional', i18n.language)
                     condition.style.margin = `${fontSize_sm}px 0`
+                    condition.classList.add("bg-black")
+                    condition.classList.add("flex")
 
                     if(game.turn <= o.value){
                         setTimeout(() => {
@@ -676,7 +678,7 @@ export const preparePickUpWindow = () => {
     const { width, height } = camera
     const { itemBlockSize, itemBlockMargin } = setting.inventory
     resizeHiddenElement(pickUpWindow.style, width, height, fontSize_sm)
-    constructPickUpWindow(game.inspectingCharacter, width, game.stepOnEvent.item, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin)
+    constructPickUpWindow(game.inspectingCharacter, width, game.eventsToTrigger[0].item, game.tileMap, fontSize, fontSize_sm, itemBlockSize, itemBlockMargin)
 }
 
 export const closePickUpWindow = async() => {
