@@ -47,19 +47,17 @@ export default class TileMap {
 
         for(let column = 0; column < this.map[currentRow].length; column++){
             const tile = this.map[currentRow][column];
-            let img = null
+            let img = this.assets[tile]
 
-            switch(tile){
-                case 1: case 4:
-                    img = this.assets[tile];
-                break;
-                case 2: case 3:
-                    this.map[currentRow][column] = 0
-                break;
-                default:
-                break;
+            if(img.includes('door_close')){
+                // Set event
+                this.event.push({
+                    position: { x: column, y: currentRow },
+                    item: [],
+                    scene: [],
+                    trigger: "beside"
+                })
             }
-
 
             if(img !== null) ctx.drawImage(img, column * this.tileSize, currentRow * this.tileSize, this.tileSize, this.tileSize)
 
