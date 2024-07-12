@@ -471,7 +471,7 @@ export default {
       {
         target: "turn",
         value: 6,
-        prize: [{ id: "currency_1", type: 1, amount: 100 }],
+        prize: [{ id: "other_currency_1", type: 1, amount: 100 }],
       },
     ],
   },

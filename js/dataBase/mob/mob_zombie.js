@@ -25,7 +25,7 @@ export default {
     ],
     "drop": [
         {
-            "id": "currency_1",
+            "id": "other_currency_1",
             "amount": 1,
             "type": 1,
             "rate": 70
@@ -37,7 +37,7 @@ export default {
             "rate": 50
         },
         {
-            "id": "key_dark_1",
+            "id": "key_silence_1",
             "amount": 1,
             "type": 6,
             "rate": 220
