@@ -43,29 +43,28 @@ export default class TileMap {
     }
 
     #drawMap(ctx, row){
-        let currentRow = row
 
-        for(let column = 0; column < this.map[currentRow].length; column++){
-            const tile = this.map[currentRow][column];
+        for(let column = 0; column < this.map[row].length; column++){
+            const tile = this.map[row][column];
             let img = this.assets[tile]
 
-            if(img.includes('door_close')){
+            if(img.src?.includes('door_close')){
                 // Set event
                 this.event.push({
-                    position: { x: column, y: currentRow },
+                    position: { x: column, y: row },
                     item: [],
                     scene: [],
-                    trigger: "beside"
+                    trigger: "item",
+                    requireOption: "key"
                 })
             }
 
-            if(img !== null) ctx.drawImage(img, column * this.tileSize, currentRow * this.tileSize, this.tileSize, this.tileSize)
+            if(img !== "") ctx.drawImage(img, column * this.tileSize, row * this.tileSize, this.tileSize, this.tileSize)
 
-            this.ready = row === (this.map.length - 1) && column === (this.map[currentRow].length - 1)
+            this.ready = row === (this.map.length - 1) && column === (this.map[row].length - 1)
 
-            if(column === (this.map[currentRow].length - 1) && currentRow < (this.map.length - 1) ){
-                currentRow += 1
-                this.#drawMap(ctx, currentRow)
+            if(column === (this.map[row].length - 1) && row < (this.map.length - 1) ){
+                this.#drawMap(ctx, row + 1)
             }
         }
     }
