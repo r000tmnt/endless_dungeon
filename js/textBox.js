@@ -39,7 +39,8 @@ export default class TextBox{
         this.animationInit = false;
         this.speed = 100; // normal
         this.delay = 3; // slow down
-        this.optionSelected = 0;
+        this.optionSelected = -1; // default as not found
+        this.optionResponse = 0;
         this.symbol = /[.。!,，「」\n\/"\?]/g
     }
 
@@ -325,10 +326,27 @@ export default class TextBox{
                     this.#checkConversationPerson()
                 }
             }else{
-                // Increase the dialogue counter by one
-                this.dialogueCounter += 1 
+                // Check if the option response played out
+                if(this.optionSelected >= 0){
+                    if((this.event[this.sceneCounter].dialogue[this.dialogueCounter].option[this.optionSelected].response.length - 1) > this.optionResponse){
+                        this.optionResponse += 1
+                        this.#checkConversationPerson(true) 
+                    }else{
+                        // Reached to the last response
+                        this.optionSelected = -1 // Reset the reference
+                        this.optionResponse = 0
 
-                this.#checkConversationPerson()                
+                        // Increase the dialogue counter by one
+                        this.dialogueCounter += 1 
+
+                        this.#checkConversationPerson() 
+                    }
+                }else{
+                    // Increase the dialogue counter by one
+                    this.dialogueCounter += 1 
+
+                    this.#checkConversationPerson() 
+                }               
             }
         }else{
             this.#checkConversationPerson()
@@ -336,10 +354,10 @@ export default class TextBox{
     }
 
     // Check if the portrait needs to change or not
-    #checkConversationPerson = () => {
-        const { person } = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
+    #checkConversationPerson = (response = false) => {
+        const { person } = (response)? this.event[this.sceneCounter].dialogue[this.dialogueCounter].option[this.optionSelected].response[this.optionResponse] : this.event[this.sceneCounter].dialogue[this.dialogueCounter]
 
-        if(person === 'none'){
+        if(!person.length){
             // Hide portrait on the screen
             portrait.forEach(p => {
                 if(!p.classList.contains('invisible')){
@@ -349,7 +367,7 @@ export default class TextBox{
 
             this.#porceedToNextDialogue()
         }else
-        if(person.length && this.event[this.sceneCounter].people > 0){
+        if(this.event[this.sceneCounter].people > 0){
             const portraitShown = (3 - character.querySelectorAll('.invisible').length)
 
             // Display one more person on the scrren if the number says so
@@ -365,7 +383,7 @@ export default class TextBox{
                         portrait[1].style.height = height + 'px'
                         portrait[1].src = `${__BASE_URL__}assets/images/portrait/${person}.png`
 
-                        this.#loadCharacterPortrait(portrait[1], () => this.#porceedToNextDialogue())
+                        this.#loadCharacterPortrait(portrait[1], () => this.#porceedToNextDialogue(response))
                         character.style.justifyContent = 'space-evenly'                                        
                     break;
                     case 2: // Change order of portraits
@@ -376,7 +394,7 @@ export default class TextBox{
                         portrait[2].style.height = height + 'px'
                         portrait[2].src = `${__BASE_URL__}assets/images/portrait/${person}.png`
 
-                        this.#loadCharacterPortrait(portrait[2], () => this.#porceedToNextDialogue())
+                        this.#loadCharacterPortrait(portrait[2], () => this.#porceedToNextDialogue(response))
                         character.style.justifyContent = 'space-evenly'                                    
                     break;
                     default: // Place a portrait in the center of screen
@@ -384,7 +402,7 @@ export default class TextBox{
                         portrait[0].style.height = height + 'px'
                         portrait[0].src = `${__BASE_URL__}assets/images/portrait/${person}.png`
 
-                        this.#loadCharacterPortrait(portrait[0], () => this.#porceedToNextDialogue())
+                        this.#loadCharacterPortrait(portrait[0], () => this.#porceedToNextDialogue(response))
                         character.style.justifyContent = 'unset' 
                     break;
                 }
@@ -393,16 +411,16 @@ export default class TextBox{
                 // Replace the portrait with the other one
                 portrait[0].src = `${__BASE_URL__}assets/images/portrait/${person}.png`
 
-                this.#porceedToNextDialogue()
+                this.#porceedToNextDialogue(response)
             }
         }else{
-            this.#porceedToNextDialogue()
+            this.#porceedToNextDialogue(response)
         }
     }
 
     // Get the next part of the conversation
-    #porceedToNextDialogue = () => {
-        const message = this.event[this.sceneCounter].dialogue[this.dialogueCounter]
+    #porceedToNextDialogue = (response = false) => {
+        const message = (response)? this.event[this.sceneCounter].dialogue[this.dialogueCounter].option[this.optionSelected].response[this.optionResponse] : this.event[this.sceneCounter].dialogue[this.dialogueCounter]
             
         if(this.action === 'skip'){
             console.log('skipping conversation')
@@ -592,7 +610,7 @@ export default class TextBox{
                     dialogue.classList.remove('invisible')
                     dialogue.style.opacity = 1
 
-                    this.textLength = message.option[i].content.length - 1
+                    this.textLength = message.option[i].response[this.optionResponse].length - 1
                     
                     for(let j=0; j < message.option[i].effect.length; j++){
                         game.eventEffect.push(message.option[i].effect[j])
@@ -602,7 +620,7 @@ export default class TextBox{
                         this.textCounter = this.textLength + 1
                         this.#loadConversation()
                     }else{
-                        this.#displayConversation(message.option[i])                      
+                        this.#displayConversation(message.option[i].response[this.optionResponse])                      
                     }
                 })
 
