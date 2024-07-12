@@ -2,7 +2,7 @@ import mob_zombie from "./mob/mob_zombie"
 
                 export default {
                     data: [
-                        ...mob_zombie,
+                        mob_zombie,
 
                     ],
 
