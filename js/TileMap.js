@@ -130,8 +130,34 @@ export default class TileMap {
         // TODO: Alter event position if needed
     }
 
-    getEventOnTile = (position) => {
-        return this.event.find(e => e.position.x === position.x && e.position.y === position.y)
+    getEventsAroundTheTile = (position) => {
+        const onTheSameTile = [this.event.find(e => e.position.x === position.x && e.position.y === position.y)]
+
+        const direction = ['top', 'right', 'down', 'left']
+
+        direction.forEach(d => {
+            let eventOnTheDirection = {}
+            switch(d){
+                case 'top':
+                    eventOnTheDirection = this.event.find(e => e.position.x === position.x && e.position.y === position.y - 1)
+                break;
+                case 'right':
+                    eventOnTheDirection = this.event.find(e => e.position.x === position.x + 1 && e.position.y === position.y)
+                break;
+                case 'down':
+                    eventOnTheDirection = this.event.find(e => e.position.x === position.x && e.position.y === position.y + 1)
+                break;
+                case 'left':
+                    eventOnTheDirection = this.event.find(e => e.position.x === position.x - 1 && e.position.y === position.y)
+                break;
+            }
+
+            if(eventOnTheDirection !== undefined && Object.entries(eventOnTheDirection).length){
+                onTheSameTile.push(eventOnTheDirection)
+            }
+        })
+
+        return onTheSameTile
     }
     changeTile = (row, col, type) => {
         this.map[row][col] = type
