@@ -30,6 +30,8 @@ var itemsToTake = []
 const createEquipTag = (fontSize) => {
     const equipBadge = document.createElement('div')
     equipBadge.classList.add('item-equip')
+    equipBadge.classList.add('bg-black')
+    equipBadge.classList.add('absolute')
     equipBadge.innerText = 'E'
     equipBadge.style.fontSize = (fontSize / 2) + 'px'
     equipBadge.style.width = 'fit-content'
@@ -593,6 +595,7 @@ export const resizeInventory = (cameraWidth, fontSize, fontSize_sm) => {
     })
 
     itemEquips.forEach(equipBadge => {
+        equipBadge.classList.add('bg-black')
         equipBadge.style.fontSize = (fontSize / 2) + 'px'
         equipBadge.style.width = 'fit-content'
         equipBadge.style.padding = `0 0 ${fontSize / 4}px ${fontSize / 4}px`
@@ -848,6 +851,7 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
         itemCount.style.fontSize = (fontSize / 2) + 'px'
         itemCount.style.padding = `0 ${fontSize / 4}px ${fontSize / 4}px 0`
         itemCount.classList.add('item-count')
+        itemCount.classList.add('absolute')
 
         item.style.width = itemBlockSize + 'px'
         item.style.height = itemBlockSize + 'px'
@@ -861,6 +865,7 @@ export const constructInventoryWindow = (currentActingPlayer, enemyPosition, til
         }
         
         item.classList.add('item')
+        item.classList.add('relative')
 
         // Append child to element
         // item.append(itemToolTip)

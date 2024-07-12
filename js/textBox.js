@@ -256,6 +256,9 @@ export default class TextBox{
                             content.innerHTML = l.content
                             log.style.margin = `${fontSize_md / 2}px 0`
                             log.style.padding = `${fontSize_md / 2}px`
+                            log.classList.add("bg-black")
+                            log.classList.add("flex")
+                            log.classList.add("flex-col")
                             log.append(content)
                             logWrapper.append(log)
                         })
@@ -590,6 +593,7 @@ export default class TextBox{
                 option.innerHTML = message.option[i].value
                 // option.style.background = 'none'
                 option.style.margin = `${setting.general.fontSize_sm}px 0`
+                option.classList.add("text-center")
 
                 const { style, size } = message.option[i]
 

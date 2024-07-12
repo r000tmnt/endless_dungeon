@@ -7,26 +7,26 @@
     <link rel="stylesheet" href="css/game.css">
     <title>Document</title>
 </head>
-<body>
-    <div id="wrapper">
+<body class="flex relative">
+    <div id="wrapper" class="bg-black relative">
         <!-- Language selection -->
-        <div id="language" class="flex absolute invisible">
+        <div id="language" class="flex flex-col absolute invisible place-center">
             <button data-lng="en">English</button>
             <button data-lng="zh">繁體中文</button>
         </div>
 
         <!-- Title Screen -->
-        <div id="titleScreen" class="menu absolute invisible">
+        <div id="titleScreen" class="menu absolute invisible bg-black text-center border-box text-white">
 
-            <p class="title">
+            <p class="title relative">
                 Endless Dungeon (for now...)
             </p>
 
-            <div class="tap">
+            <div class="tap text-center relative">
                 TAP TO START
             </div>      
             
-            <ul id="titleAction" class="invisible">
+            <ul id="titleAction" class="invisible relative w-full">
                 <li data-action="start">Start</li>
                 <li data-action="load">Load</li>
                 <li data-action="exit">Exit</li>
@@ -36,7 +36,7 @@
         </div>
 
         <!-- Turn Counter -->
-        <div id="turn" class="invisible"></div>
+        <div id="turn" class="absolute invisible bg-white"></div>
 
         <!-- Option Menu -->
         <div id="option_menu" class="absolute action_menu_close">
@@ -50,16 +50,16 @@
         </div>
 
         <!-- Party -->
-        <div id="party" class="menu absolute invisible">
+        <div id="party" class="menu absolute invisible border-box text-white bg-black">
             <div>Party</div>
 
             <button class="back absolute" data-action="party" type="button">BACK</button>
 
-            <ul id="member_list" class="disable-scrollbars"></ul>
+            <ul id="member_list" class="disable-scrollbars bg-black"></ul>
         </div>
 
         <!-- Config -->
-        <div id="config" class="menu absolute invisible">
+        <div id="config" class="menu absolute invisible border-box text-white bg-black">
             <div>Config</div>
 
             <button class="back absolute" data-action="config" type="button">BACK</button>
@@ -70,14 +70,14 @@
                     <tr>
                         <td>BGM</td>
                         <td>
-                            <input id="bgm" min="0" max="100" type="range" data-config="bgm" name="bgm" > 
+                            <input id="bgm" min="0" max="100" type="range" class="w-full" data-config="bgm" name="bgm" > 
                         </td>
                     </tr>
                     <!-- SE -->
                     <tr>
                         <td>SE</td>
                         <td>
-                            <input id="se" min="0" max="100" type="range" data-config="se" name="se" > 
+                            <input id="se" min="0" max="100" type="range" class="w-full" data-config="se" name="se" > 
                         </td>    
                     </tr>
                     <!-- Grid -->
@@ -135,22 +135,22 @@
         </div>
         
         <!-- Objective -->
-        <div id="objective" class="menu absolute invisible">
+        <div id="objective" class="menu absolute invisible border-box text-white bg-black">
             <div>Objective</div>
 
             <button class="back absolute" data-action="objective" type="button">BACK</button>
 
             <ul>
-                <li>
-                   <div class="label">Victory</div> 
+                <li class="bg-black">
+                   <div class="label bg-black relative">Victory</div> 
                    <div class="desc" data-objective="victory"></div>
                 </li>
-                <li>
-                    <div class="label">Fail</div>
+                <li class="bg-black">
+                    <div class="label bg-black relative">Fail</div>
                     <div class="desc" data-objective="fail"></div>
                 </li>
-                <li>
-                    <div class="label">Optional</div> 
+                <li class="bg-black">
+                    <div class="label bg-black relative">Optional</div> 
                     <div class="desc" data-objective="optional"></div>
                 </li>
             </ul>
@@ -170,7 +170,7 @@
         </div>
 
         <!-- Character caption -->
-        <div id="characterCaption" class="absolute invisible">
+        <div id="characterCaption" class="absolute invisible bg-white">
             <div class="caption_top  flex">
                 <h5 id="name"></h5>
                 <span class="flex">
@@ -194,12 +194,12 @@
         <canvas id="game" class="invisible"></canvas>
 
         <!-- Skill name place holder -->
-        <div id="skillName" class="absolute">
-            <p class="invisible"></p>
+        <div id="skillName" class="absolute text-center w-full">
+            <p class="invisible text-white bg-black"></p>
         </div>
 
         <!-- Character status -->
-        <div id="status" class="menu absolute invisible">
+        <div id="status" class="menu absolute invisible border-box text-white bg-black">
             <div class="status_header flex">
                 <img id="avatar" src="" alt="avatar">
                 <div id="info">
@@ -216,12 +216,12 @@
             </div>
             
             <!-- Seperator -->
-            <table id="attributes">
+            <table id="attributes" class="w-full">
                 <tbody>
                     <tr>
                         <td>HP :</td>
                         <td class="status-node" data-attribute="hp"></td>
-                        <td class="invisible flex attribute-toggle" data-attribute="maxHp">
+                        <td class="invisible flex attribute-toggle text-white" data-attribute="maxHp">
                             <span>-</span>
                             <span>+</span>
                         </td>
@@ -229,7 +229,7 @@
                     <tr>
                         <td>MP :</td>
                         <td class="status-node" data-attribute="mp"></td>
-                        <td class="invisible flex attribute-toggle" data-attribute="maxMp">
+                        <td class="invisible flex attribute-toggle text-white" data-attribute="maxMp">
                             <span>-</span>
                             <span>+</span>
                         </td>
@@ -237,7 +237,7 @@
                     <tr>
                         <td>STR :</td>
                         <td class="status-node" data-attribute="str"></td>
-                        <td class="invisible flex attribute-toggle" data-attribute="str">
+                        <td class="invisible flex attribute-toggle text-white" data-attribute="str">
                             <span>-</span>
                             <span>+</span>
                         </td>
@@ -245,7 +245,7 @@
                     <tr>
                         <td>DEF :</td>
                         <td class="status-node" data-attribute="def"></td>
-                        <td class="invisible flex attribute-toggle" data-attribute="def">
+                        <td class="invisible flex attribute-toggle text-white" data-attribute="def">
                             <span>-</span>
                             <span>+</span>
                         </td>                        
@@ -253,7 +253,7 @@
                     <tr>
                         <td>INT :</td>
                         <td class="status-node" data-attribute="int"></td>                        
-                        <td class="invisible flex attribute-toggle" data-attribute="int">
+                        <td class="invisible flex attribute-toggle text-white" data-attribute="int">
                             <span>-</span>
                             <span>+</span>
                         </td> 
@@ -261,7 +261,7 @@
                     <tr>
                         <td>SPD :</td>
                         <td class="status-node" data-attribute="spd"></td>      
-                        <td class="invisible flex attribute-toggle" data-attribute="spd">
+                        <td class="invisible flex attribute-toggle text-white" data-attribute="spd">
                             <span>-</span>
                             <span>+</span>
                         </td>                   
@@ -269,7 +269,7 @@
                     <tr>
                         <td>LUCK :</td>
                         <td class="status-node" data-attribute="lck"></td></td>
-                        <td class="invisible flex attribute-toggle" data-attribute="lck">
+                        <td class="invisible flex attribute-toggle text-white" data-attribute="lck">
                             <span>-</span>
                             <span>+</span>
                         </td>  
@@ -278,7 +278,7 @@
                         <!-- Spirit as magic defense-->
                         <td>SPI :</td>
                         <td class="status-node" data-attribute="spi"></td>
-                        <td class="invisible flex attribute-toggle" data-attribute="spi">
+                        <td class="invisible flex attribute-toggle text-white" data-attribute="spi">
                             <span>-</span>
                             <span>+</span>
                         </td> 
@@ -309,7 +309,7 @@
         </div>
 
         <!-- Skill window -->
-        <div id="skill" class="menu absolute invisible">
+        <div id="skill" class="menu absolute invisible border-box text-white bg-black">
             <div>Skill</div>
 
             <button class="back absolute" data-action="skill" type="button">BACK</button>
@@ -320,19 +320,19 @@
         </div>
 
         <!-- Inventory -->
-        <div id="item" class="menu absolute invisible">
+        <div id="item" class="menu absolute invisible border-box text-white bg-black">
             <div>INVENTORY</div>
             <button class="back absolute" data-action="item" type="button">BACK</button>
 
             <!-- filter -->
-            <div class="flex filter-group">
+            <div class="flex filter-group text-center">
                 <button class="filter" type="button" data-filter="3,4">Equipment</button>
                 <button class="filter" type="button" data-filter="0">Potion</button>
                 <button class="filter" type="button" data-filter="2">Material</button>
                 <button class="filter" type="button" data-filter="6">Key</button>                    
             </div>
 
-            <div id="inventory" class="disable-scrollbars">
+            <div id="inventory" class="disable-scrollbars flex flex-wrap">
                 <!-- items -->
             </div>
 
@@ -353,9 +353,9 @@
             </div>
 
             <!-- Range slider -->
-            <div id="slider" class="absolute invisible">
+            <div id="slider" class="absolute invisible place-center bg-black">
                 <input id="range" type="range" min="1" value="1">
-                <p>1</p>
+                <p class="text-center">1</p>
                 <div class="flex">
                     <button type="button">Cancel</button>
                     <button type="button">Confirm</button>
@@ -364,35 +364,35 @@
         </div>
 
         <!-- Pick up item window -->
-        <div id="pickUp" class="menu absolute invisible">
+        <div id="pickUp" class="menu absolute invisible border-box text-white bg-black">
             <div>Pick up</div>
             <button class="back absolute" data-action="pick" type="button">BACK</button>
 
-            <ul id="dropped-items" class="disable-scrollbars">
+            <ul id="dropped-items" class="disable-scrollbars flex flex-wrap">
                 <!-- items -->
             </ul>
 
-            <div class="btn-group">
+            <div class="absolute text-center">
                 <button type="button">Take All</button>
                 <button type="button" disabled="true">Confirm</button>
             </div>
         </div>
 
         <!-- Loading scrren -->
-        <div id="Loading" class="invisible">
+        <div id="Loading" class="invisible bg-black">
             <p>Loading ...</p>
         </div>
 
         <!-- Phase Counter -->
-        <div id="Phase_Transition" class="invisible">
-            <h3 id="phase">
+        <div id="Phase_Transition" class="absolute invisible text-center">
+            <h3 id="phase" class="absolute place-center text-white">
                 <!-- Phase -->
             </h3>
         </div>
 
         <!-- Level clear -->
-        <div id="levelClear" class="menu absolute invisible">
-            <p class="title"><!-- WIN or LOSE --></p>
+        <div id="levelClear" class="menu absolute invisible border-box text-white bg-black">
+            <p class="title text-center"><!-- WIN or LOSE --></p>
 
             <!-- If optional objective exist -->
             <ul id="optional" class="invisible"></ul>
@@ -407,11 +407,11 @@
                 <li data-action="finish">Finish</li>
             </ul>
 
-            <div id="partySubMenu" class="absolute invisible flex">
+            <div id="partySubMenu" class="absolute invisible flex evenly">
                 <!-- Party member avatar -->
             </div>
 
-            <div id="warn" class="absolute invisible">
+            <div id="warn" class="absolute invisible place-center bg-black">
                 <p>Items left on the field will be unavailable once you proceed to the next phase.</p>
 
                 <div class="flex">
@@ -420,35 +420,35 @@
                 </div>
             </div>
 
-            <div class="tap invisible">
+            <div class="text-center invisible">
                 TAP TO CONTINUE
             </div>
         </div>
 
         <!-- Conversation scene -->
-        <div id="conversation" class="menu absolute invisible">
+        <div id="conversation" class="menu absolute invisible border-box text-white bg-black">
             <ul id="dialogue_control" class="absolute">
                 <li class="action" data-action="skip">SKIP</li>
                 <li class="action" data-action="hide">HIDE</li>
                 <li class="action" data-action="auto">AUTO</li>
                 <li class="action" data-action="log">LOG</li>
             </ul>
-            <ul id="dialogue-options" class="absolute invisible"></ul>
+            <ul id="dialogue-options" class="absolute invisible place-center"></ul>
 
-            <div id="character" class="flex">
+            <div id="character" class="flex w-full">
                 <!-- Where character portrait stands -->
                 <img src="" alt="portrait" class="invisible" />
                 <img src="" alt="portrait" class="invisible" />
                 <img src="" alt="portrait" class="invisible" />
             </div>
 
-            <div id="dialogue" class="absolute invisible disable-scrollbars">
+            <div id="dialogue" class="absolute invisible disable-scrollbars overflow-scroll border-box">
             </div>
         </div>
 
         <!-- Dialogue Log -->
-        <div id="dialogue-log" class="menu absolute invisible disable-scrollbars">
-            <ul id="log" class="disable-scrollbars"></ul>
+        <div id="dialogue-log" class="menu absolute invisible disable-scrollbars overflow-scroll border-box text-white">
+            <ul id="log" class="disable-scrollbars overflow-scroll"></ul>
         </div>
     </div>
 
