@@ -112,22 +112,6 @@ const warn = document.getElementById('warn')
 // }
 
 
-// Calculate the percentage of an attribute
-const getPercentage = (type, character) => {
-    let each = 0
-    let percentage = 0
-
-    if(type === 'hp'){
-        each =  character.totalAttribute.maxHp / 100
-        percentage = Math.round( Math.floor(character.totalAttribute.hp / each) )
-    }else{
-        each = character.totalAttribute.maxMp / 100
-        percentage = Math.round( Math.floor(character.totalAttribute.mp / each) )
-    }
-
-    return percentage
-}
-
 const endBattlePhase = () => {
     // Reset backgroud audio time line back to the start
     game.bgAudio.element.currentTime = 0
@@ -752,44 +736,9 @@ export const displayUIElement = () => {
     characterCaption.classList.remove('invisible') 
 }
 
-export const prepareCharacterCaption = (inspectingCharacter, tileSize) => {
-    // Fill the element with a portion of the character info
-    characterName.innerText = inspectingCharacter.name
-    characterLv.innerText = `LV ${inspectingCharacter.lv}`
-    characterAp.innerText = `AP: ${inspectingCharacter.totalAttribute.ap}`
-
-    // Display arrow symbol if there are points to spend
-    if(inspectingCharacter.pt > 0){
-        const hint = document.querySelector('.hint')
-        hint.style.fontSize = setting.general.fontSize_sm + 'px'
-        hint.style.display = 'block'
-    }else{
-        // Hide arrow symbol
-        const hint = document.querySelector('.hint')
-        hint.style.display = 'none'
-    }
-
-    // calculation the percentage of the attribute
-    for(let i=0; i < gauges.length; i++){
-        // console.log(gauges[i].firstElementChild)
-        gauges[i].firstElementChild.style.width = getPercentage(characterCaptionAttributes[i], inspectingCharacter) + '%';
-    }
-
-    const position = (inspectingCharacter.type === 2)? game.playerPosition[game.player.findIndex(p => p.id === inspectingCharacter.id)] : game.enemyPosition[game.enemy.findIndex(e => e.id === inspectingCharacter.id)]
-
-    // Shift UI position based on the character position
-    if(position.row > 7 && position.col < Math.floor(9/2)){
-        characterCaption.style.left = ((tileSize * 9) - characterCaption.clientWidth) + 'px'
-    }else{
-        characterCaption.style.left = 'unset'
-    }
-
-    // Shift UI position based on the character position
-    if(position.row < 7 && position.col < Math.floor(9/2)){
-        actionMenu.style.left = (tileSize * 6) + 'px'
-    }else{
-        actionMenu.style.left = 'unset'
-    }  
+// Fill the element with a portion of the character info
+export const prepareCharacterCaption = (inspectingCharacter) => {
+    characterCaption.setAttribute("character", JSON.stringify(inspectingCharacter))
 }
 
 export const toggleActionMenuOption = (action, disable, mode = '') => {
@@ -910,12 +859,6 @@ export const setCanvasPosition = (tileSize) => {
 }
 
 export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_sm) => {
-        // calculation the percentage of the attribute
-        for(let i=0; i < gauges.length; i++){
-            // console.log(gauges[i].firstElementChild)
-            gauges[i].firstElementChild.style.height = fontSize_sm + 'px';
-        }
-    
         // action menu child font size
         for(let i=0; i < actionMenuOptions.length; i++){
             actionMenuOptions[i].style.fontSize = fontSize + 'px';
@@ -925,11 +868,6 @@ export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_s
         for(let i=0; i < options.length; i++){
             options[i].style.fontSize = fontSize_md + 'px';
         }       
-        
-        characterCaption.style.width = Math.floor(50 * (width / 100)) + 'px'
-        characterName.style.fontSize = fontSize + 'px';
-        characterLv.style.fontSize = fontSize_sm + 'px';
-        characterAp.style.fontSize = fontSize_sm + 'px';
     
         // Set warning window style
         warn.style.width = (width - (fontSize_md * 2)) + 'px'
