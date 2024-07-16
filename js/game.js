@@ -72,7 +72,7 @@ class Game{
 
         // Canvas mouse down event
         this.canvasEvent = async(event) => {
-            const { tileSize, fontSize, fontSize_sm } = setting.general
+            const { tileSize } = setting.general
 
             const { row, col } = getPosition(event, tileSize)
 
@@ -555,7 +555,7 @@ class Game{
         this.grid.setPointedBlock({...this.playerPosition[index]})
         this.inspectingCharacter = this.player[index]  
         this.checkIfStepOnTheEvent(this.inspectingCharacter.x, this.inspectingCharacter.y)
-        prepareCharacterCaption(this.inspectingCharacter, setting.tileSize)
+        prepareCharacterCaption(this.inspectingCharacter)
         this.#checkAp(this.inspectingCharacter)                   
         displayUIElement()
     }
@@ -592,10 +592,11 @@ class Game{
     checkIfStepOnTheEvent = async(x, y) => {
         const event = this.tileMap.getEventsAroundTheTile({x, y})
     
-        if(event !== undefined){
+        if(event[0] !== undefined && event[0].item.length){
             this.eventsToTrigger = event
-            if(event[0] !== undefined && event[0].item.length) toggleActionMenuOption('pick', false, 'event')
+            toggleActionMenuOption('pick', false, 'event')
         }else{
+            event.splice(0)
             this.eventsToTrigger.splice(0)
             toggleActionMenuOption('pick', true, 'event')
         }
