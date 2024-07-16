@@ -55,7 +55,7 @@ export default class TileMap {
                     item: [],
                     scene: [],
                     trigger: "item",
-                    requireOption: "key"
+                    requireOption: "Small key"
                 })
             }
 
