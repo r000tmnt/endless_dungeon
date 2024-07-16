@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="css/game.css">
     <script src="js/components/titleScreen.js" type="module"></script>
     <script src="js/components/characterCaption.js" type="module"></script>
+    <script src="js/components/optionMenu.js" type="module"></script>
     <title>Document</title>
 </head>
 <body class="flex relative">
@@ -30,15 +31,8 @@
         <canvas id="game" class="invisible"></canvas>
 
         <!-- Option Menu -->
-        <div id="option_menu" class="absolute action_menu_close">
-            <ul id="option_list">
-                <li class="action" data-option="party">Party</li>
-                <li class="action" data-option="objective">Objective</li>
-                <li class="action" data-option="config">Config</li>
-                <!-- <li class="action" data-option="save">Save</li> -->
-                <li class="action" data-option="end">End Turn</li>
-            </ul>
-        </div>
+        <option-menu id="option_menu" class="absolute action_menu_close">
+        </option-menu>
 
         <!-- Party -->
         <div id="party" class="menu absolute invisible border-box text-white bg-black">
