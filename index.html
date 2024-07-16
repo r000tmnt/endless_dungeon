@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/game.css">
+    <script src="js/component/titleScreen.js" type="module"></script>
     <title>Document</title>
 </head>
 <body class="flex relative">
@@ -16,27 +17,34 @@
         </div>
 
         <!-- Title Screen -->
-        <div id="titleScreen" class="menu absolute invisible bg-black text-center border-box text-white">
+        <title-screen id="titleScreen" class="menu absolute invisible bg-black text-center border-box text-white"></title-screen>
 
-            <p class="title relative">
-                Endless Dungeon (for now...)
-            </p>
-
-            <div class="tap text-center relative">
-                TAP TO START
-            </div>      
+        <!-- Character caption -->
+        <div id="characterCaption" class="absolute invisible bg-white">
+            <div class="caption_top  flex">
+                <h5 id="name"></h5>
+                <span class="flex">
+                    <span id="lv"></span>
+                    <span class="hint">&#11205;</span>
+                </span>
+                <span id="ap"></span>
+            </div>
             
-            <ul id="titleAction" class="invisible relative w-full">
-                <li data-action="start">Start</li>
-                <li data-action="load">Load</li>
-                <li data-action="exit">Exit</li>
+            <ul>
+                <li class="gauge">
+                    <div class="hp"></div>
+                </li>
+                <li class="gauge">
+                    <div class="mp"></div>
+                </li>
             </ul>
-
-            <small id="version" class="absolute"><!-- Version x.x.x --></small>
         </div>
 
         <!-- Turn Counter -->
-        <div id="turn" class="absolute invisible bg-white"></div>
+        <div id="turn" class="invisible bg-white"></div>
+
+        <!-- Game window -->
+        <canvas id="game" class="invisible"></canvas>
 
         <!-- Option Menu -->
         <div id="option_menu" class="absolute action_menu_close">
@@ -168,30 +176,6 @@
                 <li class="action" data-action="stay">Stay</li>
             </ul>
         </div>
-
-        <!-- Character caption -->
-        <div id="characterCaption" class="absolute invisible bg-white">
-            <div class="caption_top  flex">
-                <h5 id="name"></h5>
-                <span class="flex">
-                    <span id="lv"></span>
-                    <span class="hint">&#11205;</span>
-                </span>
-                <span id="ap"></span>
-            </div>
-            
-            <ul>
-                <li class="gauge">
-                    <div class="hp"></div>
-                </li>
-                <li class="gauge">
-                    <div class="mp"></div>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Game window -->
-        <canvas id="game" class="invisible"></canvas>
 
         <!-- Skill name place holder -->
         <div id="skillName" class="absolute text-center w-full">
