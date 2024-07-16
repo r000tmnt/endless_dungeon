@@ -8,45 +8,10 @@ export default class Option{
         this.mode = mode
     }
 
-    setPartyWindow(player, setting, action){
+    setPartyWindow(player){
         const partyWindow = document.getElementById('party')
-        const memberList = document.getElementById('member_list')
-        const {fontSize, fontSize_md, fontSize_sm, camera } = setting.general
-        const { width, height } = camera
-        const { itemBlockSize, itemBlockMargin } = setting.inventory
-
-        resizeHiddenElement(partyWindow.style, width, height, fontSize_md)
-
-        partyWindow.children[0].innerText = t('ui.option.party')
-        memberList.style.fontSize = fontSize_md + 'px'
-        memberList.style.maxHeight = (itemBlockSize * 3) + 'px'
-
-        for(let i=0; i < player.length; i++){
-            const member = document.createElement('li')
-            const memberIcon = document.createElement('img')
-            const memberName = document.createElement('span')
-            const memberLv = document.createElement('span')
-            member.classList.add('member')
-            member.classList.add('flex') 
-            member.style.margin = `${itemBlockMargin}px 0`
-            member.style.padding = `${itemBlockMargin}px`
-            // member click event
-            member.addEventListener('click', () => {
-                action.mode = 'status'
-                resizeHiddenElement(document.getElementById('status').style, width, height, fontSize_sm)
-                action.setStatusWindow(player[i], fontSize, fontSize_md, fontSize_sm, width)
-            })   
-            
-            memberIcon.setAttribute('alt', 'icon')
-            memberIcon.style.width = itemBlockSize + 'px'
-            memberIcon.style.height = itemBlockSize + 'px'
-            memberLv.innerText = `Lv ${player[i].lv}`
-            memberName.innerText = player[i].name
-            member.append(memberIcon)
-            member.append(memberLv)
-            member.append(memberName)
-            memberList.append(member)
-        }
+        partyWindow.setAttribute("show", true)
+        partyWindow.setAttribute("member", JSON.stringify(player))
     }
 
     resizePartyWindow(setting){
