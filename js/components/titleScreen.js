@@ -14,7 +14,7 @@ export default class titleScreen extends HTMLElement {
     // called each time the element is added to the document. The specification recommends that, as far as possible, developers should implement custom element setup in this callback rather than the constructor.
     connectedCallback() {
         this.innerHTML = this.render()
-        this.addEventListener('click', this.start())
+        this.addEventListener('click', this.start)
         resize()
         window.addEventListener('resize', resize, false);
     }
@@ -85,7 +85,7 @@ export default class titleScreen extends HTMLElement {
     start(){
         if(this.classList.contains('open_window')){
             clearInterval(this.tapInterval)
-            tap.classList.add("fade_out")
+            this.children[1].classList.add("fade_out")
 
             // Start game
             this.setAttribute("show", false)
