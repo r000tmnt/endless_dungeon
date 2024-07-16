@@ -13,21 +13,20 @@ export default class titleScreen extends HTMLElement {
 
     // called each time the element is added to the document. The specification recommends that, as far as possible, developers should implement custom element setup in this callback rather than the constructor.
     connectedCallback() {
-        this.innerHTML = this.constructTitleScreen()
-
+        this.innerHTML = this.render()
+        this.addEventListener('click', this.start())
         resize()
         window.addEventListener('resize', resize, false);
     }
 
     // called when attributes are changed, added, removed, or replaced.
     attributeChangedCallback(name, oldValue, newValue) {
-        console.log(
-            `Attribute ${name} has changed from ${oldValue} to ${newValue}.`,
-        );
+        console.log(`Attribute ${name} has changed from ${oldValue} to ${newValue}.`);
 
         switch(name){
             case 'show':
-                if(newValue){
+                const show = newValue === "true"
+                if(show){
                     this.classList.remove("invisible")
                     this.classList.add("open_window")
     
@@ -43,28 +42,6 @@ export default class titleScreen extends HTMLElement {
                             tap.classList.add("fade_in")
                         }
                     }, 1000);
-                
-                    setTimeout(() => {
-                        this.addEventListener('click', () => {
-                            if(this.classList.contains('open_window')){
-                                clearInterval(this.tapInterval)
-                                tap.classList.add("fade_out")
-                                // document.getthisById("titleAction").classList.remove('invisible')
-                
-                                // Start game
-                                this.classList.remove('open_window')
-                                this.classList.add('invisible')
-                                
-                                setTimeout(async() => {
-                                    await level.load('tutorial_1').then(() => {
-                                        game.level = JSON.parse(JSON.stringify(level.getOne('tutorial_1')));
-                                        setting.currentLevel = "tutorial_1"
-                                        game.beginNextPhase()                          
-                                    })
-                                }, 500)            
-                            }
-                        })        
-                    }, 1000)
                 }else{
                     this.classList.remove("open_window")
                     this.classList.add("invisible")
@@ -76,14 +53,14 @@ export default class titleScreen extends HTMLElement {
 
                 this.style.width = width + 'px'
                 this.style.height = height + 'px'
-                this.children[1].style.fontSize = fontSize_md + 'px'
                 this.children[0].style.fontSize = fontSize + 'px'
+                this.children[1].style.fontSize = fontSize_md + 'px'
                 this.children[3].style.fontSize = fontSize_sm + 'px'
             break;
         }
     }
 
-    constructTitleScreen() {
+    render() {
         return `
                 <p class="title relative">
                     Endless Dungeon (for now...)
@@ -103,6 +80,24 @@ export default class titleScreen extends HTMLElement {
                     Version: ${__APP_VERSION__}
                 </small>
         `
+    }
+
+    start(){
+        if(this.classList.contains('open_window')){
+            clearInterval(this.tapInterval)
+            tap.classList.add("fade_out")
+
+            // Start game
+            this.setAttribute("show", false)
+            
+            setTimeout(async() => {
+                await level.load('tutorial_1').then(() => {
+                    game.level = JSON.parse(JSON.stringify(level.getOne('tutorial_1')));
+                    setting.currentLevel = "tutorial_1"
+                    game.beginNextPhase()                          
+                })
+            }, 500)            
+        }
     }
 }
 
