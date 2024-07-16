@@ -8,6 +8,7 @@
     <script src="js/components/titleScreen.js" type="module"></script>
     <script src="js/components/characterCaption.js" type="module"></script>
     <script src="js/components/optionMenu.js" type="module"></script>
+    <script src="js/components/actionMenu.js" type="module"></script>
     <title>Document</title>
 </head>
 <body class="flex relative">
@@ -31,8 +32,7 @@
         <canvas id="game" class="invisible"></canvas>
 
         <!-- Option Menu -->
-        <option-menu id="option_menu" class="absolute action_menu_close">
-        </option-menu>
+        <option-menu id="option_menu" class="absolute action_menu_close"></option-menu>
 
         <!-- Party -->
         <div id="party" class="menu absolute invisible border-box text-white bg-black">
@@ -142,17 +142,7 @@
         </div>
 
         <!-- Action Menu -->
-        <div id="action_menu" class="absolute action_menu_close">
-            <ul id="action_list">
-                <li class="action" data-action="move">Move</li>
-                <li class="action" data-action="attack">Attack</li>
-                <li class="action" data-action="skill">Skill</li>
-                <li class="action" data-action="item">Item</li>
-                <li class="action hide" data-action="pick">Pick</li>
-                <li class="action" data-action="status">Status</li>
-                <li class="action" data-action="stay">Stay</li>
-            </ul>
-        </div>
+        <action-menu id="action_menu" class="absolute action_menu_close"></action-menu>
 
         <!-- Skill name place holder -->
         <div id="skillName" class="absolute text-center w-full">
