@@ -46,11 +46,6 @@ const options = option_menu.getElementsByTagName('li')
 
 // Character caption UI
 const characterCaption = document.getElementById('characterCaption')
-const characterName = document.getElementById('name')
-const characterLv = document.getElementById('lv')
-const characterAp = document.getElementById('ap')
-const characterCaptionAttributes = ['hp', 'mp']
-const gauges = document.querySelectorAll('.gauge')
 
 // Status UI
 const statusWindow = document.getElementById('status')
@@ -206,48 +201,6 @@ export const reRenderUi = (game) => {
  * @param {object} game - The game object
  */
 export const uiInit = (game) => {
-    // option menu child click event
-    for(let i=0; i < options.length; i++){
-        const action = options[i].dataset.option
-        switch(action){
-            case 'party':
-                game.actionSelectSound.bindTarget(options[i])
-                options[i].addEventListener('click', () => {
-                    game.option.mode = action
-                    game.option.setPartyWindow(game.player, setting, game.action)
-                    partyWindow.classList.remove('invisible')
-                    partyWindow.classList.add('open_window')
-                })
-            break;
-            case 'objective':
-                game.actionSelectSound.bindTarget(options[i])
-                options[i].addEventListener('click', () => {
-                    game.option.mode = action
-                    game.option.setObjectiveWindow(objectiveWindow, setting, game.tileMap.objective)
-                })
-            break;
-            case 'config':
-                game.actionSelectSound.bindTarget(options[i])
-                options[i].addEventListener('click', () => {
-                    game.option.mode = action
-                    game.option.setConfigWindow(setting)
-                    configWindow.classList.remove('invisible')
-                    configWindow.classList.add('open_window')
-                })
-            break;
-            case 'end':
-                game.actionSelectSound.bindTarget(options[i])
-                options[i].addEventListener('click', () => {
-                    game.player.forEach(p => {
-                        p.totalAttribute.ap = 0
-                        p.wait = true
-                    })
-                    game.characterAnimationPhaseEnded(game.player[0])
-                    option_menu.classList.remove('action_menu_open')
-                })
-            break;
-        }
-    }
 
     // Back button click event
     for(let i=0; i < backBtn.length; i++){
@@ -788,11 +741,7 @@ export const alterActionMenu = () => {
 }
 
 export const toggleOptionMenu = () => {
-    if(option_menu.classList.contains('action_menu_open')){
-        option_menu.classList.remove('action_menu_open')
-    }else{
-        option_menu.classList.add('action_menu_open')
-    }
+    option_menu.setAttribute("show", true)
 }
 
 export const hideOptionMenu = () => {
