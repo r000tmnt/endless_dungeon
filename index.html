@@ -9,6 +9,7 @@
     <script src="js/components/characterCaption.js" type="module"></script>
     <script src="js/components/optionMenu.js" type="module"></script>
     <script src="js/components/actionMenu.js" type="module"></script>
+    <script src="js/components/partyMenu.js" type="module"></script>
     <title>Document</title>
 </head>
 <body class="flex relative">
@@ -35,13 +36,7 @@
         <option-menu id="option_menu" class="absolute action_menu_close"></option-menu>
 
         <!-- Party -->
-        <div id="party" class="menu absolute invisible border-box text-white bg-black">
-            <div>Party</div>
-
-            <button class="back absolute" data-action="party" type="button">BACK</button>
-
-            <ul id="member_list" class="disable-scrollbars bg-black"></ul>
-        </div>
+        <party-menu id="party" class="menu absolute invisible border-box text-white bg-black"></party-menu>
 
         <!-- Config -->
         <div id="config" class="menu absolute invisible border-box text-white bg-black">
