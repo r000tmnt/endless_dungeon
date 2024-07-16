@@ -200,6 +200,7 @@ li{
 }
 
 #action_menu, #option_menu{
+    top: 0;
     width: 30%;
     transition: margin-left .1s ease-in-out;
 }
@@ -224,7 +225,7 @@ li{
 }
 
 .action_menu_close{
-    margin-left: -100%;
+    margin-left: -105%;
     z-index: 12;
 }
 
