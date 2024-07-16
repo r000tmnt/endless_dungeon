@@ -10,8 +10,7 @@ import { changeLanguage, t } from './utils/i18n.js'
 import { 
     uiInit,
     reRenderUi,
-    canvas, 
-    resize, 
+    canvas,
     getPosition, 
     resetActionMenu, 
     alterActionMenu,
@@ -216,7 +215,9 @@ class Game{
             displayLanguageSelection()
         }else{
             changeLanguage(localStorage.getItem('lng'))
-            displayTitleScreen()
+            setTimeout(() => {
+                displayTitleScreen()
+            }, 500);
         }
         // this.beginNextPhase()
     }
@@ -776,6 +777,3 @@ uiInit(game)
 defineSubMenu(game)
 
 export default game
-
-resize()
-window.addEventListener('resize', resize, false);
