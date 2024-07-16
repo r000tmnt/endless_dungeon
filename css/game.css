@@ -165,7 +165,7 @@ li{
 
 #titleScreen > .tap{
     opacity: 0;
-    top: 75%;
+    top: 70%;
 }
 
 #titleAction{
@@ -195,8 +195,7 @@ li{
 
 #turn{
     padding: 5px;
-    right: 0;
-    z-index: 10;
+    margin-left: auto;
 }
 
 #action_menu, #option_menu{
