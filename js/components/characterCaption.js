@@ -21,20 +21,18 @@ export default class CharacterCaption extends HTMLElement {
             this.innerHTML = this.render(newValue)
             this.style.width = Math.floor(50 * (width / 100)) + 'px'
 
-            const position = {
-                x: Math.floor(newValue.x / tileSize),
-                y: Math.floor(newValue.y / tileSize),
-            }
+            const x = parseInt(newValue.x / tileSize)
+            const y = parseInt(newValue.y / tileSize)
 
             // Shift UI position based on the character position
-            if(position.y > 7 && position.x < Math.floor(9/2)){
+            if(y > 7 && x < Math.floor(9/2)){
                 this.style.left = ((tileSize * 9) - this.clientWidth) + 'px'
             }else{
                 this.style.left = 'unset'
             }
 
             // Shift UI position based on the character position
-            if(position.y < 7 && position.x < Math.floor(9/2)){
+            if(y < 7 && x < Math.floor(9/2)){
                 document.getElementById("action_menu").style.left = (tileSize * 6) + 'px'
             }else{
                 document.getElementById("action_menu").style.left = 'unset'
