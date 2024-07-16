@@ -5,7 +5,8 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/game.css">
-    <script src="js/component/titleScreen.js" type="module"></script>
+    <script src="js/components/titleScreen.js" type="module"></script>
+    <script src="js/components/characterCaption.js" type="module"></script>
     <title>Document</title>
 </head>
 <body class="flex relative">
@@ -20,28 +21,10 @@
         <title-screen id="titleScreen" class="menu absolute invisible bg-black text-center border-box text-white"></title-screen>
 
         <!-- Character caption -->
-        <div id="characterCaption" class="absolute invisible bg-white">
-            <div class="caption_top  flex">
-                <h5 id="name"></h5>
-                <span class="flex">
-                    <span id="lv"></span>
-                    <span class="hint">&#11205;</span>
-                </span>
-                <span id="ap"></span>
-            </div>
-            
-            <ul>
-                <li class="gauge">
-                    <div class="hp"></div>
-                </li>
-                <li class="gauge">
-                    <div class="mp"></div>
-                </li>
-            </ul>
-        </div>
+        <character-caption id="characterCaption" class="absolute invisible bg-white"></character-caption>
 
         <!-- Turn Counter -->
-        <div id="turn" class="invisible bg-white"></div>
+        <div id="turn" class="absolute invisible bg-white"></div>
 
         <!-- Game window -->
         <canvas id="game" class="invisible"></canvas>
