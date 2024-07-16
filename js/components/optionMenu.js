@@ -47,7 +47,7 @@ export default class OptionMenu extends HTMLElement {
         game.option.mode = action
         switch(action){
             case 'party':
-                // game.option.setPartyWindow(game.player, setting, game.action)
+                game.option.setPartyWindow(game.player)
                 // partyWindow.classList.remove('invisible')
                 // partyWindow.classList.add('open_window')
             break;
