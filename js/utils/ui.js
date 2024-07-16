@@ -25,7 +25,7 @@ const turnCounter = document.getElementById('turn')
 turnCounter.innerText = 'Turn 1'
 
 // Title scrren UI
-const titleScreen = document.getElementById("titleScreen");
+const titleScreen = document.getElementById("titleScreen")
 // const titleAction = document.getElementById("titleAction").querySelectorAll('li');
 const version = document.getElementById('version')
 
@@ -81,8 +81,6 @@ const resultAction = document.getElementById('resultAction')
 const resultActionOptions = resultAction.querySelectorAll('li')
 const warn = document.getElementById('warn')
 
-// Display app version
-version.innerHTML = `Version: ${__APP_VERSION__}`
 
 // Title screen action child click event
 // for(let i=0; i < titleAction.length; i++){
@@ -551,50 +549,16 @@ export const displayLanguageSelection = () => {
             localStorage.setItem('lng', lb.dataset.lng)
             changeLanguage(lb.dataset.lng)
             language.classList.add('invisible')
-            displayTitleScreen()
+            setTimeout(() => {
+                displayTitleScreen()
+            }, 500);
         })
     })
 }
 
 // Display title screen
 export const displayTitleScreen = () => {
-    titleScreen.classList.remove('invisible')
-    titleScreen.classList.add('open_window')
-
-    const tap = titleScreen.children[1]
-
-    // Display tap to start
-    const tapInterval = setInterval(() => {
-        if(tap.classList.contains('fade_in')){
-            tap.classList.remove("fade_in")
-            tap.classList.add("fade_out")
-        }else{
-            tap.classList.remove("fade_out")
-            tap.classList.add("fade_in")
-        }
-    }, 1000);
-
-    setTimeout(() => {
-        titleScreen.addEventListener('click', () => {
-            if(titleScreen.classList.contains('open_window')){
-                clearInterval(tapInterval)
-                tap.classList.add("fade_out")
-                // document.getElementById("titleAction").classList.remove('invisible')
-
-                // Start game
-                titleScreen.classList.remove('open_window')
-                titleScreen.classList.add('invisible')
-                
-                setTimeout(async() => {
-                    await level.load('tutorial_1').then(() => {
-                        game.level = JSON.parse(JSON.stringify(level.getOne('tutorial_1')));
-                        setting.currentLevel = "tutorial_1"
-                        game.beginNextPhase()                          
-                    })
-                }, 500)            
-            }
-        })        
-    }, 1000)
+    titleScreen.setAttribute("show", true)
 }
 
 // Display the battle result screen
@@ -992,13 +956,15 @@ export const resize = () => {
     appWrapper.style.width = cameraWidth  + 'px';
     appWrapper.style.height = cameraHeight + 'px';
 
-    titleScreen.style.width = cameraWidth  + 'px';
-    titleScreen.style.height = cameraHeight + 'px';
-    titleScreen.children[0].style.fontSize = fontSize + 'px';
+    titleScreen.setAttribute("width", cameraWidth)
 
-    loadingScreen.style.width = cameraWidth + 'px'
-    loadingScreen.style.height = cameraHeight + 'px'
-    loadingScreen.style.fontSize = fontSize_md + 'px'
+    // titleScreen.style.width = cameraWidth  + 'px';
+    // titleScreen.style.height = cameraHeight + 'px';
+    // titleScreen.children[0].style.fontSize = fontSize + 'px';
+
+    // loadingScreen.style.width = cameraWidth + 'px'
+    // loadingScreen.style.height = cameraHeight + 'px'
+    // loadingScreen.style.fontSize = fontSize_md + 'px'
 
     // Set phase transition style
     phaseWrapper.style.width = cameraWidth + 'px'
