@@ -32,13 +32,30 @@ export default class OptionMenu extends HTMLElement {
     }
 
     render(){
+        const { fontSize } = setting.general
         return `
             <ul id="option_list">
-                <li class="action" data-option="party">Party</li>
-                <li class="action" data-option="objective">Objective</li>
-                <li class="action" data-option="config">Config</li>
+                <li 
+                    class="action" 
+                    data-option="party"
+                    style="font-size: ${fontSize}px"
+                >Party</li>
+                <li 
+                    class="action" 
+                    data-option="objective"
+                    style="font-size: ${fontSize}px"    
+                >Objective</li>
+                <li 
+                    class="action" 
+                    data-option="config"
+                    style="font-size: ${fontSize}px">Config</li>
                 <!-- <li class="action" data-option="save">Save</li> -->
-                <li class="action" data-option="end">End Turn</li>
+                <li 
+                    class="action" 
+                    data-option="end"
+                    style="font-size: ${fontSize}px">
+                    End Turn
+                </li>
             </ul>
         `
     }
