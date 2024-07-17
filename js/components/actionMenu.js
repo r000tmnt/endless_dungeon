@@ -38,15 +38,36 @@ export default class ActionMenu extends HTMLElement {
     }
 
     render(){
+        const { fontSize } = setting.general
         return `
             <ul id="action_list">
-                <li class="action" data-action="move">Move</li>
-                <li class="action" data-action="attack">Attack</li>
-                <li class="action" data-action="skill">Skill</li>
-                <li class="action" data-action="item">Item</li>
-                <li class="action hide" data-action="pick">Pick</li>
-                <li class="action" data-action="status">Status</li>
-                <li class="action" data-action="stay">Stay</li>
+                <li 
+                    class="action" 
+                    data-action="move"
+                    style="font-size: ${fontSize}px">Move</li>
+                <li 
+                    class="action" 
+                    data-action="attack"
+                    style="font-size: ${fontSize}px">Attack</li>
+                <li 
+                    class="action" 
+                    data-action="skill"
+                    style="font-size: ${fontSize}px">Skill</li>
+                <li 
+                    class="action" 
+                    data-action="item"
+                    style="font-size: ${fontSize}px">Item</li>
+                <li 
+                    class="action hide" data-action="pick"
+                    style="font-size: ${fontSize}px">Pick</li>
+                <li 
+                    class="action" 
+                    data-action="status"
+                    style="font-size: ${fontSize}px">Status</li>
+                <li 
+                    class="action" 
+                    data-action="stay"
+                    style="font-size: ${fontSize}px">Stay</li>
             </ul>
         `
     }
