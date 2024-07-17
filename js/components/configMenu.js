@@ -47,6 +47,12 @@ export default class ConfigMenu extends HTMLElement {
                 resizeHiddenElement(this.style, width, height, fontSize_md)
                 this.setAttribute("resize", null)       
                 this.innerHTML = this.render()         
+                game.actionCancelSound.bindTarget(this.children[1])
+                this.children[1].addEventListener('click', () => {
+                    this.setAttribute("show", false)
+                    game.option = ''
+                    resizeHiddenElement(this.style, 0, 0, 0)
+                })
             }
         }
     }
