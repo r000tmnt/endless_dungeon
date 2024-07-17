@@ -216,7 +216,7 @@ export default class ConfigMenu extends HTMLElement {
                 break;
                 case 'filter':
                     this.list[i].addEventListener('click', () => {
-                        setting.general.showGrid = this.list[i].value === 'true'? true : false
+                        setting.general.filter = this.list[i].value
                     })
                 break;
                 case 'language':
