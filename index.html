@@ -10,6 +10,7 @@
     <script src="js/components/optionMenu.js" type="module"></script>
     <script src="js/components/actionMenu.js" type="module"></script>
     <script src="js/components/partyMenu.js" type="module"></script>
+    <script src="js/components/configMenu.js" type="module"></script>
     <title>Document</title>
 </head>
 <body class="flex relative">
@@ -39,80 +40,7 @@
         <party-menu id="party" class="menu absolute invisible border-box text-white bg-black"></party-menu>
 
         <!-- Config -->
-        <div id="config" class="menu absolute invisible border-box text-white bg-black">
-            <div>Config</div>
-
-            <button class="back absolute" data-action="config" type="button">BACK</button>
-
-            <table id="config_option" class="disable-scrollbars">
-                <tbody>
-                    <!-- BGM -->
-                    <tr>
-                        <td>BGM</td>
-                        <td>
-                            <input id="bgm" min="0" max="100" type="range" class="w-full" data-config="bgm" name="bgm" > 
-                        </td>
-                    </tr>
-                    <!-- SE -->
-                    <tr>
-                        <td>SE</td>
-                        <td>
-                            <input id="se" min="0" max="100" type="range" class="w-full" data-config="se" name="se" > 
-                        </td>    
-                    </tr>
-                    <!-- Grid -->
-                    <tr>
-                        <td>Grid</td>
-                        <td class="flex evenly">
-                            <label for="grid">
-                                Display
-                            </label>
-                            <input type="radio" data-config="grid" name='grid' value="true"> 
-
-                            <label for="grid">
-                                Hide
-                            </label>
-                            <input type="radio" data-config="grid" name='grid' value="false">
-                        </td>
-                    </tr>
-
-                    <!-- Character image filter -->
-                    <tr>
-                        <td>Filter</td>
-
-                        <td class="flex evenly">
-                            <label for="default">
-                                Default
-                            </label>
-                            <input type="radio" data-config="filter" name="filter" value="default"> 
-
-                            <label for="retro">
-                                Retro
-                            </label>
-                            <input type="radio" data-config="filter" name="filter" value='retro'>
-                        </td>
-                    </tr> 
-                    
-                    <!-- Language selector -->
-                    <tr>
-                        <td>
-                            Language
-                        </td>
-                        <td class="flex evenly">
-                            <label for="default">
-                                English
-                            </label>
-                            <input type="radio" data-config="language" name="language" value="en"> 
-
-                            <label for="retro">
-                                繁體中文
-                            </label>
-                            <input type="radio" data-config="language" name="language" value='zh'>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+        <config-menu id="config" class="menu absolute invisible border-box text-white bg-black"></config-menu>
         
         <!-- Objective -->
         <div id="objective" class="menu absolute invisible border-box text-white bg-black">
