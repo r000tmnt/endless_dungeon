@@ -168,6 +168,8 @@ export const reRenderUi = (game) => {
             finishBtn[0].innerText = t('ui.inventory.range.cancel')
         
             finishBtn[1].innerText = t('ui.inventory.range.confirm')
+
+            const configOption = document.getElementById('config_option')
         
             // config options
             const tableRows = Array.from(configOption.querySelectorAll('tr'))
@@ -259,14 +261,6 @@ export const uiInit = (game) => {
                     game.option = ''
                     objectiveWindow.classList.add('invisible')
                     objectiveWindow.classList.remove('open_window')
-                })
-            break;
-            case 'config':
-                game.actionCancelSound.bindTarget(backBtn[i])
-                backBtn[i].addEventListener('click', () => {
-                    game.option = ''
-                    configWindow.classList.add('invisible')
-                    configWindow.classList.remove('open_window')
                 })
             break;
         }
