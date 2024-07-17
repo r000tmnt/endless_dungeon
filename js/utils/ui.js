@@ -253,19 +253,10 @@ export const uiInit = (game) => {
                     await closePickUpWindow()
                 })
             break;
-            case 'party':
-                game.actionCancelSound.bindTarget(backBtn[i])
-                backBtn[i].addEventListener('click', () => {
-                    partyWindow.classList.add('invisible')
-                    partyWindow.classList.remove('open_window')
-                    game.option.mode = ''
-                    game.option.cleatPartyWindow(partyWindow.style)
-                })
-            break;
             case 'objective':
                 game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', () => {
-                    game.option.mode = ''
+                    game.option = ''
                     objectiveWindow.classList.add('invisible')
                     objectiveWindow.classList.remove('open_window')
                 })
@@ -273,7 +264,7 @@ export const uiInit = (game) => {
             case 'config':
                 game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', () => {
-                    game.option.mode = ''
+                    game.option = ''
                     configWindow.classList.add('invisible')
                     configWindow.classList.remove('open_window')
                 })
@@ -840,11 +831,9 @@ export const resize = () => {
                     break;
                 }
 
-                switch(game.option.mode){
+                switch(game.option){
                     case 'party':
-                        // Set party window style
-                        resizeHiddenElement(partyWindow.style, cameraWidth, cameraHeight, fontSize_sm)
-                        game.option.resizePartyWindow(setting)
+                        partyWindow.setAttribute("resize", true)
                     break;
                     case 'objective':
                         game.option.resizeObjectiveWindow(objectiveWindow, setting)
