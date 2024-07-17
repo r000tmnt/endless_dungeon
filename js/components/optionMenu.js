@@ -57,9 +57,8 @@ export default class OptionMenu extends HTMLElement {
                 // })
             break;
             case 'config':
-                // game.option.setConfigWindow(setting)
-                // configWindow.classList.remove('invisible')
-                // configWindow.classList.add('open_window')
+                const configWindow = document.getElementById('config')
+                configWindow.setAttribute("show", true)
             break;
             case 'end':
                 game.player.forEach(p => {
