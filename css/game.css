@@ -225,11 +225,13 @@ li{
 }
 
 .action_menu_close{
-    margin-left: -105%;
+    visibility: hidden;
+    margin-left: -100%;
     z-index: 12;
 }
 
 .action_menu_open{
+    visibility: visible;
     margin-left: 0;
 }
 
