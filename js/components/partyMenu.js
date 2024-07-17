@@ -104,10 +104,18 @@ export default class PartyMenu extends HTMLElement {
     }
 
     render(){
+        const {fontSize_md, fontSize_sm} = setting.general
+
         return `
             <div>Party</div>
 
-            <button class="back absolute" data-action="party" type="button">BACK</button>
+            <button 
+                class="back absolute" 
+                data-action="party" 
+                type="button"
+                style="transform: translateX(-${fontSize_sm}px);top: ${fontSize_sm}px;fontSize: ${fontSize_md}px" >
+                    BACK
+                </button>
 
             <ul id="member_list" class="disable-scrollbars bg-black"></ul>
         `
