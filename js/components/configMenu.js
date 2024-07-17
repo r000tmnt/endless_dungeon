@@ -40,15 +40,19 @@ export default class ConfigMenu extends HTMLElement {
         }
 
         if(name === "resize"){
-            const { fontSize_md, camera } = setting.general
-            const { width, height } = camera
-            this.style.fontSize = setting.general.fontSize_md + 'px'
-            resizeHiddenElement(this.style, width, height, fontSize_md)
+            if(newValue !== 'null'){
+                const { fontSize_md, camera } = setting.general
+                const { width, height } = camera
+                this.style.fontSize = setting.general.fontSize_md + 'px'
+                resizeHiddenElement(this.style, width, height, fontSize_md)
+                this.setAttribute("resize", null)       
+                this.innerHTML = this.render()         
+            }
         }
     }
 
     render(){
-        const { fontSize, fontSize_md, camera } = setting.general
+        const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
         const { width, height } = camera
 
         return `
@@ -56,7 +60,13 @@ export default class ConfigMenu extends HTMLElement {
                 ${t('ui.option.config')}
             </div>
 
-            <button class="back absolute" data-action="config" type="button">${t('back')}</button>
+            <button 
+                class="back absolute" 
+                data-action="config" 
+                type="button"
+                style="transform: translateX(-${fontSize_sm}px);top: ${fontSize_sm}px;fontSize: ${fontSize_md}px" >
+                 ${t('back')}
+                </button>
 
             <table 
                 id="config_option" 
