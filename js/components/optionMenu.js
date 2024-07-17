@@ -43,13 +43,13 @@ export default class OptionMenu extends HTMLElement {
         `
     }
 
-    executeOption(action){
-        game.option.mode = action
-        switch(action){
+    executeOption(option){
+        game.option = option
+        switch(option){
             case 'party':
-                game.option.setPartyWindow(game.player)
-                // partyWindow.classList.remove('invisible')
-                // partyWindow.classList.add('open_window')
+                const partyWindow = document.getElementById('party')
+                partyWindow.setAttribute("show", true)
+                partyWindow.setAttribute("member", JSON.stringify(game.player))
             break;
             case 'objective':
                 // options[i].addEventListener('click', () => {
