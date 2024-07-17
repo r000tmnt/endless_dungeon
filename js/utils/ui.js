@@ -65,7 +65,6 @@ const partyWindow = document.getElementById('party')
 
 // Config UI
 const configWindow = document.getElementById('config')
-const configOption = document.getElementById('config_option')
 
 // Objective UI
 const objectiveWindow = document.getElementById('objective')
@@ -712,16 +711,7 @@ export const setCanvasPosition = (tileSize) => {
     canvasPosition = canvas.getBoundingClientRect();
 }
 
-export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_sm) => {
-        // action menu child font size
-        for(let i=0; i < actionMenuOptions.length; i++){
-            actionMenuOptions[i].style.fontSize = fontSize + 'px';
-        }
-    
-        // option menu child font size
-        for(let i=0; i < options.length; i++){
-            options[i].style.fontSize = fontSize_md + 'px';
-        }       
+export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_sm) => {   
     
         // Set warning window style
         warn.style.width = (width - (fontSize_md * 2)) + 'px'
@@ -729,13 +719,7 @@ export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_s
         warn.style.fontSize = fontSize_md + 'px'
 
         Array.from(levelClear.getElementsByTagName('button')).forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
-    
-        // Set back button style
-        for(let i=0; i < backBtn.length; i++){
-            backBtn[i].style.transform = `translateX(-${fontSize_sm}px)`
-            backBtn[i].style.top = fontSize_sm + 'px'      
-            backBtn[i].style.fontSize = fontSize_md + 'px'  
-        }
+
 }
 
 export const resize = () => {
@@ -833,11 +817,7 @@ export const resize = () => {
                         game.option.resizeObjectiveWindow(objectiveWindow, setting)
                     break;
                     case 'config':
-                        // Set config window style
-                        configWindow.style.fontSize = fontSize_md + 'px'
-                        configOption.style.width = (cameraWidth - (fontSize_md * 2)) + 'px'
-                        configWindow.children[0].style.fontSize = fontSize + 'px'
-                        resizeHiddenElement(configWindow.style, cameraWidth, cameraHeight, fontSize_sm)
+                        configWindow.setAttribute("resize", true)
                     break;
                 }
             break;
