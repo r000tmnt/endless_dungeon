@@ -11,6 +11,7 @@
     <script src="js/components/actionMenu.js" type="module"></script>
     <script src="js/components/partyMenu.js" type="module"></script>
     <script src="js/components/configMenu.js" type="module"></script>
+    <script src="js/components/objectiveMenu.js" type="module"></script>
     <title>Document</title>
 </head>
 <body class="flex relative">
@@ -24,48 +25,12 @@
         <!-- Title Screen -->
         <title-screen id="titleScreen" class="menu absolute invisible bg-black text-center border-box text-white"></title-screen>
 
-        <!-- Character caption -->
-        <character-caption id="characterCaption" class="absolute invisible bg-white"></character-caption>
-
         <!-- Turn Counter -->
         <div id="turn" class="absolute invisible bg-white"></div>
 
         <!-- Game window -->
         <canvas id="game" class="invisible"></canvas>
 
-        <!-- Option Menu -->
-        <option-menu id="option_menu" class="absolute action_menu_close"></option-menu>
-
-        <!-- Party -->
-        <party-menu id="party" class="menu absolute invisible border-box text-white bg-black"></party-menu>
-
-        <!-- Config -->
-        <config-menu id="config" class="menu absolute invisible border-box text-white bg-black"></config-menu>
-        
-        <!-- Objective -->
-        <div id="objective" class="menu absolute invisible border-box text-white bg-black">
-            <div>Objective</div>
-
-            <button class="back absolute" data-action="objective" type="button">BACK</button>
-
-            <ul>
-                <li class="bg-black">
-                   <div class="label bg-black relative">Victory</div> 
-                   <div class="desc" data-objective="victory"></div>
-                </li>
-                <li class="bg-black">
-                    <div class="label bg-black relative">Fail</div>
-                    <div class="desc" data-objective="fail"></div>
-                </li>
-                <li class="bg-black">
-                    <div class="label bg-black relative">Optional</div> 
-                    <div class="desc" data-objective="optional"></div>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Action Menu -->
-        <action-menu id="action_menu" class="absolute action_menu_close"></action-menu>
 
         <!-- Skill name place holder -->
         <div id="skillName" class="absolute text-center w-full">
