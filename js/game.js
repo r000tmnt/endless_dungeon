@@ -2,14 +2,12 @@ import TileMap from './TileMap.js';
 import Grid from './grid.js';
 import Action from './action.js';
 import Range from './range.js';
-import Option from './option.js';
 import TextBox from './textBox.js';
 import Audio from './audio.js';
 import { changeLanguage, t } from './utils/i18n.js'
 
 import { 
     uiInit,
-    reRenderUi,
     canvas,
     getPosition, 
     resetActionMenu, 
@@ -57,7 +55,7 @@ class Game{
         this.grid = null;
         this.range = null;
         this.action = new Action('', [], [], 0, false); 
-        this.option = new Option('');
+        this.option = '';
         this.textBox = null;
         this.player = [];
         this.playerPosition = [];
@@ -198,8 +196,6 @@ class Game{
     // 1-2. Load game ---> Display save slots
     // 1-3. Quit ---> Close the game
     init = async() => {
-        this.option.setConfigOption(setting);
-
         // Define sound effects
         this.menuOpenSound = new Audio(`${__BASE_URL__}assets/audio/menu_selection.mp3`, 'interface')
         this.menuCloseSound = new Audio(`${__BASE_URL__}assets/audio/menu_close.mp3`, 'interface')
@@ -227,7 +223,6 @@ class Game{
             this.phaseCount = 0
             // Load the next level
         }else{
-            reRenderUi(game)
             switch(this.level.phase[this.phaseCount]){
                 case 'conversation':
                     const { cameraWidth, cameraHeight } = redefineDeviceWidth()
