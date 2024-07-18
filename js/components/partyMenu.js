@@ -4,7 +4,7 @@ import { resizeHiddenElement } from "../utils/ui"
 import { t } from "../utils/i18n.js"
 
 export default class PartyMenu extends HTMLElement {
-    static observedAttributes = ["member", "show", "resize"]
+    static observedAttributes = ["member", "show"]
 
     constructor(){
         super()
@@ -12,7 +12,9 @@ export default class PartyMenu extends HTMLElement {
     }
 
     connectedCallback() {
-        this.innerHTML = this.render()
+        this.render()
+        this.setAttribute("id", "party-menu")
+        this.className = "menu absolute invisible border-box text-white bg-black"
         this.list = this.children[2]
     
         // Close button click event
@@ -67,19 +69,11 @@ export default class PartyMenu extends HTMLElement {
         }
 
         if(name === "show"){
-            const { fontSize, fontSize_md, camera } = setting.general
-            const { itemBlockSize } = setting.inventory
+            const { fontSize_md, camera } = setting.general
             const { width, height } = camera
 
-            const show = newValue === 'true'
-
-            if(show){
+            if(newValue === 'true'){
                 resizeHiddenElement(this.style, width, height, fontSize_md)
-
-                this.children[0].innerText = t('ui.option.party')
-                this.children[0].style.fontSize = fontSize + 'px'
-                this.children[2].style.fontSize = fontSize_md + 'px'
-                this.children[2].style.maxHeight = (itemBlockSize * 3) + 'px'
                 this.classList.add("open_window")
                 this.classList.remove("invisible")
             }else{
@@ -87,38 +81,41 @@ export default class PartyMenu extends HTMLElement {
                 this.classList.remove("open_window")
             }
         }
-
-        if(name === "resize"){
-            if(newValue !== 'null'){
-                const { fontSize, fontSize_md, camera } = setting.general
-                const { width, height } = camera
-                const { itemBlockSize } = setting.inventory
-                resizeHiddenElement(this.style, width, height, fontSize_md)
-                this.children[0].style.fontSize = fontSize + 'px'
-                this.children[2].style.fontSize = fontSize_md + 'px'
-                this.children[2].style.maxHeight = (itemBlockSize * 3) + 'px'
-                this.setAttribute("member", JSON.stringify(game.player))
-                this.setAttribute("resize", null)
-            }
-        }
     }
 
     render(){
-        const {fontSize_md, fontSize_sm} = setting.general
+        const {fontSize, fontSize_md, fontSize_sm} = setting.general
+        const { itemBlockSize } = setting.inventory
 
-        return `
-            <div>Party</div>
+        this.innerHTML = `
+            <div style="font-size:${fontSize}px">
+                ${t('ui.option.party')}
+            </div>
 
             <button 
                 class="back absolute" 
                 data-action="party" 
                 type="button"
-                style="transform: translateX(-${fontSize_sm}px);top: ${fontSize_sm}px;fontSize: ${fontSize_md}px" >
-                    BACK
+                style="transform: translateX(-${fontSize_sm}px);top: ${fontSize_sm}px;font-size: ${fontSize_md}px" >
+                    ${t('back')}
                 </button>
 
-            <ul id="member_list" class="disable-scrollbars bg-black"></ul>
+            <ul 
+                id="member_list" 
+                class="disable-scrollbars bg-black"
+                style="font-size:${fontSize_md}px;max-height:${itemBlockSize * 3}px"></ul>
         `
+    }
+
+    resize(){
+        const { fontSize, fontSize_md, camera } = setting.general
+        const { width, height } = camera
+        const { itemBlockSize } = setting.inventory
+        resizeHiddenElement(this.style, width, height, fontSize_md)
+        this.children[0].style.fontSize = fontSize + 'px'
+        this.children[2].style.fontSize = fontSize_md + 'px'
+        this.children[2].style.maxHeight = (itemBlockSize * 3) + 'px'
+        this.setAttribute("member", JSON.stringify(game.player))
     }
 
     getPlayerStatus(){
