@@ -26,8 +26,6 @@ turnCounter.innerText = 'Turn 1'
 
 // Title scrren UI
 const titleScreen = document.getElementById("titleScreen")
-// const titleAction = document.getElementById("titleAction").querySelectorAll('li');
-const version = document.getElementById('version')
 
 // Loading screen UI
 const loadingScreen = document.getElementById("Loading");
@@ -37,15 +35,13 @@ const phaseWrapper = document.getElementById('Phase_Transition');
 const phaseElement = document.getElementById('phase');
 
 // Actiom menu UI
-const actionMenu = document.getElementById('action_menu');
-const actionMenuOptions = actionMenu.getElementsByTagName('li')
+let actionMenu = null;
 
 // Option menu UI
-const option_menu = document.getElementById('option_menu')
-const options = option_menu.getElementsByTagName('li')
+let optionMenu = null;
 
 // Character caption UI
-const characterCaption = document.getElementById('characterCaption')
+let characterCaption = null;
 
 // Status UI
 const statusWindow = document.getElementById('status')
@@ -61,13 +57,13 @@ const pickUpWindow = document.getElementById('pickUp')
 const skillWindow = document.getElementById('skill')
 
 // Party UI
-const partyWindow = document.getElementById('party')
+let partyMenu = null;
 
 // Config UI
-const configWindow = document.getElementById('config')
+let configMenu = null;
 
 // Objective UI
-const objectiveWindow = document.getElementById('objective')
+let objectiveMenu = null;
 
 // UI after Battle finished
 const levelClear = document.getElementById('levelClear')
@@ -137,9 +133,7 @@ export const reRenderUi = (game) => {
         break;
         case 'battle':
             // option menu child inner text
-            for(let i=0; i < options.length; i++){
-                options[i].innerText = t(`ui.option.${options[i].dataset.option}`)
-            }
+            optionMenu.changeLanguage()
         
             // Back button inner text
             for(let i=0; i < backBtn.length; i++){
@@ -147,9 +141,7 @@ export const reRenderUi = (game) => {
             }
         
             // action menu child inner text
-            for(let i=0; i < actionMenuOptions.length; i++){
-                actionMenuOptions[i].innerText = t(`ui.action.${actionMenuOptions[i].dataset.action}`)
-            }
+            actionMenu.changeLanguage()
         
             // Result action child inner text
             for(let i=0; i < resultActionOptions.length; i++){
@@ -168,29 +160,7 @@ export const reRenderUi = (game) => {
         
             finishBtn[1].innerText = t('ui.inventory.range.confirm')
 
-            const configOption = document.getElementById('config_option')
-        
-            // config options
-            const tableRows = Array.from(configOption.querySelectorAll('tr'))
-
-            tableRows[0].children[0].innerText = t('ui.config.bgm')
-            tableRows[1].children[0].innerText = t('ui.config.se')
-            tableRows[2].children[0].innerText = t('ui.config.grid')
-            tableRows[3].children[0].innerText = t('ui.config.filter')
-            tableRows[4].children[0].innerText = t('ui.config.language')
-
-            const gridLabel = tableRows[2].children[1].querySelectorAll('label')
-            const filterLabel = tableRows[3].children[1].querySelectorAll('label')
-            const languageInput = tableRows[4].children[1].querySelectorAll('input')
-
-            gridLabel[0].innerText = t('ui.config.on')
-            gridLabel[1].innerText = t('ui.config.off')
-            filterLabel[0].innerText = t('ui.config.default')
-            filterLabel[1].innerText = t('ui.config.retro')
-
-            languageInput.forEach(l => {
-                l.checked = l.value === i18n.language
-            })
+            configMenu.changeLanguage()
         break;
         case 'intermission':
         break;
@@ -252,14 +222,6 @@ export const uiInit = (game) => {
                 game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', async() => {
                     await closePickUpWindow()
-                })
-            break;
-            case 'objective':
-                game.actionCancelSound.bindTarget(backBtn[i])
-                backBtn[i].addEventListener('click', () => {
-                    game.option = ''
-                    objectiveWindow.classList.add('invisible')
-                    objectiveWindow.classList.remove('open_window')
                 })
             break;
         }
@@ -517,8 +479,7 @@ export const resizeHiddenElement = (target, width, height, size) => {
     target.height = height + 'px'
 }
 
-export const toggleTurnElement = (display) => 
-{
+export const toggleTurnElement = (display) => {
     if(display){
         turnCounter.classList.remove('invisible')
     }else{
@@ -573,19 +534,15 @@ export const hideUIElement = () => {
 export const cancelAction = () => {
     game.actionCancelSound.element.play()
 
-    if(!characterCaption.classList.contains('invisible')){
-        characterCaption.classList.add('invisible') 
-    }else{
-        characterCaption.classList.remove('invisible') 
-    }
+    characterCaption.setAttribute("show", !characterCaption.classList.contains("invisible"))
 
-    if(actionMenu.classList.contains('action_menu_open')){
-        actionMenu.classList.remove('action_menu_open') 
-    }else{
-        actionMenu.classList.add('action_menu_open') 
-    }
+    actionMenu.setAttribute("show", !actionMenu.classList.contains('action_menu_open'))
 
     game.action.mode = ''  
+}
+
+export const getLevelObjective = () => {
+    objectiveMenu.renderObjective()
 }
 
 export const displayUIElement = () => {
@@ -599,21 +556,7 @@ export const prepareCharacterCaption = (inspectingCharacter) => {
 }
 
 export const toggleActionMenuOption = (action, disable, mode = '') => {
-    for(let i=0; i < actionMenuOptions.length; i++){
-        if(actionMenuOptions[i].dataset.action === action){
-            if(mode.length){
-                if(mode === 'event'){
-                    actionMenuOptions[i].style.display = (disable)? 'none' : 'block'
-                }
-            }else
-            if(disable){
-                actionMenuOptions[i].classList.add('button_disable')
-            }else{
-                actionMenuOptions[i].classList.remove('button_disable')
-            }
-            return
-        }
-    }
+    actionMenu.toggleOption(action, disable, mode)
 }
 
 export const toggleActionMenuAndCharacterCaption = () => {
@@ -627,29 +570,23 @@ export const toggleActionMenuAndCharacterCaption = () => {
 }
 
 export const resetActionMenu = async(x, y) => {
-    for(let i=0; i < actionMenuOptions.length; i++){
-        actionMenuOptions[i].style.display = 'block'
-    }
+    actionMenu.render()
 
     const event = await game.checkIfStepOnTheEvent(x, y)
 
-    if(event === undefined) actionMenuOptions[4].style.display = 'none'
+    if(event === undefined) toggleActionMenuOption("pick", true, 'event')
 }
 
 export const alterActionMenu = () => {
-    for(let i=0; i < actionMenuOptions.length; i++){
-        if (actionMenuOptions[i].dataset.action !== 'status'){
-            actionMenuOptions[i].style.display = 'none'
-        }
-    }
+    actionMenu.excludeOption("status")
 }
 
 export const toggleOptionMenu = () => {
-    option_menu.setAttribute("show", true)
+    optionMenu.setAttribute("show", !optionMenu.className.includes("action_menu_open"))
 }
 
 export const hideOptionMenu = () => {
-    option_menu.classList.remove('action_menu_open')
+    optionMenu.classList.remove('action_menu_open')
 }
   
 // Get the position on the tileMap
@@ -712,14 +649,113 @@ export const setCanvasPosition = (tileSize) => {
 }
 
 export const setBattlePhaseUIElement = (width, fontSize, fontSize_md, fontSize_sm) => {   
-    
-        // Set warning window style
-        warn.style.width = (width - (fontSize_md * 2)) + 'px'
-        warn.style.padding = fontSize_md + 'px'
-        warn.style.fontSize = fontSize_md + 'px'
+    // Set warning window style
+    warn.style.width = (width - (fontSize_md * 2)) + 'px'
+    warn.style.padding = fontSize_md + 'px'
+    warn.style.fontSize = fontSize_md + 'px'
 
-        Array.from(levelClear.getElementsByTagName('button')).forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
+    Array.from(levelClear.getElementsByTagName('button')).forEach(fb => fb.style.fontSize = fontSize_sm + 'px')
 
+}
+
+export const appendCustomElements = async() => {
+    const customElements = [
+        document.createElement("action-menu"),
+        document.createElement("character-caption"),
+        document.createElement("config-menu"),
+        document.createElement("objective-menu"),
+        document.createElement("option-menu"),
+        document.createElement("party-menu"),
+        // And more...
+    ]
+
+    customElements.forEach(ce => {
+        appWrapper.append(ce)
+    })
+
+    // Setup controller
+    actionMenu = document.getElementById("action-menu")
+    characterCaption = document.getElementById("character-caption")
+    configMenu = document.getElementById("config-menu")
+    objectiveMenu = document.getElementById("objective-menu")
+    optionMenu = document.getElementById("option-menu")
+    partyMenu = document.getElementById("party-menu")
+}
+
+// action menu child click event
+export const executeAction = async(action) => {
+    game.action.mode = action
+    hideUIElement() 
+    const { tileSize } = setting.general
+    const position = {
+        col: parseInt(game.inspectingCharacter.x / tileSize),
+        row: parseInt(game.inspectingCharacter.y / tileSize),
+    }
+
+    switch(action){
+        case 'move':
+            const possibleEncounterEnemyPosition = game.limitPositonToCheck(game.inspectingCharacter.totalAttribute.moveSpeed, position, game.enemyPosition)
+            await game.action.setMove(
+                game.tileMap, 
+                game.inspectingCharacter, 
+                position, 
+                game.inspectingCharacter.totalAttribute.moveSpeed, possibleEncounterEnemyPosition.length? possibleEncounterEnemyPosition : game.enemyPosition
+            )
+        break;
+        case 'attack':
+            await game.action.setAttack(game.tileMap, game.inspectingCharacter, position, 1)
+        break;   
+        case "skill":{
+            const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
+            const { width, height } = camera
+            resizeHiddenElement(skillWindow.style, width, height, fontSize_sm)
+            game.action.setSKillWindow(game.inspectingCharacter, game.tileMap, position, fontSize, fontSize_md, fontSize_sm)
+        }
+        break;
+        case 'item':
+            prepareInventory(game.inspectingCharacter)
+        break; 
+        case 'pick':
+            preparePickUpWindow()
+        break;
+        case 'status':{
+            const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
+            const { width, height } = camera
+            resizeHiddenElement(statusWindow.style, width, height, fontSize_sm)
+            game.action.setStatusWindow(game.inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
+        }
+        break;
+        case 'stay':
+            setTimeout(() => {
+                game.inspectingCharacter.totalAttribute.ap = 0
+                game.characterAnimationPhaseEnded(game.inspectingCharacter)
+            }, 500)
+        break;
+    }
+}
+
+export const executeOption = (option) => {
+    game.option = option
+    switch(option){
+        case 'party':
+            partyMenu.setAttribute("show", true)
+            partyMenu.setAttribute("member", JSON.stringify(game.player))
+        break;
+        case 'objective':
+            objectiveMenu.setAttribute("show", true)
+        break;
+        case 'config':
+            configMenu.setAttribute("show", true)
+        break;
+        case 'end':
+            game.player.forEach(p => {
+                p.totalAttribute.ap = 0
+                p.wait = true
+            })
+            game.characterAnimationPhaseEnded(game.player[0])
+            optionMenu.setAttribute("show", false)
+        break;
+    }
 }
 
 export const resize = () => {
@@ -732,15 +768,11 @@ export const resize = () => {
     appWrapper.style.width = cameraWidth  + 'px';
     appWrapper.style.height = cameraHeight + 'px';
 
-    titleScreen.setAttribute("width", cameraWidth)
+    titleScreen.resize()
 
-    // titleScreen.style.width = cameraWidth  + 'px';
-    // titleScreen.style.height = cameraHeight + 'px';
-    // titleScreen.children[0].style.fontSize = fontSize + 'px';
-
-    // loadingScreen.style.width = cameraWidth + 'px'
-    // loadingScreen.style.height = cameraHeight + 'px'
-    // loadingScreen.style.fontSize = fontSize_md + 'px'
+    loadingScreen.style.width = cameraWidth + 'px'
+    loadingScreen.style.height = cameraHeight + 'px'
+    loadingScreen.style.fontSize = fontSize_md + 'px'
 
     // Set phase transition style
     phaseWrapper.style.width = cameraWidth + 'px'
@@ -753,7 +785,9 @@ export const resize = () => {
                 game.textBox.resizeConversationWindow(cameraWidth, cameraHeight, fontSize, fontSize_md, fontSize_sm)
             break;
             case 'battle':
-                if(!characterCaption.classList.contains('invisible')) prepareCharacterCaption(game.inspectingCharacter)
+                actionMenu.resize(fontSize_md)
+                characterCaption.resize(JSON.stringify(game.inspectingCharacter))
+                optionMenu.resize(fontSize_md)
 
                 setCanvasPosition(tileSize)
 
@@ -811,13 +845,13 @@ export const resize = () => {
 
                 switch(game.option){
                     case 'party':
-                        partyWindow.setAttribute("resize", true)
+                        partyMenu.resize()
                     break;
                     case 'objective':
-                        game.option.resizeObjectiveWindow(objectiveWindow, setting)
+                        objectiveMenu.resize()
                     break;
                     case 'config':
-                        configWindow.setAttribute("resize", true)
+                        configMenu.setAttribute("resize", true)
                     break;
                 }
             break;
