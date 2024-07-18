@@ -9,21 +9,13 @@ export default class ConfigMenu extends HTMLElement {
     constructor(){
         super()
         this.list = null
+        this.rows = null
     }
 
     connectedCallback() {
-        this.innerHTML = this.render()
+        this.render()
         this.setAttribute("id", "config-menu")
         this.className = "menu absolute invisible border-box text-white bg-black"
-        this.list = this.children[2].querySelectorAll("input")
-        // Close button click event
-        game.actionCancelSound.bindTarget(this.children[1])
-        this.children[1].addEventListener('click', () => {
-            this.setAttribute("show", false)
-            game.option = ''
-            resizeHiddenElement(this.style, 0, 0, 0)
-        })
-        this.setConfigOption()
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
@@ -47,24 +39,17 @@ export default class ConfigMenu extends HTMLElement {
                 const { width, height } = camera
                 this.style.fontSize = setting.general.fontSize_md + 'px'
                 resizeHiddenElement(this.style, width, height, fontSize_md)
-                this.setAttribute("resize", null)       
-                this.innerHTML = this.render()         
-                game.actionCancelSound.bindTarget(this.children[1])
-                this.children[1].addEventListener('click', () => {
-                    this.setAttribute("show", false)
-                    game.option = ''
-                    resizeHiddenElement(this.style, 0, 0, 0)
-                })
+                this.render()
             }
         }
     }
 
     render(){
         const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
-        const { width, height } = camera
+        const { width } = camera
 
-        return `
-            <div style="fontSize:${fontSize}px">
+        this.innerHTML = `
+            <div style="font-size:${fontSize}px">
                 ${t('ui.option.config')}
             </div>
 
@@ -72,7 +57,7 @@ export default class ConfigMenu extends HTMLElement {
                 class="back absolute" 
                 data-action="config" 
                 type="button"
-                style="transform: translateX(-${fontSize_sm}px);top: ${fontSize_sm}px;fontSize: ${fontSize_md}px" >
+                style="transform: translateX(-${fontSize_sm}px);top: ${fontSize_sm}px;font-size: ${fontSize_md}px" >
                  ${t('back')}
                 </button>
 
@@ -82,7 +67,7 @@ export default class ConfigMenu extends HTMLElement {
                 style="width:${width - (fontSize_md * 2)}px" >
                 <tbody>
                     <!-- BGM -->
-                    <tr>
+                    <tr data-config="bgm">
                         <td>${t('ui.config.bgm')}</td>
                         <td>
                             <input 
@@ -96,7 +81,7 @@ export default class ConfigMenu extends HTMLElement {
                         </td>
                     </tr>
                     <!-- SE -->
-                    <tr>
+                    <tr data-config="se">
                         <td>${t('ui.config.se')}</td>
                         <td>
                             <input 
@@ -111,7 +96,7 @@ export default class ConfigMenu extends HTMLElement {
                         </td>    
                     </tr>
                     <!-- Grid -->
-                    <tr>
+                    <tr data-config="grid">
                         <td>${t('ui.config.grid')}</td>
                         <td class="flex evenly">
                             <label for="grid">
@@ -137,7 +122,7 @@ export default class ConfigMenu extends HTMLElement {
                     </tr>
 
                     <!-- Character image filter -->
-                    <tr>
+                    <tr data-config="filter">
                         <td>${t('ui.config.filter')}</td>
 
                         <td class="flex evenly">
@@ -164,7 +149,7 @@ export default class ConfigMenu extends HTMLElement {
                     </tr> 
                     
                     <!-- Language selector -->
-                    <tr>
+                    <tr data-config="language">
                         <td>
                             ${t('ui.config.language')}
                         </td>
@@ -193,6 +178,17 @@ export default class ConfigMenu extends HTMLElement {
                 </tbody>
             </table>
         `
+        
+        this.list = this.children[2].querySelectorAll("input")
+        this.rows = this.children[2].querySelectorAll("tr")
+        // Close button click event
+        game.actionCancelSound.bindTarget(this.children[1])
+        this.children[1].addEventListener('click', () => {
+            this.setAttribute("show", false)
+            game.option = ''
+            resizeHiddenElement(this.style, 0, 0, 0)
+        })
+        this.setConfigOption()
     }
 
     setConfigOption(){
@@ -247,6 +243,25 @@ export default class ConfigMenu extends HTMLElement {
                 break;
             }
         }
+    }
+
+    changeLanguage(){
+        this.rows.forEach(tr => {
+            tr.children[0].innerText = t(`ui.config.${tr.dataset.config}`)
+        })
+
+        const gridLabel = this.rows[2].children[1].querySelectorAll('label')
+        const filterLabel = this.rows[3].children[1].querySelectorAll('label')
+        const languageInput = this.rows[4].children[1].querySelectorAll('input')
+
+        gridLabel[0].innerText = t('ui.config.on')
+        gridLabel[1].innerText = t('ui.config.off')
+        filterLabel[0].innerText = t('ui.config.default')
+        filterLabel[1].innerText = t('ui.config.retro')
+
+        languageInput.forEach(l => {
+            l.checked = l.value === i18n.language
+        })
     }
 }
 
