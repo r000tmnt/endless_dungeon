@@ -13,6 +13,8 @@ export default class ConfigMenu extends HTMLElement {
 
     connectedCallback() {
         this.innerHTML = this.render()
+        this.setAttribute("id", "config-menu")
+        this.className = "menu absolute invisible border-box text-white bg-black"
         this.list = this.children[2].querySelectorAll("input")
         // Close button click event
         game.actionCancelSound.bindTarget(this.children[1])
