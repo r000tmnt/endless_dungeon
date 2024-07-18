@@ -1,22 +1,20 @@
 import game from "../game"
 import setting from "../utils/setting"
+import { executeOption } from '../utils/ui'
+import { t } from '../utils/i18n'
 
 export default class OptionMenu extends HTMLElement {
     static observedAttributes = ["show"]
 
     constructor(){
         super()
+        this.options = null
     }
 
     connectedCallback(){
-        this.innerHTML = this.render()
-
-        const options = this.querySelectorAll('li')
-
-        options.forEach(option => {
-            game.actionSelectSound.bindTarget(option)
-            option.addEventListener('click', () => this.executeOption(option.dataset.option))
-        })
+        this.render()
+        this.setAttribute("id", "option-menu")
+        this.className = "absolute action_menu_close"
     }
 
     attributeChangedCallback(name, oldValue, newValue){
@@ -25,6 +23,7 @@ export default class OptionMenu extends HTMLElement {
         const show = newValue === 'true'
 
         if(show){
+            this.resize()
             this.classList.add('action_menu_open')
         }else{
             this.classList.remove('action_menu_open')
@@ -32,60 +31,59 @@ export default class OptionMenu extends HTMLElement {
     }
 
     render(){
-        const { fontSize } = setting.general
-        return `
+        const { fontSize_md } = setting.general
+        this.innerHTML =  `
             <ul id="option_list">
                 <li 
                     class="action" 
                     data-option="party"
-                    style="font-size: ${fontSize}px"
-                >Party</li>
+                    style="font-size: ${fontSize_md}px"
+                >
+                    ${t(`ui.option.party`)}
+                </li>
                 <li 
                     class="action" 
                     data-option="objective"
-                    style="font-size: ${fontSize}px"    
-                >Objective</li>
+                    style="font-size: ${fontSize_md}px"    
+                >
+                    ${t(`ui.option.objective`)}
+                </li>
                 <li 
                     class="action" 
                     data-option="config"
-                    style="font-size: ${fontSize}px">Config</li>
+                    style="font-size: ${fontSize_md}px">
+                        ${t(`ui.option.config`)}
+                    </li>
                 <!-- <li class="action" data-option="save">Save</li> -->
                 <li 
                     class="action" 
                     data-option="end"
-                    style="font-size: ${fontSize}px">
-                    End Turn
+                    style="font-size: ${fontSize_md}px">
+                        ${t(`ui.option.end`)}
                 </li>
             </ul>
         `
+
+        this.options = this.querySelectorAll('li')
+
+        this.options.forEach(option => {
+            game.actionSelectSound.bindTarget(option)
+            option.addEventListener('click', () => executeOption(option.dataset.option))
+        })
     }
 
-    executeOption(option){
-        game.option = option
-        switch(option){
-            case 'party':
-                const partyWindow = document.getElementById('party')
-                partyWindow.setAttribute("show", true)
-                partyWindow.setAttribute("member", JSON.stringify(game.player))
-            break;
-            case 'objective':
-                // options[i].addEventListener('click', () => {
-                //     game.option.setObjectiveWindow(objectiveWindow, setting, game.tileMap.objective)
-                // })
-            break;
-            case 'config':
-                const configWindow = document.getElementById('config')
-                configWindow.setAttribute("show", true)
-            break;
-            case 'end':
-                game.player.forEach(p => {
-                    p.totalAttribute.ap = 0
-                    p.wait = true
-                })
-                game.characterAnimationPhaseEnded(game.player[0])
-                this.classList.remove('action_menu_open')
-            break;
-        }
+    resize(fontSize){
+        this.options.forEach(option => {
+            option.style.fontSize = fontSize + 'px'
+        })
+    }
+
+    changeLanguage(){
+        const options = this.querySelectorAll("li")
+
+        options.forEach(o => {
+            o.innerText = t(`ui.option.${o.dataset.option}`)
+        })
     }
 }
 
