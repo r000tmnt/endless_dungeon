@@ -199,7 +199,7 @@ li{
     z-index: 10;
 }
 
-#action_menu, #option_menu{
+#action-menu, #option-menu{
     top: 0;
     width: 30%;
     transition: margin-left .1s ease-in-out;
@@ -247,7 +247,7 @@ li{
     transform: translateY(10%);
 }
 
-#characterCaption{
+#character-caption{
     padding: 5px 5px 0 5px;
     bottom: 0;
     /* width: 80%; */
@@ -496,7 +496,7 @@ li{
     border: 1px solid white;
   }
 
-  #objective > ul > li{
+  #objective-menu > ul > li{
     border: 1px dotted white;
   }
 
