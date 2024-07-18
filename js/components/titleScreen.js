@@ -1,10 +1,10 @@
 import game from "../game";
 import level from "../dataBase/level";
 import setting from "../utils/setting";
-import { resize } from "../utils/ui";
+import { resize, appendCustomElements } from "../utils/ui";
 
 export default class titleScreen extends HTMLElement {
-    static observedAttributes = ["show", "width"]
+    static observedAttributes = ["show"]
 
     constructor(){
         super();
@@ -23,40 +23,27 @@ export default class titleScreen extends HTMLElement {
     attributeChangedCallback(name, oldValue, newValue) {
         console.log(`Attribute ${name} has changed from ${oldValue} to ${newValue}.`);
 
-        switch(name){
-            case 'show':
-                const show = newValue === "true"
-                if(show){
-                    this.classList.remove("invisible")
-                    this.classList.add("open_window")
-    
-                    const tap = this.children[1]
-    
-                    // Display tap to start
-                    this.tapInterval = setInterval(() => {
-                        if(tap.classList.contains('fade_in')){
-                            tap.classList.remove("fade_in")
-                            tap.classList.add("fade_out")
-                        }else{
-                            tap.classList.remove("fade_out")
-                            tap.classList.add("fade_in")
-                        }
-                    }, 1000);
-                }else{
-                    this.classList.remove("open_window")
-                    this.classList.add("invisible")
-                }
-            break;
-            case 'width':
-                const { fontSize, fontSize_md, fontSize_sm } = setting.general
-                const { width, height } = setting.general.camera
+        if(name === "show"){
+            if(newValue === "true"){
+                this.classList.remove("invisible")
+                this.classList.add("open_window")
 
-                this.style.width = width + 'px'
-                this.style.height = height + 'px'
-                this.children[0].style.fontSize = fontSize + 'px'
-                this.children[1].style.fontSize = fontSize_md + 'px'
-                this.children[3].style.fontSize = fontSize_sm + 'px'
-            break;
+                const tap = this.children[1]
+
+                // Display tap to start
+                this.tapInterval = setInterval(() => {
+                    if(tap.classList.contains('fade_in')){
+                        tap.classList.remove("fade_in")
+                        tap.classList.add("fade_out")
+                    }else{
+                        tap.classList.remove("fade_out")
+                        tap.classList.add("fade_in")
+                    }
+                }, 1000);
+            }else{
+                this.classList.remove("open_window")
+                this.classList.add("invisible")
+            }
         }
     }
 
@@ -82,6 +69,17 @@ export default class titleScreen extends HTMLElement {
         `
     }
 
+    resize(){
+        const { fontSize, fontSize_md, fontSize_sm } = setting.general
+        const { width, height } = setting.general.camera
+
+        this.style.width = width + 'px'
+        this.style.height = height + 'px'
+        this.children[0].style.fontSize = fontSize + 'px'
+        this.children[1].style.fontSize = fontSize_md + 'px'
+        this.children[3].style.fontSize = fontSize_sm + 'px'
+    }
+
     start(){
         if(this.classList.contains('open_window')){
             clearInterval(this.tapInterval)
@@ -91,9 +89,15 @@ export default class titleScreen extends HTMLElement {
             this.setAttribute("show", false)
             
             setTimeout(async() => {
-                await level.load('tutorial_1').then(() => {
+                await level.load('tutorial_1').then(async() => {
                     game.level = JSON.parse(JSON.stringify(level.getOne('tutorial_1')));
                     setting.currentLevel = "tutorial_1"
+
+                    if(document.getElementById("action-menu") === null){
+                        // Append custom elements
+                        await appendCustomElements()
+                    }
+
                     game.beginNextPhase()                          
                 })
             }, 500)            
