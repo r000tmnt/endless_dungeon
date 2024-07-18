@@ -115,7 +115,7 @@ li{
     border: 1px solid;
     padding: 1px 2px;
     margin:  3px 0;
-    padding: 5px
+    padding: 5px;
 }
 
 .place-center{
@@ -203,6 +203,7 @@ li{
     top: 0;
     width: 30%;
     transition: margin-left .1s ease-in-out;
+    white-space: nowrap;
 }
 
 #dialogue{
