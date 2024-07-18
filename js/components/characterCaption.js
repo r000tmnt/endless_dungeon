@@ -1,7 +1,7 @@
 import setting from "../utils/setting";
 
 export default class CharacterCaption extends HTMLElement {
-    static observedAttributes = ["character"];
+    static observedAttributes = ["character", "show"];
 
     constructor(){
         super()
@@ -9,39 +9,52 @@ export default class CharacterCaption extends HTMLElement {
 
     connectedCallback(){
         this.innerHTML = this.render()
+        this.setAttribute("id", "character-caption")
+        this.className = "absolute invisible bg-white"
     }
 
     attributeChangedCallback(name, oldValue, newValue){
         console.log(`Attribute ${name} has changed from ${oldValue} to ${newValue}.`);
 
-        if(newValue){
-            const { tileSize} = setting.general   
-            const { width } = setting.general.camera  
-            // Rerender the element 
-            this.innerHTML = this.render(newValue)
-            this.style.width = Math.floor(50 * (width / 100)) + 'px'
-
-            const x = parseInt(newValue.x / tileSize)
-            const y = parseInt(newValue.y / tileSize)
-
-            // Shift UI position based on the character position
-            if(y > 7 && x < Math.floor(9/2)){
-                this.style.left = ((tileSize * 9) - this.clientWidth) + 'px'
-            }else{
-                this.style.left = 'unset'
+        if(name === "character"){
+            if(newValue){
+                const { tileSize} = setting.general   
+                const { width } = setting.general.camera  
+                // Rerender the element 
+                this.innerHTML = this.render(newValue)
+    
+                const x = parseInt(newValue.x / tileSize)
+                const y = parseInt(newValue.y / tileSize)
+    
+                // Shift UI position based on the character position
+                if(y > 7 && x < Math.floor(9/2)){
+                    this.style.left = ((tileSize * 9) - this.clientWidth) + 'px'
+                }else{
+                    this.style.left = 'unset'
+                }
+    
+                // Shift UI position based on the character position
+                if(y < 7 && x < Math.floor(9/2)){
+                    document.getElementById("action-menu").style.left = (tileSize * 6) + 'px'
+                }else{
+                    document.getElementById("action-menu").style.left = 'unset'
+                }  
             }
+        }
 
-            // Shift UI position based on the character position
-            if(y < 7 && x < Math.floor(9/2)){
-                document.getElementById("action_menu").style.left = (tileSize * 6) + 'px'
+        if(name === "show"){
+            if(newValue === "true"){
+                this.classList.remove("invisible")
             }else{
-                document.getElementById("action_menu").style.left = 'unset'
-            }  
+                this.classList.add("invisible")
+            }
         }
     }
 
     render(character=null) {
-        const { fontSize_sm } = setting.general 
+        const { fontSize, fontSize_sm } = setting.general 
+
+        this.style.width = Math.floor(50 * (setting.general.camera.width / 100)) + 'px'
 
         if(character !== null){
             character = JSON.parse(character)
@@ -49,12 +62,14 @@ export default class CharacterCaption extends HTMLElement {
 
         return `
             <div class="caption_top flex">
-                <h5 id="name">${character?.name}</h5>
-                <span class="flex">
-                    <span id="lv">LV ${character?.lv}</span>
+                <h5 id="name" style="font-size:${fontSize}px">
+                    ${character?.name}
+                </h5>
+                <span class="flex" style="align-item:center">
+                    <span id="lv" style="font-size:${fontSize_sm}px">LV ${character?.lv}</span>
                     <span class="hint" style="display:${character?.pt > 0? 'block' : 'none'};font-size:${fontSize_sm}px">&#11205;</span>
                 </span>
-                <span id="ap">${character?.totalAttribute?.ap}</span>
+                <span id="ap" style="font-size:${fontSize_sm}px">AP ${character?.totalAttribute?.ap}</span>
             </div>
             
             <ul>
@@ -82,6 +97,10 @@ export default class CharacterCaption extends HTMLElement {
         }
 
         return percentage
+    }
+
+    resize(character=null){
+        this.innerHTML = this.render(character)
     }
 }
 
