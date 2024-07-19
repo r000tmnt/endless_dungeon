@@ -7,6 +7,8 @@ export default class StatusMenu extends HTMLElement {
 
     constructor(){
         super()
+        this.info = null
+        this.avatar = null
         this.tableNode = null
         this.statusToggle = null
     }
@@ -211,6 +213,8 @@ export default class StatusMenu extends HTMLElement {
             </table>
         `
 
+        this.info = document.getElementById("info")
+        this.avatar = document.getElementById("avatar")
         this.tableNode = this.children[3].querySelectorAll('.status-node')
         this.statusToggle = this.children[3].querySelectorAll('.attribute-toggle')
 
@@ -280,6 +284,19 @@ export default class StatusMenu extends HTMLElement {
     }
 
     resize(){
-        
+        const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
+        const { width } = camera
+        this.style.fontSize = fontSize + 'px'
+        this.children[3].style.fontSize = fontSize_md + 'px'
+       this.info.style.fontSize = fontSize_md + 'px' 
+       this.avatar.style.width = Math.floor(width * 0.3) + 'px';
+       this.avatar.style.height = Math.floor(width * 0.3) + 'px';
+
+       for(let i=0; i < this.statusToggle.length; i++){
+            this.statusToggle[i].children[0].style.margin = `0 ${fontSize_sm}px`
+            this.statusToggle[i].children[0].style.padding = `0 ${fontSize_sm / 2}px`
+            this.statusToggle[i].children[1].style.margin = `0 ${fontSize_sm}px`
+            this.statusToggle[i].children[1].style.padding = `0 ${fontSize_sm / 2}px`
+        }
     }
 }
