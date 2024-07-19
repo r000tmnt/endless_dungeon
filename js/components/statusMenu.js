@@ -14,13 +14,13 @@ export default class StatusMenu extends HTMLElement {
     }
 
     connectedCallback() {
-        this.render()
         this.setAttribute("id", "status-menu")
         this.className = "menu absolute invisible border-box text-white bg-black"
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
         if(newValue === 'true'){
+            this.render()
             this.classList.remove('invisible')
             this.classList.add('open_window')
         }else{
@@ -42,7 +42,7 @@ export default class StatusMenu extends HTMLElement {
                     src="" 
                     alt="avatar"
                     style="width:${Math.floor(width * 0.3)}px;height:${Math.floor(width * 0.3)}px">
-                <div id="info" style="${fontSize_md}px">
+                <div id="info" style="font-size:${fontSize_md}px">
                     <p>
                         ${game.inspectingCharacter.name}
                     </p>
@@ -52,7 +52,10 @@ export default class StatusMenu extends HTMLElement {
                 </div>
             </div>
 
-            <button class="back absolute" data-action="status" type="button">BACK</button>
+            <button class="back absolute" data-action="status" type="button"
+            style="transform: translateX(-${fontSize_sm}px);top: ${fontSize_sm}px;font-size: ${fontSize_md}px">
+                ${t('back')}
+            </button>
 
             <div class="flex" style="justify-content: space-between">
                 <p>Lv ${game.inspectingCharacter.lv}</p>
@@ -62,14 +65,15 @@ export default class StatusMenu extends HTMLElement {
             <!-- Seperator -->
             <table 
                 id="attributes" 
-                class="w-fu>
+                class="w-full"
+                style="font-size:${fontSize_md}px">
                 <tbody>
                     <tr>
                         <td>HP :</td>
                         <td class="status-node" data-attribute="hp">
                             ${game.inspectingCharacter.totalAttribute.hp}/${game.inspectingCharacter.totalAttribute.maxHp}
                         </td>
-                        <td 
+                        <td
                             class="invisible flex attribute-toggle text-white" 
                             data-attribute="maxHp">
                             <span 
@@ -97,8 +101,8 @@ export default class StatusMenu extends HTMLElement {
                         <td class="status-node" data-attribute="str">
                           ${game.inspectingCharacter.totalAttribute.str}
                         </td>
-                        <td c
-                            lass="invisible flex attribute-toggle text-white" 
+                        <td 
+                            class="invisible flex attribute-toggle text-white" 
                             data-attribute="str">
                             <span 
                                 class="button_disable"
@@ -218,6 +222,12 @@ export default class StatusMenu extends HTMLElement {
         this.tableNode = this.children[3].querySelectorAll('.status-node')
         this.statusToggle = this.children[3].querySelectorAll('.attribute-toggle')
 
+        // Close button click event
+        game.actionCancelSound.bindTarget(this.children[1])
+        this.children[1].addEventListener("click", () => {
+            this.setAttribute("show", false)
+        })
+
         // Status toggle click event
         for(let i=0; i < this.statusToggle.length; i++){
             this.statusToggle[i].children[0].addEventListener('click', () => {
@@ -300,3 +310,5 @@ export default class StatusMenu extends HTMLElement {
         }
     }
 }
+
+customElements.define("status-menu", StatusMenu)
