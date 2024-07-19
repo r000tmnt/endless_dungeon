@@ -338,7 +338,7 @@ li{
     z-index: 15;
 }
 
-#status > .status_header > img{
+#status-menu > .status_header > img{
     border: 1px solid red;
     margin-right: 5%;
 }
