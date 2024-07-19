@@ -720,10 +720,10 @@ export const executeAction = async(action) => {
             preparePickUpWindow()
         break;
         case 'status':{
-            const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
+            const { fontSize_sm, camera } = setting.general
             const { width, height } = camera
             resizeHiddenElement(statusMenu.style, width, height, fontSize_sm)
-            game.action.setStatusMenu(game.inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
+            statusMenu.setAttribute("show", true)
         }
         break;
         case 'stay':
