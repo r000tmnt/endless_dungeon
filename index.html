@@ -12,6 +12,7 @@
     <script src="js/components/partyMenu.js" type="module"></script>
     <script src="js/components/configMenu.js" type="module"></script>
     <script src="js/components/objectiveMenu.js" type="module"></script>
+    <script src="js/components/statusMenu.js" type="module"></script>
     <title>Document</title>
 </head>
 <body class="flex relative">
@@ -35,116 +36,6 @@
         <!-- Skill name place holder -->
         <div id="skillName" class="absolute text-center w-full">
             <p class="invisible text-white bg-black"></p>
-        </div>
-
-        <!-- Character status -->
-        <div id="status" class="menu absolute invisible border-box text-white bg-black">
-            <div class="status_header flex">
-                <img id="avatar" src="" alt="avatar">
-                <div id="info">
-                    <p>NAME</p>
-                    <p>JOB</p>
-                </div>
-            </div>
-
-            <button class="back absolute" data-action="status" type="button">BACK</button>
-
-            <div class="flex" style="justify-content: space-between">
-                <p>LV</p>
-                <p><!-- Points --></p>
-            </div>
-            
-            <!-- Seperator -->
-            <table id="attributes" class="w-full">
-                <tbody>
-                    <tr>
-                        <td>HP :</td>
-                        <td class="status-node" data-attribute="hp"></td>
-                        <td class="invisible flex attribute-toggle text-white" data-attribute="maxHp">
-                            <span>-</span>
-                            <span>+</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>MP :</td>
-                        <td class="status-node" data-attribute="mp"></td>
-                        <td class="invisible flex attribute-toggle text-white" data-attribute="maxMp">
-                            <span>-</span>
-                            <span>+</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>STR :</td>
-                        <td class="status-node" data-attribute="str"></td>
-                        <td class="invisible flex attribute-toggle text-white" data-attribute="str">
-                            <span>-</span>
-                            <span>+</span>
-                        </td>
-                    </tr>   
-                    <tr>
-                        <td>DEF :</td>
-                        <td class="status-node" data-attribute="def"></td>
-                        <td class="invisible flex attribute-toggle text-white" data-attribute="def">
-                            <span>-</span>
-                            <span>+</span>
-                        </td>                        
-                    </tr>
-                    <tr>
-                        <td>INT :</td>
-                        <td class="status-node" data-attribute="int"></td>                        
-                        <td class="invisible flex attribute-toggle text-white" data-attribute="int">
-                            <span>-</span>
-                            <span>+</span>
-                        </td> 
-                    </tr>           
-                    <tr>
-                        <td>SPD :</td>
-                        <td class="status-node" data-attribute="spd"></td>      
-                        <td class="invisible flex attribute-toggle text-white" data-attribute="spd">
-                            <span>-</span>
-                            <span>+</span>
-                        </td>                   
-                    </tr>
-                    <tr>
-                        <td>LUCK :</td>
-                        <td class="status-node" data-attribute="lck"></td></td>
-                        <td class="invisible flex attribute-toggle text-white" data-attribute="lck">
-                            <span>-</span>
-                            <span>+</span>
-                        </td>  
-                    </tr>     
-                    <tr>
-                        <!-- Spirit as magic defense-->
-                        <td>SPI :</td>
-                        <td class="status-node" data-attribute="spi"></td>
-                        <td class="invisible flex attribute-toggle text-white" data-attribute="spi">
-                            <span>-</span>
-                            <span>+</span>
-                        </td> 
-                    </tr>       
-                    <tr>
-                        <td>AP :</td>
-                        <td class="status-node" data-attribute="ap"></td>                        
-                    </tr>        
-                    <tr>
-                        <!-- VIEW as sight -->
-                        <td>VIEW :</td>
-                        <td class="status-node"  data-attribute="sight"></td></td>                        
-                    </tr>
-                    <tr>
-                        <td>MOVE :</td>
-                        <td class="status-node"  data-attribute="moveSpeed"></td>
-                    </tr>
-                    <tr>
-                        <td>STAT :</td>
-                        <td class="status-node"  data-attribute="status"></td>                        
-                    </tr>                    
-                    <tr>
-                        <td>EXP :</td>
-                        <td class="status-node" data-attribute="exp"></td></td>
-                    </tr>                    
-                </tbody>
-            </table>
         </div>
 
         <!-- Skill window -->
