@@ -220,7 +220,7 @@ export default class StatusMenu extends HTMLElement {
                 this.decreaseAttribute(this.statusToggle[i].dataset.attribute)
             })
             this.statusToggle[i].children[1].addEventListener('click', () => {
-                this.increaseAttribute(this.statusToggle[i].dataset.attribute)
+                this.increaseAttribute(this.statusToggle[i].dataset.attribute, i)
             })
         }
     }
@@ -243,14 +243,15 @@ export default class StatusMenu extends HTMLElement {
         }
     }
 
-    increaseAttribute(attr){
+    increaseAttribute(attr, index){
         game.inspectingCharacter.totalAttribute[attr] += 1
         game.inspectingCharacter.base_attribute[attr] += 1
         game.inspectingCharacter.pt -= 1
         this.children[2].children[0].innerText = `Pt ${game.inspectingCharacter.pt}`
         this.alterStatusList(game.inspectingCharacter, attr)
 
-        this.children[3].querySelector(`[data-attribute='${attr}']`).children[0].classList.add("button_disable")
+        // Unlock the minus button on the row
+        this.statusToggle[index].children[0].classList.remove("button_disable")
 
         if(game.inspectingCharacter.pt === 0){
             this.statusToggle.forEach(t => t.children[1].classList.add('button_disable'))
