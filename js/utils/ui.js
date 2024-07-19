@@ -44,8 +44,7 @@ let optionMenu = null;
 let characterCaption = null;
 
 // Status UI
-const statusWindow = document.getElementById('status')
-const avatar = document.getElementById('avatar')
+let statusMenu = document.getElementById('status')
 
 const backBtn = document.getElementsByClassName('back')
 
@@ -195,9 +194,9 @@ export const uiInit = (game) => {
                 backBtn[i].addEventListener('click', async() => {
                     game.action.mode = ''
                     // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
-                    statusWindow.classList.add('invisible')
-                    statusWindow.classList.remove('open_window')
-                    game.action.resetStatusWindow(statusWindow.style)
+                    statusMenu.classList.add('invisible')
+                    statusMenu.classList.remove('open_window')
+                    game.action.resetStatusMenu(statusMenu.style)
 
                     if(game?.inspectingCharacter?.id){
                         prepareCharacterCaption(game.inspectingCharacter) 
@@ -666,6 +665,7 @@ export const appendCustomElements = async() => {
         document.createElement("objective-menu"),
         document.createElement("option-menu"),
         document.createElement("party-menu"),
+        document.createElement("status-menu"),
         // And more...
     ]
 
@@ -680,6 +680,7 @@ export const appendCustomElements = async() => {
     objectiveMenu = document.getElementById("objective-menu")
     optionMenu = document.getElementById("option-menu")
     partyMenu = document.getElementById("party-menu")
+    statusMenu = document.getElementById("status-menu")
 }
 
 // action menu child click event
@@ -721,8 +722,8 @@ export const executeAction = async(action) => {
         case 'status':{
             const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
             const { width, height } = camera
-            resizeHiddenElement(statusWindow.style, width, height, fontSize_sm)
-            game.action.setStatusWindow(game.inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
+            resizeHiddenElement(statusMenu.style, width, height, fontSize_sm)
+            game.action.setStatusMenu(game.inspectingCharacter, fontSize, fontSize_md, fontSize_sm, width)
         }
         break;
         case 'stay':
@@ -826,10 +827,8 @@ export const resize = () => {
                     break;
                     case 'status':
                         // Set status window style
-                        resizeHiddenElement(statusWindow.style, cameraWidth, cameraHeight, fontSize_sm)
-                        avatar.style.width = Math.floor(cameraWidth * 0.3) + 'px';
-                        avatar.style.height = Math.floor(cameraWidth * 0.3) + 'px';
-                        action.resizeStatusWindow()
+                        resizeHiddenElement(statusMenu.style, cameraWidth, cameraHeight, fontSize_sm)
+                        statusMenu.resize()
                     break;
                     case 'pick':
                         // Set pick up window style
