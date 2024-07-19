@@ -156,26 +156,6 @@ export default class Action{
         skillWindow.classList.add('open_window')
     }
 
-    resizeStatusWindow(){
-        const statusWindow = document.getElementById('status')
-        const statusInfo = document.getElementById('info')
-        const statusTable = statusWindow.children[3]
-        const { fontSize, fontSize_md, fontSize_sm } = setting.general
-        const statusToggle = document.querySelectorAll('.attribute-toggle')
-
-        statusWindow.style.fontSize = fontSize + 'px'
-        statusTable.style.fontSize = fontSize_md + 'px'
-        // statusTable.style.maxHeight = (statusTable.clientHeight - (height - statusTable.clientHeight)) + 'px'
-        statusInfo.style.fontSize = fontSize_md + 'px' 
-        
-        for(let i=0; i < statusToggle.length; i++){
-            statusToggle[i].children[0].style.margin = `0 ${fontSize_sm}px`
-            statusToggle[i].children[0].style.padding = `0 ${fontSize_sm / 2}px`
-            statusToggle[i].children[1].style.margin = `0 ${fontSize_sm}px`
-            statusToggle[i].children[1].style.padding = `0 ${fontSize_sm / 2}px`
-        }
-    }
-
     resetStatusWindow(target){
         const statusToggle = document.querySelectorAll('.attribute-toggle')
         statusToggle.forEach(t => t.classList.add('invisible'))
