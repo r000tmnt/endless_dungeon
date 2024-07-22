@@ -53,7 +53,7 @@ const Inventory = document.getElementById('item')
 const pickUpWindow = document.getElementById('pickUp')
 
 // Skill UI
-const skillWindow = document.getElementById('skill')
+let skillMenu = null;
 
 // Party UI
 let partyMenu = null;
@@ -175,35 +175,6 @@ export const uiInit = (game) => {
     // Back button click event
     for(let i=0; i < backBtn.length; i++){
         switch(backBtn[i].dataset.action){
-            case 'skill':
-                game.actionCancelSound.bindTarget(backBtn[i])
-                backBtn[i].addEventListener('click', async() => {
-                    game.action.mode = ''
-                    // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
-                    skillWindow.classList.add('invisible')
-                    skillWindow.classList.remove('open_window')
-                    game.action.clearSkillWindow(skillWindow.style)
-                    // if(game.inspectingCharacter){
-                    //     prepareCharacterCaption(game.inspectingCharacter) 
-                    //  }
-                    displayUIElement()
-                })
-            break;
-            case 'status':
-                game.actionCancelSound.bindTarget(backBtn[i])
-                backBtn[i].addEventListener('click', async() => {
-                    game.action.mode = ''
-                    // await checkIfStepOnTheEvent(game.inspectingCharacter.x, game.inspectingCharacter.y)
-                    statusMenu.classList.add('invisible')
-                    statusMenu.classList.remove('open_window')
-                    game.action.resetStatusMenu(statusMenu.style)
-
-                    if(game?.inspectingCharacter?.id){
-                        prepareCharacterCaption(game.inspectingCharacter) 
-                        displayUIElement()                    
-                    }
-                })
-            break;
             case 'item':
                 game.actionCancelSound.bindTarget(backBtn[i])
                 backBtn[i].addEventListener('click', async() => {
@@ -666,6 +637,7 @@ export const appendCustomElements = async() => {
         document.createElement("option-menu"),
         document.createElement("party-menu"),
         document.createElement("status-menu"),
+        document.createElement("skill-menu"),
         // And more...
     ]
 
@@ -681,6 +653,7 @@ export const appendCustomElements = async() => {
     optionMenu = document.getElementById("option-menu")
     partyMenu = document.getElementById("party-menu")
     statusMenu = document.getElementById("status-menu")
+    skillMenu = document.getElementById("skill-menu")
 }
 
 // action menu child click event
@@ -707,10 +680,7 @@ export const executeAction = async(action) => {
             await game.action.setAttack(game.tileMap, game.inspectingCharacter, position, 1)
         break;   
         case "skill":{
-            const { fontSize, fontSize_md, fontSize_sm, camera } = setting.general
-            const { width, height } = camera
-            resizeHiddenElement(skillWindow.style, width, height, fontSize_sm)
-            game.action.setSKillWindow(game.inspectingCharacter, game.tileMap, position, fontSize, fontSize_md, fontSize_sm)
+            skillMenu.setAttribute("show", true)
         }
         break;
         case 'item':
@@ -837,8 +807,8 @@ export const resize = () => {
                     break;
                     case 'skill':
                         // Set skill window style
-                        resizeHiddenElement(skillWindow.style, cameraWidth, cameraHeight, fontSize_sm)
-                        action.resizeSkillWindow(fontSize, fontSize_md, fontSize_sm, tileSize)
+                        resizeHiddenElement(skillMenu.style, cameraWidth, cameraHeight, fontSize_sm)
+                        action.resizeSkillMenu(fontSize, fontSize_md, fontSize_sm, tileSize)
                     break;
                 }
 
