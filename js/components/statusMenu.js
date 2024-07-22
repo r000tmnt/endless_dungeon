@@ -1,6 +1,7 @@
 import setting from "../utils/setting"
 import game from "../game"
 import { t } from '../utils/i18n'
+import { prepareCharacterCaption, displayUIElement } from "../utils/ui"
 
 export default class StatusMenu extends HTMLElement {
     static observedAttributes = ["show"]
@@ -225,7 +226,13 @@ export default class StatusMenu extends HTMLElement {
         // Close button click event
         game.actionCancelSound.bindTarget(this.children[1])
         this.children[1].addEventListener("click", () => {
+            game.action.mode = ''
             this.setAttribute("show", false)
+
+            if(game?.inspectingCharacter?.id){
+                prepareCharacterCaption(game.inspectingCharacter) 
+                displayUIElement()                    
+            }
         })
 
         // Status toggle click event
