@@ -31,7 +31,7 @@ export default class SkillMenu extends HTMLElement {
 
                 return `
                     <li class="skill flex bg-black"
-                        style="font-size:${fontSize_md}px; box-sizing:border-box; padding:${fontSize_sm}px;${this.ifSkillAvailable(skillData)? 'color:grey' : '' }"
+                        style="font-size:${fontSize_md}px; box-sizing:border-box; padding:${fontSize_sm}px;${this.ifSkillAvailable(skillData)? '' : 'color:grey' }"
                         data-skill="${JSON.stringify(skillData)}">
                         <img src="" alt="icon"
                             class="icon"
@@ -110,12 +110,24 @@ export default class SkillMenu extends HTMLElement {
     }
 
     ifSkillAvailable(skillData){
-        if(game.inspectingCharacter.totalAttribute[skillData.cost.attribute] >= skillData.cost.value && game.inspectingCharacter.equip.hand?.id.includes(skill_type[skillData.type]) ||
-        skill_type[skillData.type] === 'none' || skill_type[skillData.type] === 'status'){
-            return true
+        console.log("check :>>>", skill_type[skillData.type])
+
+        let result = false
+
+        if(game.inspectingCharacter.totalAttribute[skillData.cost.attribute] >= skillData.cost.value){
+            if(skill_type[skillData.type].category === 'none' || skill_type[skillData.type].category === 'status'){
+                result = true
+            }else
+            if(game.inspectingCharacter.equip.hand?.id.includes(skill_type[skillData.type].category)){
+                result = true
+            }else{
+                result = false
+            }
         }else{
-            return false
+            result = false
         }
+
+        return result
     }
 
     resize(){
